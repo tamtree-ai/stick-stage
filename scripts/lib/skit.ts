@@ -8,8 +8,8 @@ import { ROOT } from "./tools";
 export const skitDir = (id: string) => path.join(ROOT, "public/skits", id);
 export const isSkit = (id: string) => fs.existsSync(path.join(skitDir(id), "skit.json"));
 
-/** Compile, printing diagnostics. Exits the process on errors. */
-export const compileSkitDir = (id: string): CompileResult => {
+/** Compile, printing diagnostics. Exits the process on errors (or rethrows, with `exitOnError: false`). */
+export const compileSkitDir = (id: string, { exitOnError = true } = {}): CompileResult => {
   const dir = skitDir(id);
   const skit = JSON.parse(fs.readFileSync(path.join(dir, "skit.json"), "utf8"));
   const voicePath = path.join(dir, "generated/voice.prepared.json");
@@ -21,7 +21,7 @@ export const compileSkitDir = (id: string): CompileResult => {
     fs.writeFileSync(path.join(dir, "generated/timeline.json"), JSON.stringify(r.program));
     return r;
   } catch (e) {
-    if (!(e instanceof SkitError)) throw e;
+    if (!(e instanceof SkitError) || !exitOnError) throw e;
     console.error(`${path.relative(ROOT, path.join(dir, "skit.json"))}: ${formatDiagnostics(e.diagnostics)}`);
     process.exit(1);
   }
