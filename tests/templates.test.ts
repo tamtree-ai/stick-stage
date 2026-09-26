@@ -26,6 +26,15 @@ describe("templates", () => {
       expect(report.findings.filter((f) => f.level === "error")).toEqual([]);
     });
 
+  for (const set of Object.keys(sets))
+    it(`exchange in ${set}: stages, compiles and passes the self-check`, () => {
+      const skit = fromPremise({ ...premise("exchange"), set }, library, sets);
+      const lines = skitLines(parseSkit(skit)).map((l) => ({ id: l.id, text: l.text, durationMs: 400 + l.text.split(/\s+/).length * 330 }));
+      const result = compileSkit({ skit, voice: fakeVoice(lines), lib: library, sets, sfx: sfxLibrary, reactions });
+      expect(skit.set).toBe(set);
+      expect(checkSkit({ result, lib: library, sets, safeArea }).findings.filter((f) => f.level === "error")).toEqual([]);
+    });
+
   it("exchange: roles drive expression, gestures and the punchline pause + slam", () => {
     const skit = fromPremise(premise("exchange"), library, sets);
     const [a, , c, d] = skit.beats!;

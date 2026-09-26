@@ -47,6 +47,16 @@ import lounge1 from "./sets/lounge-1.json";
 import office1 from "./sets/office-1.json";
 import park1 from "./sets/park-1.json";
 import street1 from "./sets/street-1.json";
+import kitchen1 from "./sets/kitchen-1.json";
+import bedroom1 from "./sets/bedroom-1.json";
+import cafe1 from "./sets/cafe-1.json";
+import classroom1 from "./sets/classroom-1.json";
+import meeting1 from "./sets/meeting-1.json";
+import living2 from "./sets/living-2.json";
+import park2 from "./sets/park-2.json";
+import streetNight1 from "./sets/street-night-1.json";
+import beach1 from "./sets/beach-1.json";
+import stage1 from "./sets/stage-1.json";
 
 import safeAreaJson from "./safe-area.json";
 import safeAreaProfilesJson from "./safe-area-profiles.json";
@@ -67,7 +77,7 @@ export const library: Library = createLibrary({
   props: [phone, mic, cup, laptop, sign],
 });
 
-export const sets: Record<string, SetDef> = createSets([plain1, living1, lounge1, office1, park1, street1]);
+export const sets: Record<string, SetDef> = createSets([plain1, living1, lounge1, office1, park1, street1, kitchen1, bedroom1, cafe1, classroom1, meeting1, living2, park2, streetNight1, beach1, stage1]);
 
 /** One conservative profile for TikTok / Reels / Shorts overlays (verify against real screenshots in M4). */
 export const safeArea: SafeArea = SafeAreaSchema.parse(migrate("safeArea", safeAreaJson).doc);

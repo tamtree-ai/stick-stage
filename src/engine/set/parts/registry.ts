@@ -5,9 +5,11 @@ import { Cabinet, Clock, Desk, Door, OfficeChair, Whiteboard } from "./office";
 import { Bench, Couch } from "./furniture";
 import { Bush, Grass, Hills, Sky, StreetLamp, Tree } from "./outdoor";
 import { Buildings, Hydrant, Shopfront, Sidewalk } from "./street";
+import { Bed, Counter, FloorLamp, Fridge, Tv } from "./home";
+import { Board, Curtain, Sand, Sea, Umbrella } from "./venue";
 import type { PartComponent } from "./types";
 
-export const KITS = ["plain", "interior", "office", "park", "street"] as const;
+export const KITS = ["plain", "interior", "office", "park", "street", "beach"] as const;
 export type Kit = (typeof KITS)[number];
 
 export type PartInfo = {
@@ -46,6 +48,16 @@ export const PART_INFO: Record<string, PartInfo> = {
   sidewalk: { draw: Sidewalk, kits: ["street"], backdrop: true },
   shopfront: { draw: Shopfront, kits: ["street"] },
   hydrant: { draw: Hydrant, kits: ["street"] },
+  curtain: { draw: Curtain, kits: ["plain"], backdrop: true },
+  counter: { draw: Counter, kits: ["interior"] },
+  fridge: { draw: Fridge, kits: ["interior"] },
+  bed: { draw: Bed, kits: ["interior"] },
+  tv: { draw: Tv, kits: ["interior"] },
+  "floor-lamp": { draw: FloorLamp, kits: ["interior"] },
+  board: { draw: Board, kits: ["office", "interior"] },
+  sea: { draw: Sea, kits: ["beach"], backdrop: true },
+  sand: { draw: Sand, kits: ["beach"], backdrop: true },
+  umbrella: { draw: Umbrella, kits: ["beach"] },
 };
 
 export const PARTS: Record<string, PartComponent> = Object.fromEntries(Object.entries(PART_INFO).map(([id, p]) => [id, p.draw]));
@@ -57,6 +69,7 @@ export const KIT_BACKDROP: Record<Kit, SetDef["layers"]> = {
   office: [part("wall", { pattern: "stripes" }), part("floor")],
   park: [part("sky"), part("hills"), part("grass")],
   street: [part("sky"), part("buildings"), part("sidewalk")],
+  beach: [part("sky"), part("sea"), part("sand")],
 };
 
 function part(id: string, extra: Partial<SetDef["layers"][number]> = {}): SetDef["layers"][number] {

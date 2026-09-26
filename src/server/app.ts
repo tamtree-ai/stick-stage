@@ -3,6 +3,7 @@
  * that isn't listening yet; `scripts/serve.ts` reads the environment and starts it.
  *
  *   GET    /healthz                  liveness + tools (no auth)
+ *   GET    /sets                     set catalog (id, description, tags, seated marks) for premise writers
  *   POST   /validate                 { premise } | { skit } → skit + lines to voice + verdict
  *   POST   /render                   multipart skit + voice + audio files → 202 job
  *   GET    /jobs/:id                 job status
@@ -11,6 +12,7 @@
  */
 import http from "node:http";
 import path from "node:path";
+import { setCatalog } from "../engine/core";
 import type { Project } from "../node";
 import { requireBearer } from "./auth";
 import { HttpError, readForm, readJson, router, type Ctx } from "./http";
@@ -50,6 +52,8 @@ export const createService = (o: ServiceOptions) => {
   };
 
   r.get("/healthz", () => ({ json: { ok: true, queue: o.queue.depth(), ...o.health?.() } }));
+
+  r.get("/sets", () => ({ json: { sets: setCatalog(o.project.sets) } }));
 
   r.post("/validate", async ({ req }) => ({ json: validate(o.project, await readJson(req, jsonLimit)) }));
 

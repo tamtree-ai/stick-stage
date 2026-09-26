@@ -103,6 +103,21 @@ Downloads an output by its key (`mp4`, `srt`, `txt`, `manifest`, `sheet`).
 
 Cancels a queued or running job and removes its media. Returns the job.
 
+## `GET /sets`
+
+The set catalog, for whoever writes the premise (a person or the script LLM). Put it in the
+prompt and have the premise set `"set"`; without one, every premise of a template gets the
+same default set.
+
+```json
+{ "sets": [ { "id": "cafe-1", "kit": "interior",
+              "description": "A coffee shop: menu chalkboard, espresso counter, pastry case. Standing.",
+              "tags": ["cafe", "coffee", "barista", "ordering", "date"], "seated": [] } ] }
+```
+
+`seated` lists the marks where a cast member starts sitting (premise staging seats them). An
+unknown set id in a premise is a `422` whose diagnostic lists the known ids.
+
 ## `GET /healthz` (no auth)
 
 `{ ok, queue, bundle: "building" | "ready" | "failed", lipSync: "rhubarb" | "estimated", auth }`

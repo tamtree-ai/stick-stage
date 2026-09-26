@@ -82,6 +82,46 @@ export const PALETTES: Record<string, Palette> = {
     sky: "#d2e6f3",
     detail: "#95a1b6",
   },
+  /** Sunny kitchen yellows. */
+  butter: {
+    wallA: "#f7ecc9",
+    wallB: "#efdfae",
+    floor: "#d7c08e",
+    accent: "#9fcbd9",
+    shade: "#eadaa8",
+    sky: "#d3eaf6",
+    detail: "#c4a468",
+  },
+  /** Night outdoors: blue-grey sky, still light enough for the character strokes. */
+  night: {
+    wallA: "#cfd3e8",
+    wallB: "#b9bfdc",
+    floor: "#a8b0cc",
+    accent: "#f3d99a",
+    shade: "#bcc2dc",
+    sky: "#9fa9d0",
+    detail: "#7f89b3",
+  },
+  /** Beach: sand floor, sea-blue detail. */
+  coast: {
+    wallA: "#e4f1f4",
+    wallB: "#cfe6ec",
+    floor: "#f0dcb0",
+    accent: "#f4a99a",
+    shade: "#e6d3a8",
+    sky: "#c8e8f6",
+    detail: "#7fbccc",
+  },
+  /** Comedy-club stage: soft red curtain, warm light. */
+  stage: {
+    wallA: "#e7bfc3",
+    wallB: "#d9a9af",
+    floor: "#caa98a",
+    accent: "#f2d08f",
+    shade: "#d7b3b6",
+    sky: "#d6e6f3",
+    detail: "#a9828a",
+  },
 };
 
 /** Tones every part may use, derived from the seven tokens (still no raw hex in parts). */

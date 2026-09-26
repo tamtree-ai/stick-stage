@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "cafe-1",
+  "kit": "interior",
+  "palette": "peach",
+  "description": "A coffee shop: menu chalkboard, espresso counter, pastry case. Standing.",
+  "tags": ["cafe", "coffee", "barista", "ordering", "date", "first date", "friends", "customer service", "prices"],
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "wall", "pattern": "stripes" },
+    { "part": "floor" },
+    { "part": "board", "x": 0.5, "y": 0.12, "variant": "menu" },
+    { "part": "counter", "x": 0.5, "variant": "cafe", "size": 1.1 },
+    { "part": "plant", "x": 0.94 }
+  ],
+  "marks": { "left": 0.27, "center": 0.5, "right": 0.73 }
+}

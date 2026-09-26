@@ -3,6 +3,8 @@
   "id": "park-1",
   "kit": "park",
   "palette": "meadow",
+  "description": "A sunny park with a bench. Both cast members sit on the bench.",
+  "tags": ["outdoors", "park", "sunny", "friends", "date", "advice", "nature", "lunch break"],
   "groundY": 1480,
   "figureHeightPx": 720,
   "layers": [

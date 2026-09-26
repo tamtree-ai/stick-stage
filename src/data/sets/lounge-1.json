@@ -3,6 +3,8 @@
   "id": "lounge-1",
   "kit": "interior",
   "palette": "peach",
+  "description": "A cosy lounge with a couch. Both cast members sit on the couch.",
+  "tags": ["home", "couch", "couple", "friends", "relaxing", "movie night", "talk", "dating"],
   "groundY": 1480,
   "figureHeightPx": 720,
   "layers": [

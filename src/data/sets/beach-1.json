@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "beach-1",
+  "kit": "beach",
+  "palette": "coast",
+  "description": "A sunny beach: sea, sand, striped umbrella. Standing.",
+  "tags": ["beach", "summer", "vacation", "holiday", "travel", "sun", "swimming", "body image", "weekend"],
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "sky", "variant": "sun" },
+    { "part": "sea" },
+    { "part": "sand" },
+    { "part": "umbrella", "x": 0.93, "size": 0.85 }
+  ],
+  "marks": { "left": 0.27, "center": 0.5, "right": 0.73 }
+}

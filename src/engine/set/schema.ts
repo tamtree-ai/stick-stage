@@ -27,7 +27,11 @@ export type SetPart = z.infer<typeof SetPartSchema>;
 export const SetSchema = z.object({
   schemaVersion: z.literal(1),
   id: z.string(),
-  kit: z.enum(["plain", "interior", "office", "park", "street"]),
+  kit: z.enum(["plain", "interior", "office", "park", "street", "beach"]),
+  /** Catalog text for whoever picks the set (an LLM or a person): what the place is and what it suits. */
+  description: z.string().optional(),
+  /** Topic keywords this set suits, e.g. "work", "date", "morning"; `GET /sets` lists them. */
+  tags: z.array(z.string()).default([]),
   palette: z.string(),
   groundY: z.number().min(0),
   /** Standing figure height in px at this set's scale. */

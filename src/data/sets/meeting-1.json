@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "meeting-1",
+  "kit": "office",
+  "palette": "lilac",
+  "description": "An office meeting room: whiteboard with a chart, window blinds. Standing (use office-1 for a seated desk scene).",
+  "tags": ["work", "meeting", "boss", "presentation", "coworker", "deadline", "corporate", "startup", "pitch", "job interview"],
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "wall", "pattern": "stripes" },
+    { "part": "floor" },
+    { "part": "window", "x": 0.2, "y": 0.18, "size": 0.85, "variant": "blinds" },
+    { "part": "whiteboard", "x": 0.64, "y": 0.15 },
+    { "part": "plant", "x": 0.95 }
+  ],
+  "marks": { "left": 0.27, "center": 0.5, "right": 0.73 }
+}

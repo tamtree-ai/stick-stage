@@ -39,8 +39,8 @@ TTS is **not** called from this repo. The tamtree agent harness generates audio 
 - `src/engine/face/visemes.ts`: Rhubarb A–H/X → mouth params, `speechMouth` layers speech on the expression mouth
 - `src/engine/voice`: voice contract schemas, `tokenize` / `alignWords` / `estimateWordsInSpans`
 - `src/engine/text`: `buildCaptionPages` (script tokens + timings → `@remotion/captions` pages), `Subtitles`, `PovCard`, `SlamText`, safe area
-- `src/engine/set`: set schema, palettes (tokens + `derived()` tones; no raw hex in parts), patterns, `<SetLayers>`, `seatHeightAt`
-- `src/engine/set/parts`: part components by kit (`room`, `decor`, `office`, `furniture`, `outdoor`, `street`) and `registry.ts` (`PART_INFO`, `KIT_BACKDROP`). New part → add to `PART_INFO`; it shows up in SetLab
+- `src/engine/set`: set schema (with `description` / `tags` for set pickers; `catalog.ts` → `GET /sets`), palettes (tokens + `derived()` tones; no raw hex in parts), patterns, `<SetLayers>`, `seatHeightAt`
+- `src/engine/set/parts`: part components by kit (`room`, `decor`, `office`, `furniture`, `outdoor`, `street`, `home`, `venue`) and `registry.ts` (`PART_INFO`, `KIT_BACKDROP`). New part → add to `PART_INFO`; it shows up in SetLab
 - `src/engine/shots/Stage.tsx`: set background, then actors, then set foreground, under one camera
 - `src/engine/shots/framing.ts`: `frameShot({ framing, on })` → camera for `wide | two | medium | close | extreme`
 - `src/engine/director`: skit schema (`schema.ts`), diagnostics (path + expected + example), anchors, beat layout (`layout.ts`, inserts the punchline reaction beat), actions + listener auto-reactions → cast tracks (`tracks.ts`), default shot policy (`shots.ts`), cameras / punch-ins / shake (`camera.ts`), `compileSkit` → `Timeline`, `<Skit>`. Authoring guide: `docs/skits.md`

@@ -3,6 +3,8 @@
   "id": "living-1",
   "kit": "interior",
   "palette": "lilac",
+  "description": "A home living room: window, picture, bookshelf, plant. Standing.",
+  "tags": ["home", "family", "roommates", "couple", "parents", "chores", "weekend"],
   "groundY": 1480,
   "figureHeightPx": 720,
   "layers": [

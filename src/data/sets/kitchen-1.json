@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "kitchen-1",
+  "kit": "interior",
+  "palette": "butter",
+  "description": "A sunny home kitchen: counter with a pot and fruit, fridge, window. Standing.",
+  "tags": ["home", "kitchen", "food", "cooking", "morning", "roommates", "family", "diet", "snacks"],
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "wall", "pattern": "dots" },
+    { "part": "floor" },
+    { "part": "window", "x": 0.42, "y": 0.14, "size": 0.8 },
+    { "part": "clock", "x": 0.13, "y": 0.2 },
+    { "part": "counter", "x": 0.42 },
+    { "part": "fridge", "x": 0.88 }
+  ],
+  "marks": { "left": 0.27, "center": 0.5, "right": 0.73 }
+}

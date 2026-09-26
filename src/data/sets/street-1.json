@@ -3,6 +3,8 @@
   "id": "street-1",
   "kit": "street",
   "palette": "city",
+  "description": "A daytime city street with a shopfront. Standing. The interview template's default.",
+  "tags": ["city", "street", "interview", "stranger", "shopping", "commute", "public"],
   "groundY": 1480,
   "figureHeightPx": 720,
   "layers": [

@@ -121,5 +121,10 @@ Decisions not covered by the plan. Newest last.
 - **`pnpm lib:pack-test`** is the boundary guard: it installs the packed tarball into a clean fixture, type-checks it, asserts private paths fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`, and compiles, checks and renders a still through a consumer-owned composition.
 - **Tooling note:** Remotion's bundled ffmpeg is a minimal build (no `volumedetect`, no raw PCM muxer, no stdout output through `remotion ffmpeg`). To inspect audio, decode to a WAV file.
 
+## 2026-09-26 (set catalog)
+- **16 sets.** New parts: `counter` (`variant: "cafe"`), `fridge`, `bed` (seat, 0.2 figure heights), `tv`, `floor-lamp`, `board` (chalkboard; `variant: "menu"`), `curtain` (stage backdrop; `variant: "spot"`), and a `beach` kit (`sea`, `sand`, `umbrella`). `sky` gained `variant: "night"` (moon and stars). New palettes: `butter`, `night`, `coast`, `stage`.
+- **Sets carry `description` + `tags`** (optional in the schema, a test requires them for shipped sets). `setCatalog()` and `GET /sets` expose them with the seated marks, so the script LLM picks the set from the catalog instead of falling back to the per-template default, which made every exchange premise render in `living-1`.
+- **Premise staging seats the cast**: a cast member whose mark has a seat part starts `seated`. Before, `fromPremise` never did, so couch/bench/desk sets rendered the cast standing in front of the furniture.
+
 ## 2026-09-26 (topic-to-video skill)
 - **`skills/topic-to-video`** takes a topic and delivers a ~30 s skit end to end, **including writing the jokes**. This deliberately relaxes the plan's "humans write premises and punchlines" rule (plan §8), at the team's request. `skit-director` still never writes or changes a line; topic-to-video writes `premise.json` and then hands staging to it. The skill returns the script with the MP4 so a person can judge the joke. Sizing target: 8–11 lines, 55–80 words, 26–33 s compiled.

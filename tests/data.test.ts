@@ -31,6 +31,12 @@ describe("data library", () => {
       }
     }
   });
+  it("every set has catalog text for set pickers", () => {
+    for (const s of Object.values(sets)) {
+      expect(s.description, s.id).toBeTruthy();
+      expect(s.tags.length, s.id).toBeGreaterThan(2);
+    }
+  });
   it("every palette has the same seven tokens", () => {
     for (const p of Object.values(PALETTES)) expect(Object.keys(p).sort()).toEqual(["accent", "detail", "floor", "shade", "sky", "wallA", "wallB"]);
   });

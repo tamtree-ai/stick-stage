@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "stage-1",
+  "kit": "plain",
+  "palette": "stage",
+  "description": "A comedy-club stage: red curtain and a spotlight. Best for one person talking to camera, stand-up, or a big announcement.",
+  "tags": ["stage", "stand-up", "performance", "announcement", "speech", "talent show", "confession", "awards", "monologue"],
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "curtain", "variant": "spot" },
+    { "part": "floor" }
+  ],
+  "marks": { "left": 0.27, "center": 0.5, "right": 0.73 }
+}

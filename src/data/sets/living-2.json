@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "living-2",
+  "kit": "interior",
+  "palette": "mint",
+  "description": "A living room with a TV, floor lamp and photos. Standing.",
+  "tags": ["home", "tv", "streaming", "gaming", "family", "roommates", "couple", "weekend", "remote"],
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "wall", "pattern": "dots" },
+    { "part": "floor" },
+    { "part": "frame", "x": 0.32, "y": 0.2, "seed": 3 },
+    { "part": "frame", "x": 0.52, "y": 0.25, "size": 0.7, "seed": 7 },
+    { "part": "floor-lamp", "x": 0.08 },
+    { "part": "tv", "x": 0.84, "size": 0.72 }
+  ],
+  "marks": { "left": 0.27, "center": 0.5, "right": 0.73 }
+}

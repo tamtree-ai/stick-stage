@@ -24,6 +24,14 @@ describe("auth", () => {
     expect((await svc.call("/validate", json({ skit: {} }), "wrong")).status).toBe(401);
     expect((await svc.call("/jobs/00000000-0000-0000-0000-000000000000", {}, null)).status).toBe(401);
   });
+  it("GET /sets lists the catalog with seated marks", async () => {
+    const res = await svc.call("/sets");
+    expect(res.status).toBe(200);
+    const { sets } = (await res.json()) as { sets: { id: string; description: string; tags: string[]; seated: string[] }[] };
+    expect(sets.length).toBeGreaterThanOrEqual(16);
+    expect(sets.find((s) => s.id === "bedroom-1")).toMatchObject({ seated: ["left", "right"] });
+    expect(sets.find((s) => s.id === "cafe-1")?.tags).toContain("coffee");
+  });
   it("unknown routes and methods", async () => {
     expect((await svc.call("/nope")).status).toBe(404);
     expect((await svc.call("/validate")).status).toBe(405);

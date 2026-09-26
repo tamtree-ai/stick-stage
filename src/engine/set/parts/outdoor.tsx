@@ -44,9 +44,17 @@ export const Sky: PartComponent = ({ part, palette, W, groundY, fig, seed }) => 
     <g>
       <rect width={W} height={groundY} fill={palette.sky} />
       {part.variant === "sun" ? <circle cx={W * 0.78} cy={groundY * 0.2} r={fig * 0.12} fill={lighten(palette.accent, 0.35)} /> : null}
-      {clouds.map((c, i) => (
-        <Cloud key={i} {...c} fill={lighten(palette.sky, 0.6)} seed={seed} k={i} />
-      ))}
+      {part.variant === "night" ? (
+        <g>
+          {Array.from({ length: 18 }, (_, i) => (
+            <circle key={i} cx={W * rand(seed, `sx${i}`)} cy={groundY * randRange(seed, `sy${i}`, 0.04, 0.5)} r={fig * randRange(seed, `sr${i}`, 0.004, 0.008)} fill={lighten(palette.sky, 0.75)} />
+          ))}
+          <circle cx={W * 0.76} cy={groundY * 0.16} r={fig * 0.09} fill={lighten(palette.accent, 0.45)} />
+          <circle cx={W * 0.76 + fig * 0.045} cy={groundY * 0.16 - fig * 0.025} r={fig * 0.08} fill={palette.sky} />
+        </g>
+      ) : (
+        clouds.map((c, i) => <Cloud key={i} {...c} fill={lighten(palette.sky, 0.6)} seed={seed} k={i} />)
+      )}
     </g>
   );
 };

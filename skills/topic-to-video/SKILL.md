@@ -59,7 +59,7 @@ with an example in `public/skits/exchange-lab/premise.json`:
   "pov": "POV: the situation in a few words",
   "description": "One line for the post; don't spoil the punchline.",
   "hashtags": ["stickfigure", "relatable", "<topic>"],
-  "set": "living-1",
+  "set": "<pick from the set table>",
   "cast": [ { "id": "milo", "character": "milo" }, { "id": "june", "character": "june" } ],
   "lines": [
     { "who": "milo", "text": "…", "role": "setup", "expression": "neutral" },
@@ -73,8 +73,32 @@ with an example in `public/skits/exchange-lab/premise.json`:
   `me-vs-me` is one character arguing with themselves, `pov-monologue` is one character talking to
   the camera, and `text-slam` is meme text only. Use a different template only when the topic
   clearly calls for it.
-- **Set:** pick the one that matches the topic: `living-1` (home), `office-1` (work; Milo starts
-  seated), `lounge-1`, `park-1`, `street-1`, `plain-1` (abstract).
+- **Set:** always pick one; never leave it out (the template default makes every video look the same).
+  Choose the place where the situation *happens*, not the topic's subject: a joke about emails
+  sent at midnight lives in `bedroom-1`, not `office-1`. Prefer a set that hasn't been used in the
+  last few videos. Seated sets put both characters on furniture, which suits slow conversations
+  (confessions, late-night talks) better than physical gags. Full list with tags: `src/data/sets/*.json`
+  or `GET /sets`.
+
+| Set | Where | Seated |
+|---|---|---|
+| `plain-1` | abstract backdrop (memes, thoughts, no real place) | no |
+| `stage-1` | comedy-club stage, curtain + spotlight (stand-up, announcements, confessions) | no |
+| `living-1` | living room | no |
+| `living-2` | living room with TV (streaming, gaming, family) | no |
+| `lounge-1` | lounge | both, on the couch |
+| `bedroom-1` | bedroom (sleep, late night, phone, siblings) | both, on the bed |
+| `kitchen-1` | home kitchen (food, cooking, roommates, diet) | no |
+| `cafe-1` | coffee shop, menu board + counter (ordering, dates) | no |
+| `office-1` | office desk | `left` at the desk |
+| `meeting-1` | meeting room, whiteboard (boss, presentations, pitches) | no |
+| `classroom-1` | classroom, chalkboard (school, exams, teachers) | no |
+| `park-1` | sunny park | both, on the bench |
+| `park-2` | autumn park path (walks, weather, dogs) | no |
+| `street-1` | daytime city street | no |
+| `street-night-1` | city street at night (going out, walking home) | no |
+| `beach-1` | beach (summer, vacation) | no |
+
 - **Expressions:** `neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe,
   confused, deadpan`. Use strong ones (`shocked`, `cringe`, `crying`) on one or two peak lines only.
 - **Slam:** one or two words from the punchline, in capitals.

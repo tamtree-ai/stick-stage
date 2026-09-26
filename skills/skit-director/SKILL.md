@@ -31,9 +31,10 @@ reaction close-up after the punchline); your job is to add what the joke needs a
   `src/engine/templates/premise.ts`), or lines pasted by a person, which you copy **verbatim** into a
   `premise.json` first.
 - Cast: character ids from `src/data/characters/*.json` (currently `milo`, `june`).
-- Set: `src/data/sets/*.json` (`plain-1`, `living-1`, `lounge-1`, `office-1`, `park-1`, `street-1`).
-  `office-1` has a chair at `left` (seated start); marks are `left`, `center`, `right`, plus
-  `off-left` / `off-right` for entrances and exits.
+- Set: `src/data/sets/*.json`; each has a `description` and `tags` (the service lists them at
+  `GET /sets`). Seats: `office-1` (chair at `left`), `lounge-1` (couch), `park-1` (bench) and
+  `bedroom-1` (bed) seat whoever stands on a seated mark; premise staging sets `seated` for you.
+  Marks are `left`, `center`, `right`, plus `off-left` / `off-right` for entrances and exits.
 
 ## Workflow
 

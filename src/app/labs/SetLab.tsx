@@ -24,7 +24,8 @@ export const LAB_PALETTES: Record<Kit, string[]> = {
   interior: ["lilac", "mint", "peach"],
   office: ["mint", "lilac", "peach"],
   park: ["meadow", "autumn", "mint"],
-  street: ["city", "dusk", "peach"],
+  street: ["city", "dusk", "night"],
+  beach: ["coast", "peach", "mint"],
 };
 
 type Row = { part: string; kit: Kit };
@@ -72,6 +73,7 @@ const tileSet = (row: Row, palette: string, seed: number): SetDef => {
     schemaVersion: 1,
     id: `lab-${row.part}-${palette}-${seed}`,
     kit: row.kit,
+    tags: [],
     palette,
     groundY: GROUND,
     figureHeightPx: FIG,

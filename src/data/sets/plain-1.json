@@ -3,8 +3,13 @@
   "id": "plain-1",
   "kit": "plain",
   "palette": "mint",
+  "description": "An abstract plain backdrop with a soft spotlight circle. For memes, text-slam, and topics with no real place.",
+  "tags": ["abstract", "meme", "any", "internet", "thoughts", "pov"],
   "groundY": 1480,
   "figureHeightPx": 720,
-  "layers": [{ "part": "plain-wall", "pattern": "halftone" }, { "part": "floor" }],
+  "layers": [
+    { "part": "plain-wall", "pattern": "halftone" },
+    { "part": "floor" }
+  ],
   "marks": { "left": 0.27, "center": 0.5, "right": 0.73 }
 }

@@ -16,8 +16,19 @@
         "interior",
         "office",
         "park",
-        "street"
+        "street",
+        "beach"
       ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "tags": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "palette": {
       "type": "string"

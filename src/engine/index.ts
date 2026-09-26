@@ -33,6 +33,7 @@ export { Face } from "./face/Face";
 export * from "./set/schema";
 export * from "./set/palettes";
 export * from "./set/seating";
+export * from "./set/catalog";
 export { SetLayers } from "./set/Set";
 export { PARTS, PART_INFO, KITS, KIT_BACKDROP, type Kit, type PartInfo } from "./set/parts/registry";
 export { SEAT_HEIGHT, SEAT_PARTS } from "./set/parts/seats";

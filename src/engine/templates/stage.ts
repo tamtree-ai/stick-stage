@@ -2,6 +2,7 @@ import { SkitError, unknownId, type Diagnostic } from "../director/diagnostics";
 import type { SkitInput } from "../director/schema";
 import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
+import { seatHeightAt } from "../set/seating";
 import { normWord, tokenize } from "../voice/words";
 import { PremiseSchema, type Premise, type PremiseLine, type TemplateId } from "./premise";
 import { fromZodIssues } from "../director/diagnostics";
@@ -108,10 +109,11 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
   const marks = solo ? ["center"] : ["left", "right"];
   const n = { gesture: 0 };
   const beats = p.template === "text-slam" ? slamBeats(p) : dress(p, p.lines.map((_, i) => spokenBeat(p, i, n)));
+  const set = p.set ?? DEFAULT_SET[p.template];
   return {
     schemaVersion: 1,
     meta: { title: p.title, ...(p.description ? { description: p.description } : {}), hashtags: p.hashtags },
-    set: p.set ?? DEFAULT_SET[p.template],
+    set,
     cast: p.cast.map((c, i) => ({
       id: c.id,
       character: c.character,
@@ -119,6 +121,8 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
       ...(c.label ? { label: c.label } : {}),
       ...(c.holding ? { holding: { prop: c.holding, hand: "R" as const } } : p.template === "interview" && i === 0 ? { holding: { prop: "mic", hand: "R" as const } } : {}),
       ...(p.template === "interview" && i === 0 ? { pose: "hold-chest" } : {}),
+      // A seat on this mark (couch, bench, bed, desk chair) means the cast member starts on it.
+      ...(seatHeightAt(sets[set]!, marks[i]!) !== undefined ? { seated: true } : {}),
     })),
     overlay: { ...(p.pov ? { pov: p.pov } : {}), subtitles: p.template !== "text-slam" },
     beats,

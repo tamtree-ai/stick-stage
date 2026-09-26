@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "park-2",
+  "kit": "park",
+  "palette": "autumn",
+  "description": "An autumn park: orange trees and a path. Standing (use park-1 for a sunny bench scene).",
+  "tags": ["outdoors", "walk", "autumn", "fall", "weather", "dog", "exercise", "friends", "nature"],
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "sky" },
+    { "part": "hills" },
+    { "part": "grass", "variant": "path" },
+    { "part": "tree", "x": 0.86, "y": 0.72, "size": 1.1 },
+    { "part": "tree", "x": 0.1, "y": 0.72, "size": 0.8, "seed": 3 },
+    { "part": "bush", "x": 0.26, "y": 0.72, "size": 0.8 }
+  ],
+  "marks": { "left": 0.27, "center": 0.5, "right": 0.73 }
+}

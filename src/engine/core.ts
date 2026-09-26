@@ -30,6 +30,7 @@ export * from "./text/layout";
 export * from "./set/schema";
 export * from "./set/palettes";
 export * from "./set/seating";
+export * from "./set/catalog";
 export * from "./shots/framing";
 export type { Camera, StageActor } from "./shots/Stage";
 export * from "./director/schema";

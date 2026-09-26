@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "bedroom-1",
+  "kit": "interior",
+  "palette": "lilac",
+  "description": "A bedroom: bed, window, floor lamp. Both cast members sit on the bed.",
+  "tags": ["home", "bedroom", "sleep", "night", "late", "morning", "alarm", "siblings", "couple", "phone", "scrolling"],
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "wall", "pattern": "halftone" },
+    { "part": "floor" },
+    { "part": "window", "x": 0.78, "y": 0.16 },
+    { "part": "frame", "x": 0.24, "y": 0.22, "seed": 4 },
+    { "part": "floor-lamp", "x": 0.07 },
+    { "part": "bed", "x": 0.5, "seatFor": ["left", "right"] }
+  ],
+  "marks": { "left": 0.3, "center": 0.5, "right": 0.7 }
+}

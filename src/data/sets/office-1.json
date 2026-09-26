@@ -3,6 +3,8 @@
   "id": "office-1",
   "kit": "office",
   "palette": "mint",
+  "description": "An office with a desk: the left cast member sits at the desk, the right one stands.",
+  "tags": ["work", "office", "boss", "coworker", "email", "deadline", "job", "remote work", "it support"],
   "groundY": 1480,
   "figureHeightPx": 720,
   "layers": [
@@ -14,6 +16,8 @@
     { "part": "cabinet", "x": 0.95 },
     { "part": "chair", "mark": "left", "seatFor": ["left"] }
   ],
-  "foreground": [{ "part": "desk", "mark": "left", "dx": 0.17 }],
+  "foreground": [
+    { "part": "desk", "mark": "left", "dx": 0.17 }
+  ],
   "marks": { "left": 0.24, "center": 0.5, "right": 0.76 }
 }
