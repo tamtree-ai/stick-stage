@@ -12,7 +12,8 @@ import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { formatDiagnostics, parseSkit, postText, programSrt, skitLines, slug, SkitError, VoiceManifestSchema } from "../src/engine";
+import { formatDiagnostics, parseSkit, skitLines, slug, SkitError, VoiceManifestSchema } from "../src/engine";
+import { writePostFiles } from "../src/node";
 import { library } from "../src/data";
 import { prepIfVoiced, renderSkitMp4 } from "./lib/render";
 import { checkSkitDir, compileSkitDir, isSkit, skitDir } from "./lib/skit";
@@ -62,20 +63,7 @@ for (const id of ids) {
     const hash = crypto.createHash("sha256").update(JSON.stringify(result.program)).update(CODE_HASH).digest("hex").slice(0, 8);
     const dir = path.join(ROOT, "out/posts", id);
     const base = path.join(dir, `${id}-${slug(doc.meta.title)}-${hash}`);
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(`${base}.txt`, postText(doc, library));
-    fs.writeFileSync(`${base}.srt`, programSrt(result.program));
-    const manifest = {
-      skit: id,
-      title: doc.meta.title,
-      hash,
-      durationSec: +(result.program.durationInFrames / result.program.fps).toFixed(2),
-      scenes: result.program.scenes.length,
-      check: { ok: report.ok, errors: report.errors, warnings: report.warnings },
-      syntheticVoices: doc.meta.syntheticVoices,
-      reminder: doc.meta.syntheticVoices ? "Tick the platform's AI-generated / synthetic-media label when posting." : undefined,
-    };
-    fs.writeFileSync(`${base}.json`, JSON.stringify(manifest, null, 2) + "\n");
+    writePostFiles(base, { skit: id, doc, program: result.program, report, hash, lib: library });
     if (fs.existsSync(`${base}.mp4`) && !has("force")) {
       rows.push({ id, status: "unchanged", out: path.relative(ROOT, `${base}.mp4`) });
       continue;

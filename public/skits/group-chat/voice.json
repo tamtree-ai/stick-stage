@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "milo",
+      "text": "Why did nobody answer my message in the group chat?",
+      "audio": "voice/l1.wav",
+      "durationMs": 2905
+    },
+    {
+      "id": "l2",
+      "speaker": "june",
+      "text": "We saw it.",
+      "audio": "voice/l2.wav",
+      "durationMs": 606
+    },
+    {
+      "id": "l3",
+      "speaker": "milo",
+      "text": "All six of you saw it?",
+      "audio": "voice/l3.wav",
+      "durationMs": 1327
+    },
+    {
+      "id": "l4",
+      "speaker": "june",
+      "text": "Seven. Your mom's in there now.",
+      "audio": "voice/l4.wav",
+      "durationMs": 1837
+    },
+    {
+      "id": "l5",
+      "speaker": "milo",
+      "text": "Then why did nobody say anything?",
+      "audio": "voice/l5.wav",
+      "durationMs": 2020
+    },
+    {
+      "id": "l6",
+      "speaker": "june",
+      "text": "Someone reacted with a thumbs up.",
+      "audio": "voice/l6.wav",
+      "durationMs": 1779
+    },
+    {
+      "id": "l7",
+      "speaker": "milo",
+      "text": "I asked if anyone could help me move.",
+      "audio": "voice/l7.wav",
+      "durationMs": 2129
+    },
+    {
+      "id": "l8",
+      "speaker": "june",
+      "text": "Exactly. The thumbs up means good luck.",
+      "audio": "voice/l8.wav",
+      "durationMs": 2400
+    },
+    {
+      "id": "l9",
+      "speaker": "milo",
+      "text": "Good luck is not help!",
+      "audio": "voice/l9.wav",
+      "durationMs": 1361
+    },
+    {
+      "id": "l10",
+      "speaker": "june",
+      "text": "It was a very supportive thumbs up.",
+      "audio": "voice/l10.wav",
+      "durationMs": 1762
+    },
+    {
+      "id": "l11",
+      "speaker": "milo",
+      "text": "Who even sent the thumbs up?",
+      "audio": "voice/l11.wav",
+      "durationMs": 1521
+    },
+    {
+      "id": "l12",
+      "speaker": "june",
+      "text": "Your mom.",
+      "audio": "voice/l12.wav",
+      "durationMs": 561
+    }
+  ]
+}

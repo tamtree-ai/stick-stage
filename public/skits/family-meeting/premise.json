@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "template": "exchange",
+  "title": "Quarterly family meeting",
+  "logline": "Dad runs breakfast like a corporate meeting to find out who ate the last biscuit; his kid out-corporates him.",
+  "pov": "POV: your dad just read a management book",
+  "description": "Every family needs a quarterly review. Apparently.",
+  "hashtags": ["stickfigure", "familyjokes", "dadjokes", "relatable"],
+  "set": "living-1",
+  "cast": [
+    { "id": "milo", "character": "milo" },
+    { "id": "june", "character": "june" }
+  ],
+  "lines": [
+    { "who": "milo", "text": "Okay, family. Welcome to our first quarterly family meeting.", "role": "setup", "expression": "happy" },
+    { "who": "june", "text": "Dad, it's breakfast. And it's just us.", "role": "setup", "expression": "deadpan", "delivery": "flat" },
+    { "who": "milo", "text": "Agenda item one. Someone ate the last biscuit.", "role": "escalation", "expression": "neutral" },
+    { "who": "june", "text": "Tragic.", "role": "escalation", "expression": "deadpan", "delivery": "flat" },
+    { "who": "milo", "text": "So. Who owns this action?", "role": "escalation", "expression": "neutral" },
+    { "who": "june", "text": "The dog.", "role": "escalation", "expression": "deadpan" },
+    { "who": "milo", "text": "The dog doesn't have opposable thumbs.", "role": "escalation", "expression": "confused" },
+    { "who": "june", "text": "Which is why he needed my help.", "role": "escalation", "expression": "smug" },
+    { "who": "milo", "text": "Wait. So you're admitting you took it?", "role": "escalation", "expression": "shocked" },
+    { "who": "june", "text": "I'm saying it was cross-team collaboration.", "role": "escalation", "expression": "deadpan", "delivery": "flat" },
+    { "who": "milo", "text": "Honestly? That's great teamwork.", "role": "escalation", "expression": "happy" },
+    { "who": "june", "text": "Thanks. Now let's discuss my bonus.", "role": "punchline", "expression": "smug", "slam": "BONUS." }
+  ]
+}

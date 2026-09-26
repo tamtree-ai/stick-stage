@@ -1,0 +1,140 @@
+# Render service API
+
+StickStage as an HTTPS service, for the tamtree `stickstage` plugin nodes (`validate`,
+`render_submit`, `render_collect`). The service owns timing, lip-sync and rendering. Tamtree owns
+the script LLM, the TTS and the credentials. The service never calls a TTS or LLM API.
+
+```
+pnpm serve                       # needs STICKSTAGE_API_TOKEN (or --insecure-local)
+pnpm serve:smoke [baseUrl]       # validate + render public/skits/fine over HTTP, downloads to out/smoke/
+docker build --platform linux/amd64 -t stickstage-render .
+```
+
+All endpoints except `/healthz` need `Authorization: Bearer <STICKSTAGE_API_TOKEN>`. Errors are
+JSON: `{ "error": { "code", "message", "diagnostics"?: [{ level, code, path, message, expected?, example? }] } }`.
+Diagnostic codes are the compiler's own, and they are stable (`voice-stale`, `unknown-pose`, …).
+
+## `POST /validate`: before any TTS
+
+Body (JSON): exactly one of `{ "premise": <premise.json> }` (staged with its template, like
+`pnpm new`) or `{ "skit": <skit.json> }`.
+
+`200`:
+```json
+{
+  "ok": true,
+  "skit": { "...": "the staged skit.json; send this to /render" },
+  "lines": [ { "id": "b1", "speaker": "milo", "character": "milo", "text": "Hey. You okay?", "delivery": "flat",
+               "voice": { "provider": "google", "voiceId": "en-US-…", "settings": {} } } ],
+  "estimatedDurationSec": 7.8,
+  "warnings": [],
+  "check": { "ok": true, "errors": 0, "warnings": 0, "findings": [], "ran": ["…"] }
+}
+```
+
+- `lines` is exactly what to voice: one audio file per entry. Its `text` is what the TTS must
+  say, and what `voice.json` must repeat verbatim.
+- `voice` holds the character's hints from `src/data/characters/<id>.json`. It is absent when the
+  character has none, and then the plugin picks a voice.
+- `check` runs the self-check with placeholder timings (~160 wpm). The real check runs again at
+  render with the real audio.
+- `422 invalid-skit` means the premise or skit has errors. File-clip beats (`audio.source: "file"`) are
+  rejected with `clip-unsupported`.
+
+## `POST /render`: submit
+
+`multipart/form-data`:
+
+| Part | What |
+|---|---|
+| `skit` | skit.json (text) |
+| `voice` | voice.json exactly as in [voice-contract.md](voice-contract.md), `audio: "voice/<file>"` |
+| `options` | optional JSON: `{ "skipCheck": false, "debug": false, "sheet": false }` |
+| files | one file part per line; its **filename** is the `<file>` in `voice/<file>` (WAV, MP3 or OGG) |
+
+Mapping `shortvideo.google_tts` output to a voice line: `durationMs = duration_seconds × 1000`.
+With one SSML mark per word, `words = marks.map(m => ({ text: <that word>, startMs: m.time_seconds × 1000 }))`.
+Phrase captions work too: one entry per phrase, holding the phrase's first word. Without timings,
+leave out `words`. The service then estimates them from silences, and mouths still come from Rhubarb.
+
+`202`: the job (below), `status: "queued"`. `422 invalid-render-request` means the upload has problems,
+and nothing is queued:
+
+| Code | Meaning |
+|---|---|
+| `voice-missing` | a spoken beat has no voice line |
+| `voice-stale` | a voice line's `text` isn't the skit's line |
+| `audio-path` | `audio` isn't `voice/<plain file name>.{wav,mp3,ogg}` |
+| `audio-missing` | no file part with that filename |
+| `audio-format` | the file isn't WAV/MP3/OGG (e.g. a saved error page) |
+| `voice-invalid`, `field-missing`, `bad-json`, `skit.*` paths | malformed parts |
+
+`413` means the body is over 100 MB. Voice lines for non-spoken beats are dropped, with a job warning.
+
+## `GET /jobs/:id`: status
+
+```json
+{
+  "id": "…", "status": "running", "stage": "render", "progress": 0.4,
+  "createdAt": "…", "startedAt": "…", "finishedAt": null,
+  "title": "Not being sarcastic", "durationSec": 8.9,
+  "warnings": [], "diagnostics": [], "check": { "ok": true, "errors": 0, "warnings": 0, "findings": [] },
+  "error": { "code": "check-failed", "message": "…" },
+  "outputs": { "mp4": { "url": "/jobs/…/files/mp4", "type": "video/mp4", "bytes": 2306931, "name": "not-being-sarcastic.mp4" } }
+}
+```
+
+- `status`: `queued` → `running` → `succeeded` | `failed` | `cancelled`.
+- `stage`: `prep` → `compile` → `check` → `render` → `post`. `progress` runs from 0 to 1 within `render`.
+- Failure codes: `prep-failed`, `invalid-skit` (with `diagnostics`), `check-failed` (see `check.findings`;
+  resubmit with `skipCheck` to render anyway), `render-failed`, `internal`.
+- `outputs` (on success): `mp4`, `srt` (script-exact subtitles), `txt` (post caption: description,
+  hashtags, AI-voice note, script), `manifest` (title, duration, check summary), and `sheet`
+  (contact sheet PNG, if requested).
+
+Poll every few seconds. As a guide, an 8.9 s skit takes ~14 s on an M-series Mac, and a 29 s
+skit takes ~90 s in the amd64 container under emulation. Real x86_64 hosts are much faster.
+
+## `GET /jobs/:id/files/:name`
+
+Downloads an output by its key (`mp4`, `srt`, `txt`, `manifest`, `sheet`).
+
+## `DELETE /jobs/:id`
+
+Cancels a queued or running job and removes its media. Returns the job.
+
+## `GET /healthz` (no auth)
+
+`{ ok, queue, bundle: "building" | "ready" | "failed", lipSync: "rhubarb" | "estimated", auth }`
+
+## Running it
+
+| Env | Default | |
+|---|---|---|
+| `STICKSTAGE_API_TOKEN` | (required) | shared bearer token |
+| `PORT` / `HOST` | 8787 / 127.0.0.1 (container: 0.0.0.0) | |
+| `STICKSTAGE_JOB_TTL_HOURS` | 24 | finished jobs are deleted after this |
+| `STICKSTAGE_BROWSER` | Remotion's Chrome Headless Shell | |
+| `STICKSTAGE_RENDER_CONCURRENCY` | Remotion's default | tabs per render |
+| `STICKSTAGE_ALLOW_ESTIMATED_MOUTHS` | off | `1` lets it start without Rhubarb |
+| `RHUBARB_PATH` | `tools/`, then PATH (container: `/opt/rhubarb/rhubarb`) | |
+
+- **One render at a time.** Renders queue FIFO, since each one already uses every core. Scale by adding
+  instances with their own volumes, not threads.
+- **State is on disk.** Each job is a skit folder at `public/skits/_jobs/<id>/` with `job.json`. That
+  directory is the container's volume. On restart, queued and interrupted jobs are re-queued.
+- **TLS** belongs to the host (Fly, Cloud Run, or Caddy in front of a VM). The service speaks plain HTTP.
+- **Cloud Run:** the queue lives in memory and renders run outside requests, so use
+  `--no-cpu-throttling`, `--max-instances=1` and `--min-instances=1`.
+- **x86_64 only**, because Rhubarb has no Linux arm64 build.
+
+## How it's built
+
+- `src/server/`: `http.ts` (router, bodies), `auth.ts`, `validate.ts`, `submit.ts`, `jobs.ts`
+  (queue), `pipeline.ts` (prep → compile → check → render → post), `prep-child.ts`, `app.ts`.
+  `scripts/serve.ts` wires it up for this repo.
+- Prep runs in a child process. It shells out to ffmpeg and Rhubarb synchronously, and in-process it
+  would stall status polls.
+- The Remotion bundle is built once per process with `symlinkPublicDir: true`, so job folders
+  written after the bundle are served. (The default copies `public/` at bundle time.)
+- The job pipeline and `pnpm batch` share `src/node/post.ts`, so both produce the same post files.

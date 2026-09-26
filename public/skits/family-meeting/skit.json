@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "meta": {
+    "title": "Quarterly family meeting",
+    "description": "Every family needs a quarterly review. Apparently.",
+    "hashtags": [
+      "stickfigure",
+      "familyjokes",
+      "dadjokes",
+      "relatable"
+    ]
+  },
+  "set": "living-1",
+  "cast": [
+    {
+      "id": "milo",
+      "character": "milo",
+      "mark": "left"
+    },
+    {
+      "id": "june",
+      "character": "june",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "pov": "POV: your dad just read a management book",
+    "subtitles": true
+  },
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "milo",
+      "line": "Okay, family. Welcome to our first quarterly family meeting.",
+      "expression": "happy",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "hold-out",
+          "at": {
+            "word": "quarterly"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "speaker": "june",
+      "line": "Dad, it's breakfast. And it's just us.",
+      "expression": "deadpan",
+      "delivery": "flat",
+      "pauseBeforeMs": 300,
+      "holdAfterMs": 200,
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "arms-crossed",
+          "at": {
+            "word": "breakfast"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l3",
+      "speaker": "milo",
+      "line": "Agenda item one. Someone ate the last biscuit.",
+      "expression": "neutral",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "word": "biscuit"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l4",
+      "speaker": "june",
+      "line": "Tragic.",
+      "expression": "deadpan",
+      "delivery": "flat",
+      "pauseBeforeMs": 400,
+      "holdAfterMs": 300,
+      "actions": []
+    },
+    {
+      "id": "l5",
+      "speaker": "milo",
+      "line": "So. Who owns this action?",
+      "expression": "neutral",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "lean-in",
+          "at": {
+            "word": "owns"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l6",
+      "speaker": "june",
+      "line": "The dog.",
+      "expression": "deadpan",
+      "pauseBeforeMs": 500,
+      "holdAfterMs": 200,
+      "actions": []
+    },
+    {
+      "id": "l7",
+      "speaker": "milo",
+      "line": "The dog doesn't have opposable thumbs.",
+      "expression": "confused",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "hold-up",
+          "at": {
+            "word": "thumbs"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l8",
+      "speaker": "june",
+      "line": "Which is why he needed my help.",
+      "expression": "smug",
+      "pauseBeforeMs": 300,
+      "holdAfterMs": 200,
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "hands-on-hips",
+          "at": {
+            "word": "help"
+          }
+        }
+      ]
+    },
+    {
+      "id": "r1",
+      "silent": true,
+      "durationMs": 1000,
+      "actions": [
+        {
+          "who": "milo",
+          "do": "expression",
+          "expression": "shocked",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "who": "milo",
+          "do": "symbol",
+          "symbol": "exclaim",
+          "at": {
+            "ms": 80
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "id": "record-scratch",
+          "at": {
+            "ms": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "l9",
+      "speaker": "milo",
+      "line": "Wait. So you're admitting you took it?",
+      "expression": "shocked",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "word": "took"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l10",
+      "speaker": "june",
+      "line": "I'm saying it was cross-team collaboration.",
+      "expression": "deadpan",
+      "delivery": "flat",
+      "pauseBeforeMs": 400,
+      "holdAfterMs": 300,
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "arms-crossed",
+          "at": {
+            "word": "collaboration"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l11",
+      "speaker": "milo",
+      "line": "Honestly? That's great teamwork.",
+      "expression": "happy",
+      "pauseBeforeMs": 700,
+      "holdAfterMs": 200,
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "hold-chest",
+          "at": {
+            "word": "teamwork"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l12",
+      "speaker": "june",
+      "line": "Thanks. Now let's discuss my bonus.",
+      "expression": "smug",
+      "punchline": true,
+      "pauseBeforeMs": 500,
+      "holdAfterMs": 500,
+      "actions": [],
+      "text": [
+        {
+          "type": "slam",
+          "value": "BONUS.",
+          "at": {
+            "word": "bonus"
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "id": "ding",
+          "at": {
+            "word": "bonus"
+          }
+        }
+      ]
+    }
+  ]
+}

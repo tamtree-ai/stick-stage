@@ -60,6 +60,12 @@ A skit is one JSON file:
 }
 ```
 
+## Render service
+
+`pnpm serve` runs StickStage as an HTTP service for tamtree: `POST /validate` (premise → skit + the
+lines to voice), `POST /render` (skit + voice.json + audio → job), `GET /jobs/:id`. `Dockerfile`
+builds the Linux image (Chrome Headless Shell + Rhubarb). API: [docs/render-service.md](docs/render-service.md).
+
 ## Voices
 
 StickStage never calls a TTS API, and no provider keys live here. The tamtree agent harness writes
@@ -72,7 +78,8 @@ runs Rhubarb, cached by content hash. Rendering needs no network access.
 | Path | What |
 |---|---|
 | `src/engine/` | Pure rendering and compiling: rig, face, props, sets, shots, text, director, QA. No `fs`, `process.env` or `registerRoot` |
-| `src/node/` | File and tool adapters (ffmpeg, WAV, Rhubarb, whisper.cpp), prep, render backend |
+| `src/node/` | File and tool adapters (ffmpeg, WAV, Rhubarb, whisper.cpp), prep, render backend, post files |
+| `src/server/` | The render service (`pnpm serve`): routes, auth, job queue, render pipeline |
 | `src/app/` | Remotion root, `Skit` compositions and the labs (`CharacterLab`, `CloseupLab`, `TalkLab`, `SetLab`, `StagingLab`, …) |
 | `src/data/` | Characters (+ cast bibles), poses, expressions, sets, SFX manifest, safe areas |
 | `scripts/` | CLI entry points behind the `pnpm` commands |
