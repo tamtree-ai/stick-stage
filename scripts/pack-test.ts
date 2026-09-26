@@ -35,7 +35,7 @@ w(
       private: true,
       type: "module",
       dependencies: Object.fromEntries(
-        [["stickstage", `file:${tgz}`], ...["remotion", "@remotion/bundler", "@remotion/renderer", "@remotion/captions", "@remotion/noise", "@remotion/transitions", "react", "react-dom", "zod"].map((n) => [n, v(n)])],
+        [["stickstage", `file:${tgz}`], ...["remotion", "@remotion/bundler", "@remotion/renderer", "@remotion/captions", "@remotion/transitions", "react", "react-dom", "zod"].map((n) => [n, v(n)])],
       ),
       devDependencies: { typescript: v("typescript"), "@types/react": v("@types/react"), "@types/node": v("@types/node") },
     },

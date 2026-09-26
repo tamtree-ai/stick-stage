@@ -20,9 +20,6 @@ importers:
       '@remotion/fonts':
         specifier: 4.0.529
         version: 4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@remotion/noise':
-        specifier: 4.0.529
-        version: 4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@remotion/paths':
         specifier: 4.0.529
         version: 4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -44,6 +41,9 @@ importers:
       remotion:
         specifier: 4.0.529
         version: 4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      simplex-noise:
+        specifier: 4.0.1
+        version: 4.0.1
       zod:
         specifier: 4.5.4
         version: 4.5.4
@@ -539,9 +539,6 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
-
-  '@remotion/noise@4.0.529':
-    resolution: {integrity: sha512-pNMygRwof82dk9pkSDdS7SyYAeSZIyiEFhnuQ8EWbAbUjHaGkhDM9Te9uzj0Ik9O13uU3jwmQ7oHpxRl6x4yBg==}
 
   '@remotion/paths@4.0.529':
     resolution: {integrity: sha512-kTm3lehZkjpqLi+e1rdgsMoRulDVUTkZMOUFPu9tCZDDh+gVFqQcsuOnhYZlgxnSun8f8zvy9aP2khS3Oooq3Q==}
@@ -2661,14 +2658,6 @@ snapshots:
       react-dom: 19.3.0(react@19.3.0)
       remotion: 4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       zod: 4.5.4
-
-  '@remotion/noise@4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
-    dependencies:
-      remotion: 4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      simplex-noise: 4.0.1
-    transitivePeerDependencies:
-      - react
-      - react-dom
 
   '@remotion/paths@4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:

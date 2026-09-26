@@ -2,7 +2,7 @@
   "name": "stickstage",
   "version": "0.1.0",
   "private": true,
-  "description": "Stick-figure comedy skits from JSON: rig, faces, sets, a director (beats \u2192 shots) and self-checks, on Remotion.",
+  "description": "Stick-figure comedy skits from JSON: rig, faces, sets, a director (beats → shots) and self-checks, on Remotion.",
   "license": "UNLICENSED",
   "type": "module",
   "sideEffects": false,
@@ -41,10 +41,12 @@
     "dist",
     "README.md"
   ],
+  "dependencies": {
+    "simplex-noise": "4.0.1"
+  },
   "peerDependencies": {
     "@remotion/bundler": "4.0.529",
     "@remotion/captions": "4.0.529",
-    "@remotion/noise": "4.0.529",
     "@remotion/renderer": "4.0.529",
     "@remotion/transitions": "4.0.529",
     "react": ">=18.0.0",
