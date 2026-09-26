@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "milo",
+      "text": "Okay, family. Welcome to our first quarterly family meeting.",
+      "audio": "voice/l1.wav",
+      "durationMs": 4223
+    },
+    {
+      "id": "l2",
+      "speaker": "june",
+      "text": "Dad, it's breakfast. And it's just us.",
+      "audio": "voice/l2.wav",
+      "durationMs": 2641
+    },
+    {
+      "id": "l3",
+      "speaker": "milo",
+      "text": "Agenda item one. Someone ate the last biscuit.",
+      "audio": "voice/l3.wav",
+      "durationMs": 3103
+    },
+    {
+      "id": "l4",
+      "speaker": "june",
+      "text": "Tragic.",
+      "audio": "voice/l4.wav",
+      "durationMs": 558
+    },
+    {
+      "id": "l5",
+      "speaker": "milo",
+      "text": "So. Who owns this action?",
+      "audio": "voice/l5.wav",
+      "durationMs": 1927
+    },
+    {
+      "id": "l6",
+      "speaker": "june",
+      "text": "The dog.",
+      "audio": "voice/l6.wav",
+      "durationMs": 480
+    },
+    {
+      "id": "l7",
+      "speaker": "milo",
+      "text": "The dog doesn't have opposable thumbs.",
+      "audio": "voice/l7.wav",
+      "durationMs": 2171
+    },
+    {
+      "id": "l8",
+      "speaker": "june",
+      "text": "Which is why he needed my help.",
+      "audio": "voice/l8.wav",
+      "durationMs": 1639
+    },
+    {
+      "id": "l9",
+      "speaker": "milo",
+      "text": "Wait. So you're admitting you took it?",
+      "audio": "voice/l9.wav",
+      "durationMs": 2278
+    },
+    {
+      "id": "l10",
+      "speaker": "june",
+      "text": "I'm saying it was cross-team collaboration.",
+      "audio": "voice/l10.wav",
+      "durationMs": 2365
+    },
+    {
+      "id": "l11",
+      "speaker": "milo",
+      "text": "Honestly? That's great teamwork.",
+      "audio": "voice/l11.wav",
+      "durationMs": 2174
+    },
+    {
+      "id": "l12",
+      "speaker": "june",
+      "text": "Thanks. Now let's discuss my bonus.",
+      "audio": "voice/l12.wav",
+      "durationMs": 2510
+    }
+  ]
+}

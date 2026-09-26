@@ -23,6 +23,10 @@ Stick-figure comedy-skit engine on Remotion, for our own channel. Plan: `../plan
 - `pnpm voice:say <skitId>`: dev stand-in for the tamtree harness TTS; macOS `say` → `public/skits/<id>/voice/` + `voice.json`
 - `pnpm prep <skitId> [--require-rhubarb]`: voice.json → Rhubarb mouths + script-aligned word timings → `generated/voice.prepared.json` (hash-cached, no network). Rhubarb: `RHUBARB_PATH`, `tools/Rhubarb-Lip-Sync-*/rhubarb` (gitignored), or PATH
 
+## Skills
+- `topic-to-video` (`skills/topic-to-video/SKILL.md`): a topic → a ~30 s skit, end to end (writes the jokes, stages, renders, packages). Use it when asked to "make a video about X".
+- `skit-director` (`skills/skit-director/SKILL.md`): stages a human-written premise; never writes or changes a line.
+
 ## Voice
 TTS is **not** called from this repo. The tamtree agent harness generates audio (+ optional word timings) and writes `voice.json`; see `docs/voice-contract.md`. Never add TTS provider keys here.
 
