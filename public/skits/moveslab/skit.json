@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "meta": { "title": "Moves lab" },
+  "set": "street-1",
+  "cast": [
+    { "id": "milo", "character": "milo", "mark": "left" },
+    { "id": "june", "character": "june", "mark": "off-right" }
+  ],
+  "overlay": { "subtitles": false },
+  "beats": [
+    { "id": "enter", "silent": true, "durationMs": 1600, "shot": { "framing": "wide" },
+      "actions": [ { "who": "june", "do": "walkTo", "mark": "right" } ] },
+    { "id": "five", "silent": true, "durationMs": 1400,
+      "actions": [ { "who": "milo", "do": "highFive", "with": "june", "at": { "ms": 600 } },
+                   { "who": "milo", "do": "expression", "expression": "happy", "at": { "ms": 500 } },
+                   { "who": "june", "do": "expression", "expression": "happy", "at": { "ms": 500 } } ],
+      "sfx": [ { "id": "pop", "at": { "ms": 600 } } ] },
+    { "id": "shove", "silent": true, "durationMs": 1400,
+      "actions": [ { "who": "june", "do": "shove", "target": "milo", "at": { "ms": 500 } },
+                   { "who": "june", "do": "expression", "expression": "angry", "at": { "ms": 300 } },
+                   { "who": "milo", "do": "expression", "expression": "shocked", "at": { "ms": 520 } } ],
+      "sfx": [ { "id": "thud", "at": { "ms": 500 } } ] },
+    { "id": "exit", "silent": true, "durationMs": 1600, "shot": { "framing": "wide" },
+      "actions": [ { "who": "milo", "do": "walkTo", "mark": "off-left", "speed": "run" },
+                   { "who": "milo", "do": "symbol", "symbol": "speed-lines", "durationMs": 800 } ] }
+  ]
+}

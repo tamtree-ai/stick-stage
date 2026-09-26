@@ -217,3 +217,16 @@ export const estimateWordsInSpans = (text: string, spans: readonly Span[], durat
       : { text: t.text, startMs: last.startMs, endMs: Math.round(b.ms) };
   });
 };
+
+/**
+ * Word timings from whisper.cpp JSON output (`-oj`, run with `-ml 1 -sow` so each segment is
+ * one word). Offsets are in ms. Empty and bracketed segments ("[MUSIC]") are dropped.
+ */
+export const parseWhisperJson = (json: unknown): TimedWord[] => {
+  const segs = (json as { transcription?: { offsets?: { from: number; to: number }; text?: string }[] }).transcription ?? [];
+  return segs.flatMap((s) => {
+    const text = (s.text ?? "").trim();
+    if (!text || /^[[(].*[\])]$/.test(text) || !s.offsets) return [];
+    return [{ text, startMs: s.offsets.from, endMs: s.offsets.to }];
+  });
+};

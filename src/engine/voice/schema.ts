@@ -62,7 +62,8 @@ export const PreparedLineSchema = z.object({
   words: z.array(WordTimingSchema),
   mouthCues: z.array(MouthCueSchema),
   source: z.object({
-    words: z.enum(["tts", "estimated"]),
+    /** tts: provider timings; manual: given in skit.json; whisper: transcribed; estimated: from silences. */
+    words: z.enum(["tts", "manual", "whisper", "estimated"]),
     mouth: z.enum(["rhubarb", "estimated"]),
   }),
 });

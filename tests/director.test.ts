@@ -87,7 +87,7 @@ describe("beat layout", () => {
 describe("schema and library errors are actionable", () => {
   const base = skitOf([{ id: "a", speaker: "milo", line: "Hello there friend." }]);
   const withBeat = (patch: object, beatPatch: object = {}) => () =>
-    compileSkit({ ...base, skit: { ...base.skit, ...patch, beats: [{ ...base.skit.beats[0], ...beatPatch }] }, lib: library, sets, sfx: sfxLibrary, reactions });
+    compileSkit({ ...base, skit: { ...base.skit, ...patch, beats: [{ ...base.skit.beats![0], ...beatPatch }] }, lib: library, sets, sfx: sfxLibrary, reactions });
 
   it("bad enum: path, expected values and an example", () => {
     const [e] = errorsOf(withBeat({}, { shot: { framing: "closeup", on: "milo" } }));
@@ -121,7 +121,7 @@ describe("schema and library errors are actionable", () => {
     expect(errorsOf(withBeat({}, { line: "Hello there, friend!" }))[0]!.message).toContain("line changed");
     expect(errorsOf(withBeat({}, { actions: [{ who: "milo", do: "pose", pose: "shrug", at: { word: "bye" } }] }))[0]!.path).toBe("beats[0].actions[0].at");
     expect(errorsOf(() => compile([{ id: "s", silent: true, line: "Hm." }]))[0]!.path).toBe("beats[0].line");
-    expect(errorsOf(withBeat({}, { audio: { source: "file", src: "x.mp3" } }))[0]!.message).toContain("not supported yet");
+    expect(errorsOf(withBeat({}, { id: "clip", audio: { source: "file", src: "x.mp3" } }))[0]!.message).toContain("isn't prepared");
   });
 });
 
@@ -193,12 +193,18 @@ describe("default shot policy", () => {
     expect(["close", "extreme"]).toContain(cut.framing);
   });
   it("a strong punchline emotion shows in the two-shot first, then cuts to the face", () => {
-    const beats = [...exchange.slice(0, 3), { ...exchange[3]!, expression: "angry" }];
+    const beats = [...exchange.slice(0, 3), { ...exchange[3]!, line: "Then no, I did not eat it.", expression: "angry" }];
     const { timeline: tl } = compile(beats);
     const d = tl.beats.find((b) => b.id === "d")!;
     const cut = tl.shots.find((s) => s.frame >= d.from)!;
     expect(cut).toMatchObject({ framing: "close", on: "june", frame: d.from + 10 });
     expect(tl.punchIns).toHaveLength(0);
+  });
+  it("a punchline too short for the close-up to hold 1 s gets the punch-in instead", () => {
+    const { timeline: tl } = compile([...exchange.slice(0, 3), { ...exchange[3]!, expression: "angry" }]);
+    const d = tl.beats.find((b) => b.id === "d")!;
+    expect(tl.punchIns.map((p) => p.on)).toEqual(["june"]);
+    expect(tl.shots.filter((s) => s.frame >= d.from && s.frame < d.to)).toEqual([]);
   });
   it("close-up budget: no second emotion close-up within 3 s (the punchline pair excepted)", () => {
     const { timeline: tl } = compile([
@@ -246,3 +252,25 @@ describe("determinism and data", () => {
     for (const e of [...Object.values(reactions.listen), ...Object.values(reactions.punchline)]) expect(library.expressions[e]).toBeDefined();
   });
 });
+
+describe("diagnostic codes", () => {
+  it("every diagnostic carries a stable machine-readable code", () => {
+    const codes = (beats: Parameters<typeof skitOf>[0], drop?: string) => {
+      const { skit, voice } = skitOf(beats);
+      try {
+        compileSkit({ skit, voice: { ...voice, lines: voice.lines.filter((l) => l.id !== drop) }, lib: library, sets, sfx: sfxLibrary, reactions });
+      } catch (e) {
+        return (e as SkitError).diagnostics.map((d) => d.code);
+      }
+      return [];
+    };
+    expect(codes([{ id: "a", speaker: "milo", line: "Hi there.", actions: [{ who: "milo", do: "pose", pose: "shurg" }] }])).toEqual(["unknown-pose"]);
+    expect(codes([{ id: "b", speaker: "june", line: "No voice here." }], "b")).toEqual(["voice-missing"]);
+    try {
+      parseSkit({ schemaVersion: 1, meta: { title: "x" }, set: "plain-1", cast: [], beats: [] });
+    } catch (e) {
+      expect((e as SkitError).diagnostics.every((d) => d.code.startsWith("schema/"))).toBe(true);
+    }
+  });
+});
+

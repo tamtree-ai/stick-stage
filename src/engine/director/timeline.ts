@@ -1,6 +1,7 @@
 import type { ExpressionKey } from "../face/expressions";
 import type { PropKey } from "../props/schema";
 import type { GazeKey, NodKey, SpeechClip, SymbolKey } from "../rig/actorState";
+import type { GaitKey } from "../rig/gait";
 import type { PoseKey } from "../rig/pose";
 import type { SeatKey } from "../rig/seat";
 import type { Camera } from "../shots/Stage";
@@ -15,7 +16,7 @@ import type { CaptionPage } from "../text/captions";
 export type Facing = "left" | "right";
 
 /** Quick cartoon move to a new horizontal position (fraction of frame width). */
-export type MoveKey = { frame: number; x: number; durationFrames: number };
+export type MoveKey = { frame: number; x: number; durationFrames: number; /** Default "snap" (cartoon slide); "linear" for walks. */ ease?: "snap" | "linear" };
 export type FacingKey = { frame: number; facing: Facing };
 export type HopKey = { frame: number; /** Fraction of figure height. */ height: number };
 
@@ -23,6 +24,8 @@ export type CastTrack = {
   id: string;
   character: string;
   seed: string;
+  /** Name tag above the head in group shots. */
+  label?: string;
   /** Starting position (fraction of frame width) and facing. */
   x: number;
   facing: Facing;
@@ -37,6 +40,7 @@ export type CastTrack = {
   moveKeys: MoveKey[];
   facingKeys: FacingKey[];
   hopKeys: HopKey[];
+  gaitKeys: GaitKey[];
 };
 
 export type BeatKind = "line" | "silent" | "reaction";
@@ -100,4 +104,26 @@ export type Timeline = {
   pov?: { text: string; from: number; to: number };
   slams: SlamEvent[];
   pages: CaptionPage[];
+};
+
+/** How a scene comes in (`cut` has no overlap). */
+export type SceneTransition = { type: "cut" | "fade" | "slide" | "wipe" | "clock-wipe"; durationFrames: number };
+
+export type ProgramScene = {
+  id: string;
+  /** First frame of the scene in the whole skit (transitions overlap the previous scene). */
+  from: number;
+  transitionIn?: SceneTransition;
+  timeline: Timeline;
+};
+
+/** A compiled skit: one or more scene timelines joined by transitions (`generated/timeline.json`). */
+export type Program = {
+  schemaVersion: 1;
+  title: string;
+  fps: number;
+  width: number;
+  height: number;
+  durationInFrames: number;
+  scenes: ProgramScene[];
 };

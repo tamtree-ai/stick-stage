@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "meta": {
+    "title": "Working title",
+    "hashtags": []
+  },
+  "set": "plain-1",
+  "cast": [
+    {
+      "id": "milo",
+      "character": "milo",
+      "mark": "center"
+    }
+  ],
+  "overlay": {
+    "subtitles": false
+  },
+  "beats": [
+    {
+      "id": "s1",
+      "silent": true,
+      "durationMs": 1350,
+      "actions": [
+        {
+          "who": "milo",
+          "do": "expression",
+          "expression": "neutral",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "text": [
+        {
+          "type": "slam",
+          "value": "FIRST BEAT",
+          "at": {
+            "ms": 120
+          },
+          "durationMs": 1250
+        }
+      ],
+      "sfx": [
+        {
+          "id": "pop",
+          "at": {
+            "ms": 120
+          }
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "silent": true,
+      "durationMs": 1440,
+      "actions": [
+        {
+          "who": "milo",
+          "do": "expression",
+          "expression": "confused",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "text": [
+        {
+          "type": "slam",
+          "value": "IT ESCALATES",
+          "at": {
+            "ms": 120
+          },
+          "durationMs": 1340
+        }
+      ],
+      "sfx": [
+        {
+          "id": "pop",
+          "at": {
+            "ms": 120
+          }
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "silent": true,
+      "durationMs": 1305,
+      "actions": [
+        {
+          "who": "milo",
+          "do": "expression",
+          "expression": "shocked",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "text": [
+        {
+          "type": "slam",
+          "value": "PUNCHLINE",
+          "at": {
+            "ms": 120
+          },
+          "durationMs": 1205
+        }
+      ],
+      "sfx": [
+        {
+          "id": "boom",
+          "at": {
+            "ms": 120
+          }
+        }
+      ],
+      "punchline": true,
+      "reaction": false,
+      "pauseBeforeMs": 450
+    }
+  ]
+}

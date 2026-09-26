@@ -36,6 +36,8 @@ export const planShots = (
   hint: (expression: string) => Expression["closeup"],
   fps: number,
   diags: Diagnostic[],
+  /** When someone moving at `frame` (a slide, a stagger, a walk) comes to rest. Default: no wait. */
+  settleAt: (who: string, frame: number) => number = (_w, f) => f,
 ): ShotPlan => {
   const plan: ShotPlan = { cuts: [{ frame: 0, framing: "two", reason: "open on two" }], punchIns: [], shakes: [] };
   let cam: Cam = { framing: "two", since: 0, punched: false };
@@ -56,7 +58,9 @@ export const planShots = (
   /** Two-shot first, then cut to the face once the expression has landed. */
   const emotionCloseup = (m: Moment, reason: string) => {
     const framing = hint(m.expression) ?? "close";
-    const frame = onTwo() ? m.frame + LAND_FRAMES : m.frame;
+    // Don't cut to a face that is still flying across the frame: wait until it settles.
+    const base = onTwo() ? m.frame + LAND_FRAMES : m.frame;
+    const frame = Math.max(base, settleAt(m.who, base));
     cut(frame, framing, m.who, `${reason}: ${m.expression}`);
     lastCloseup = frame;
   };
@@ -75,9 +79,9 @@ export const planShots = (
       if (s.punchIn) {
         const pf = anchorFrame(b, s.punchIn.at, `${where}.punchIn.at`, fps, diags) ?? from;
         if (FACE.includes(s.framing))
-          diags.push({ level: "warning", path: `${where}.punchIn`, message: "a punch-in on a face framing: use a close-up or a punch-in, not both" });
+          diags.push({ level: "warning", code: "punch-on-face", path: `${where}.punchIn`, message: "a punch-in on a face framing: use a close-up or a punch-in, not both" });
         if (pf - lastPunch < msToFrame(MIN_PUNCH_GAP_MS, fps))
-          diags.push({ level: "warning", path: `${where}.punchIn`, message: `punch-ins less than ${MIN_PUNCH_GAP_MS / 1000} s apart` });
+          diags.push({ level: "warning", code: "punch-gap", path: `${where}.punchIn`, message: `punch-ins less than ${MIN_PUNCH_GAP_MS / 1000} s apart` });
         punch(pf, s.punchIn.on, "skit punch-in");
       }
       if (s.shake) {
@@ -104,8 +108,19 @@ export const planShots = (
 
     const m = strongest(b);
     if (b.punchline) {
-      const speaker = b.beat.speaker!;
-      if (m && from - lastCloseup >= msToFrame(CLOSEUP_BUDGET_MS, fps)) return emotionCloseup(m, "punchline emotion");
+      // A silent punchline (a slam, a look) belongs to whoever reacts in it.
+      const speaker = b.beat.speaker ?? m?.who;
+      if (!speaker) return;
+      if (!b.line) {
+        // Silent punchline: land the reaction on a face (a new framing), else punch in.
+        if (m && (from - lastCloseup >= msToFrame(CLOSEUP_BUDGET_MS, fps) || !onTwo())) return emotionCloseup(m, "punchline emotion");
+        if (onTwo() && from - lastPunch >= msToFrame(MIN_PUNCH_GAP_MS, fps)) return punch(from + 2, speaker, "punchline punch-in");
+        return cut(from, "close", speaker, "punchline close");
+      }
+      // The emotion close-up needs room to hold ≥ 1 s before the reaction cut; short lines get the punch-in.
+      const cutAt = m ? (onTwo() ? m.frame + LAND_FRAMES : m.frame) : 0;
+      const room = msToFrame(b.endMs, fps) - cutAt;
+      if (m && from - lastCloseup >= msToFrame(CLOSEUP_BUDGET_MS, fps) && room >= minHold) return emotionCloseup(m, "punchline emotion");
       const twoAt = backToTwo("back to two before the punchline");
       const lastWord = b.line?.words[b.line.words.length - 1];
       const pf = from + msToFrame(lastWord?.startMs ?? 0, fps);
@@ -120,7 +135,8 @@ export const planShots = (
       return emotionCloseup(m, "reaction close-up");
     }
 
-    if (b.kind === "silent" && m) {
+    // A slam is the beat's one dominant thing: no close-up cut away from it.
+    if (b.kind === "silent" && m && b.beat.text.length === 0) {
       const afterPunch = prev?.punchline === true;
       if (afterPunch || from - lastCloseup >= msToFrame(CLOSEUP_BUDGET_MS, fps)) emotionCloseup(m, "reaction emotion");
     }

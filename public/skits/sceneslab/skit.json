@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "meta": { "title": "Scenes lab", "description": "Pipeline demo: two scenes joined by a clock wipe." },
+  "cast": [
+    { "id": "milo", "character": "milo", "mark": "left" },
+    { "id": "june", "character": "june", "mark": "right" }
+  ],
+  "overlay": { "pov": "LAB: two scenes, one skit" },
+  "scenes": [
+    {
+      "id": "office", "set": "office-1",
+      "cast": [ { "id": "milo", "seated": true }, { "id": "june" } ],
+      "beats": [
+        { "id": "s1a", "speaker": "june", "line": "Lunch at noon?" },
+        { "id": "s1b", "speaker": "milo", "line": "Sure. Noon.", "expression": "happy" }
+      ]
+    },
+    {
+      "id": "park", "set": "park-1",
+      "transition": { "type": "clock-wipe", "durationMs": 600 },
+      "cast": [ { "id": "milo", "mark": "left" }, { "id": "june", "mark": "off-right" } ],
+      "beats": [
+        { "id": "s2a", "silent": true, "durationMs": 1600,
+          "actions": [ { "who": "june", "do": "walkTo", "mark": "right" } ] },
+        { "id": "s2b", "speaker": "milo", "line": "It is four p.m.", "expression": "annoyed" }
+      ]
+    }
+  ]
+}

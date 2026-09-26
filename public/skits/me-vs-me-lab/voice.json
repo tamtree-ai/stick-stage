@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "me",
+      "text": "What I want to do.",
+      "audio": "voice/l1.wav",
+      "durationMs": 1163
+    },
+    {
+      "id": "l2",
+      "speaker": "brain",
+      "text": "What the other me says.",
+      "audio": "voice/l2.wav",
+      "durationMs": 1279
+    },
+    {
+      "id": "l3",
+      "speaker": "me",
+      "text": "Punchline.",
+      "audio": "voice/l3.wav",
+      "durationMs": 796
+    }
+  ]
+}

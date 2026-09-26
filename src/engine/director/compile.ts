@@ -1,188 +1,137 @@
-import type { Library } from "../rig/actorState";
-import type { SetDef } from "../set/schema";
-import { buildCaptionPages } from "../text/captions";
-import type { PreparedLine, PreparedVoice } from "../voice/schema";
-import { solveShots } from "./camera";
-import { fromZodIssues, SkitError, unknownId, type Diagnostic } from "./diagnostics";
-import { anchorFrame, layoutBeats, msToFrame, reactorFor } from "./layout";
-import { xAt } from "./placement";
-import { SkitSchema, type Beat, type ReactionTable, type SfxManifest, type Skit } from "./schema";
-import { planShots } from "./shots";
-import { buildTracks } from "./tracks";
-import type { AudioClip, SfxEvent, SlamEvent, Timeline } from "./timeline";
+import { migrate } from "../migrate";
+import { fromZodIssues, SkitError, type Diagnostic } from "./diagnostics";
+import { msToFrame } from "./layout";
+import { docBeats, SkitSchema, type Beat, type CastMember, type Skit, type SkitDoc } from "./schema";
+import { compileScene, type CompileInput } from "./scene";
+import type { Program, SceneTransition, Timeline } from "./timeline";
 
-export type CompileInput = {
-  /** Raw `skit.json` (validated here). */
-  skit: unknown;
-  /** Prepared voice (`generated/voice.prepared.json`); needed for spoken beats. */
-  voice?: PreparedVoice;
-  lib: Library;
-  sets: Readonly<Record<string, SetDef>>;
-  sfx: SfxManifest;
-  reactions: ReactionTable;
+export type { CompileInput } from "./scene";
+
+export type CompiledScene = { id: string; skit: Skit; timeline: Timeline };
+
+export type CompileResult = {
+  /** The first scene's timeline (for a single-scene skit, the whole skit). */
+  timeline: Timeline;
+  /** The first scene, resolved. */
+  skit: Skit;
+  /** Every scene with its resolved skit and timeline. */
+  scenes: CompiledScene[];
+  /** What the renderer plays: scenes joined by transitions. */
+  program: Program;
+  doc: SkitDoc;
+  warnings: Diagnostic[];
 };
 
-export type CompileResult = { timeline: Timeline; skit: Skit; warnings: Diagnostic[] };
-
 /** Validate the document's shape. Throws `SkitError` with path + expected + example per problem. */
-export const parseSkit = (json: unknown): Skit => {
-  const r = SkitSchema.safeParse(json);
+export const parseSkit = (json: unknown): SkitDoc => {
+  const r = SkitSchema.safeParse(migrate("skit", json).doc);
   if (!r.success) throw new SkitError(fromZodIssues(r.error.issues));
   return r.data;
 };
 
-const FACE_FRAMINGS = ["medium", "close", "extreme"];
+type Resolved = { id: string; skit: Skit; enter?: SceneTransition; remap: (path: string) => string };
 
-/** Library ids the schema can't check: poses, expressions, props, sfx, characters, cast refs. */
-const checkIds = (skit: Skit, input: CompileInput, diags: Diagnostic[]) => {
-  const { lib, sets, sfx } = input;
-  const ids = (t: object) => Object.keys(t);
-  const castIds = skit.cast.map((c) => c.id);
-  const need = (kind: string, got: string | undefined, known: string[], path: (string | number)[]) => {
-    if (got !== undefined && !known.includes(got)) diags.push(unknownId(kind, got, known, path));
-  };
-  need("set", skit.set, ids(sets), ["set"]);
-  const dup = (xs: string[], path: string, what: string) =>
-    xs.forEach((x, i) => xs.indexOf(x) !== i && diags.push({ level: "error", path: `${path}[${i}].id`, message: `duplicate ${what} id "${x}"` }));
-  dup(castIds, "cast", "cast");
-  dup(skit.beats.map((b) => b.id), "beats", "beat");
-  skit.cast.forEach((c, i) => {
-    need("character", c.character, ids(lib.characters), ["cast", i, "character"]);
-    need("pose", c.pose, ids(lib.poses), ["cast", i, "pose"]);
-    need("expression", c.expression, ids(lib.expressions), ["cast", i, "expression"]);
-    need("prop", c.holding?.prop, ids(lib.props), ["cast", i, "holding", "prop"]);
+const spoken = (b: Beat) => !b.silent && !!b.line;
+
+/**
+ * Split a document into scene skits. The punchline is global (flagged beats, else the last
+ * spoken beat of the skit); later scenes start after their transition, and each scene's tail
+ * leaves room for the next transition.
+ */
+export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[]): Resolved[] => {
+  if (!doc.scenes) return [{ id: "main", skit: { ...doc, set: doc.set!, beats: doc.beats! }, remap: (p) => p }];
+  const all = docBeats(doc);
+  const ids = all.map((b) => b.id);
+  ids.forEach((id, i) => ids.indexOf(id) !== i && diags.push({ level: "error", code: "duplicate-id", path: "scenes", message: `duplicate beat id "${id}" (beat ids name voice files, so they are unique across scenes)` }));
+  const flagged = all.some((b) => b.punchline);
+  const last = [...all].reverse().find((b) => spoken(b) && b.punchline !== false);
+  const { fps } = doc.meta;
+  const gap = doc.timing.gapMs;
+  const trans = doc.scenes.map((sc, i) => {
+    if (i === 0) return undefined;
+    const t = sc.transition ?? { type: "fade" as const, durationMs: 400 };
+    return { type: t.type, durationFrames: t.type === "cut" ? 0 : msToFrame(t.durationMs, fps) } satisfies SceneTransition;
   });
-  const sounds = sfx.sounds.map((s) => s.id);
-  skit.beats.forEach((b, i) => {
-    const p = (...rest: (string | number)[]) => ["beats", i, ...rest];
-    need("speaker", b.speaker, castIds, p("speaker"));
-    need("expression", b.expression, ids(lib.expressions), p("expression"));
-    if (typeof b.reaction === "string") need("expression", b.reaction, ids(lib.expressions), p("reaction"));
-    if (b.silent && b.expression)
-      diags.push({ level: "error", path: `beats[${i}].expression`, message: "a silent beat has no speaker", expected: `an action instead`, example: `{ "who": "milo", "do": "expression", "expression": "${b.expression}" }` });
-    if (b.shot) {
-      need("cast member", b.shot.on, castIds, p("shot", "on"));
-      need("cast member", b.shot.punchIn?.on, castIds, p("shot", "punchIn", "on"));
-      if (FACE_FRAMINGS.includes(b.shot.framing) && !b.shot.on)
-        diags.push({ level: "error", path: `beats[${i}].shot.on`, message: `framing "${b.shot.framing}" needs "on"`, expected: `one of ${castIds.join(", ")}`, example: `"shot": { "framing": "${b.shot.framing}", "on": "${castIds[0]}" }` });
-    }
-    b.actions.forEach((a, j) => {
-      if (a.do === "pose") need("pose", a.pose, ids(lib.poses), p("actions", j, "pose"));
-      if (a.do === "expression") need("expression", a.expression, ids(lib.expressions), p("actions", j, "expression"));
-      if (a.do === "hold") need("prop", a.prop, ids(lib.props), p("actions", j, "prop"));
-    });
-    b.sfx.forEach((s, j) => need("sound", s.id, sounds, p("sfx", j, "id")));
+  const transMs = (i: number) => ((trans[i]?.durationFrames ?? 0) / fps) * 1000;
+  return doc.scenes.map((sc, s) => {
+    const castPath = new Map<number, string>();
+    const cast: CastMember[] = sc.cast
+      ? sc.cast.flatMap((o, j) => {
+          const base = doc.cast.find((c) => c.id === o.id);
+          if (!base) {
+            diags.push({ level: "error", code: "unknown-cast-member", path: `scenes[${s}].cast[${j}].id`, message: `"${o.id}" is not in the skit's cast`, expected: `one of ${doc.cast.map((c) => c.id).join(", ")}` });
+            return [];
+          }
+          castPath.set(castPath.size, `scenes[${s}].cast[${j}]`);
+          const defined = Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined));
+          return [{ ...base, ...defined } as CastMember];
+        })
+      : doc.cast.map((c, j) => (castPath.set(j, `cast[${j}]`), c));
+    const beats = sc.beats.map((b) => (spoken(b) && b.punchline === undefined ? { ...b, punchline: !flagged && b === last } : b));
+    const skit: Skit = {
+      ...doc,
+      set: sc.set ?? doc.set!,
+      cast,
+      beats,
+      overlay: { ...doc.overlay, pov: sc.pov ?? (s === 0 ? doc.overlay.pov : undefined) },
+      timing: {
+        gapMs: gap,
+        leadInMs: s === 0 ? doc.timing.leadInMs : transMs(s) + gap,
+        tailMs: s === doc.scenes!.length - 1 ? doc.timing.tailMs : gap + transMs(s + 1),
+      },
+    };
+    const remap = (p: string) => {
+      const m = p.match(/^cast\[(\d+)\](.*)$/);
+      if (m) return `${castPath.get(Number(m[1])) ?? `scenes[${s}].cast`}${m[2]}`;
+      return /^(beats|set)\b/.test(p) ? `scenes[${s}].${p}` : p;
+    };
+    return { id: sc.id, skit, enter: trans[s], remap };
   });
 };
 
-/** The speaker's expression going into beat `index` (for the default punchline reaction). */
-const speakerExpression = (skit: Skit, index: number, speaker: string): string => {
-  for (let i = index; i >= 0; i--) {
-    const b = skit.beats[i]!;
-    if (b.speaker === speaker && b.expression) return b.expression;
-    const act = [...b.actions].reverse().find((a) => a.who === speaker && a.do === "expression");
-    if (act && act.do === "expression") return act.expression;
-  }
-  return skit.cast.find((c) => c.id === speaker)?.expression ?? "neutral";
-};
-
-/** skit.json + prepared voice + library → frame-indexed timeline. Throws `SkitError` on any error. */
+/** skit.json + prepared voice + library → program (scene timelines). Throws `SkitError` on any error. */
 export const compileSkit = (input: CompileInput): CompileResult => {
-  const skit = parseSkit(input.skit);
+  const doc = parseSkit(input.skit);
   const diags: Diagnostic[] = [];
-  checkIds(skit, input, diags);
-  const fail = () => diags.some((d) => d.level === "error");
-  if (fail()) throw new SkitError(diags);
-
-  const { fps, width, height } = skit.meta;
-  const set = input.sets[skit.set]!;
-  const lines = new Map<string, PreparedLine>((input.voice?.lines ?? []).map((l) => [l.id, l]));
-  const reactionFor = (beat: Beat, i: number) => {
-    const reactor = reactorFor(skit, i, beat.speaker!);
-    if (!reactor) return undefined;
-    const e = speakerExpression(skit, i, beat.speaker!);
-    const expression = typeof beat.reaction === "string" ? beat.reaction : (input.reactions.punchline[e] ?? input.reactions.defaultPunchline);
-    return { reactor, expression };
-  };
-  const layout = layoutBeats(skit, lines, reactionFor, diags);
-  if (fail()) throw new SkitError(diags);
-
-  const { cast, moments } = buildTracks(skit, layout, set, input.lib, input.reactions, fps, diags);
-  const hint = (e: string) => input.lib.expressions[e]?.closeup;
-  const plan = planShots(layout, moments, hint, fps, diags);
-  if (fail()) throw new SkitError(diags);
-  const { shots, punchIns, shakes } = solveShots(plan, cast, input.lib, set, fps, width, height);
-
-  const audio: AudioClip[] = [];
-  const sfx: SfxEvent[] = [];
-  const slams: SlamEvent[] = [];
-  const sounds = new Map(input.sfx.sounds.map((s) => [s.id, s]));
-  for (const b of layout.beats) {
-    const where = b.path.join(".").replace(/\.(\d+)/g, "[$1]");
-    if (b.line && b.kind === "line") {
-      audio.push({ frame: msToFrame(b.zeroMs, fps), durationFrames: Math.ceil((b.line.durationMs / 1000) * fps) + 1, src: b.line.audio, beatId: b.beat.id });
+  const resolved = resolveScenes(doc, diags);
+  const scenes: CompiledScene[] = [];
+  for (const r of resolved) {
+    let found: Diagnostic[];
+    try {
+      const out = compileScene(r.skit, input);
+      scenes.push({ id: r.id, skit: r.skit, timeline: out.timeline });
+      found = out.warnings;
+    } catch (e) {
+      if (!(e instanceof SkitError)) throw e;
+      found = e.diagnostics;
     }
-    b.beat.sfx.forEach((s, j) => {
-      const frame = anchorFrame(b, s.at, `${where}.sfx[${j}].at`, fps, diags);
-      const snd = sounds.get(s.id)!;
-      if (frame !== undefined)
-        sfx.push({ frame: Math.max(0, frame), id: s.id, src: snd.file, volume: s.volume * snd.gain, durationFrames: Math.ceil((snd.durationMs / 1000) * fps) + 1 });
-    });
-    b.beat.text.forEach((t, j) => {
-      const frame = anchorFrame(b, t.at, `${where}.text[${j}].at`, fps, diags);
-      if (frame !== undefined) slams.push({ text: t.value, from: frame, to: frame + msToFrame(t.durationMs, fps) });
-    });
+    diags.push(...found.map((d) => ({ ...d, path: r.remap(d.path) })));
   }
-  if (fail()) throw new SkitError(diags);
+  if (diags.some((d) => d.level === "error")) throw new SkitError(diags);
 
-  // Screen direction: characters keep their left/right order across the whole skit.
-  const order = (f: number) => [...cast].sort((a, b) => xAt(a, f) - xAt(b, f)).map((c) => c.id).join(",");
-  const durationInFrames = msToFrame(layout.totalMs, fps);
-  if (order(0) !== order(durationInFrames))
-    diags.push({ level: "warning", path: "beats", message: "a slideTo swaps the characters' sides; screen direction breaks across cuts" });
-
-  const spoken = layout.beats.filter((b) => b.kind === "line" && b.line);
-  const timeline: Timeline = {
+  let from = 0;
+  const programScenes = scenes.map((sc, i) => {
+    const t = resolved[i]!.enter;
+    if (i > 0) from += scenes[i - 1]!.timeline.durationInFrames - (t?.durationFrames ?? 0);
+    return { id: sc.id, from, transitionIn: t, timeline: sc.timeline };
+  });
+  const lastScene = programScenes[programScenes.length - 1]!;
+  const program: Program = {
     schemaVersion: 1,
-    title: skit.meta.title,
-    fps,
-    width,
-    height,
-    durationInFrames,
-    set: skit.set,
-    cast,
-    beats: layout.beats.map((b) => ({
-      id: b.beat.id,
-      kind: b.kind,
-      synthetic: b.synthetic,
-      punchline: b.punchline,
-      from: msToFrame(b.fromMs, fps),
-      to: msToFrame(b.endMs, fps),
-      speaker: b.beat.speaker,
-      audioFrom: b.line ? msToFrame(b.zeroMs, fps) : undefined,
-      audioTo: b.line ? msToFrame(b.zeroMs + b.line.durationMs, fps) : undefined,
-    })),
-    shots,
-    punchIns,
-    shakes,
-    audio,
-    sfx: sfx.sort((a, b) => a.frame - b.frame),
-    pov: skit.overlay.pov ? { text: skit.overlay.pov, from: 4, to: durationInFrames } : undefined,
-    // A slam belongs to its shot: it ends at the next cut.
-    slams: slams
-      .sort((a, b) => a.from - b.from)
-      .map((sl) => ({ ...sl, to: Math.min(sl.to, shots.find((c) => c.frame > sl.from)?.frame ?? sl.to) })),
-    pages: skit.overlay.subtitles
-      ? buildCaptionPages(spoken.map((b) => ({ startMs: (msToFrame(b.zeroMs, fps) / fps) * 1000, words: b.line!.words })))
-      : [],
+    title: doc.meta.title,
+    fps: doc.meta.fps,
+    width: doc.meta.width,
+    height: doc.meta.height,
+    durationInFrames: lastScene.from + lastScene.timeline.durationInFrames,
+    scenes: programScenes,
   };
-  return { timeline, skit, warnings: diags };
+  return { timeline: scenes[0]!.timeline, skit: scenes[0]!.skit, scenes, program, doc, warnings: diags };
 };
 
-/** The lines a voice source must synthesize: one per spoken beat (id = beat id = voice file name). */
-export const skitLines = (skit: Skit) =>
-  skit.beats.flatMap((b) => {
+/** The lines a voice source must synthesize: one per spoken TTS beat (id = beat id = voice file name). */
+export const skitLines = (doc: SkitDoc) =>
+  docBeats(doc).flatMap((b) => {
     if (b.silent || !b.speaker || !b.line || b.audio.source !== "tts") return [];
-    const character = skit.cast.find((c) => c.id === b.speaker)?.character ?? b.speaker;
+    const character = doc.cast.find((c) => c.id === b.speaker)?.character ?? b.speaker;
     return [{ id: b.id, speaker: b.speaker, character, text: b.line, delivery: b.delivery }];
   });

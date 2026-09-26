@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "id": {
+      "type": "string"
+    },
+    "torso": {
+      "default": 0,
+      "type": "number"
+    },
+    "head": {
+      "default": 0,
+      "type": "number"
+    },
+    "shoulderL": {
+      "type": "number"
+    },
+    "elbowL": {
+      "type": "number"
+    },
+    "shoulderR": {
+      "type": "number"
+    },
+    "elbowR": {
+      "type": "number"
+    },
+    "hipL": {
+      "default": -5,
+      "type": "number"
+    },
+    "kneeL": {
+      "default": 0,
+      "type": "number"
+    },
+    "hipR": {
+      "default": 5,
+      "type": "number"
+    },
+    "kneeR": {
+      "default": 0,
+      "type": "number"
+    },
+    "bend": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "armL": {
+          "type": "number"
+        },
+        "armR": {
+          "type": "number"
+        },
+        "legL": {
+          "type": "number"
+        },
+        "legR": {
+          "type": "number"
+        }
+      }
+    },
+    "anticipation": {
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "shoulderL",
+    "elbowL",
+    "shoulderR",
+    "elbowR"
+  ],
+  "$id": "https://stickstage.dev/schemas/pose.schema.json",
+  "title": "StickStage pose"
+}

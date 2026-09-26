@@ -10,4 +10,4 @@ if (!id || !isSkit(id)) {
   console.error(`usage: pnpm compile <skitId>   (public/skits/<skitId>/skit.json${id ? ` not found for "${id}"` : ""})`);
   process.exit(1);
 }
-console.log(summarize(compileSkitDir(id).timeline));
+console.log(summarize(compileSkitDir(id).program));

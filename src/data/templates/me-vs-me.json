@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "template": "me-vs-me",
+  "title": "Working title",
+  "logline": "Me arguing with a part of me (my brain, my stomach, me at 3 a.m.).",
+  "cast": [ { "id": "me", "character": "milo", "label": "me" }, { "id": "brain", "character": "milo", "label": "my brain", "holding": "phone" } ],
+  "lines": [
+    { "who": "me", "text": "What I want to do.", "role": "setup" },
+    { "who": "brain", "text": "What the other me says.", "role": "escalation" },
+    { "who": "me", "text": "Punchline.", "role": "punchline" }
+  ]
+}

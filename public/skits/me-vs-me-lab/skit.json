@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "meta": {
+    "title": "Working title",
+    "hashtags": []
+  },
+  "set": "living-1",
+  "cast": [
+    {
+      "id": "me",
+      "character": "milo",
+      "mark": "left",
+      "label": "me"
+    },
+    {
+      "id": "brain",
+      "character": "milo",
+      "mark": "right",
+      "label": "my brain",
+      "holding": {
+        "prop": "phone",
+        "hand": "R"
+      }
+    }
+  ],
+  "overlay": {
+    "subtitles": true
+  },
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "me",
+      "line": "What I want to do.",
+      "expression": "neutral",
+      "actions": []
+    },
+    {
+      "id": "l2",
+      "speaker": "brain",
+      "line": "What the other me says.",
+      "expression": "annoyed",
+      "actions": [
+        {
+          "who": "brain",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ]
+    },
+    {
+      "id": "l3",
+      "speaker": "me",
+      "line": "Punchline.",
+      "expression": "deadpan",
+      "actions": [],
+      "punchline": true,
+      "pauseBeforeMs": 450,
+      "holdAfterMs": 300
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "meta": { "title": "Lip-sync lab", "syntheticVoices": true },
+  "set": "living-1",
+  "cast": [
+    { "id": "milo", "character": "milo", "mark": "left" },
+    { "id": "june", "character": "june", "mark": "right" }
+  ],
+  "overlay": { "pov": "LAB: lip-sync to an existing sound" },
+  "beats": [
+    { "id": "l1", "speaker": "milo", "line": "Why are you in my kitchen?", "expression": "confused",
+      "audio": { "source": "file", "src": "audio/sound.wav", "startMs": 0, "endMs": 1488 } },
+    { "id": "l2", "speaker": "june", "line": "I live here now.", "expression": "smug",
+      "audio": { "source": "file", "src": "audio/sound.wav", "startMs": 1938, "endMs": 2921 } }
+  ]
+}

@@ -2,6 +2,7 @@ import React from "react";
 import { easeOutBack } from "../lib/easing";
 import { clamp } from "../lib/math";
 import { pageAt, type CaptionPage } from "./captions";
+import { SUBTITLE } from "./layout";
 import { safeRect, type SafeArea } from "./safeArea";
 
 export type TextStyle = {
@@ -36,7 +37,7 @@ const POP_FRAMES = 3;
  * lifts and grows slightly, so it still reads without color (and in grayscale previews).
  * Spaces are separate text nodes so the grown word never eats its neighbours' gaps.
  */
-export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, height, safeArea, style, y = 0.62, fontSize = 74, hidden }) => {
+export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, height, safeArea, style, y = SUBTITLE.y, fontSize = SUBTITLE.fontSize, hidden }) => {
   if (hidden) return null;
   const ms = (frame / fps) * 1000;
   const page = pageAt(pages, ms);
@@ -45,7 +46,7 @@ export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, 
   const cy = clamp(y * height, safe.y + fontSize * 1.3, safe.y + safe.h - fontSize * 1.3);
   const pageFrame = frame - (page.startMs / 1000) * fps;
   const pop = 0.86 + 0.14 * easeOutBack(pageFrame / POP_FRAMES, 2);
-  const outline = style.outline ?? "#111114";
+  const outline = style.outline ?? SUBTITLE.outline;
   return (
     <div
       style={{
@@ -58,8 +59,8 @@ export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, 
         fontFamily: style.fontFamily,
         fontWeight: 800,
         fontSize,
-        lineHeight: 1.15,
-        color: style.color ?? "#ffffff",
+        lineHeight: SUBTITLE.lineHeight,
+        color: style.color ?? SUBTITLE.fill,
         WebkitTextStroke: `${Math.round(fontSize * 0.2)}px ${outline}`,
         paintOrder: "stroke fill",
         whiteSpace: "pre-wrap",
@@ -75,7 +76,7 @@ export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, 
             <span
               style={{
                 display: "inline-block",
-                color: active ? (style.highlight ?? "#ffd84a") : undefined,
+                color: active ? (style.highlight ?? SUBTITLE.highlight) : undefined,
                 transform: active ? `translateY(${(-fontSize * 0.1).toFixed(1)}px) scale(1.05)` : undefined,
               }}
             >

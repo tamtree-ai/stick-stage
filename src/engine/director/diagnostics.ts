@@ -3,6 +3,8 @@ import type { z } from "zod";
 /** One problem in a skit, phrased so a person (or the M5 skill) can fix the JSON directly. */
 export type Diagnostic = {
   level: "error" | "warning";
+  /** Stable machine-readable id (e.g. `unknown-pose`, `voice-stale`, `schema/invalid_type`). */
+  code: string;
   /** JSON path, e.g. `beats[2].actions[0].pose`. */
   path: string;
   message: string;
@@ -54,6 +56,10 @@ const EXAMPLES: Record<string, string> = {
   to: `{ "who": "milo", "do": "look", "to": "june" }`,
   prop: `{ "who": "milo", "do": "hold", "prop": "phone", "hand": "R" }`,
   hand: `"hand": "R"`,
+  speed: `{ "who": "milo", "do": "walkTo", "mark": "center", "speed": "run" }`,
+  with: `{ "who": "milo", "do": "highFive", "with": "june", "at": { "word": "yes" } }`,
+  target: `{ "who": "june", "do": "shove", "target": "milo", "at": { "word": "out" } }`,
+  distance: `{ "who": "june", "do": "shove", "target": "milo", "distance": 0.14 }`,
   symbol: `{ "who": "milo", "do": "symbol", "symbol": "sweat" }`,
   sfx: `"sfx": [{ "id": "record-scratch", "at": { "ms": 0 } }]`,
   text: `"text": [{ "type": "slam", "value": "SURE.", "at": { "word": "Sure" } }]`,
@@ -74,7 +80,7 @@ export const exampleFor = (path: readonly PropertyKey[]): string | undefined => 
 /** Zod issues → diagnostics with the path, what was expected and an example. */
 export const fromZodIssues = (issues: readonly z.core.$ZodIssue[]): Diagnostic[] =>
   issues.map((i) => {
-    const d: Diagnostic = { level: "error", path: pathString(i.path), message: i.message, example: exampleFor(i.path) };
+    const d: Diagnostic = { level: "error", code: `schema/${i.code}`, path: pathString(i.path), message: i.message, example: exampleFor(i.path) };
     if (i.code === "invalid_value") d.expected = `one of ${i.values.map((v) => JSON.stringify(v)).join(" | ")}`;
     if (i.code === "invalid_union" && "note" in i && i.note === "No matching discriminator")
       d.message = `unknown "${i.discriminator}" value`;
@@ -112,6 +118,7 @@ export const unknownId = (kind: string, got: string, known: readonly string[], p
   const guess = didYouMean(got, known);
   return {
     level: "error",
+    code: `unknown-${kind.replace(/\s+/g, "-")}`,
     path: pathString(path),
     message: `unknown ${kind} "${got}"${guess ? ` (did you mean "${guess}"?)` : ""}`,
     expected: `one of ${known.join(", ")}`,
@@ -123,7 +130,7 @@ export const formatDiagnostics = (ds: readonly Diagnostic[]): string => {
   const errors = ds.filter((d) => d.level === "error").length;
   const head = `skit has ${errors} error${errors === 1 ? "" : "s"}${ds.length > errors ? ` and ${ds.length - errors} warning(s)` : ""}:`;
   const body = ds.map((d) => {
-    const lines = [`  ${d.level === "error" ? "✗" : "!"} ${d.path}: ${d.message}`];
+    const lines = [`  ${d.level === "error" ? "✗" : "!"} ${d.path}: ${d.message}  [${d.code}]`];
     if (d.expected) lines.push(`      expected: ${d.expected}`);
     if (d.example) lines.push(`      example:  ${d.example}`);
     return lines.join("\n");

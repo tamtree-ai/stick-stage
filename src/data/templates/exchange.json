@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "template": "exchange",
+  "title": "Working title",
+  "logline": "One sentence: who wants what, and what goes wrong.",
+  "pov": "POV: the situation in a few words",
+  "hashtags": ["stickfigure"],
+  "cast": [ { "id": "milo", "character": "milo" }, { "id": "june", "character": "june" } ],
+  "lines": [
+    { "who": "milo", "text": "Setup line: the hook, said in the first second.", "role": "setup" },
+    { "who": "june", "text": "Answer line.", "role": "setup" },
+    { "who": "milo", "text": "Escalation line: it gets worse.", "role": "escalation" },
+    { "who": "june", "text": "Punchline.", "role": "punchline", "slam": "OPTIONAL" }
+  ]
+}

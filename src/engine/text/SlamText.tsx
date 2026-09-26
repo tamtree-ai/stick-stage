@@ -2,6 +2,7 @@ import React from "react";
 import { easeOutBack } from "../lib/easing";
 import { clamp } from "../lib/math";
 import { randRange } from "../lib/seed";
+import { SLAM, slamLayout } from "./layout";
 import { safeRect, type SafeArea } from "./safeArea";
 
 export type SlamTextProps = {
@@ -39,14 +40,16 @@ export const SlamText: React.FC<SlamTextProps> = ({
   height,
   safeArea,
   fontFamily,
-  color = "#ffffff",
-  y = 0.64,
-  fontSize = 190,
+  color = SLAM.fill,
+  y = SLAM.y,
+  fontSize = SLAM.fontSize,
   seed = text,
 }) => {
   const start = from - SLAM_FRAMES;
   if (frame < start || frame >= to) return null;
   const safe = safeRect(safeArea, width, height);
+  // Long slams shrink to fit (at most two lines) and stay inside the safe area.
+  const { fontSize: size, cy } = slamLayout(text, width, height, safeArea, y, fontSize);
   const t = frame - start;
   const slam = 2.3 - 1.3 * easeOutBack(t / SLAM_FRAMES, 1.4);
   const out = clamp((to - frame) / OUT_FRAMES, 0, 1);
@@ -61,18 +64,18 @@ export const SlamText: React.FC<SlamTextProps> = ({
         position: "absolute",
         left: safe.x,
         width: safe.w,
-        top: y * height,
+        top: cy,
         transform: `translate(${dx.toFixed(1)}px, calc(-50% + ${dy.toFixed(1)}px)) rotate(-4deg) scale(${(slam * (0.7 + 0.3 * out)).toFixed(3)})`,
         opacity,
         textAlign: "center",
         fontFamily,
         fontWeight: 900,
-        fontSize,
-        lineHeight: 1,
+        fontSize: size,
+        lineHeight: SLAM.lineHeight,
         color,
-        WebkitTextStroke: `${Math.round(fontSize * 0.13)}px #111114`,
+        WebkitTextStroke: `${Math.round(size * 0.13)}px ${SLAM.outline}`,
         paintOrder: "stroke fill",
-        textShadow: `0 ${Math.round(fontSize * 0.07)}px 0 #111114`,
+        textShadow: `0 ${Math.round(size * 0.07)}px 0 ${SLAM.outline}`,
         letterSpacing: "-0.01em",
       }}
     >

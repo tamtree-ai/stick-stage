@@ -36,4 +36,6 @@ export default [
   { ignores: ["out/**", "node_modules/**", "public/**"] },
   ...remotion,
   { files: ["src/engine/**/*.{ts,tsx}"], rules: engineRules },
+  // Tests and scripts build skit data, whose `transition` fields aren't CSS animations.
+  { files: ["tests/**", "scripts/**"], rules: { "@remotion/non-pure-animation": "off" } },
 ];

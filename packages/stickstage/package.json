@@ -1,0 +1,53 @@
+{
+  "name": "stickstage",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Stick-figure comedy skits from JSON: rig, faces, sets, a director (beats → shots) and self-checks, on Remotion.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/engine/core.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/types/engine/schemas.d.ts",
+      "import": "./dist/schema.js"
+    },
+    "./remotion": {
+      "types": "./dist/types/engine/remotion.d.ts",
+      "import": "./dist/remotion.js"
+    },
+    "./node": {
+      "types": "./dist/types/node/index.d.ts",
+      "import": "./dist/node.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@remotion/bundler": "4.0.529",
+    "@remotion/captions": "4.0.529",
+    "@remotion/noise": "4.0.529",
+    "@remotion/renderer": "4.0.529",
+    "@remotion/transitions": "4.0.529",
+    "react": ">=18.0.0",
+    "remotion": "4.0.529",
+    "zod": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@remotion/bundler": {
+      "optional": true
+    },
+    "@remotion/renderer": {
+      "optional": true
+    }
+  }
+}

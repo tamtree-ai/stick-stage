@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "meta": { "title": "Not being sarcastic" },
+  "meta": { "title": "Not being sarcastic", "description": "When they say they're fine. (Pipeline demo.)", "hashtags": ["stickfigure", "relatable"] },
   "set": "office-1",
   "cast": [
     { "id": "milo", "character": "milo", "mark": "left", "seated": true },

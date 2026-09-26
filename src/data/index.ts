@@ -1,5 +1,4 @@
-import type { z } from "zod";
-import { CharacterSchema, PoseSchema, PropSchema, ExpressionSchema, ReactionTableSchema, SafeAreaSchema, SetSchema, SfxManifestSchema, type Library, type ReactionTable, type SafeArea, type SetDef, type SfxManifest } from "../engine";
+import { createLibrary, createSets, migrate, SafeAreaProfilesSchema, type SafeAreaProfiles, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type SafeArea, type SetDef, type SfxManifest } from "../engine";
 
 import milo from "./characters/milo.json";
 import june from "./characters/june.json";
@@ -20,6 +19,8 @@ import sit from "./poses/sit.json";
 import holdOut from "./poses/hold-out.json";
 import holdChest from "./poses/hold-chest.json";
 import holdUp from "./poses/hold-up.json";
+import highFive from "./poses/high-five.json";
+import shove from "./poses/shove.json";
 
 import phone from "./props/phone.json";
 import mic from "./props/mic.json";
@@ -48,43 +49,34 @@ import park1 from "./sets/park-1.json";
 import street1 from "./sets/street-1.json";
 
 import safeAreaJson from "./safe-area.json";
+import safeAreaProfilesJson from "./safe-area-profiles.json";
 import reactionsJson from "./reactions.json";
 import sfxJson from "./sfx.json";
-
-const table = <S extends z.ZodType<{ id: string }>>(kind: string, schema: S, docs: unknown[]) => {
-  const out: Record<string, z.infer<S>> = {};
-  for (const doc of docs) {
-    const r = schema.safeParse(doc);
-    if (!r.success) {
-      const id = (doc as { id?: string }).id ?? "?";
-      throw new Error(`Invalid ${kind} "${id}":\n${r.error.issues.map((i) => `  ${i.path.join(".")}: ${i.message}`).join("\n")}`);
-    }
-    out[r.data.id] = r.data;
-  }
-  return out;
-};
 
 /** Order matters: labs cycle through poses/expressions in this order. */
 export const POSE_IDS = ["idle", "point", "shrug", "facepalm", "arms-up", "arms-crossed", "think", "lean-in", "recoil", "slump", "hands-on-hips", "hold-phone"];
 /** Poses added after M1 (labs that cycle POSE_IDS skip these). */
-export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up"];
+export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up", "high-five", "shove"];
 export const PROP_IDS = ["phone", "mic", "cup", "laptop", "sign"];
 export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed", "angry", "shocked", "sad", "crying", "cringe", "confused", "deadpan"];
 
-export const library: Library = {
-  characters: table("character", CharacterSchema, [milo, june]),
-  poses: table("pose", PoseSchema, [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp]),
-  expressions: table("expression", ExpressionSchema, [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan]),
-  props: table("prop", PropSchema, [phone, mic, cup, laptop, sign]),
-};
+export const library: Library = createLibrary({
+  characters: [milo, june],
+  poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove],
+  expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan],
+  props: [phone, mic, cup, laptop, sign],
+});
 
-export const sets: Record<string, SetDef> = table("set", SetSchema, [plain1, living1, lounge1, office1, park1, street1]);
+export const sets: Record<string, SetDef> = createSets([plain1, living1, lounge1, office1, park1, street1]);
 
 /** One conservative profile for TikTok / Reels / Shorts overlays (verify against real screenshots in M4). */
-export const safeArea: SafeArea = SafeAreaSchema.parse(safeAreaJson);
+export const safeArea: SafeArea = SafeAreaSchema.parse(migrate("safeArea", safeAreaJson).doc);
+
+/** Per-platform overlay measurements; `safeArea` is the strictest of them (`pnpm safearea`). */
+export const safeAreaProfiles: SafeAreaProfiles = SafeAreaProfilesSchema.parse(safeAreaProfilesJson);
 
 /** Listener reaction defaults: speaker expression → listener expression. */
-export const reactions: ReactionTable = ReactionTableSchema.parse(reactionsJson);
+export const reactions: ReactionTable = ReactionTableSchema.parse(migrate("reactions", reactionsJson).doc);
 
 /** SFX library manifest (`pnpm sfx` regenerates the synthesized entries). */
-export const sfxLibrary: SfxManifest = SfxManifestSchema.parse(sfxJson);
+export const sfxLibrary: SfxManifest = SfxManifestSchema.parse(migrate("sfx", sfxJson).doc);

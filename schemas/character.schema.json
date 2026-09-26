@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "id": {
+      "type": "string"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "proportions": {
+      "type": "object",
+      "properties": {
+        "height": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 1.5
+        },
+        "headRadius": {
+          "type": "number",
+          "minimum": 0.08,
+          "maximum": 0.25
+        },
+        "neck": {
+          "default": 0.02,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.1
+        },
+        "torso": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 0.5
+        },
+        "upperArm": {
+          "type": "number",
+          "minimum": 0.05,
+          "maximum": 0.3
+        },
+        "forearm": {
+          "type": "number",
+          "minimum": 0.05,
+          "maximum": 0.3
+        },
+        "thigh": {
+          "type": "number",
+          "minimum": 0.05,
+          "maximum": 0.35
+        },
+        "shin": {
+          "type": "number",
+          "minimum": 0.05,
+          "maximum": 0.35
+        }
+      },
+      "required": [
+        "headRadius",
+        "torso",
+        "upperArm",
+        "forearm",
+        "thigh",
+        "shin"
+      ]
+    },
+    "style": {
+      "type": "object",
+      "properties": {
+        "stroke": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{3,8}$"
+        },
+        "strokeWidth": {
+          "type": "number",
+          "minimum": 2,
+          "maximum": 30
+        },
+        "headFill": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{3,8}$"
+        },
+        "torso": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "style": {
+                  "type": "string",
+                  "const": "line"
+                }
+              },
+              "required": [
+                "style"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "style": {
+                  "type": "string",
+                  "const": "bean"
+                },
+                "fill": {
+                  "type": "string",
+                  "pattern": "^#[0-9a-fA-F]{3,8}$"
+                },
+                "width": {
+                  "default": 0.13,
+                  "type": "number",
+                  "minimum": 0.04,
+                  "maximum": 0.3
+                }
+              },
+              "required": [
+                "style",
+                "fill"
+              ]
+            }
+          ]
+        },
+        "limbCurve": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "hands": {
+          "type": "string",
+          "enum": [
+            "nub"
+          ]
+        },
+        "feet": {
+          "type": "string",
+          "enum": [
+            "oval"
+          ]
+        },
+        "footFill": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{3,8}$"
+        },
+        "cheek": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{3,8}$"
+        }
+      },
+      "required": [
+        "stroke",
+        "strokeWidth",
+        "headFill",
+        "torso",
+        "limbCurve",
+        "hands",
+        "feet",
+        "footFill"
+      ]
+    },
+    "face": {
+      "type": "object",
+      "properties": {
+        "eyes": {
+          "type": "string",
+          "enum": [
+            "big-pupil",
+            "dot"
+          ]
+        },
+        "brows": {
+          "type": "boolean"
+        },
+        "mouthSet": {
+          "default": "default",
+          "type": "string"
+        },
+        "offsetX": {
+          "default": 0.14,
+          "type": "number",
+          "minimum": -0.5,
+          "maximum": 0.5
+        },
+        "eyeSpacing": {
+          "default": 0.44,
+          "type": "number",
+          "minimum": 0.2,
+          "maximum": 0.8
+        },
+        "eyeY": {
+          "default": -0.06,
+          "type": "number",
+          "minimum": -0.5,
+          "maximum": 0.5
+        },
+        "mouthY": {
+          "default": 0.42,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.8
+        }
+      },
+      "required": [
+        "eyes",
+        "brows"
+      ]
+    },
+    "accessories": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "slot": {
+            "type": "string",
+            "enum": [
+              "hair",
+              "eyewear",
+              "headwear",
+              "neck"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{3,8}$"
+          }
+        },
+        "required": [
+          "slot",
+          "id"
+        ]
+      }
+    },
+    "voice": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "voiceId": {
+          "type": "string"
+        },
+        "settings": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "say": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "proportions",
+    "style",
+    "face"
+  ],
+  "$id": "https://stickstage.dev/schemas/character.schema.json",
+  "title": "StickStage character"
+}

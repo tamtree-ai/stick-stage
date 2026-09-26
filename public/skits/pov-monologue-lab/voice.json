@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "june",
+      "text": "Setup, straight to camera.",
+      "audio": "voice/l1.wav",
+      "durationMs": 1686
+    },
+    {
+      "id": "l2",
+      "speaker": "june",
+      "text": "It gets worse.",
+      "audio": "voice/l2.wav",
+      "durationMs": 868
+    },
+    {
+      "id": "l3",
+      "speaker": "june",
+      "text": "Punchline.",
+      "audio": "voice/l3.wav",
+      "durationMs": 766
+    }
+  ]
+}

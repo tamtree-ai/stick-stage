@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "speaker": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "audio": {
+            "type": "string"
+          },
+          "durationMs": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "words": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "startMs": {
+                  "type": "number"
+                },
+                "endMs": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "text",
+                "startMs",
+                "endMs"
+              ]
+            }
+          },
+          "mouthCues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "startMs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "endMs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "shape": {
+                  "type": "string",
+                  "enum": [
+                    "A",
+                    "B",
+                    "C",
+                    "D",
+                    "E",
+                    "F",
+                    "G",
+                    "H",
+                    "X"
+                  ]
+                }
+              },
+              "required": [
+                "startMs",
+                "endMs",
+                "shape"
+              ]
+            }
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "words": {
+                "type": "string",
+                "enum": [
+                  "tts",
+                  "manual",
+                  "whisper",
+                  "estimated"
+                ]
+              },
+              "mouth": {
+                "type": "string",
+                "enum": [
+                  "rhubarb",
+                  "estimated"
+                ]
+              }
+            },
+            "required": [
+              "words",
+              "mouth"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "audio",
+          "durationMs",
+          "words",
+          "mouthCues",
+          "source"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "lines"
+  ],
+  "$id": "https://stickstage.dev/schemas/preparedVoice.schema.json",
+  "title": "StickStage preparedVoice"
+}

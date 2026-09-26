@@ -3,12 +3,14 @@ import { AbsoluteFill, Html5Audio, Sequence, staticFile, useCurrentFrame } from 
 import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
 import { Stage } from "../shots/Stage";
+import { CastLabels } from "../text/CastLabels";
 import { PovCard } from "../text/PovCard";
 import type { SafeArea } from "../text/safeArea";
 import { SlamText } from "../text/SlamText";
 import { Subtitles } from "../text/Subtitles";
 import { cameraAt, shotAt } from "./camera";
 import { stageActorsAt } from "./placement";
+import { QaOverlay } from "./QaOverlay";
 import type { Timeline } from "./timeline";
 
 const FACE_FRAMINGS: readonly string[] = ["medium", "close", "extreme"];
@@ -45,11 +47,21 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
           <Html5Audio src={staticFile(s.src)} volume={() => s.volume} />
         </Sequence>
       ))}
+      <CastLabels
+        actors={actors.map((a) => ({ ...a, label: tl.cast.find((c) => c.id === a.id)?.label }))}
+        camera={camera}
+        width={W}
+        height={H}
+        groundY={set.groundY}
+        minY={safeArea.top * H}
+        fontFamily={fontFamily}
+      />
       {tl.pov && !faceShot ? <PovCard text={tl.pov.text} frame={frame} from={tl.pov.from} to={tl.pov.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} /> : null}
       <Subtitles hidden={slamUp} pages={tl.pages} frame={frame} fps={fps} width={W} height={H} safeArea={safeArea} style={{ fontFamily }} />
       {tl.slams.map((s, i) => (
         <SlamText key={i} seed={`${tl.title}-${i}`} text={s.text} frame={frame} from={s.from} to={s.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} />
       ))}
+      {showLabels ? <QaOverlay tl={tl} lib={lib} set={set} safeArea={safeArea} camera={camera} frame={frame} /> : null}
       {showLabels ? <SkitLabel tl={tl} frame={frame} /> : null}
     </AbsoluteFill>
   );
