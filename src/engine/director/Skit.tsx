@@ -23,10 +23,12 @@ export type SkitProps = {
   fontFamily: string;
   /** Debug overlay: beat, shot reason, frame. */
   showLabels?: boolean;
+  /** `false`: mount no dialog or SFX audio (a preview on placeholder timings has no files). Default true. */
+  audio?: boolean;
 };
 
 /** Renders a compiled skit: stage under the director's camera, dialog + SFX audio, text overlays. */
-export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fontFamily, showLabels }) => {
+export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fontFamily, showLabels, audio = true }) => {
   const frame = useCurrentFrame();
   const { width: W, height: H, fps } = tl;
   const actors = stageActorsAt(lib, tl.cast, set, frame, fps, W);
@@ -37,12 +39,12 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
   return (
     <AbsoluteFill style={{ background: "#ffffff" }}>
       <Stage set={set} actors={actors} width={W} height={H} frame={frame} camera={camera} fontFamily={fontFamily} />
-      {tl.audio.map((a) => (
+      {audio && tl.audio.map((a) => (
         <Sequence key={`v-${a.beatId}`} from={a.frame} durationInFrames={a.durationFrames} layout="none">
           <Html5Audio src={staticFile(a.src)} />
         </Sequence>
       ))}
-      {tl.sfx.map((s, i) => (
+      {audio && tl.sfx.map((s, i) => (
         <Sequence key={`sfx-${i}`} from={s.frame} durationInFrames={s.durationFrames} layout="none">
           <Html5Audio src={staticFile(s.src)} volume={() => s.volume} />
         </Sequence>

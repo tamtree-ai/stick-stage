@@ -12,23 +12,28 @@
   "exports": {
     ".": {
       "types": "./dist/types/engine/core.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./schema": {
       "types": "./dist/types/engine/schemas.d.ts",
-      "import": "./dist/schema.js"
+      "import": "./dist/schema.js",
+      "default": "./dist/schema.js"
     },
     "./remotion": {
       "types": "./dist/types/engine/remotion.d.ts",
-      "import": "./dist/remotion.js"
+      "import": "./dist/remotion.js",
+      "default": "./dist/remotion.js"
     },
     "./node": {
       "types": "./dist/types/node/index.d.ts",
-      "import": "./dist/node.js"
+      "import": "./dist/node.js",
+      "default": "./dist/node.js"
     },
     "./data": {
       "types": "./dist/types/data/index.d.ts",
-      "import": "./dist/data.js"
+      "import": "./dist/data.js",
+      "default": "./dist/data.js"
     },
     "./package.json": "./package.json"
   },

@@ -11,7 +11,7 @@ cuts, and self-checks (safe areas, overlay collisions, contrast, comedy-staging 
 
 | Import | What | Never |
 |---|---|---|
-| `stickstage` | Pure core: types, zod schemas, `compileSkit`, diagnostics, `checkSkit`, templates (`fromPremise`), `createLibrary`, migrations, math | React, Node APIs, side effects |
+| `stickstage` | Pure core: types, zod schemas, `compileSkit`, diagnostics, `checkSkit`, `checkDraft` (what `/validate` does, locally), `placeholderVoice`, templates (`fromPremise`), `createLibrary`, migrations, math | React, Node APIs, side effects |
 | `stickstage/schema` | Schemas for every document kind, `jsonSchemaFor(kind)`, `migrate` | React, Node APIs |
 | `stickstage/remotion` | `StickStageComposition` (`SkitProgram`), `calculateStickStageMetadata`, `Skit`, `Stage`, `Actor`, text overlays, `ContactSheet` | `registerRoot`, file paths |
 | `stickstage/data` | The shipped registry: `library`, `sets`, `sfxLibrary`, `reactions`, `safeArea`, and `catalog` (characters, sets, templates, expressions, props + `version`) | React, Node APIs |
