@@ -4,3 +4,4 @@ out
 .env.*
 public/skits/*/generated
 .DS_Store
+tools/

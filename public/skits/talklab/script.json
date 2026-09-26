@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "title": "TalkLab: one character, three lines, three expressions",
+  "set": "living-1",
+  "pov": "POV: your friend finally read your script",
+  "voices": { "milo": "Daniel", "june": "Samantha" },
+  "lines": [
+    { "id": "l1", "speaker": "milo", "text": "Good news! I finally read your script.", "expression": "happy", "pose": "hands-on-hips", "poseAt": "news", "shot": "two" },
+    { "id": "l2", "speaker": "milo", "text": "I loved it. Especially the part where nothing happens.", "expression": "sarcastic", "pose": "shrug", "poseAt": "Especially", "shot": "two" },
+    { "id": "l3", "speaker": "milo", "text": "Forty pages. Forty! And the dog never talks!", "expression": "angry", "pose": "arms-up", "poseAt": "Forty!", "shot": "close", "slam": { "value": "FORTY!", "at": "Forty!" } }
+  ]
+}

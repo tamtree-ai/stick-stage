@@ -11,6 +11,8 @@ import {
   closeupSheetSchema,
   closeupSheetSize,
 } from "./labs/CloseupLab";
+import { TalkLab } from "./labs/TalkLab";
+import { calculateTalkLabMetadata, talkLabSchema } from "./talk/talkData";
 import { calculateContactSheetMetadata, ContactSheet, contactSheetSchema } from "./ContactSheet";
 
 const FPS = 30;
@@ -84,6 +86,28 @@ export const RemotionRoot: React.FC = () => (
       defaultProps={{ set: "living-1", characters: ["milo", "june"], framing: "close" as const }}
       calculateMetadata={({ props }) => closeupSheetSize(props.characters.length)}
       {...closeupSheetSize(2)}
+    />
+    <Composition
+      id="TalkLab"
+      component={TalkLab}
+      schema={talkLabSchema}
+      defaultProps={{ skit: "talklab", character: "milo", showLabels: true }}
+      calculateMetadata={calculateTalkLabMetadata}
+      durationInFrames={FPS}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
+    <Composition
+      id="TalkLabClean"
+      component={TalkLab}
+      schema={talkLabSchema}
+      defaultProps={{ skit: "talklab", character: "milo", showLabels: false }}
+      calculateMetadata={calculateTalkLabMetadata}
+      durationInFrames={FPS}
+      fps={FPS}
+      width={W}
+      height={H}
     />
     <Composition
       id="PoseLab"

@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import { CharacterSchema, PoseSchema, ExpressionSchema, SetSchema, type Library, type SetDef } from "../engine";
+import { CharacterSchema, PoseSchema, ExpressionSchema, SafeAreaSchema, SetSchema, type Library, type SafeArea, type SetDef } from "../engine";
 
 import milo from "./characters/milo.json";
 import june from "./characters/june.json";
@@ -33,6 +33,8 @@ import deadpan from "./expressions/deadpan.json";
 import plain1 from "./sets/plain-1.json";
 import living1 from "./sets/living-1.json";
 
+import safeAreaJson from "./safe-area.json";
+
 const table = <S extends z.ZodType<{ id: string }>>(kind: string, schema: S, docs: unknown[]) => {
   const out: Record<string, z.infer<S>> = {};
   for (const doc of docs) {
@@ -57,3 +59,6 @@ export const library: Library = {
 };
 
 export const sets: Record<string, SetDef> = table("set", SetSchema, [plain1, living1]);
+
+/** One conservative profile for TikTok / Reels / Shorts overlays (verify against real screenshots in M4). */
+export const safeArea: SafeArea = SafeAreaSchema.parse(safeAreaJson);
