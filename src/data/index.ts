@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import { CharacterSchema, PoseSchema, PropSchema, ExpressionSchema, SafeAreaSchema, SetSchema, type Library, type SafeArea, type SetDef } from "../engine";
+import { CharacterSchema, PoseSchema, PropSchema, ExpressionSchema, ReactionTableSchema, SafeAreaSchema, SetSchema, SfxManifestSchema, type Library, type ReactionTable, type SafeArea, type SetDef, type SfxManifest } from "../engine";
 
 import milo from "./characters/milo.json";
 import june from "./characters/june.json";
@@ -48,6 +48,8 @@ import park1 from "./sets/park-1.json";
 import street1 from "./sets/street-1.json";
 
 import safeAreaJson from "./safe-area.json";
+import reactionsJson from "./reactions.json";
+import sfxJson from "./sfx.json";
 
 const table = <S extends z.ZodType<{ id: string }>>(kind: string, schema: S, docs: unknown[]) => {
   const out: Record<string, z.infer<S>> = {};
@@ -80,3 +82,9 @@ export const sets: Record<string, SetDef> = table("set", SetSchema, [plain1, liv
 
 /** One conservative profile for TikTok / Reels / Shorts overlays (verify against real screenshots in M4). */
 export const safeArea: SafeArea = SafeAreaSchema.parse(safeAreaJson);
+
+/** Listener reaction defaults: speaker expression → listener expression. */
+export const reactions: ReactionTable = ReactionTableSchema.parse(reactionsJson);
+
+/** SFX library manifest (`pnpm sfx` regenerates the synthesized entries). */
+export const sfxLibrary: SfxManifest = SfxManifestSchema.parse(sfxJson);

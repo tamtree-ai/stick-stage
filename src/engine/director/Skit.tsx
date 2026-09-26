@@ -1,0 +1,71 @@
+import React from "react";
+import { AbsoluteFill, Html5Audio, Sequence, staticFile, useCurrentFrame } from "remotion";
+import type { Library } from "../rig/actorState";
+import type { SetDef } from "../set/schema";
+import { Stage } from "../shots/Stage";
+import { PovCard } from "../text/PovCard";
+import type { SafeArea } from "../text/safeArea";
+import { SlamText } from "../text/SlamText";
+import { Subtitles } from "../text/Subtitles";
+import { cameraAt, shotAt } from "./camera";
+import { stageActorsAt } from "./placement";
+import type { Timeline } from "./timeline";
+
+const FACE_FRAMINGS: readonly string[] = ["medium", "close", "extreme"];
+
+export type SkitProps = {
+  timeline: Timeline;
+  lib: Library;
+  set: SetDef;
+  safeArea: SafeArea;
+  fontFamily: string;
+  /** Debug overlay: beat, shot reason, frame. */
+  showLabels?: boolean;
+};
+
+/** Renders a compiled skit: stage under the director's camera, dialog + SFX audio, text overlays. */
+export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fontFamily, showLabels }) => {
+  const frame = useCurrentFrame();
+  const { width: W, height: H, fps } = tl;
+  const actors = stageActorsAt(lib, tl.cast, set, frame, fps, W);
+  const camera = cameraAt(tl, frame);
+  const slamUp = tl.slams.some((s) => frame >= s.from - 4 && frame < s.to);
+  // The POV card sits where a face close-up puts the head, so it steps aside on face shots.
+  const faceShot = FACE_FRAMINGS.includes(shotAt(tl, frame).framing);
+  return (
+    <AbsoluteFill style={{ background: "#ffffff" }}>
+      <Stage set={set} actors={actors} width={W} height={H} frame={frame} camera={camera} fontFamily={fontFamily} />
+      {tl.audio.map((a) => (
+        <Sequence key={`v-${a.beatId}`} from={a.frame} durationInFrames={a.durationFrames} layout="none">
+          <Html5Audio src={staticFile(a.src)} />
+        </Sequence>
+      ))}
+      {tl.sfx.map((s, i) => (
+        <Sequence key={`sfx-${i}`} from={s.frame} durationInFrames={s.durationFrames} layout="none">
+          <Html5Audio src={staticFile(s.src)} volume={() => s.volume} />
+        </Sequence>
+      ))}
+      {tl.pov && !faceShot ? <PovCard text={tl.pov.text} frame={frame} from={tl.pov.from} to={tl.pov.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} /> : null}
+      <Subtitles hidden={slamUp} pages={tl.pages} frame={frame} fps={fps} width={W} height={H} safeArea={safeArea} style={{ fontFamily }} />
+      {tl.slams.map((s, i) => (
+        <SlamText key={i} seed={`${tl.title}-${i}`} text={s.text} frame={frame} from={s.from} to={s.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} />
+      ))}
+      {showLabels ? <SkitLabel tl={tl} frame={frame} /> : null}
+    </AbsoluteFill>
+  );
+};
+
+const SkitLabel: React.FC<{ tl: Timeline; frame: number }> = ({ tl, frame }) => {
+  const beat = [...tl.beats].reverse().find((b) => b.from <= frame);
+  const shot = shotAt(tl, frame);
+  const punch = tl.punchIns.find((p) => p.frame <= frame && frame < p.frame + 30);
+  const text = [
+    `f${frame}  ${beat ? `${beat.id} (${beat.kind}${beat.punchline ? ", punchline" : ""})` : "lead-in"}`,
+    `shot ${shot.framing}${shot.on ? ` on ${shot.on}` : ""}: ${shot.reason}${punch ? `  + punch-in ${punch.on}` : ""}`,
+  ].join("\n");
+  return (
+    <div style={{ position: "absolute", left: 30, bottom: 40, color: "#fff", background: "#000b", font: "600 28px Menlo, monospace", padding: "8px 14px", borderRadius: 8, whiteSpace: "pre" }}>
+      {text}
+    </div>
+  );
+};

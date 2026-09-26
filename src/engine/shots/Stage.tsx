@@ -11,6 +11,8 @@ export type StageActor = {
   /** Horizontal root position, fraction of frame width. */
   x: number;
   facing: "left" | "right";
+  /** Vertical root offset in stage px (negative = up), e.g. a hop. */
+  dy?: number;
 };
 
 export type Camera = {
@@ -43,7 +45,7 @@ export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame,
       <g transform={t}>
         <SetLayers set={set} width={width} height={height} layer="background" />
         {actors.map((a) => (
-          <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY} facing={a.facing} frame={frame} fontFamily={fontFamily} />
+          <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY + (a.dy ?? 0)} facing={a.facing} frame={frame} fontFamily={fontFamily} />
         ))}
         <SetLayers set={set} width={width} height={height} layer="foreground" />
       </g>

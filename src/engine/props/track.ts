@@ -15,6 +15,12 @@ export type PropState = { held: Partial<Record<Hand, HeldProp>>; dropped: Droppe
 /** Hand position + forearm direction at some frame (from the actor's own pose track). */
 export type HandAt = (frame: number, hand: Hand) => { hand: Vec2; elbow: Vec2 };
 
+/**
+ * Re-express a dropped prop given in figure space as of `dropFrame` in the figure space of the
+ * current frame, so a prop on the floor stays put when its owner slides or turns.
+ */
+export type Reframe = (p: Omit<DroppedProp, "def">, dropFrame: number) => Omit<DroppedProp, "def">;
+
 export const POP_FRAMES = 4;
 
 /** Rotation (degrees, SVG clockwise) that points the prop's up axis along its grip. */
@@ -63,6 +69,7 @@ export const evalProps = (
   getProp: (id: string) => PropDef,
   handAt: HandAt,
   figurePx: number,
+  reframe?: Reframe,
 ): PropState => {
   const state: PropState = { held: {}, dropped: [] };
   if (!keys || keys.length === 0) return state;
@@ -84,7 +91,7 @@ export const evalProps = (
     const def = getProp(id);
     const at = handAt(k.frame, k.hand);
     const pose = fallPose(def, at.hand, propAngle(def, at.elbow, at.hand), (frame - k.frame) / fps, figurePx);
-    state.dropped.push({ def, ...pose });
+    state.dropped.push({ def, ...(reframe ? reframe(pose, k.frame) : pose) });
   });
   return state;
 };

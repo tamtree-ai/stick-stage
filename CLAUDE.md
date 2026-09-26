@@ -15,7 +15,10 @@ Stick-figure comedy-skit engine on Remotion, for our own channel. Plan: `../plan
 - `pnpm test` / `pnpm typecheck` / `pnpm lint`: run all three before every commit
 - `pnpm still <Comp> out/x.png --frame=N`: single still (layout checks only)
 - `pnpm sheet <Comp> <from> <to> <step> [--cols=6] [--scale=0.25]`: contact sheet PNG in `out/`
-- `pnpm render <Comp> out/x.mp4 [--frames=a-b]`: MP4. **Motion is reviewed as video, not stills.**
+- `pnpm render <skitId> [out.mp4] [--debug] [--frames=a-b]`: prep → compile → `out/<skitId>.mp4` for `public/skits/<id>/skit.json`
+- `pnpm render <Comp> out/x.mp4 [--frames=a-b]`: any other composition (labs) passes through to `remotion render`. **Motion is reviewed as video, not stills.**
+- `pnpm compile <skitId>`: validate a skit, print diagnostics or the director's choices (beats, cuts and why, punch-ins, SFX), write `generated/timeline.json`
+- `pnpm sfx`: regenerate the synthesized SFX library (`public/sfx/`, `src/data/sfx.json`); `pnpm render SfxLab out/SfxLab.mp4` plays them all
 - `pnpm still SetLab out/SetLab.png [--props='{"kits":["park"],"tileWidth":200}']`: every set part × 3 palettes × 3 seeds
 - `pnpm voice:say <skitId>`: dev stand-in for the tamtree harness TTS; macOS `say` → `public/skits/<id>/voice/` + `voice.json`
 - `pnpm prep <skitId> [--require-rhubarb]`: voice.json → Rhubarb mouths + script-aligned word timings → `generated/voice.prepared.json` (hash-cached, no network). Rhubarb: `RHUBARB_PATH`, `tools/Rhubarb-Lip-Sync-*/rhubarb` (gitignored), or PATH
@@ -36,10 +39,11 @@ TTS is **not** called from this repo. The tamtree agent harness generates audio 
 - `src/engine/set/parts`: part components by kit (`room`, `decor`, `office`, `furniture`, `outdoor`, `street`) and `registry.ts` (`PART_INFO`, `KIT_BACKDROP`). New part → add to `PART_INFO`; it shows up in SetLab
 - `src/engine/shots/Stage.tsx`: set background, then actors, then set foreground, under one camera
 - `src/engine/shots/framing.ts`: `frameShot({ framing, on })` → camera for `wide | two | medium | close | extreme`
-- `src/data`: JSON library + `index.ts` loader (validates on import), `safe-area.json`
-- `scripts/`: `sheet.ts`, `voice-say.ts`, `prep.ts`, `lib/` (Rhubarb + bundled ffmpeg, WAV reading)
-- `public/skits/<id>/`: `script.json`, `voice.json`, `voice/*.wav` (committed); `generated/` (gitignored)
-- `src/app`: Remotion root and lab compositions (`CharacterLab`, `FaceLab`, `CloseupLab`, `CloseupSheet`, `PoseLab`, `TalkLab`, `SetLab`, `PropLab`, `StagingLab`, `ContactSheet`); `fonts.ts` loads the local text font
+- `src/engine/director`: skit schema (`schema.ts`), diagnostics (path + expected + example), anchors, beat layout (`layout.ts`, inserts the punchline reaction beat), actions + listener auto-reactions → cast tracks (`tracks.ts`), default shot policy (`shots.ts`), cameras / punch-ins / shake (`camera.ts`), `compileSkit` → `Timeline`, `<Skit>`. Authoring guide: `docs/skits.md`
+- `src/data`: JSON library + `index.ts` loader (validates on import), `safe-area.json`, `reactions.json` (listener reaction defaults), `sfx.json` (SFX manifest with licenses)
+- `scripts/`: `sheet.ts`, `voice-say.ts`, `prep.ts`, `compile.ts`, `render.ts`, `sfx-gen.ts`, `lib/` (prep, skit loading, Rhubarb + bundled ffmpeg, WAV reading, `synth.ts` DSP)
+- `public/skits/<id>/`: `skit.json` (labs: `script.json`), `voice.json`, `voice/*.wav` (committed); `generated/` (gitignored)
+- `src/app`: Remotion root and lab compositions (`CharacterLab`, `FaceLab`, `CloseupLab`, `CloseupSheet`, `PoseLab`, `TalkLab`, `SetLab`, `PropLab`, `StagingLab`, `SfxLab`, `ContactSheet`), `skit/` (the `Skit` / `SkitDebug` compositions); `fonts.ts` loads the local text font
 
 ## Rig conventions
 Canonical view faces right; `facing: "left"` mirrors. `L` = back limb, `R` = front limb. Arms: 0° hangs along the torso, +90° forward, 180° up; elbow + flexes forward. Legs are world-relative (0° down, + forward); knee + bends back. The rig lifts the figure so the lowest foot touches `groundY`.
