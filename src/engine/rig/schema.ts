@@ -58,11 +58,16 @@ export const CharacterSchema = z.object({
     mouthY: frac(0, 0.8).default(0.42),
   }),
   accessories: z.array(AccessorySchema).default([]),
+  /**
+   * Voice hints. TTS runs in the tamtree harness, which reads `provider` / `voiceId` / `settings`;
+   * `say` is the macOS voice `pnpm voice:say` uses for local dev.
+   */
   voice: z
     .object({
-      provider: z.string(),
-      voiceId: z.string(),
+      provider: z.string().optional(),
+      voiceId: z.string().optional(),
       settings: z.record(z.string(), z.unknown()).default({}),
+      say: z.string().optional(),
     })
     .optional(),
 });

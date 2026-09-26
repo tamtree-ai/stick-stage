@@ -14,5 +14,6 @@
     "footFill": "#ffffff"
   },
   "face": { "eyes": "big-pupil", "brows": true, "mouthSet": "default", "offsetX": 0.14, "eyeSpacing": 0.46, "eyeY": -0.04, "mouthY": 0.44 },
-  "accessories": [{ "slot": "hair", "id": "tuft-01" }]
+  "accessories": [{ "slot": "hair", "id": "tuft-01" }],
+  "voice": { "say": "Daniel" }
 }

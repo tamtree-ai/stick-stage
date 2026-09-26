@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "sounds": [
+    {
+      "id": "pop",
+      "file": "sfx/pop.wav",
+      "durationMs": 140,
+      "gain": 0.7,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "appear",
+        "small"
+      ]
+    },
+    {
+      "id": "boing",
+      "file": "sfx/boing.wav",
+      "durationMs": 800,
+      "gain": 0.75,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "hop",
+        "silly"
+      ]
+    },
+    {
+      "id": "whoosh",
+      "file": "sfx/whoosh.wav",
+      "durationMs": 550,
+      "gain": 0.7,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "move",
+        "transition"
+      ]
+    },
+    {
+      "id": "swish",
+      "file": "sfx/swish.wav",
+      "durationMs": 220,
+      "gain": 0.6,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "move",
+        "gesture"
+      ]
+    },
+    {
+      "id": "zip",
+      "file": "sfx/zip.wav",
+      "durationMs": 260,
+      "gain": 0.6,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "move",
+        "slide"
+      ]
+    },
+    {
+      "id": "record-scratch",
+      "file": "sfx/record-scratch.wav",
+      "durationMs": 600,
+      "gain": 0.8,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "interrupt",
+        "awkward"
+      ]
+    },
+    {
+      "id": "boom",
+      "file": "sfx/boom.wav",
+      "durationMs": 1500,
+      "gain": 0.85,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "hit",
+        "dramatic"
+      ]
+    },
+    {
+      "id": "ding",
+      "file": "sfx/ding.wav",
+      "durationMs": 1400,
+      "gain": 0.55,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "idea",
+        "correct"
+      ]
+    },
+    {
+      "id": "buzzer",
+      "file": "sfx/buzzer.wav",
+      "durationMs": 700,
+      "gain": 0.5,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "wrong",
+        "fail"
+      ]
+    },
+    {
+      "id": "crickets",
+      "file": "sfx/crickets.wav",
+      "durationMs": 2400,
+      "gain": 0.6,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "silence",
+        "awkward"
+      ]
+    },
+    {
+      "id": "rimshot",
+      "file": "sfx/rimshot.wav",
+      "durationMs": 1400,
+      "gain": 0.75,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "joke",
+        "punchline"
+      ]
+    },
+    {
+      "id": "slide-up",
+      "file": "sfx/slide-up.wav",
+      "durationMs": 600,
+      "gain": 0.55,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "silly",
+        "rise"
+      ]
+    },
+    {
+      "id": "slide-down",
+      "file": "sfx/slide-down.wav",
+      "durationMs": 600,
+      "gain": 0.55,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "silly",
+        "fall"
+      ]
+    },
+    {
+      "id": "sad-trombone",
+      "file": "sfx/sad-trombone.wav",
+      "durationMs": 2400,
+      "gain": 0.6,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "fail",
+        "sad"
+      ]
+    },
+    {
+      "id": "thud",
+      "file": "sfx/thud.wav",
+      "durationMs": 350,
+      "gain": 0.8,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "fall",
+        "hit"
+      ]
+    },
+    {
+      "id": "sparkle",
+      "file": "sfx/sparkle.wav",
+      "durationMs": 900,
+      "gain": 0.45,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "idea",
+        "magic"
+      ]
+    }
+  ]
+}

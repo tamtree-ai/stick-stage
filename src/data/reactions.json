@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "listen": {
+    "neutral": "neutral",
+    "happy": "happy",
+    "smug": "annoyed",
+    "sarcastic": "deadpan",
+    "annoyed": "confused",
+    "angry": "cringe",
+    "shocked": "confused",
+    "sad": "sad",
+    "crying": "sad",
+    "cringe": "deadpan",
+    "confused": "deadpan",
+    "deadpan": "confused"
+  },
+  "defaultListen": "neutral",
+  "punchline": {
+    "neutral": "deadpan",
+    "happy": "cringe",
+    "smug": "annoyed",
+    "sarcastic": "deadpan",
+    "annoyed": "cringe",
+    "angry": "shocked",
+    "shocked": "confused",
+    "sad": "cringe",
+    "crying": "cringe",
+    "cringe": "deadpan",
+    "confused": "deadpan",
+    "deadpan": "shocked"
+  },
+  "defaultPunchline": "deadpan"
+}

@@ -7,7 +7,9 @@ import { evalPoseTrack, type PoseKey } from "./pose";
 import type { Character, Pose, PoseAngles } from "./schema";
 import { evalSeat, type SeatKey } from "./seat";
 import type { PropDef, PropKey } from "../props/schema";
-import { evalProps, type PropState } from "../props/track";
+import { evalProps, type PropState, type Reframe } from "../props/track";
+import { easeOutCubic, bump } from "../lib/easing";
+import { lerp } from "../lib/math";
 import { rigMetrics, solveSkeleton, type Joints, type RigMetrics } from "./skeleton";
 
 export type Library = {
@@ -32,6 +34,12 @@ export type ActorTracks = {
   expressionKeys: readonly ExpressionKey[];
   /** Optional gaze override (x,y in [-1,1]), e.g. listeners looking at the speaker. */
   gaze?: { x: number; y: number };
+  /** Timed gaze overrides; `null` hands that axis back to the expression. Blends over 4 frames. */
+  gazeKeys?: readonly GazeKey[];
+  /** Small head nods (listeners). */
+  nodKeys?: readonly NodKey[];
+  /** Where the root stands at a frame (stage px) and which way it faces. Keeps dropped props in place. */
+  rootAt?: (frame: number) => { x: number; sign: 1 | -1 };
   idle?: number;
   /** Sit down / stand up (seat heights come from the set: `seatHeightAt`). */
   seatKeys?: readonly SeatKey[];
@@ -44,6 +52,34 @@ export type ActorTracks = {
 };
 
 export type SymbolKey = { frame: number; symbol: SymbolId; durationFrames?: number };
+export type GazeKey = { frame: number; x: number | null; y?: number | null };
+export type NodKey = { frame: number; /** Degrees of forward head tilt at the bottom of the nod. */ amount?: number };
+
+export const GAZE_BLEND_FRAMES = 4;
+export const NOD_FRAMES = 9;
+const NOD_DEG = 7;
+
+/** Gaze with timed overrides layered on the expression's own gaze (keys sorted by frame). */
+export const evalGaze = (keys: readonly GazeKey[] | undefined, frame: number, base: { x: number; y: number }) => {
+  const blendAt = (a: { x: number; y: number }, b: { x: number; y: number }, elapsed: number) => {
+    const t = easeOutCubic(elapsed / GAZE_BLEND_FRAMES);
+    return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t) };
+  };
+  let seg: { start: { x: number; y: number }; target: { x: number; y: number }; frame: number } | undefined;
+  for (const k of keys ?? []) {
+    if (k.frame > frame) break;
+    const start = seg ? blendAt(seg.start, seg.target, k.frame - seg.frame) : base;
+    seg = { start, target: { x: k.x ?? base.x, y: k.y ?? base.y }, frame: k.frame };
+  }
+  return seg ? blendAt(seg.start, seg.target, frame - seg.frame) : base;
+};
+
+/** Forward head tilt from nods active at `frame`. */
+export const nodOffset = (keys: readonly NodKey[] | undefined, frame: number): number => {
+  let deg = 0;
+  for (const k of keys ?? []) deg += (k.amount ?? NOD_DEG) * bump((frame - k.frame) / NOD_FRAMES);
+  return deg;
+};
 export const DEFAULT_SYMBOL_FRAMES = 30;
 
 /** Add active symbol events to the face; returns each event symbol's age for its entry pop. */
@@ -85,6 +121,16 @@ export type ActorState = {
   props: PropState;
 };
 
+/** Figure space at `dropFrame` → stage → figure space now (x mirrors with facing). */
+const reframeFrom =
+  (rootAt: NonNullable<ActorTracks["rootAt"]>, frame: number): Reframe =>
+  (p, dropFrame) => {
+    const then = rootAt(dropFrame);
+    const now = rootAt(frame);
+    const stageX = then.x + then.sign * p.x;
+    return { x: (stageX - now.x) * now.sign, y: p.y, angle: p.angle * then.sign * now.sign };
+  };
+
 const lastKeyFrame = (keys: readonly ExpressionKey[], frame: number): number => {
   let at = 0;
   for (const k of keys) if (k.frame <= frame) at = k.frame;
@@ -105,7 +151,7 @@ export const evalActor = (
   const bodyAt = (f: number) => {
     const base = evalPoseTrack(tracks.poseKeys, f, getPose);
     const idle = idleOffsets(seed, f, fps, tracks.idle ?? 1);
-    const angles: PoseAngles = { ...base, torso: base.torso + idle.torso, head: base.head + idle.head };
+    const angles: PoseAngles = { ...base, torso: base.torso + idle.torso, head: base.head + idle.head + nodOffset(tracks.nodKeys, f) };
     const joints = solveSkeleton(character, angles, figureHeightPx, {
       torsoScale: idle.torsoScale,
       seat: evalSeat(tracks.seatKeys, f),
@@ -115,6 +161,7 @@ export const evalActor = (
   const { angles, joints } = bodyAt(frame);
   const face = evalExpressionTrack(tracks.expressionKeys, frame, getter("expression", lib.expressions));
   if (tracks.gaze) face.gaze = tracks.gaze;
+  if (tracks.gazeKeys?.length) face.gaze = evalGaze(tracks.gazeKeys, frame, face.gaze);
   applySpeech(face, tracks.speech, frame, fps);
   const symbolAges = applySymbols(face, tracks.symbolKeys, frame);
   const props = evalProps(
@@ -127,6 +174,7 @@ export const evalActor = (
       return hand === "L" ? { hand: j.handL, elbow: j.elbowL } : { hand: j.handR, elbow: j.elbowR };
     },
     figureHeightPx,
+    tracks.rootAt ? reframeFrom(tracks.rootAt, frame) : undefined,
   );
   return {
     character,

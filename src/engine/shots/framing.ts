@@ -36,7 +36,7 @@ export const headInStage = (
   const ly = character.face.eyeY * R;
   const ex = lx * Math.cos(t) - ly * Math.sin(t);
   const ey = lx * Math.sin(t) + ly * Math.cos(t);
-  const head = { x: a.x * width + sign * joints.head.x, y: groundY + joints.head.y };
+  const head = { x: a.x * width + sign * joints.head.x, y: groundY + (a.dy ?? 0) + joints.head.y };
   return { head, eyes: { x: head.x + sign * ex, y: head.y + ey }, R };
 };
 

@@ -36,3 +36,14 @@ export { PARTS, PART_INFO, KITS, KIT_BACKDROP, type Kit, type PartInfo } from ".
 export { SEAT_HEIGHT, SEAT_PARTS } from "./set/parts/seats";
 export { Stage, FULL_FRAME, type Camera, type StageActor } from "./shots/Stage";
 export * from "./shots/framing";
+export * from "./director/schema";
+export * from "./director/diagnostics";
+export * from "./director/anchors";
+export * from "./director/timeline";
+export * from "./director/layout";
+export * from "./director/placement";
+export * from "./director/tracks";
+export * from "./director/shots";
+export * from "./director/camera";
+export * from "./director/compile";
+export { Skit, type SkitProps } from "./director/Skit";

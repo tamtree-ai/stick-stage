@@ -17,5 +17,6 @@
   "accessories": [
     { "slot": "hair", "id": "bun-01", "color": "#4a3440" },
     { "slot": "eyewear", "id": "glasses-round" }
-  ]
+  ],
+  "voice": { "say": "Samantha" }
 }

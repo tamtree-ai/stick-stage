@@ -1,0 +1,76 @@
+import { easeOutBack } from "../lib/easing";
+import { noise } from "../lib/seed";
+import type { Library } from "../rig/actorState";
+import type { SetDef } from "../set/schema";
+import { clampCamera, frameShot, headInStage } from "../shots/framing";
+import type { Camera } from "../shots/Stage";
+import { stageActorsAt } from "./placement";
+import { PUNCH_FACTOR, PUNCH_FRAMES, type ShotPlan } from "./shots";
+import type { CastTrack, PunchIn, Shake, ShotKey, Timeline } from "./timeline";
+
+/** Frame each planned cut from the actors as they stand at the cut frame (locked-off shots). */
+export const solveShots = (
+  plan: ShotPlan,
+  cast: readonly CastTrack[],
+  lib: Library,
+  set: SetDef,
+  fps: number,
+  width: number,
+  height: number,
+): { shots: ShotKey[]; punchIns: PunchIn[]; shakes: Shake[] } => {
+  const actorsAt = (f: number) => stageActorsAt(lib, cast, set, f, fps, width);
+  const shots = plan.cuts.map((c) => ({
+    frame: c.frame,
+    framing: c.framing,
+    on: c.on,
+    reason: c.reason,
+    camera: frameShot({ framing: c.framing, on: c.on }, actorsAt(c.frame), width, height, set.groundY),
+  }));
+  const punchIns = plan.punchIns.map((p): PunchIn => {
+    const a = actorsAt(p.frame).find((x) => x.id === p.on)!;
+    const { head } = headInStage(a, width, set.groundY);
+    return { frame: p.frame, on: p.on, cx: head.x, cy: head.y, factor: PUNCH_FACTOR, durationFrames: PUNCH_FRAMES };
+  });
+  return { shots, punchIns, shakes: plan.shakes };
+};
+
+const SHAKE_PX = 22;
+
+/** The cut in effect at `frame`. */
+export const shotAt = (tl: Pick<Timeline, "shots">, frame: number): ShotKey => {
+  let shot = tl.shots[0]!;
+  for (const s of tl.shots) if (s.frame <= frame) shot = s;
+  return shot;
+};
+
+/** Camera at `frame`: the latest cut, plus a punch-in since that cut, plus any shake. */
+export const cameraAt = (tl: Pick<Timeline, "shots" | "punchIns" | "shakes" | "width" | "height">, frame: number): Camera => {
+  const shot = shotAt(tl, frame);
+  let cam = shot.camera;
+  let punch: PunchIn | undefined;
+  for (const p of tl.punchIns) if (p.frame <= frame && p.frame >= shot.frame) punch = p;
+  if (punch) {
+    const k = 1 + (punch.factor - 1) * easeOutBack((frame - punch.frame) / punch.durationFrames, 1.4);
+    const s = cam.scale * k;
+    // Zoom about the subject's head so it stays put on screen.
+    cam = clampCamera(
+      { scale: s, cx: punch.cx - (cam.scale / s) * (punch.cx - cam.cx), cy: punch.cy - (cam.scale / s) * (punch.cy - cam.cy) },
+      tl.width,
+      tl.height,
+    );
+  }
+  for (const sh of tl.shakes) {
+    const t = frame - sh.frame;
+    if (t < 0 || t >= sh.durationFrames) continue;
+    const decay = 1 - t / sh.durationFrames;
+    // Zoom in a touch so the shake has room without showing past the set's edges.
+    const scale = cam.scale * (1 + 0.05 * sh.intensity * decay);
+    const amp = (SHAKE_PX * sh.intensity * decay) / scale;
+    cam = clampCamera(
+      { scale, cx: cam.cx + amp * noise(`shake-${sh.frame}`, "x", t * 0.9), cy: cam.cy + amp * noise(`shake-${sh.frame}`, "y", t * 0.9) },
+      tl.width,
+      tl.height,
+    );
+  }
+  return cam;
+};

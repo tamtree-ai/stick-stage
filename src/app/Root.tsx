@@ -17,6 +17,9 @@ import { SetLab, setLabSchema, setLabSize } from "./labs/SetLab";
 import { PROP_LAB_FRAMES, PropLab, propLabSchema } from "./labs/PropLab";
 import { STAGING_LAB_FRAMES, StagingLab, stagingLabSchema } from "./labs/StagingLab";
 import { calculateContactSheetMetadata, ContactSheet, contactSheetSchema } from "./ContactSheet";
+import { SkitComposition } from "./skit/SkitComposition";
+import { calculateSkitMetadata, skitCompositionSchema } from "./skit/skitData";
+import { SFX_LAB_FRAMES, SfxLab } from "./labs/SfxLab";
 
 const FPS = 30;
 const W = 1080;
@@ -170,6 +173,30 @@ export const RemotionRoot: React.FC = () => (
       calculateMetadata={({ props }) => setLabSize(props)}
       {...setLabSize({ kits: [], tileWidth: 200 })}
     />
+    {/* A skit from public/skits/<skit>/skit.json. `pnpm render <skitId>` sets the prop. */}
+    <Composition
+      id="Skit"
+      component={SkitComposition}
+      schema={skitCompositionSchema}
+      defaultProps={{ skit: "fine", showLabels: false }}
+      calculateMetadata={calculateSkitMetadata}
+      durationInFrames={FPS}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
+    <Composition
+      id="SkitDebug"
+      component={SkitComposition}
+      schema={skitCompositionSchema}
+      defaultProps={{ skit: "fine", showLabels: true }}
+      calculateMetadata={calculateSkitMetadata}
+      durationInFrames={FPS}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
+    <Composition id="SfxLab" component={SfxLab} durationInFrames={SFX_LAB_FRAMES} fps={FPS} width={W} height={H} />
     <Still
       id="ContactSheet"
       component={ContactSheet}
