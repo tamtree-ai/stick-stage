@@ -8,7 +8,7 @@ const chars = Object.keys(library.characters);
 
 describe("grounding", () => {
   for (const c of chars) {
-    for (const p of POSE_IDS) {
+    for (const p of Object.keys(library.poses)) {
       it(`${c} / ${p}: lowest foot sits on groundY`, () => {
         const ch = library.characters[c]!;
         const j = solveSkeleton(ch, toAngles(library.poses[p]!), FIG);

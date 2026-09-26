@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "lounge-1",
+  "kit": "interior",
+  "palette": "peach",
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "wall", "pattern": "dots" },
+    { "part": "floor" },
+    { "part": "clock", "x": 0.16, "y": 0.2 },
+    { "part": "frame", "x": 0.5, "y": 0.33, "seed": 2 },
+    { "part": "frame", "x": 0.68, "y": 0.3, "size": 0.7, "seed": 5 },
+    { "part": "plant", "x": 0.94 },
+    { "part": "couch", "x": 0.5, "seatFor": ["left", "right"] }
+  ],
+  "marks": { "left": 0.3, "center": 0.5, "right": 0.7 }
+}

@@ -13,6 +13,14 @@ export const SetPartSchema = z.object({
   seed: z.union([z.string(), z.number()]).optional(),
   pattern: z.enum(PATTERNS).optional(),
   flip: z.boolean().default(false),
+  /** Snap x to a named mark (plus `dx`) instead of giving `x`. */
+  mark: z.string().optional(),
+  /** Horizontal nudge from the mark, fraction of frame width. */
+  dx: z.number().min(-1).max(1).default(0),
+  /** Part-specific look, e.g. window "blinds", desk "clear". */
+  variant: z.string().optional(),
+  /** Marks whose cast member sits on this part (seat parts only: chair, bench, couch). */
+  seatFor: z.array(z.string()).default([]),
 });
 export type SetPart = z.infer<typeof SetPartSchema>;
 

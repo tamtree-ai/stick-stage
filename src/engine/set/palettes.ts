@@ -1,3 +1,5 @@
+import { darken, lighten, mix } from "../lib/color";
+
 export type Palette = {
   wallA: string;
   wallB: string;
@@ -40,7 +42,56 @@ export const PALETTES: Record<string, Palette> = {
     sky: "#d2e9f5",
     detail: "#bf8b74",
   },
+  /** Outdoor: green grass and foliage, blue sky. */
+  meadow: {
+    wallA: "#dcecd9",
+    wallB: "#c8e2c3",
+    floor: "#afd6a2",
+    accent: "#f4c98a",
+    shade: "#bcdcb2",
+    sky: "#cde6f5",
+    detail: "#8fbf84",
+  },
+  /** Warm evening outdoors. */
+  dusk: {
+    wallA: "#eed9e4",
+    wallB: "#e2c6d6",
+    floor: "#cfb2c4",
+    accent: "#f6c49a",
+    shade: "#dcbccd",
+    sky: "#f7d9d0",
+    detail: "#a98fb4",
+  },
+  /** Warm outdoors: olive grass, orange foliage. */
+  autumn: {
+    wallA: "#f1e4d2",
+    wallB: "#e6d3b8",
+    floor: "#c8cf9f",
+    accent: "#eaa982",
+    shade: "#dccbaa",
+    sky: "#f5e0cb",
+    detail: "#e2ab7a",
+  },
+  /** Cool street greys. */
+  city: {
+    wallA: "#dde2ea",
+    wallB: "#cbd2de",
+    floor: "#bfc6d2",
+    accent: "#f2bf94",
+    shade: "#c3cad7",
+    sky: "#d2e6f3",
+    detail: "#95a1b6",
+  },
 };
+
+/** Tones every part may use, derived from the seven tokens (still no raw hex in parts). */
+export const derived = (p: Palette) => ({
+  wood: darken(mix(p.accent, p.detail, 0.45), 0.1),
+  metal: darken(mix(p.detail, p.wallB, 0.45), 0.08),
+  glass: lighten(p.sky, 0.3),
+  paper: lighten(p.wallA, 0.72),
+  foliage: p.detail,
+});
 
 export const getPalette = (id: string): Palette => {
   const p = PALETTES[id];

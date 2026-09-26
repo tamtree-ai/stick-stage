@@ -10,9 +10,10 @@ export type ActorProps = {
   groundY: number;
   facing: "left" | "right";
   frame: number;
+  fontFamily?: string;
 };
 
-export const Actor: React.FC<ActorProps> = ({ state, x, groundY, facing, frame }) => (
+export const Actor: React.FC<ActorProps> = ({ state, x, groundY, facing, frame, fontFamily }) => (
   <g transform={`translate(${f2(x)} ${f2(groundY)}) scale(${facing === "left" ? -1 : 1} 1)`}>
     <Rig
       character={state.character}
@@ -23,6 +24,10 @@ export const Actor: React.FC<ActorProps> = ({ state, x, groundY, facing, frame }
       blink={state.blink}
       frame={frame}
       symbolsSince={state.symbolsSince}
+      symbolAges={state.symbolAges}
+      props={state.props}
+      mirrored={facing === "left"}
+      fontFamily={fontFamily}
     />
   </g>
 );

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "office-1",
+  "kit": "office",
+  "palette": "mint",
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "wall", "pattern": "stripes" },
+    { "part": "floor" },
+    { "part": "whiteboard", "x": 0.3, "y": 0.2 },
+    { "part": "clock", "x": 0.66, "y": 0.15 },
+    { "part": "window", "x": 0.8, "y": 0.22, "size": 0.85, "variant": "blinds" },
+    { "part": "cabinet", "x": 0.95 },
+    { "part": "chair", "mark": "left", "seatFor": ["left"] }
+  ],
+  "foreground": [{ "part": "desk", "mark": "left", "dx": 0.17 }],
+  "marks": { "left": 0.24, "center": 0.5, "right": 0.76 }
+}

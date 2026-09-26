@@ -1,20 +1,9 @@
 import React from "react";
 import { getPalette } from "./palettes";
-import { Floor, PlainWall, Wall } from "./parts/room";
-import { Plant, PictureFrame, Shelf, Window } from "./parts/decor";
+import { PARTS } from "./parts/registry";
 import type { PartComponent } from "./parts/types";
 import { PatternDefs } from "./patterns";
 import type { SetDef, SetPart } from "./schema";
-
-export const PARTS: Record<string, PartComponent> = {
-  wall: Wall,
-  "plain-wall": PlainWall,
-  floor: Floor,
-  window: Window,
-  shelf: Shelf,
-  frame: PictureFrame,
-  plant: Plant,
-};
 
 export type SetLayersProps = {
   set: SetDef;
@@ -33,7 +22,7 @@ const renderPart = (p: SetPart, i: number, props: Omit<React.ComponentProps<Part
 export const SetLayers: React.FC<SetLayersProps> = ({ set, width, height, layer }) => {
   const palette = getPalette(set.palette);
   const prefix = `set-${set.id}`;
-  const common = { palette, W: width, H: height, groundY: set.groundY, fig: set.figureHeightPx, prefix };
+  const common = { palette, W: width, H: height, groundY: set.groundY, fig: set.figureHeightPx, prefix, marks: set.marks };
   if (layer === "foreground") {
     return <g>{set.foreground.map((p, i) => renderPart(p, i, common, set.id))}</g>;
   }

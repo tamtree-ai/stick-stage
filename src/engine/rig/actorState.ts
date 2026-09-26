@@ -1,16 +1,20 @@
 import { evalExpressionTrack, type ExpressionKey, type FaceState } from "../face/expressions";
-import type { Expression } from "../face/schema";
+import type { Expression, SymbolId } from "../face/schema";
 import { speechMouth } from "../face/visemes";
 import type { MouthCue } from "../voice/schema";
 import { blinkAmount, idleOffsets } from "./idle";
 import { evalPoseTrack, type PoseKey } from "./pose";
 import type { Character, Pose, PoseAngles } from "./schema";
+import { evalSeat, type SeatKey } from "./seat";
+import type { PropDef, PropKey } from "../props/schema";
+import { evalProps, type PropState } from "../props/track";
 import { rigMetrics, solveSkeleton, type Joints, type RigMetrics } from "./skeleton";
 
 export type Library = {
   characters: Record<string, Character>;
   poses: Record<string, Pose>;
   expressions: Record<string, Expression>;
+  props: Record<string, PropDef>;
 };
 
 export const getter =
@@ -29,8 +33,29 @@ export type ActorTracks = {
   /** Optional gaze override (x,y in [-1,1]), e.g. listeners looking at the speaker. */
   gaze?: { x: number; y: number };
   idle?: number;
+  /** Sit down / stand up (seat heights come from the set: `seatHeightAt`). */
+  seatKeys?: readonly SeatKey[];
+  /** Symbols popped on top of the expression (M4 `symbol` action). Default 30 frames. */
+  symbolKeys?: readonly SymbolKey[];
+  /** Hold / put away / drop hand props. */
+  propKeys?: readonly PropKey[];
   /** Spoken lines: mouth cues (line-relative ms) starting at `startFrame`. */
   speech?: readonly SpeechClip[];
+};
+
+export type SymbolKey = { frame: number; symbol: SymbolId; durationFrames?: number };
+export const DEFAULT_SYMBOL_FRAMES = 30;
+
+/** Add active symbol events to the face; returns each event symbol's age for its entry pop. */
+const applySymbols = (face: FaceState, keys: readonly SymbolKey[] | undefined, frame: number) => {
+  const ages: Partial<Record<SymbolId, number>> = {};
+  for (const k of keys ?? []) {
+    const age = frame - k.frame;
+    if (age < 0 || age >= (k.durationFrames ?? DEFAULT_SYMBOL_FRAMES)) continue;
+    if (!face.symbols.includes(k.symbol)) face.symbols = [...face.symbols, k.symbol];
+    ages[k.symbol] = age;
+  }
+  return ages;
 };
 
 export type SpeechClip = { startFrame: number; cues: readonly MouthCue[] };
@@ -55,6 +80,9 @@ export type ActorState = {
   face: FaceState;
   blink: number;
   symbolsSince: number;
+  /** Ages of event symbols (see `symbolKeys`). */
+  symbolAges: Partial<Record<SymbolId, number>>;
+  props: PropState;
 };
 
 const lastKeyFrame = (keys: readonly ExpressionKey[], frame: number): number => {
@@ -73,19 +101,42 @@ export const evalActor = (
 ): ActorState => {
   const character = getter("character", lib.characters)(tracks.character);
   const seed = tracks.seed ?? character.id;
-  const base = evalPoseTrack(tracks.poseKeys, frame, getter("pose", lib.poses));
-  const idle = idleOffsets(seed, frame, fps, tracks.idle ?? 1);
-  const angles: PoseAngles = { ...base, torso: base.torso + idle.torso, head: base.head + idle.head };
+  const getPose = getter("pose", lib.poses);
+  const bodyAt = (f: number) => {
+    const base = evalPoseTrack(tracks.poseKeys, f, getPose);
+    const idle = idleOffsets(seed, f, fps, tracks.idle ?? 1);
+    const angles: PoseAngles = { ...base, torso: base.torso + idle.torso, head: base.head + idle.head };
+    const joints = solveSkeleton(character, angles, figureHeightPx, {
+      torsoScale: idle.torsoScale,
+      seat: evalSeat(tracks.seatKeys, f),
+    });
+    return { angles, joints };
+  };
+  const { angles, joints } = bodyAt(frame);
   const face = evalExpressionTrack(tracks.expressionKeys, frame, getter("expression", lib.expressions));
   if (tracks.gaze) face.gaze = tracks.gaze;
   applySpeech(face, tracks.speech, frame, fps);
+  const symbolAges = applySymbols(face, tracks.symbolKeys, frame);
+  const props = evalProps(
+    tracks.propKeys,
+    frame,
+    fps,
+    getter("prop", lib.props),
+    (f, hand) => {
+      const j = bodyAt(f).joints;
+      return hand === "L" ? { hand: j.handL, elbow: j.elbowL } : { hand: j.handR, elbow: j.elbowR };
+    },
+    figureHeightPx,
+  );
   return {
     character,
     angles,
-    joints: solveSkeleton(character, angles, figureHeightPx, { torsoScale: idle.torsoScale }),
+    joints,
     metrics: rigMetrics(character, figureHeightPx),
     face,
     blink: blinkAmount(seed, frame, fps),
     symbolsSince: lastKeyFrame(tracks.expressionKeys, frame),
+    symbolAges,
+    props,
   };
 };
