@@ -61,3 +61,8 @@ Decisions not covered by the plan. Newest last.
 - **Prop track:** `propKeys: [{ frame, hand, prop | null, drop? }]`. A pickup pops in over 4 frames. `drop: true` releases the previously held prop from the hand's position at that frame (re-evaluated, so it stays frame-pure): a small up-and-forward arc, gravity 7 × figure/s², one spin, then it lands lying on its side with one small bounce. It stays on the floor until the same prop is picked up again. Dropped props live in figure space, so **when M4 adds `slideTo` they must move to stage space.**
 - **Symbol FX:** `exclaim` (!), `question` (?, wobbles and counter-flips when mirrored) and `speed-lines` (radial shock lines that flicker every 2 frames) join sweat, anger, blush and tears. `!` and `?` have a white halo so they read over any set. `symbolKeys: [{ frame, symbol, durationFrames = 30 }]` pops a symbol on top of the expression, with its own entry pop, for the M4 `symbol` action. `?` is hidden while `!` shows (they share a spot).
 - **New poses:** `sit`, `hold-out` (mic / offering), `hold-chest` (cup, laptop), `hold-up` (sign; the hand is far enough forward that the stick clears the face). They are `EXTRA_POSE_IDS`, so M1 labs that cycle `POSE_IDS` are unchanged.
+
+## 2026-09-26 (M4 director)
+- **M3 gate passed** (team review of `SetLab.png` + `StagingLabClean.mp4`, 2026-09-26). `m3-staging` merged into `main`.
+- **Desk height stays at 0.34 × figure height** (team decision), so a seated character's shoulders and pointing gestures clear the desk.
+- **Outdoor palettes stay as reviewed:** park uses `meadow` / `autumn` / `mint`, street uses `city` / `dusk` / `peach`. The defaults are `meadow` (park) and `city` (street).
