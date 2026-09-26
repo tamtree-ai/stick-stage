@@ -47,3 +47,6 @@ Decisions not covered by the plan. Newest last.
 - **Slam text** sits at 64% height (below the face in every framing) and subtitles hide while a slam is up, since the slam is the word.
 - **Safe area** starts as one profile in `src/data/safe-area.json`: top 14%, bottom 30%, left 4%, right 12%.
 - **TalkLab shots are locked off:** the camera is framed from the actor at the line's first frame, not per frame, so gestures don't drag the camera.
+
+## 2026-09-26 (M3 staging)
+- **M2 gate passed** (team approval of `TalkLabClean.mp4`, 2026-09-26). `m2-talking` merged into `main`.
