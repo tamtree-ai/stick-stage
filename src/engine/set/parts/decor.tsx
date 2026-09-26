@@ -39,7 +39,15 @@ export const Window: PartComponent = ({ part, palette, W, H, fig, seed }) => {
         <rect x={x0} y={top + h * 0.48} width={w} height={t * 0.8} />
         <rect x={x0 - t * 2} y={top + h + t} width={w + 4 * t} height={t * 0.9} />
       </g>
-      {[-1, 1].map((s) => {
+      {part.variant === "blinds" ? (
+        <g>
+          {Array.from({ length: Math.round((h * 0.62) / (t * 1.5)) }, (_, i) => (
+            <rect key={i} x={x0} y={top + i * t * 1.5} width={w} height={t * 1.1} fill={lighten(palette.wallA, 0.55)} stroke={line} strokeWidth={SET_LINE * 0.6} />
+          ))}
+          <line x1={x0 + w * 0.85} x2={x0 + w * 0.85} y1={top} y2={top + h * 0.8} stroke={line} strokeWidth={SET_LINE * 0.8} />
+        </g>
+      ) : null}
+      {(part.variant === "blinds" ? [] : [-1, 1]).map((s) => {
         const edge = s < 0 ? x0 - t * 1.5 : x0 + w + t * 1.5;
         const inner = edge - s * curtainW;
         const hem = top + h + fig * 0.08;

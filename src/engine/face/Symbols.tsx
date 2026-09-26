@@ -1,6 +1,7 @@
 import React from "react";
 import { f2 } from "../lib/math";
 import type { SymbolId } from "./schema";
+import { Exclaim, Question, SpeedLines } from "./Emanata";
 
 const WATER = "#8fd0f4";
 const WATER_LINE = "#3f8fc2";
@@ -18,6 +19,11 @@ export type SymbolsProps = {
   sw: number;
   /** When the symbol set last changed (for entry pops). */
   since: number;
+  /** Per-symbol age in frames (symbol events); falls back to `frame - since`. */
+  ages?: Partial<Record<SymbolId, number>>;
+  stroke?: string;
+  mirrored?: boolean;
+  seed?: string;
 };
 
 const Tear: React.FC<{ x: number; y: number; R: number; frame: number; phase: number; sw: number }> = ({
@@ -35,9 +41,24 @@ const Tear: React.FC<{ x: number; y: number; R: number; frame: number; phase: nu
   return <path d={d} fill={WATER} stroke={WATER_LINE} strokeWidth={sw * 0.35} strokeLinejoin="round" />;
 };
 
-export const Symbols: React.FC<SymbolsProps> = ({ symbols, R, faceX, eyeY, eyeDx, frame, sw, since }) => {
+export const Symbols: React.FC<SymbolsProps> = ({
+  symbols,
+  R,
+  faceX,
+  eyeY,
+  eyeDx,
+  frame,
+  sw,
+  since,
+  ages,
+  stroke = "#1b1b1f",
+  mirrored = false,
+  seed = "symbols",
+}) => {
   const age = frame - since;
-  const pop = age < 4 ? 0.6 + 0.4 * (age / 4) + 0.12 * Math.sin((age / 4) * Math.PI) : 1;
+  const ageOf = (id: SymbolId) => ages?.[id] ?? age;
+  const mark = { R, frame, stroke, sw, mirrored };
+  const popOf = (a: number) => (a < 4 ? 0.6 + 0.4 * (a / 4) + 0.12 * Math.sin((a / 4) * Math.PI) : 1);
   return (
     <g>
       {symbols.includes("blush")
@@ -59,7 +80,7 @@ export const Symbols: React.FC<SymbolsProps> = ({ symbols, R, faceX, eyeY, eyeDx
           ))
         : null}
       {symbols.includes("sweat") ? (
-        <g transform={`translate(${f2(0.86 * R)} ${f2(-0.5 * R + Math.min(age, 20) * 0.004 * R)}) scale(${f2(pop)})`}>
+        <g transform={`translate(${f2(0.86 * R)} ${f2(-0.5 * R + Math.min(ageOf("sweat"), 20) * 0.004 * R)}) scale(${f2(popOf(ageOf("sweat")))})`}>
           <path
             d={`M 0 ${f2(-0.2 * R)} C ${f2(0.12 * R)} ${f2(-0.02 * R)} ${f2(0.12 * R)} ${f2(0.1 * R)} 0 ${f2(0.1 * R)} C ${f2(-0.12 * R)} ${f2(0.1 * R)} ${f2(-0.12 * R)} ${f2(-0.02 * R)} 0 ${f2(-0.2 * R)} Z`}
             fill={WATER}
@@ -71,7 +92,7 @@ export const Symbols: React.FC<SymbolsProps> = ({ symbols, R, faceX, eyeY, eyeDx
       ) : null}
       {symbols.includes("anger") ? (
         <g
-          transform={`translate(${f2(0.55 * R)} ${f2(-0.72 * R)}) scale(${f2(pop * (1 + 0.06 * Math.sin(frame * 0.8)))})`}
+          transform={`translate(${f2(0.55 * R)} ${f2(-0.72 * R)}) scale(${f2(popOf(ageOf("anger")) * (1 + 0.06 * Math.sin(frame * 0.8)))})`}
         >
           {[0, 90, 180, 270].map((r) => (
             <path
@@ -86,6 +107,9 @@ export const Symbols: React.FC<SymbolsProps> = ({ symbols, R, faceX, eyeY, eyeDx
           ))}
         </g>
       ) : null}
+      {symbols.includes("speed-lines") ? <SpeedLines {...mark} age={ageOf("speed-lines")} seed={seed} /> : null}
+      {symbols.includes("exclaim") ? <Exclaim {...mark} age={ageOf("exclaim")} /> : null}
+      {symbols.includes("question") && !symbols.includes("exclaim") ? <Question {...mark} age={ageOf("question")} /> : null}
     </g>
   );
 };

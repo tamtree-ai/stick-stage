@@ -30,10 +30,12 @@ export type StageProps = {
   height: number;
   frame: number;
   camera?: Camera;
+  /** Font for text on props (signs). */
+  fontFamily?: string;
 };
 
 /** Set background → actors → set foreground, under one camera transform. */
-export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame, camera }) => {
+export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame, camera, fontFamily }) => {
   const cam = camera ?? FULL_FRAME(width, height);
   const t = `translate(${f2(width / 2)} ${f2(height / 2)}) scale(${f2(cam.scale)}) translate(${f2(-cam.cx)} ${f2(-cam.cy)})`;
   return (
@@ -41,7 +43,7 @@ export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame,
       <g transform={t}>
         <SetLayers set={set} width={width} height={height} layer="background" />
         {actors.map((a) => (
-          <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY} facing={a.facing} frame={frame} />
+          <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY} facing={a.facing} frame={frame} fontFamily={fontFamily} />
         ))}
         <SetLayers set={set} width={width} height={height} layer="foreground" />
       </g>

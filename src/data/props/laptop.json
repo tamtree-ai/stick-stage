@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "laptop", "kind": "laptop", "colors": { "body": "#c9ccd6", "screen": "#bfe3f5" }, "align": "upright" }

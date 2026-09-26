@@ -13,6 +13,9 @@ import {
 } from "./labs/CloseupLab";
 import { TalkLab } from "./labs/TalkLab";
 import { calculateTalkLabMetadata, talkLabSchema } from "./talk/talkData";
+import { SetLab, setLabSchema, setLabSize } from "./labs/SetLab";
+import { PROP_LAB_FRAMES, PropLab, propLabSchema } from "./labs/PropLab";
+import { STAGING_LAB_FRAMES, StagingLab, stagingLabSchema } from "./labs/StagingLab";
 import { calculateContactSheetMetadata, ContactSheet, contactSheetSchema } from "./ContactSheet";
 
 const FPS = 30;
@@ -128,6 +131,44 @@ export const RemotionRoot: React.FC = () => (
       fps={FPS}
       width={W}
       height={H}
+    />
+    <Composition
+      id="StagingLab"
+      component={StagingLab}
+      schema={stagingLabSchema}
+      defaultProps={{ showLabels: true, left: "milo", right: "june" }}
+      durationInFrames={STAGING_LAB_FRAMES}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
+    <Composition
+      id="StagingLabClean"
+      component={StagingLab}
+      schema={stagingLabSchema}
+      defaultProps={{ showLabels: false, left: "milo", right: "june" }}
+      durationInFrames={STAGING_LAB_FRAMES}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
+    <Composition
+      id="PropLab"
+      component={PropLab}
+      schema={propLabSchema}
+      defaultProps={{ set: "plain-1", showLabels: true }}
+      durationInFrames={PROP_LAB_FRAMES}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
+    <Still
+      id="SetLab"
+      component={SetLab}
+      schema={setLabSchema}
+      defaultProps={{ kits: [] as string[], tileWidth: 200 }}
+      calculateMetadata={({ props }) => setLabSize(props)}
+      {...setLabSize({ kits: [], tileWidth: 200 })}
     />
     <Still
       id="ContactSheet"

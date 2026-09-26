@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "street-1",
+  "kit": "street",
+  "palette": "city",
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "sky" },
+    { "part": "buildings" },
+    { "part": "sidewalk" },
+    { "part": "shopfront", "x": 0.52 },
+    { "part": "lamp", "x": 0.07 },
+    { "part": "hydrant", "x": 0.93 }
+  ],
+  "marks": { "left": 0.27, "center": 0.5, "right": 0.73 }
+}

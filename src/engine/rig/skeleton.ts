@@ -1,5 +1,6 @@
-import { add, dirFromAngle, scale, type Vec2 } from "../lib/math";
+import { add, dirFromAngle, lerp, scale, type Vec2 } from "../lib/math";
 import type { Character, PoseAngles } from "./schema";
+import { blendLegs, seatContact, seatedLegs, type SeatState } from "./seat";
 
 export type Joints = {
   hip: Vec2;
@@ -46,6 +47,8 @@ export const rigMetrics = (c: Character, figureHeightPx: number): RigMetrics => 
 export type Extras = {
   /** Multiplier on torso length (breathing). */
   torsoScale?: number;
+  /** Sitting: the hip rests on a seat and the legs plant the feet (see `seat.ts`). */
+  seat?: SeatState;
 };
 
 /**
@@ -63,20 +66,26 @@ export const solveSkeleton = (
   const P = c.proportions;
 
   // Legs are world-relative, measured from the hip at the origin.
+  const seat = extras.seat;
+  const stand = { hipL: p.hipL, kneeL: p.kneeL, hipR: p.hipR, kneeR: p.kneeR };
+  const legs = seat ? blendLegs(stand, seatedLegs(c, m, seat.seatPx), seat.amount) : stand;
   const hip0: Vec2 = { x: 0, y: 0 };
-  const thighL = p.hipL;
-  const thighR = p.hipR;
+  const thighL = legs.hipL;
+  const thighR = legs.hipR;
   const kneeL0 = add(hip0, scale(dirFromAngle(thighL), P.thigh * H));
   const kneeR0 = add(hip0, scale(dirFromAngle(thighR), P.thigh * H));
-  const ankleL0 = add(kneeL0, scale(dirFromAngle(thighL - p.kneeL), P.shin * H));
-  const ankleR0 = add(kneeR0, scale(dirFromAngle(thighR - p.kneeR), P.shin * H));
+  const ankleL0 = add(kneeL0, scale(dirFromAngle(thighL - legs.kneeL), P.shin * H));
+  const ankleR0 = add(kneeR0, scale(dirFromAngle(thighR - legs.kneeR), P.shin * H));
   const footOffset: Vec2 = { x: m.footRx * 0.45, y: m.footRy * 0.35 };
   const footL0 = add(ankleL0, footOffset);
   const footR0 = add(ankleR0, footOffset);
 
-  // Lift the whole figure so the lowest foot touches y = 0.
+  // Standing: lift the whole figure so the lowest foot touches y = 0.
+  // Seated: the body's underside rests on the seat top. The hip never drops below the
+  // height that keeps the feet on the floor (mid-sit), but can rise above it (dangling feet).
   const lowest = Math.max(footL0.y, footR0.y) + m.footRy;
-  const lift: Vec2 = { x: 0, y: -lowest };
+  const seatedHip = seat ? seat.seatPx + seatContact(c, m) : lowest;
+  const lift: Vec2 = { x: 0, y: -Math.max(lowest, lerp(lowest, seatedHip, seat?.amount ?? 0)) };
   const at = (v: Vec2) => add(v, lift);
 
   const hip = at(hip0);

@@ -5,6 +5,7 @@ import { Eye } from "./Eyes";
 import type { FaceState } from "./expressions";
 import { Mouth } from "./Mouth";
 import { Symbols } from "./Symbols";
+import type { SymbolId } from "./schema";
 
 export type FaceProps = {
   character: Character;
@@ -13,10 +14,12 @@ export type FaceProps = {
   blink: number;
   frame: number;
   symbolsSince: number;
+  symbolAges?: Partial<Record<SymbolId, number>>;
+  mirrored?: boolean;
 };
 
 /** Face in head-local coordinates (origin = head center, canonical right-facing). */
-export const Face: React.FC<FaceProps> = ({ character, face, R, blink, frame, symbolsSince }) => {
+export const Face: React.FC<FaceProps> = ({ character, face, R, blink, frame, symbolsSince, symbolAges, mirrored }) => {
   const f = character.face;
   const { stroke, strokeWidth: sw, headFill } = character.style;
   const faceX = f.offsetX * R;
@@ -39,6 +42,10 @@ export const Face: React.FC<FaceProps> = ({ character, face, R, blink, frame, sy
         frame={frame}
         sw={sw}
         since={symbolsSince}
+        ages={symbolAges}
+        stroke={stroke}
+        mirrored={mirrored}
+        seed={character.id}
       />
       {(["L", "R"] as const).map((side) => {
         const cx = faceX + lookX + (side === "L" ? -eyeDx : eyeDx);
@@ -81,6 +88,10 @@ export const Face: React.FC<FaceProps> = ({ character, face, R, blink, frame, sy
         frame={frame}
         sw={sw}
         since={symbolsSince}
+        ages={symbolAges}
+        stroke={stroke}
+        mirrored={mirrored}
+        seed={character.id}
       />
     </g>
   );

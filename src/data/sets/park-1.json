@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "park-1",
+  "kit": "park",
+  "palette": "meadow",
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "sky", "variant": "sun" },
+    { "part": "hills" },
+    { "part": "grass", "variant": "path" },
+    { "part": "tree", "x": 0.13, "y": 0.72 },
+    { "part": "lamp", "x": 0.92, "y": 0.72 },
+    { "part": "bush", "x": 0.8, "y": 0.72, "size": 0.9 },
+    { "part": "bench", "x": 0.5, "seatFor": ["left", "right"] }
+  ],
+  "marks": { "left": 0.3, "center": 0.5, "right": 0.7 }
+}
