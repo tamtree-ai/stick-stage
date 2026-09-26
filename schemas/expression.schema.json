@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "id": {
+      "type": "string"
+    },
+    "eyes": {
+      "default": {
+        "shape": "base",
+        "lid": 0,
+        "lower": 0,
+        "lidTilt": 0,
+        "pupil": 1,
+        "gaze": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "type": "object",
+      "properties": {
+        "shape": {
+          "default": "base",
+          "type": "string",
+          "enum": [
+            "base",
+            "big",
+            "dot",
+            "closed-happy",
+            "closed",
+            "squint",
+            "shock",
+            "teary"
+          ]
+        },
+        "lid": {
+          "default": 0,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "lower": {
+          "default": 0,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "lidTilt": {
+          "default": 0,
+          "type": "number",
+          "minimum": -40,
+          "maximum": 40
+        },
+        "pupil": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0.3,
+          "maximum": 1.6
+        },
+        "gaze": {
+          "default": {
+            "x": 0,
+            "y": 0
+          },
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        }
+      }
+    },
+    "brows": {
+      "default": {
+        "raise": 0,
+        "tilt": 0
+      },
+      "type": "object",
+      "properties": {
+        "raise": {
+          "default": 0,
+          "type": "number",
+          "minimum": -1.5,
+          "maximum": 1.5
+        },
+        "tilt": {
+          "default": 0,
+          "type": "number",
+          "minimum": -45,
+          "maximum": 45
+        },
+        "left": {
+          "type": "object",
+          "properties": {
+            "raise": {
+              "default": 0,
+              "type": "number",
+              "minimum": -1.5,
+              "maximum": 1.5
+            },
+            "tilt": {
+              "default": 0,
+              "type": "number",
+              "minimum": -45,
+              "maximum": 45
+            }
+          }
+        },
+        "right": {
+          "type": "object",
+          "properties": {
+            "raise": {
+              "default": 0,
+              "type": "number",
+              "minimum": -1.5,
+              "maximum": 1.5
+            },
+            "tilt": {
+              "default": 0,
+              "type": "number",
+              "minimum": -45,
+              "maximum": 45
+            }
+          }
+        }
+      }
+    },
+    "mouth": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "speech"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "w": {
+              "type": "number",
+              "minimum": 0.05,
+              "maximum": 1.2
+            },
+            "open": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "curve": {
+              "type": "number",
+              "minimum": -1.5,
+              "maximum": 1.5
+            },
+            "skew": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            "round": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "top": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "teeth": {
+              "type": "boolean"
+            },
+            "tongue": {
+              "type": "boolean"
+            },
+            "preset": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "preset"
+          ]
+        }
+      ]
+    },
+    "symbols": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "tears",
+          "sweat",
+          "blush",
+          "anger",
+          "exclaim",
+          "question",
+          "speed-lines"
+        ]
+      }
+    },
+    "closeup": {
+      "type": "string",
+      "enum": [
+        "close",
+        "extreme"
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "mouth"
+  ],
+  "$id": "https://stickstage.dev/schemas/expression.schema.json",
+  "title": "StickStage expression"
+}

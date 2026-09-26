@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "id": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "phone",
+        "mic",
+        "cup",
+        "laptop",
+        "sign"
+      ]
+    },
+    "size": {
+      "default": 1,
+      "type": "number",
+      "minimum": 0.3,
+      "maximum": 3
+    },
+    "colors": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{3,8}$"
+        },
+        "accent": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{3,8}$"
+        },
+        "screen": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{3,8}$"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "align": {
+      "type": "string",
+      "enum": [
+        "forearm",
+        "upright"
+      ]
+    },
+    "angle": {
+      "default": 0,
+      "type": "number"
+    },
+    "text": {
+      "type": "string",
+      "maxLength": 24
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "kind",
+    "colors",
+    "align"
+  ],
+  "$id": "https://stickstage.dev/schemas/prop.schema.json",
+  "title": "StickStage prop"
+}

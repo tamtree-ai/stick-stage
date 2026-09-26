@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "sounds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "durationMs": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "gain": {
+            "default": 0.8,
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "license": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tags": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "file",
+          "durationMs",
+          "license",
+          "source"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "sounds"
+  ],
+  "$id": "https://stickstage.dev/schemas/sfx.schema.json",
+  "title": "StickStage sfx"
+}

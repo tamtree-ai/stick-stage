@@ -57,3 +57,6 @@ export * from "./text/layout";
 export * from "./templates";
 export * from "./migrate";
 export * from "./library";
+export * from "./director/metadata";
+export * from "./sheet/ContactSheet";
+export { DOC_SCHEMAS, jsonSchemaFor } from "./schemas";

@@ -5,3 +5,4 @@ out
 public/skits/*/generated
 .DS_Store
 tools/
+packages/stickstage/dist

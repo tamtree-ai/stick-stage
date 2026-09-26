@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "listen": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "defaultListen": {
+      "type": "string"
+    },
+    "punchline": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "defaultPunchline": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "listen",
+    "defaultListen",
+    "punchline",
+    "defaultPunchline"
+  ],
+  "$id": "https://stickstage.dev/schemas/reactions.schema.json",
+  "title": "StickStage reactions"
+}

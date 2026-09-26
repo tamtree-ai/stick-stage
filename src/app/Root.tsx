@@ -16,7 +16,7 @@ import { calculateTalkLabMetadata, talkLabSchema } from "./talk/talkData";
 import { SetLab, setLabSchema, setLabSize } from "./labs/SetLab";
 import { PROP_LAB_FRAMES, PropLab, propLabSchema } from "./labs/PropLab";
 import { STAGING_LAB_FRAMES, StagingLab, stagingLabSchema } from "./labs/StagingLab";
-import { calculateContactSheetMetadata, ContactSheet, contactSheetSchema } from "./ContactSheet";
+import { calculateContactSheetMetadata, ContactSheet, contactSheetSchema } from "../engine";
 import { SkitComposition } from "./skit/SkitComposition";
 import { calculateSkitMetadata, skitCompositionSchema } from "./skit/skitData";
 import { SFX_LAB_FRAMES, SfxLab } from "./labs/SfxLab";

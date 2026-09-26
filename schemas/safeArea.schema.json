@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "top": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 0.5
+    },
+    "bottom": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 0.5
+    },
+    "left": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 0.5
+    },
+    "right": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 0.5
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "top",
+    "bottom",
+    "left",
+    "right"
+  ],
+  "$id": "https://stickstage.dev/schemas/safeArea.schema.json",
+  "title": "StickStage safeArea"
+}

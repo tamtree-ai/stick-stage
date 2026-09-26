@@ -189,6 +189,8 @@ export const MetaSchema = z.strictObject({
 /** The skit document (`skit.json`): one scene (`set` + `beats`) or several (`scenes`). */
 export const SkitSchema = z
   .strictObject({
+    /** Editor hint (JSON Schema path); ignored. */
+    $schema: z.string().optional(),
     schemaVersion: z.literal(1),
     meta: MetaSchema,
     /** The set (single-scene skits), or the default set for scenes. */

@@ -33,6 +33,8 @@ export const PremiseCastSchema = z.strictObject({
 });
 
 export const PremiseSchema = z.strictObject({
+  /** Editor hint (JSON Schema path); ignored. */
+  $schema: z.string().optional(),
   schemaVersion: z.literal(1),
   template: z.enum(TEMPLATES),
   title: z.string().min(1),
