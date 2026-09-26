@@ -107,7 +107,8 @@ export const pacingChecks = (tl: Timeline): Finding[] => {
   });
   // One dominant thing at a time: camera events and big gestures don't pile up.
   const events = [
-    ...tl.shots.filter((s) => s.frame > 0).map((s) => ({ frame: s.frame, what: `cut to ${s.framing}` })),
+    // The reaction close-up answering the punchline is one move with it, not a pile-up.
+    ...tl.shots.filter((s) => s.frame > 0 && !s.reason.startsWith("reaction close-up")).map((s) => ({ frame: s.frame, what: `cut to ${s.framing}` })),
     ...tl.punchIns.map((p) => ({ frame: p.frame, what: "punch-in" })),
     ...tl.shakes.map((s) => ({ frame: s.frame, what: "shake" })),
   ].sort((a, b) => a.frame - b.frame);

@@ -59,8 +59,13 @@ export const layoutBeats = (
   const punch = punchlineIndexes(skit);
   const out: LaidBeat[] = [];
   let cursor = skit.timing.leadInMs;
+  /** The previous beat, if it was cut from an audio file: the next cut from the same file keeps its timing. */
+  let lastClip: { src: string; endMs: number } | undefined;
   const push = (beat: Beat, path: (string | number)[], kind: BeatKind, synthetic: boolean, isPunch: boolean, extra: Partial<LaidBeat> = {}) => {
-    const gap = beat.pauseBeforeMs ?? (out.length === 0 || synthetic ? 0 : skit.timing.gapMs);
+    const a = beat.audio;
+    const clipGap = a.source === "file" && lastClip?.src === a.src && a.startMs !== undefined ? Math.max(0, a.startMs - lastClip.endMs) : undefined;
+    const gap = beat.pauseBeforeMs ?? clipGap ?? (out.length === 0 || synthetic ? 0 : skit.timing.gapMs);
+    lastClip = a.source === "file" && a.endMs !== undefined && kind === "line" ? { src: a.src, endMs: a.endMs } : undefined;
     const line = extra.line;
     const durMs = line ? line.durationMs : (beat.durationMs ?? DEFAULT_SILENT_MS);
     const hold = beat.holdAfterMs ?? 0;
@@ -98,11 +103,11 @@ export const layoutBeats = (
       });
       return;
     }
-    if (beat.audio.source === "file") {
-      diags.push({ level: "error", path: `beats[${i}].audio`, message: `audio source "file" (lip-sync to existing audio) is not supported yet`, expected: `{ "source": "tts" }` });
+    const line = lines.get(beat.id);
+    if (!line && beat.audio.source === "file") {
+      diags.push({ level: "error", path: `beats[${i}].audio`, message: `the clip for "${beat.id}" isn't prepared`, expected: `run \`pnpm prep <skit>\` (trims "${beat.audio.src}" and lip-syncs it)` });
       return;
     }
-    const line = lines.get(beat.id);
     if (!line) {
       diags.push({ level: "error", path: `beats[${i}]`, message: `no voice for beat "${beat.id}"`, expected: `generated voice: run the tamtree harness or \`pnpm voice:say <skit>\`, then \`pnpm prep <skit>\`` });
       return;

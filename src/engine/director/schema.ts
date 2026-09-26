@@ -70,7 +70,18 @@ export const TextCueSchema = z.strictObject({
 
 export const AudioSourceSchema = z.discriminatedUnion("source", [
   z.strictObject({ source: z.literal("tts") }),
-  z.strictObject({ source: z.literal("file"), src: z.string().min(1), startMs: z.number().min(0).optional(), endMs: z.number().min(0).optional() }),
+  /**
+   * Lip-sync to existing audio (e.g. a trending sound): `src` is relative to the skit folder,
+   * trimmed to `startMs`–`endMs`. Consecutive beats cut from one file keep the file's own timing.
+   * `words` are optional word start times in the source file's ms (else Whisper, else estimated).
+   */
+  z.strictObject({
+    source: z.literal("file"),
+    src: z.string().min(1),
+    startMs: z.number().min(0).optional(),
+    endMs: z.number().min(0).optional(),
+    words: z.array(z.strictObject({ text: z.string().min(1), startMs: z.number().min(0), endMs: z.number().min(0).optional() })).optional(),
+  }),
 ]);
 
 export const BeatSchema = z.strictObject({

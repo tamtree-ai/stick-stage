@@ -57,3 +57,28 @@ export const ffmpeg = (args: string[]): void => {
 /** Any audio → mono 16-bit PCM WAV (what Rhubarb reads). */
 export const toPcmWav = (input: string, output: string): void =>
   ffmpeg(["-i", input, "-ac", "1", "-ar", "22050", "-c:a", "pcm_s16le", output]);
+
+/**
+ * Optional Whisper (whisper.cpp) for word timings on existing audio: WHISPER_PATH (the
+ * `whisper-cli` binary) + WHISPER_MODEL (a ggml model file), or `whisper-cli` on PATH with
+ * WHISPER_MODEL. Returns undefined when not set up; prep then estimates from silences.
+ */
+export const findWhisper = (): { bin: string; model: string } | undefined => {
+  const model = process.env.WHISPER_MODEL;
+  if (!model || !fs.existsSync(model)) return undefined;
+  if (process.env.WHISPER_PATH) return { bin: process.env.WHISPER_PATH, model };
+  try {
+    const bin = execFileSync("which", ["whisper-cli"], { encoding: "utf8" }).trim();
+    return bin ? { bin, model } : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+/** whisper.cpp JSON with one word per segment, for a 16 kHz mono WAV. */
+export const runWhisper = (w: { bin: string; model: string }, wav16k: string, outBase: string): unknown => {
+  execFileSync(w.bin, ["-m", w.model, "-f", wav16k, "-oj", "-ml", "1", "-sow", "-of", outBase, "-np"], { stdio: ["ignore", "ignore", "inherit"] });
+  const json = JSON.parse(fs.readFileSync(`${outBase}.json`, "utf8"));
+  fs.rmSync(`${outBase}.json`);
+  return json;
+};

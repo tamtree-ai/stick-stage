@@ -105,7 +105,10 @@ export const planShots = (
     const m = strongest(b);
     if (b.punchline) {
       const speaker = b.beat.speaker!;
-      if (m && from - lastCloseup >= msToFrame(CLOSEUP_BUDGET_MS, fps)) return emotionCloseup(m, "punchline emotion");
+      // The emotion close-up needs room to hold ≥ 1 s before the reaction cut; short lines get the punch-in.
+      const cutAt = m ? (onTwo() ? m.frame + LAND_FRAMES : m.frame) : 0;
+      const room = msToFrame(b.endMs, fps) - cutAt;
+      if (m && from - lastCloseup >= msToFrame(CLOSEUP_BUDGET_MS, fps) && room >= minHold) return emotionCloseup(m, "punchline emotion");
       const twoAt = backToTwo("back to two before the punchline");
       const lastWord = b.line?.words[b.line.words.length - 1];
       const pf = from + msToFrame(lastWord?.startMs ?? 0, fps);

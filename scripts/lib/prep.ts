@@ -11,12 +11,14 @@ import {
   estimateWords,
   estimateWordsInSpans,
   estimateMouthCues,
+  parseSkit,
   PreparedLineSchema,
   VoiceManifestSchema,
   type PreparedLine,
   type PreparedVoice,
 } from "../../src/engine";
 import { speechSpans, wavDurationMs } from "./audio";
+import { fileBeats, prepFileLines } from "./clips";
 import { findRhubarb, rhubarbVersion, ROOT, runRhubarb, toPcmWav } from "./tools";
 
 /** Bump when prepare's output for the same inputs changes, to invalidate the cache. */
@@ -36,15 +38,21 @@ export const prepSkit = (skitId: string, opts: { requireRhubarb?: boolean } = {}
   fs.mkdirSync(cacheDir, { recursive: true });
 
   const manifestPath = path.join(skitDir, "voice.json");
-  if (!fs.existsSync(manifestPath))
+  const skitPath = path.join(skitDir, "skit.json");
+  const doc = fs.existsSync(skitPath) ? parseSkit(JSON.parse(fs.readFileSync(skitPath, "utf8"))) : undefined;
+  const hasFileAudio = doc ? fileBeats(doc).length > 0 : false;
+  if (!fs.existsSync(manifestPath) && !hasFileAudio)
     throw new Error(
       `No voice manifest at ${path.relative(ROOT, manifestPath)}. Generate voices first (tamtree harness, or pnpm voice:say ${skitId}).`,
     );
-  const parsed = VoiceManifestSchema.safeParse(JSON.parse(fs.readFileSync(manifestPath, "utf8")));
-  if (!parsed.success)
-    throw new Error(
-      `Invalid ${path.relative(ROOT, manifestPath)}:\n${parsed.error.issues.map((i) => `  ${i.path.join(".")}: ${i.message}`).join("\n")}`,
-    );
+  const readManifest = () => {
+    const parsed = VoiceManifestSchema.safeParse(JSON.parse(fs.readFileSync(manifestPath, "utf8")));
+    if (!parsed.success)
+      throw new Error(
+        `Invalid ${path.relative(ROOT, manifestPath)}:\n${parsed.error.issues.map((i) => `  ${i.path.join(".")}: ${i.message}`).join("\n")}`,
+      );
+    return parsed.data.lines;
+  };
 
   const warnings: string[] = [];
   const rhubarb = findRhubarb();
@@ -56,7 +64,8 @@ export const prepSkit = (skitId: string, opts: { requireRhubarb?: boolean } = {}
   const mouthTool = rhubarb ? `rhubarb ${rhubarbVersion(rhubarb)}` : "estimated";
 
   let hits = 0;
-  const lines: PreparedLine[] = parsed.data.lines.map((line) => {
+  const ttsLines = fs.existsSync(manifestPath) ? readManifest() : [];
+  const lines: PreparedLine[] = ttsLines.map((line) => {
     const audioPath = path.join(skitDir, line.audio);
     if (!fs.existsSync(audioPath))
       throw new Error(`Line "${line.id}": audio not found at ${path.relative(ROOT, audioPath)}`);
@@ -100,6 +109,11 @@ export const prepSkit = (skitId: string, opts: { requireRhubarb?: boolean } = {}
     return prepared;
   });
 
+  if (doc && hasFileAudio) {
+    const clips = prepFileLines(doc, { skitId, rhubarb, mouthTool, warnings });
+    hits += clips.hits;
+    lines.push(...clips.lines);
+  }
   const out: PreparedVoice = { schemaVersion: 1, lines };
   fs.writeFileSync(path.join(genDir, "voice.prepared.json"), JSON.stringify(out, null, 1));
   return { voice: out, hits, mouthTool, warnings };
