@@ -1,6 +1,6 @@
 /** Minimal PCM WAV reading for the prepare step (duration, silence detection). */
 import fs from "node:fs";
-import type { Span } from "../../src/engine";
+import type { Span } from "../engine/core";
 
 type Pcm = { rate: number; channels: number; bits: number; data: Buffer };
 

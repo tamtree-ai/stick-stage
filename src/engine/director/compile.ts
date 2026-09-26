@@ -1,3 +1,4 @@
+import { migrate } from "../migrate";
 import { fromZodIssues, SkitError, type Diagnostic } from "./diagnostics";
 import { msToFrame } from "./layout";
 import { docBeats, SkitSchema, type Beat, type CastMember, type Skit, type SkitDoc } from "./schema";
@@ -23,7 +24,7 @@ export type CompileResult = {
 
 /** Validate the document's shape. Throws `SkitError` with path + expected + example per problem. */
 export const parseSkit = (json: unknown): SkitDoc => {
-  const r = SkitSchema.safeParse(json);
+  const r = SkitSchema.safeParse(migrate("skit", json).doc);
   if (!r.success) throw new SkitError(fromZodIssues(r.error.issues));
   return r.data;
 };

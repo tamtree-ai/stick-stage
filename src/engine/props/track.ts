@@ -1,6 +1,6 @@
 import { easeOutBack } from "../lib/easing";
 import { lerp, type Vec2 } from "../lib/math";
-import { PROP_BOUNDS } from "./draw";
+import { PROP_BOUNDS } from "./bounds";
 import type { PropDef, PropKey } from "./schema";
 
 export type Hand = "L" | "R";

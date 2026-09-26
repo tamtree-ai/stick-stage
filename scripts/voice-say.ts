@@ -13,7 +13,7 @@ import path from "node:path";
 import { z } from "zod";
 import { formatDiagnostics, parseSkit, SkitError, skitLines, type VoiceManifest } from "../src/engine";
 import { library } from "../src/data";
-import { wavDurationMs } from "./lib/audio";
+import { wavDurationMs } from "../src/node";
 import { ROOT } from "./lib/tools";
 
 const ScriptSchema = z.object({

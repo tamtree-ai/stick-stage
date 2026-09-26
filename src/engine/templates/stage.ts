@@ -5,6 +5,7 @@ import type { SetDef } from "../set/schema";
 import { normWord, tokenize } from "../voice/words";
 import { PremiseSchema, type Premise, type PremiseLine, type TemplateId } from "./premise";
 import { fromZodIssues } from "../director/diagnostics";
+import { migrate } from "../migrate";
 
 type Beat = NonNullable<SkitInput["beats"]>[number];
 type Action = NonNullable<Beat["actions"]>[number];
@@ -98,7 +99,7 @@ const slamBeats = (p: Premise): Beat[] =>
 
 /** Premise → draft skit.json. Throws `SkitError` (path + expected + example) on a bad premise. */
 export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<string, SetDef>>): SkitInput => {
-  const r = PremiseSchema.safeParse(json);
+  const r = PremiseSchema.safeParse(migrate("premise", json).doc);
   if (!r.success) throw new SkitError(fromZodIssues(r.error.issues));
   const p = r.data;
   const diags = check(p, lib, sets);
