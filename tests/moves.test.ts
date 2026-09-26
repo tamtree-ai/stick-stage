@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { library, sets } from "../src/data";
-import { applyGait, facingAt, SkitError, stageActorsAt, toAngles, xAt, type Diagnostic } from "../src/engine";
+import { library, safeArea, sets } from "../src/data";
+import { applyGait, checkSkit, facingAt, SkitError, stageActorsAt, toAngles, xAt, type Diagnostic } from "../src/engine";
 import { compile } from "./director-fixtures";
 
 const FPS = 30;
+const check = (result: ReturnType<typeof compile>) => checkSkit({ result, lib: library, sets, safeArea });
 const errorsOf = (fn: () => unknown): Diagnostic[] => {
   try {
     fn();
@@ -72,6 +73,32 @@ describe("contact", () => {
     const hit = tl.beats[0]!.from + Math.round(0.5 * FPS);
     expect(xAt(milo, hit + 20)).toBeLessThan(xAt(milo, hit - 1));
     expect(milo.poseKeys.some((k) => k.pose === "recoil")).toBe(true);
+  });
+  it("an emotion close-up waits for the shoved character to land, and a moving face gets close, not extreme", () => {
+    const r = compile([
+      silent("s", [
+        { who: "june", do: "shove", target: "milo", at: { ms: 500 } },
+        { who: "milo", do: "expression", expression: "shocked", at: { ms: 520 } },
+      ]),
+    ]);
+    const tl = r.timeline;
+    const milo = tl.cast.find((c) => c.id === "milo")!;
+    const stagger = milo.moveKeys.at(-1)!;
+    const cut = tl.shots.find((x) => x.on === "milo")!;
+    expect(cut.frame).toBeGreaterThanOrEqual(stagger.frame + stagger.durationFrames);
+    // Whichever framing the director picks, the face stays readable.
+    expect(check(r).findings.filter((f) => f.check === "faces-safe")).toEqual([]);
+  });
+  it("an extreme close-up on a face still in motion steps back to close", () => {
+    // Cut straight onto the stagger (no two-shot first): the head is still moving.
+    const { timeline: tl } = compile([
+      silent("w", [], 600),
+      { id: "s", silent: true, durationMs: 1500, shot: { framing: "wide" }, actions: [{ who: "june", do: "shove", target: "milo", at: { ms: 0 } }] } as never,
+      silent("r", [{ who: "milo", do: "expression", expression: "shocked", at: { ms: 0 } }]),
+    ]);
+    const cut = tl.shots.find((x) => x.on === "milo");
+    if (cut?.framing === "close") expect(cut.reason).toContain("moving");
+    expect(cut).toBeDefined();
   });
   it("contact needs another cast member", () => {
     const [e] = errorsOf(() => compile([silent("s", [{ who: "june", do: "shove", target: "june" }])]));

@@ -21,7 +21,7 @@ export const compileSkitIn = (p: Project, id: string): CompileResult => {
   const skit = JSON.parse(fs.readFileSync(path.join(dir, "skit.json"), "utf8"));
   const voicePath = path.join(dir, "generated/voice.prepared.json");
   const voice = fs.existsSync(voicePath) ? PreparedVoiceSchema.parse(JSON.parse(fs.readFileSync(voicePath, "utf8"))) : undefined;
-  const r = compileSkit({ skit, voice, lib: p.lib, sets: p.sets, sfx: p.sfx, reactions: p.reactions });
+  const r = compileSkit({ skit, voice, lib: p.lib, sets: p.sets, sfx: p.sfx, reactions: p.reactions, safeArea: p.safeArea });
   fs.mkdirSync(path.join(dir, "generated"), { recursive: true });
   fs.writeFileSync(path.join(dir, "generated/timeline.json"), JSON.stringify(r.program));
   return r;

@@ -1,4 +1,4 @@
-import { library, reactions, sets, sfxLibrary } from "../src/data";
+import { library, reactions, safeArea, sets, sfxLibrary } from "../src/data";
 import { compileSkit, estimateMouthCues, estimateWords, type PreparedVoice, type SkitInput } from "../src/engine";
 
 /** Prepared voice for test lines without audio: estimated words and mouths. */
@@ -33,5 +33,5 @@ export const skitOf = (beats: BeatIn[], extra: Partial<SkitInput> = {}) => {
 
 export const compile = (beats: BeatIn[], extra: Partial<SkitInput> = {}) => {
   const { skit, voice } = skitOf(beats, extra);
-  return compileSkit({ skit, voice, lib: library, sets, sfx: sfxLibrary, reactions });
+  return compileSkit({ skit, voice, lib: library, sets, sfx: sfxLibrary, reactions, safeArea });
 };

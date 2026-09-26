@@ -21,6 +21,8 @@ type Hint = (expression: string) => Expression["closeup"];
 
 export const STORY_CHECKS = ["punchline-camera", "punchline-reaction", "emotion-closeups", "closeup-budget", "closeup-hold", "punch-gap", "one-thing", "hook", "length"];
 
+const CONTACT_POSES = ["high-five"];
+
 const skitBeat = (skit: Skit, id: string) => skit.beats.find((b) => b.id === id);
 
 export const punchlineChecks = (tl: Timeline, skit: Skit): Finding[] => {
@@ -125,7 +127,8 @@ export const pacingChecks = (tl: Timeline): Finding[] => {
     for (let b = a + 1; b < tl.cast.length; b++)
       for (const ka of tl.cast[a]!.poseKeys.slice(1))
         for (const kb of tl.cast[b]!.poseKeys.slice(1))
-          if (Math.abs(ka.frame - kb.frame) <= 3 && ka.pose !== "idle" && kb.pose !== "idle")
+          // Matching contact poses (a high-five) are one shared gesture.
+          if (Math.abs(ka.frame - kb.frame) <= 3 && ka.pose !== "idle" && kb.pose !== "idle" && !(ka.pose === kb.pose && CONTACT_POSES.includes(ka.pose)))
             out.push({ check: "one-thing", level: "warning", frame: ka.frame, message: `${tl.cast[a]!.id} (${ka.pose}) and ${tl.cast[b]!.id} (${kb.pose}) gesture at the same time` });
   return out;
 };

@@ -1,6 +1,7 @@
 /** Compile one resolved scene (a single-scene skit is one scene). */
 import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
+import type { SafeArea } from "../text/safeArea";
 import { buildCaptionPages } from "../text/captions";
 import type { PreparedLine, PreparedVoice } from "../voice/schema";
 import { solveShots } from "./camera";
@@ -21,6 +22,8 @@ export type CompileInput = {
   sets: Readonly<Record<string, SetDef>>;
   sfx: SfxManifest;
   reactions: ReactionTable;
+  /** Face shots keep the face in this area. Default: `DEFAULT_SAFE_AREA`. */
+  safeArea?: SafeArea;
 };
 
 
@@ -101,9 +104,14 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
 
   const { cast, moments } = buildTracks(skit, layout, set, input.lib, input.reactions, fps, diags);
   const hint = (e: string) => input.lib.expressions[e]?.closeup;
-  const plan = planShots(layout, moments, hint, fps, diags);
+  const settleAt = (who: string, f: number) => {
+    let at = f;
+    for (const k of cast.find((c) => c.id === who)?.moveKeys ?? []) if (k.frame <= at && at < k.frame + k.durationFrames) at = k.frame + k.durationFrames;
+    return at;
+  };
+  const plan = planShots(layout, moments, hint, fps, diags, settleAt);
   if (fail()) throw new SkitError(diags);
-  const { shots, punchIns, shakes } = solveShots(plan, cast, input.lib, set, fps, width, height);
+  const { shots, punchIns, shakes } = solveShots(plan, cast, input.lib, set, fps, width, height, input.safeArea, msToFrame(layout.totalMs, fps));
 
   const audio: AudioClip[] = [];
   const sfx: SfxEvent[] = [];

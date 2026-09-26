@@ -6,6 +6,7 @@ import type { ReactionTable, SfxManifest } from "./schema";
 import type { Program } from "./timeline";
 import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
+import type { SafeArea } from "../text/safeArea";
 import { PreparedVoiceSchema } from "../voice/schema";
 
 /** Props of the skit composition the consumer registers (`skit` = folder under their skits dir). */
@@ -23,6 +24,8 @@ export type StickStageContext = {
   sets: Readonly<Record<string, SetDef>>;
   sfx: SfxManifest;
   reactions: ReactionTable;
+  /** The platform safe area face shots keep faces inside. */
+  safeArea?: SafeArea;
   /** Where skit folders are, relative to the served root. Default "skits". */
   skitsPath?: string;
 };
@@ -39,7 +42,7 @@ export const calculateStickStageMetadata =
     if (skit === undefined) throw new Error(`Missing ${base}/skit.json`);
     const voiceJson = await ctx.load(`${base}/generated/voice.prepared.json`);
     const voice = voiceJson === undefined ? undefined : PreparedVoiceSchema.parse(voiceJson);
-    const { program, warnings } = compileSkit({ skit, voice, lib: ctx.lib, sets: ctx.sets, sfx: ctx.sfx, reactions: ctx.reactions });
+    const { program, warnings } = compileSkit({ skit, voice, lib: ctx.lib, sets: ctx.sets, sfx: ctx.sfx, reactions: ctx.reactions, safeArea: ctx.safeArea });
     if (warnings.length) console.warn(formatDiagnostics(warnings));
     return { durationInFrames: program.durationInFrames, fps: program.fps, width: program.width, height: program.height, props: { ...props, program } };
   };

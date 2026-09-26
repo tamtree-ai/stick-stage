@@ -1,4 +1,5 @@
 import { clamp } from "../lib/math";
+import type { Rect } from "../text/safeArea";
 import type { Camera, StageActor } from "./Stage";
 
 export const FRAMINGS = ["wide", "two", "medium", "close", "extreme"] as const;
@@ -105,4 +106,17 @@ export const frameShot = (
       `Shot "${shot.framing}" needs "on" to name a cast member (got "${shot.on ?? ""}")`,
     );
   return faceShot(subject, shot.framing, width, height, groundY);
+};
+
+/** Eyes, brows and mouth of an actor, in screen px under `cam` (the part that must stay readable). */
+export const faceRect = (a: StageActor, cam: Camera, width: number, height: number, groundY: number): Rect => {
+  const { head, eyes, R } = headInStage(a, width, groundY);
+  const c = a.state.character.face;
+  const sign = a.facing === "left" ? -1 : 1;
+  const cx = head.x + sign * c.offsetX * R;
+  const x0 = cx - 0.6 * R;
+  const y0 = eyes.y - 0.55 * R;
+  const y1 = head.y + (c.mouthY + 0.22) * R;
+  const s = cam.scale;
+  return { x: (x0 - cam.cx) * s + width / 2, y: (y0 - cam.cy) * s + height / 2, w: 1.2 * R * s, h: (y1 - y0) * s };
 };

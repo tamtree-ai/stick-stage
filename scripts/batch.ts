@@ -2,7 +2,7 @@
  * Batch render (plan M6): pnpm batch [skitId…] [--all] [--say] [--force] [--skip-check]
  *   --all: every skit in public/skits except labs (ids ending in "lab").
  * Per skit: prep → compile → self-check → render, into out/posts/<skitId>/:
- *   <skitId>-<title-slug>-<hash>.mp4   the video (hash of the compiled program: unchanged skits are skipped)
+ *   <skitId>-<title-slug>-<hash>.mp4   the video (hash of the program + renderer/library code: unchanged skits are skipped)
  *   …txt                               post caption: description, hashtags, AI-voice note, script
  *   …srt                               subtitles (script text exactly)
  *   …json                              what was rendered: title, duration, check summary
@@ -27,6 +27,15 @@ if (!ids.length) {
   process.exit(1);
 }
 
+/** Hash of everything that affects pixels besides the program: engine, app and library sources, public media. */
+const CODE_HASH = (() => {
+  const h = crypto.createHash("sha256");
+  const walk = (dir: string): string[] =>
+    fs.readdirSync(dir, { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? walk(path.join(dir, d.name)) : [path.join(dir, d.name)]));
+  for (const f of ["src/engine", "src/app", "src/data", "public/sfx", "public/fonts"].flatMap((d) => walk(path.join(ROOT, d))).sort()) h.update(f).update(fs.readFileSync(f));
+  return h.digest("hex");
+})();
+
 type Row = { id: string; status: "rendered" | "unchanged" | "failed"; out?: string; reason?: string };
 const rows: Row[] = [];
 for (const id of ids) {
@@ -49,7 +58,8 @@ for (const id of ids) {
       rows.push({ id, status: "failed", reason: `self-check: ${report.errors} error(s)` });
       continue;
     }
-    const hash = crypto.createHash("sha256").update(JSON.stringify(result.program)).digest("hex").slice(0, 8);
+    // What's rendered depends on the program and on the renderer + library code.
+    const hash = crypto.createHash("sha256").update(JSON.stringify(result.program)).update(CODE_HASH).digest("hex").slice(0, 8);
     const dir = path.join(ROOT, "out/posts", id);
     const base = path.join(dir, `${id}-${slug(doc.meta.title)}-${hash}`);
     fs.mkdirSync(dir, { recursive: true });

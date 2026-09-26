@@ -103,6 +103,7 @@ export const shove = (ctx: MoveCtx, a: CastTrack, b: CastTrack, frame: number, d
   a.poseKeys.push({ frame: frame + HOLD, pose: "idle" });
   b.poseKeys.push({ frame: Math.max(0, frame - 1), pose: "recoil", durationFrames: 3 });
   b.poseKeys.push({ frame: frame + HOLD + 4, pose: "idle" });
-  b.moveKeys.push({ frame, x: Math.min(0.92, Math.max(0.08, xb + dir * distance)), durationFrames: 8 });
+  // Keep the target far enough from the stage edge that its face can still be framed.
+  b.moveKeys.push({ frame, x: Math.min(0.78, Math.max(0.22, xb + dir * distance)), durationFrames: 8 });
   b.hopKeys.push({ frame, height: 0.04 });
 };

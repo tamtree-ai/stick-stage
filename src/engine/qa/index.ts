@@ -8,7 +8,7 @@ import { report, type CheckReport, type Finding } from "./types";
 import { visualChecks, VISUAL_CHECKS } from "./visual";
 
 export * from "./types";
-export { faceRect, sampleFrames, contrastChecks } from "./visual";
+export { sampleFrames, contrastChecks } from "./visual";
 
 export type CheckInput = {
   result: Pick<CompileResult, "scenes" | "program">;

@@ -1,12 +1,11 @@
 import { cameraAt, shotAt } from "../director/camera";
-import { stageActorsAt } from "../director/placement";
+import { stageActorsAt, xAt } from "../director/placement";
 import type { Timeline } from "../director/timeline";
 import { contrastRatio } from "../lib/color";
 import type { Library } from "../rig/actorState";
 import { getPalette } from "../set/palettes";
 import type { SetDef } from "../set/schema";
-import { headInStage } from "../shots/framing";
-import type { Camera, StageActor } from "../shots/Stage";
+import { faceRect } from "../shots/framing";
 import { pageAt } from "../text/captions";
 import { inside, overlaps, povRect, slamRect, SLAM, SUBTITLE, subtitleRect } from "../text/layout";
 import { safeRect, type Rect, type SafeArea } from "../text/safeArea";
@@ -17,19 +16,6 @@ import type { Finding } from "./types";
 export const VISUAL_CHECKS = ["faces-safe", "overlay-collision", "overlay-fit", "contrast"];
 
 const FACE = ["medium", "close", "extreme"];
-
-/** Eyes, brows and mouth of an actor, in screen px under `cam` (the part that must stay readable). */
-export const faceRect = (a: StageActor, cam: Camera, width: number, height: number, groundY: number): Rect => {
-  const { head, eyes, R } = headInStage(a, width, groundY);
-  const c = a.state.character.face;
-  const sign = a.facing === "left" ? -1 : 1;
-  const cx = head.x + sign * c.offsetX * R;
-  const x0 = cx - 0.6 * R;
-  const y0 = eyes.y - 0.55 * R;
-  const y1 = head.y + (c.mouthY + 0.22) * R;
-  const s = cam.scale;
-  return { x: (x0 - cam.cx) * s + width / 2, y: (y0 - cam.cy) * s + height / 2, w: 1.2 * R * s, h: (y1 - y0) * s };
-};
 
 const onScreen = (r: Rect, width: number, height: number) => r.x + r.w > 0 && r.x < width && r.y + r.h > 0 && r.y < height;
 
@@ -68,8 +54,11 @@ export const visualChecks = ({ tl, lib, set, safeArea }: Ctx): Finding[] => {
     const faces = stageActorsAt(lib, tl.cast, set, frame, fps, W)
       .map((a) => ({ id: a.id, rect: faceRect(a, cam, W, H, set.groundY) }))
       .filter((f) => onScreen(f.rect, W, H));
+    // Entrances and exits cross the frame edge on purpose.
+    const inTransit = (id: string) =>
+      tl.cast.find((c) => c.id === id)!.moveKeys.some((k) => frame >= k.frame && frame < k.frame + k.durationFrames && (k.x < 0 || k.x > 1 || xAt(tl.cast.find((c) => c.id === id)!, k.frame) < 0 || xAt(tl.cast.find((c) => c.id === id)!, k.frame) > 1));
     for (const f of faces) {
-      if (inside(f.rect, safe, tol)) continue;
+      if (inside(f.rect, safe, tol) || inTransit(f.id)) continue;
       // In a face framing or a punch-in only the subject matters; the other face is usually cut off.
       const punch = tl.punchIns.find((p) => p.frame <= frame && p.frame >= shot.frame);
       const focus = FACE.includes(shot.framing) ? shot.on : punch?.on;

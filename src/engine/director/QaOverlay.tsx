@@ -1,5 +1,5 @@
 import React from "react";
-import { faceRect } from "../qa/visual";
+import { faceRect } from "../shots/framing";
 import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
 import type { Camera } from "../shots/Stage";

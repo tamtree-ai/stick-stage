@@ -36,6 +36,8 @@ export const planShots = (
   hint: (expression: string) => Expression["closeup"],
   fps: number,
   diags: Diagnostic[],
+  /** When someone moving at `frame` (a slide, a stagger, a walk) comes to rest. Default: no wait. */
+  settleAt: (who: string, frame: number) => number = (_w, f) => f,
 ): ShotPlan => {
   const plan: ShotPlan = { cuts: [{ frame: 0, framing: "two", reason: "open on two" }], punchIns: [], shakes: [] };
   let cam: Cam = { framing: "two", since: 0, punched: false };
@@ -56,7 +58,9 @@ export const planShots = (
   /** Two-shot first, then cut to the face once the expression has landed. */
   const emotionCloseup = (m: Moment, reason: string) => {
     const framing = hint(m.expression) ?? "close";
-    const frame = onTwo() ? m.frame + LAND_FRAMES : m.frame;
+    // Don't cut to a face that is still flying across the frame: wait until it settles.
+    const base = onTwo() ? m.frame + LAND_FRAMES : m.frame;
+    const frame = Math.max(base, settleAt(m.who, base));
     cut(frame, framing, m.who, `${reason}: ${m.expression}`);
     lastCloseup = frame;
   };
