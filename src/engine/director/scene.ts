@@ -36,7 +36,7 @@ const checkIds = (skit: Skit, input: CompileInput, diags: Diagnostic[]) => {
   };
   need("set", skit.set, ids(sets), ["set"]);
   const dup = (xs: string[], path: string, what: string) =>
-    xs.forEach((x, i) => xs.indexOf(x) !== i && diags.push({ level: "error", path: `${path}[${i}].id`, message: `duplicate ${what} id "${x}"` }));
+    xs.forEach((x, i) => xs.indexOf(x) !== i && diags.push({ level: "error", code: "duplicate-id", path: `${path}[${i}].id`, message: `duplicate ${what} id "${x}"` }));
   dup(castIds, "cast", "cast");
   dup(skit.beats.map((b) => b.id), "beats", "beat");
   skit.cast.forEach((c, i) => {
@@ -52,12 +52,12 @@ const checkIds = (skit: Skit, input: CompileInput, diags: Diagnostic[]) => {
     need("expression", b.expression, ids(lib.expressions), p("expression"));
     if (typeof b.reaction === "string") need("expression", b.reaction, ids(lib.expressions), p("reaction"));
     if (b.silent && b.expression)
-      diags.push({ level: "error", path: `beats[${i}].expression`, message: "a silent beat has no speaker", expected: `an action instead`, example: `{ "who": "milo", "do": "expression", "expression": "${b.expression}" }` });
+      diags.push({ level: "error", code: "silent-with-expression", path: `beats[${i}].expression`, message: "a silent beat has no speaker", expected: `an action instead`, example: `{ "who": "milo", "do": "expression", "expression": "${b.expression}" }` });
     if (b.shot) {
       need("cast member", b.shot.on, castIds, p("shot", "on"));
       need("cast member", b.shot.punchIn?.on, castIds, p("shot", "punchIn", "on"));
       if (FACE_FRAMINGS.includes(b.shot.framing) && !b.shot.on)
-        diags.push({ level: "error", path: `beats[${i}].shot.on`, message: `framing "${b.shot.framing}" needs "on"`, expected: `one of ${castIds.join(", ")}`, example: `"shot": { "framing": "${b.shot.framing}", "on": "${castIds[0]}" }` });
+        diags.push({ level: "error", code: "shot-needs-on", path: `beats[${i}].shot.on`, message: `framing "${b.shot.framing}" needs "on"`, expected: `one of ${castIds.join(", ")}`, example: `"shot": { "framing": "${b.shot.framing}", "on": "${castIds[0]}" }` });
     }
     b.actions.forEach((a, j) => {
       if (a.do === "pose") need("pose", a.pose, ids(lib.poses), p("actions", j, "pose"));
@@ -132,7 +132,7 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
   const order = (f: number) => [...cast].sort((a, b) => xAt(a, f) - xAt(b, f)).map((c) => c.id).join(",");
   const durationInFrames = msToFrame(layout.totalMs, fps);
   if (order(0) !== order(durationInFrames))
-    diags.push({ level: "warning", path: "beats", message: "a slideTo swaps the characters' sides; screen direction breaks across cuts" });
+    diags.push({ level: "warning", code: "screen-direction", path: "beats", message: "a slideTo swaps the characters' sides; screen direction breaks across cuts" });
 
   const spoken = layout.beats.filter((b) => b.kind === "line" && b.line);
   const timeline: Timeline = {

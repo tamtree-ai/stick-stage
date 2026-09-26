@@ -48,7 +48,7 @@ const seatPx = (ctx: Ctx, who: string, path: string): number | undefined => {
   const mark = ctx.mark.get(who)!;
   const px = seatHeightAt(ctx.set, mark);
   if (px === undefined)
-    ctx.diags.push({ level: "error", path, message: `no seat at mark "${mark}" in set "${ctx.set.id}"`, expected: `a set with a chair/bench/couch whose "seatFor" lists "${mark}"` });
+    ctx.diags.push({ level: "error", code: "no-seat", path, message: `no seat at mark "${mark}" in set "${ctx.set.id}"`, expected: `a set with a chair/bench/couch whose "seatFor" lists "${mark}"` });
   return px;
 };
 
@@ -160,7 +160,7 @@ const applyAction = (ctx: Ctx, b: LaidBeat, a: Action, path: string, moments: Mo
         return;
       }
       if (c.seatKeys.length && c.seatKeys[c.seatKeys.length - 1]!.seatPx !== null && c.seatKeys[c.seatKeys.length - 1]!.frame <= f)
-        ctx.diags.push({ level: "warning", path, message: `${a.who} walks while seated; add a "stand" action first` });
+        ctx.diags.push({ level: "warning", code: "walk-seated", path, message: `${a.who} walks while seated; add a "stand" action first` });
       walk(moveCtx(ctx), c, f, x, a.speed, a.facing);
       ctx.mark.set(a.who, a.mark);
       return;
@@ -266,7 +266,7 @@ const checkOverlaps = (cast: CastTrack[], diags: Diagnostic[]) => {
         const ida = "pose" in a ? a.pose : a.expression;
         const idb = "pose" in b ? b.pose : b.expression;
         if (b.frame - a.frame <= 1 && ida !== idb && a.frame > 0)
-          diags.push({ level: "warning", path: `cast "${c.id}"`, message: `${name} "${ida}" and "${idb}" land together at frame ${b.frame}; "${idb}" wins` });
+          diags.push({ level: "warning", code: "overlap", path: `cast "${c.id}"`, message: `${name} "${ida}" and "${idb}" land together at frame ${b.frame}; "${idb}" wins` });
       }
     }
   }

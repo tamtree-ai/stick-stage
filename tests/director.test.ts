@@ -252,3 +252,25 @@ describe("determinism and data", () => {
     for (const e of [...Object.values(reactions.listen), ...Object.values(reactions.punchline)]) expect(library.expressions[e]).toBeDefined();
   });
 });
+
+describe("diagnostic codes", () => {
+  it("every diagnostic carries a stable machine-readable code", () => {
+    const codes = (beats: Parameters<typeof skitOf>[0], drop?: string) => {
+      const { skit, voice } = skitOf(beats);
+      try {
+        compileSkit({ skit, voice: { ...voice, lines: voice.lines.filter((l) => l.id !== drop) }, lib: library, sets, sfx: sfxLibrary, reactions });
+      } catch (e) {
+        return (e as SkitError).diagnostics.map((d) => d.code);
+      }
+      return [];
+    };
+    expect(codes([{ id: "a", speaker: "milo", line: "Hi there.", actions: [{ who: "milo", do: "pose", pose: "shurg" }] }])).toEqual(["unknown-pose"]);
+    expect(codes([{ id: "b", speaker: "june", line: "No voice here." }], "b")).toEqual(["voice-missing"]);
+    try {
+      parseSkit({ schemaVersion: 1, meta: { title: "x" }, set: "plain-1", cast: [], beats: [] });
+    } catch (e) {
+      expect((e as SkitError).diagnostics.every((d) => d.code.startsWith("schema/"))).toBe(true);
+    }
+  });
+});
+

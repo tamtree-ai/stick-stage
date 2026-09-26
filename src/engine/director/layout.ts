@@ -90,13 +90,14 @@ export const layoutBeats = (
     const path = ["beats", i];
     const isPunch = punch.has(i);
     if (beat.silent) {
-      if (beat.line) diags.push({ level: "error", path: `beats[${i}].line`, message: "a silent beat has no line", expected: `remove "line", or set "silent": false` });
+      if (beat.line) diags.push({ level: "error", code: "silent-with-line", path: `beats[${i}].line`, message: "a silent beat has no line", expected: `remove "line", or set "silent": false` });
       push(beat, path, "silent", false, isPunch);
       return;
     }
     if (!beat.speaker || !beat.line) {
       diags.push({
         level: "error",
+        code: "beat-incomplete",
         path: `beats[${i}]`,
         message: `a spoken beat needs "speaker" and "line" (or "silent": true)`,
         example: `{ "id": "${beat.id}", "speaker": "${skit.cast[0]?.id ?? "milo"}", "line": "…" }  or  { "id": "${beat.id}", "silent": true, "durationMs": 900 }`,
@@ -105,15 +106,15 @@ export const layoutBeats = (
     }
     const line = lines.get(beat.id);
     if (!line && beat.audio.source === "file") {
-      diags.push({ level: "error", path: `beats[${i}].audio`, message: `the clip for "${beat.id}" isn't prepared`, expected: `run \`pnpm prep <skit>\` (trims "${beat.audio.src}" and lip-syncs it)` });
+      diags.push({ level: "error", code: "clip-unprepared", path: `beats[${i}].audio`, message: `the clip for "${beat.id}" isn't prepared`, expected: `run \`pnpm prep <skit>\` (trims "${beat.audio.src}" and lip-syncs it)` });
       return;
     }
     if (!line) {
-      diags.push({ level: "error", path: `beats[${i}]`, message: `no voice for beat "${beat.id}"`, expected: `generated voice: run the tamtree harness or \`pnpm voice:say <skit>\`, then \`pnpm prep <skit>\`` });
+      diags.push({ level: "error", code: "voice-missing", path: `beats[${i}]`, message: `no voice for beat "${beat.id}"`, expected: `generated voice: run the tamtree harness or \`pnpm voice:say <skit>\`, then \`pnpm prep <skit>\`` });
       return;
     }
     if (line.text !== beat.line) {
-      diags.push({ level: "error", path: `beats[${i}].line`, message: `line changed since the voice was generated ("${line.text}")`, expected: `re-generate the voice for "${beat.id}", then \`pnpm prep <skit>\`` });
+      diags.push({ level: "error", code: "voice-stale", path: `beats[${i}].line`, message: `line changed since the voice was generated ("${line.text}")`, expected: `re-generate the voice for "${beat.id}", then \`pnpm prep <skit>\`` });
       return;
     }
     push(beat, path, "line", false, isPunch, { line });
@@ -138,7 +139,7 @@ export const anchorFrame = (
 ): number | undefined => {
   const r = resolveAnchor(anchor, b.ctx);
   if (!r.ok) {
-    diags.push({ level: "error", path, message: r.message, expected: r.expected, example: `"at": { "word": "${b.ctx.words[0]?.text ?? "fine"}" }  or  { "ms": 0 }` });
+    diags.push({ level: "error", code: "anchor", path, message: r.message, expected: r.expected, example: `"at": { "word": "${b.ctx.words[0]?.text ?? "fine"}" }  or  { "ms": 0 }` });
     return undefined;
   }
   return msToFrame(b.zeroMs + r.ms, fps);

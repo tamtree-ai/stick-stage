@@ -44,14 +44,14 @@ const check = (p: Premise, lib: Library, sets: Readonly<Record<string, SetDef>>)
   });
   if (p.set && !sets[p.set]) d.push(unknownId("set", p.set, Object.keys(sets), ["set"]));
   const need = { exchange: 2, interview: 2, "me-vs-me": 2, "pov-monologue": 1, "text-slam": 1 }[p.template];
-  if (p.cast.length < need) d.push({ level: "error", path: "cast", message: `template "${p.template}" needs ${need} cast members`, example: `"cast": [{ "id": "milo", "character": "milo" }, { "id": "june", "character": "june" }]` });
+  if (p.cast.length < need) d.push({ level: "error", code: "template-cast", path: "cast", message: `template "${p.template}" needs ${need} cast members`, example: `"cast": [{ "id": "milo", "character": "milo" }, { "id": "june", "character": "june" }]` });
   if (p.template === "me-vs-me" && p.cast.some((c) => !c.label))
-    d.push({ level: "error", path: "cast", message: `me-vs-me: give both a "label" so viewers can tell them apart`, example: `{ "id": "me", "character": "milo", "label": "me" }, { "id": "brain", "character": "milo", "label": "my brain" }` });
+    d.push({ level: "error", code: "template-labels", path: "cast", message: `me-vs-me: give both a "label" so viewers can tell them apart`, example: `{ "id": "me", "character": "milo", "label": "me" }, { "id": "brain", "character": "milo", "label": "my brain" }` });
   p.lines.forEach((l, i) => {
     if (l.who !== undefined && !ids.includes(l.who)) d.push(unknownId("cast member", l.who, ids, ["lines", i, "who"]));
-    if (l.who === undefined && p.template !== "text-slam" && p.cast.length > 1) d.push({ level: "error", path: `lines[${i}].who`, message: "who says this line?", expected: `one of ${ids.join(", ")}` });
+    if (l.who === undefined && p.template !== "text-slam" && p.cast.length > 1) d.push({ level: "error", code: "line-speaker", path: `lines[${i}].who`, message: "who says this line?", expected: `one of ${ids.join(", ")}` });
     if (l.expression && !lib.expressions[l.expression]) d.push(unknownId("expression", l.expression, Object.keys(lib.expressions), ["lines", i, "expression"]));
-    if (p.template === "text-slam" && l.text.length > 40) d.push({ level: "error", path: `lines[${i}].text`, message: "slam text is at most 40 characters", expected: "a word or a short phrase" });
+    if (p.template === "text-slam" && l.text.length > 40) d.push({ level: "error", code: "slam-length", path: `lines[${i}].text`, message: "slam text is at most 40 characters", expected: "a word or a short phrase" });
   });
   return d;
 };

@@ -47,7 +47,7 @@ export const migrate = (
   let doc = input as Doc;
   let v = doc.schemaVersion as number;
   const fail = (message: string, expected?: string): never => {
-    const d: Diagnostic = { level: "error", path: "schemaVersion", message, expected };
+    const d: Diagnostic = { level: "error", code: "schema-version", path: "schemaVersion", message, expected };
     throw new SkitError([d]);
   };
   if (v > current) fail(`${kind} schemaVersion ${v} is newer than this engine supports (${current})`, "update StickStage, or use a document written for this version");

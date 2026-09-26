@@ -42,7 +42,7 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[]): Resolved[] => 
   if (!doc.scenes) return [{ id: "main", skit: { ...doc, set: doc.set!, beats: doc.beats! }, remap: (p) => p }];
   const all = docBeats(doc);
   const ids = all.map((b) => b.id);
-  ids.forEach((id, i) => ids.indexOf(id) !== i && diags.push({ level: "error", path: "scenes", message: `duplicate beat id "${id}" (beat ids name voice files, so they are unique across scenes)` }));
+  ids.forEach((id, i) => ids.indexOf(id) !== i && diags.push({ level: "error", code: "duplicate-id", path: "scenes", message: `duplicate beat id "${id}" (beat ids name voice files, so they are unique across scenes)` }));
   const flagged = all.some((b) => b.punchline);
   const last = [...all].reverse().find((b) => spoken(b) && b.punchline !== false);
   const { fps } = doc.meta;
@@ -59,7 +59,7 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[]): Resolved[] => 
       ? sc.cast.flatMap((o, j) => {
           const base = doc.cast.find((c) => c.id === o.id);
           if (!base) {
-            diags.push({ level: "error", path: `scenes[${s}].cast[${j}].id`, message: `"${o.id}" is not in the skit's cast`, expected: `one of ${doc.cast.map((c) => c.id).join(", ")}` });
+            diags.push({ level: "error", code: "unknown-cast-member", path: `scenes[${s}].cast[${j}].id`, message: `"${o.id}" is not in the skit's cast`, expected: `one of ${doc.cast.map((c) => c.id).join(", ")}` });
             return [];
           }
           castPath.set(castPath.size, `scenes[${s}].cast[${j}]`);

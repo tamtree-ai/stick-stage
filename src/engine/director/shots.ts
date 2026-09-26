@@ -75,9 +75,9 @@ export const planShots = (
       if (s.punchIn) {
         const pf = anchorFrame(b, s.punchIn.at, `${where}.punchIn.at`, fps, diags) ?? from;
         if (FACE.includes(s.framing))
-          diags.push({ level: "warning", path: `${where}.punchIn`, message: "a punch-in on a face framing: use a close-up or a punch-in, not both" });
+          diags.push({ level: "warning", code: "punch-on-face", path: `${where}.punchIn`, message: "a punch-in on a face framing: use a close-up or a punch-in, not both" });
         if (pf - lastPunch < msToFrame(MIN_PUNCH_GAP_MS, fps))
-          diags.push({ level: "warning", path: `${where}.punchIn`, message: `punch-ins less than ${MIN_PUNCH_GAP_MS / 1000} s apart` });
+          diags.push({ level: "warning", code: "punch-gap", path: `${where}.punchIn`, message: `punch-ins less than ${MIN_PUNCH_GAP_MS / 1000} s apart` });
         punch(pf, s.punchIn.on, "skit punch-in");
       }
       if (s.shake) {
