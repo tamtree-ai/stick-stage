@@ -13,6 +13,8 @@
     "voice:say": "tsx scripts/voice-say.ts",
     "prep": "tsx scripts/prep.ts",
     "compile": "tsx scripts/compile.ts",
+    "check": "tsx scripts/check.ts",
+    "direct": "tsx scripts/direct.ts",
     "sfx": "tsx scripts/sfx-gen.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

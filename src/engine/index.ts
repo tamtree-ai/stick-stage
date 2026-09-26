@@ -47,3 +47,5 @@ export * from "./director/shots";
 export * from "./director/camera";
 export * from "./director/compile";
 export { Skit, type SkitProps } from "./director/Skit";
+export * from "./qa";
+export * from "./text/layout";

@@ -23,3 +23,19 @@ export const mix = (a: string, b: string, t: number): string => {
 /** One tone darker/lighter than a fill (for set outlines and shade). */
 export const darken = (hex: string, amount = 0.12): string => mix(hex, "#1a1420", amount);
 export const lighten = (hex: string, amount = 0.12): string => mix(hex, "#ffffff", amount);
+
+/** WCAG relative luminance of a hex color. */
+export const luminance = (hex: string): number => {
+  const lin = (v: number) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  const [r, g, b] = parse(hex);
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+};
+
+/** WCAG contrast ratio (1…21). */
+export const contrastRatio = (a: string, b: string): number => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number];
+  return (hi + 0.05) / (lo + 0.05);
+};

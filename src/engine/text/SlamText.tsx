@@ -2,6 +2,7 @@ import React from "react";
 import { easeOutBack } from "../lib/easing";
 import { clamp } from "../lib/math";
 import { randRange } from "../lib/seed";
+import { SLAM } from "./layout";
 import { safeRect, type SafeArea } from "./safeArea";
 
 export type SlamTextProps = {
@@ -39,9 +40,9 @@ export const SlamText: React.FC<SlamTextProps> = ({
   height,
   safeArea,
   fontFamily,
-  color = "#ffffff",
-  y = 0.64,
-  fontSize = 190,
+  color = SLAM.fill,
+  y = SLAM.y,
+  fontSize = SLAM.fontSize,
   seed = text,
 }) => {
   const start = from - SLAM_FRAMES;
@@ -68,11 +69,11 @@ export const SlamText: React.FC<SlamTextProps> = ({
         fontFamily,
         fontWeight: 900,
         fontSize,
-        lineHeight: 1,
+        lineHeight: SLAM.lineHeight,
         color,
-        WebkitTextStroke: `${Math.round(fontSize * 0.13)}px #111114`,
+        WebkitTextStroke: `${Math.round(fontSize * 0.13)}px ${SLAM.outline}`,
         paintOrder: "stroke fill",
-        textShadow: `0 ${Math.round(fontSize * 0.07)}px 0 #111114`,
+        textShadow: `0 ${Math.round(fontSize * 0.07)}px 0 ${SLAM.outline}`,
         letterSpacing: "-0.01em",
       }}
     >

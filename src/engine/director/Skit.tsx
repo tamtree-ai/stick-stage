@@ -9,6 +9,7 @@ import { SlamText } from "../text/SlamText";
 import { Subtitles } from "../text/Subtitles";
 import { cameraAt, shotAt } from "./camera";
 import { stageActorsAt } from "./placement";
+import { QaOverlay } from "./QaOverlay";
 import type { Timeline } from "./timeline";
 
 const FACE_FRAMINGS: readonly string[] = ["medium", "close", "extreme"];
@@ -50,6 +51,7 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
       {tl.slams.map((s, i) => (
         <SlamText key={i} seed={`${tl.title}-${i}`} text={s.text} frame={frame} from={s.from} to={s.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} />
       ))}
+      {showLabels ? <QaOverlay tl={tl} lib={lib} set={set} safeArea={safeArea} camera={camera} frame={frame} /> : null}
       {showLabels ? <SkitLabel tl={tl} frame={frame} /> : null}
     </AbsoluteFill>
   );

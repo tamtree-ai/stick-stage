@@ -1,6 +1,7 @@
 import React from "react";
 import { easeOutBack } from "../lib/easing";
 import { clamp } from "../lib/math";
+import { POV } from "./layout";
 import { safeRect, type SafeArea } from "./safeArea";
 
 export type PovCardProps = {
@@ -21,7 +22,7 @@ const IN_FRAMES = 5;
 const OUT_FRAMES = 3;
 
 /** Top "POV:" card: dark text on a white rounded card, just inside the top safe edge. */
-export const PovCard: React.FC<PovCardProps> = ({ text, frame, width, height, safeArea, fontFamily, from = 0, to, fontSize = 52 }) => {
+export const PovCard: React.FC<PovCardProps> = ({ text, frame, width, height, safeArea, fontFamily, from = 0, to, fontSize = POV.fontSize }) => {
   if (frame < from || (to !== undefined && frame >= to)) return null;
   const safe = safeRect(safeArea, width, height);
   const inT = easeOutBack((frame - from + 1) / IN_FRAMES, 1.6);
@@ -45,15 +46,15 @@ export const PovCard: React.FC<PovCardProps> = ({ text, frame, width, height, sa
         style={{
           maxWidth: safe.w * 0.94,
           padding: `${fontSize * 0.34}px ${fontSize * 0.55}px`,
-          background: "#ffffff",
-          color: "#16161a",
+          background: POV.card,
+          color: POV.fill,
           borderRadius: fontSize * 0.45,
           border: `${Math.round(fontSize * 0.1)}px solid #16161a`,
           boxShadow: `0 ${Math.round(fontSize * 0.12)}px 0 #16161a`,
           fontFamily,
           fontWeight: 700,
           fontSize,
-          lineHeight: 1.18,
+          lineHeight: POV.lineHeight,
           textAlign: "center",
         }}
       >
