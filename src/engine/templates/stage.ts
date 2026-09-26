@@ -13,13 +13,15 @@ type Action = NonNullable<Beat["actions"]>[number];
 type Role = NonNullable<PremiseLine["role"]>;
 
 /** Per-template staging defaults. The director adds listener reactions, shots and the reaction beat. */
-const DEFAULT_SET: Record<TemplateId, string> = {
+export const TEMPLATE_DEFAULT_SET: Record<TemplateId, string> = {
   exchange: "living-1",
   interview: "street-1",
   "me-vs-me": "living-1",
   "pov-monologue": "plain-1",
   "text-slam": "plain-1",
 };
+/** How many cast members each template stages. */
+export const TEMPLATE_CAST: Record<TemplateId, 1 | 2> = { exchange: 2, interview: 2, "me-vs-me": 2, "pov-monologue": 1, "text-slam": 1 };
 const ROLE_EXPRESSION: Record<Role, string> = { setup: "neutral", escalation: "annoyed", punchline: "deadpan" };
 /** Escalation gestures, one per escalation line, in turn. */
 const GESTURES = ["point", "hands-on-hips", "shrug", "arms-crossed"];
@@ -44,7 +46,7 @@ const check = (p: Premise, lib: Library, sets: Readonly<Record<string, SetDef>>)
     if (c.holding && !lib.props[c.holding]) d.push(unknownId("prop", c.holding, Object.keys(lib.props), ["cast", i, "holding"]));
   });
   if (p.set && !sets[p.set]) d.push(unknownId("set", p.set, Object.keys(sets), ["set"]));
-  const need = { exchange: 2, interview: 2, "me-vs-me": 2, "pov-monologue": 1, "text-slam": 1 }[p.template];
+  const need = TEMPLATE_CAST[p.template];
   if (p.cast.length < need) d.push({ level: "error", code: "template-cast", path: "cast", message: `template "${p.template}" needs ${need} cast members`, example: `"cast": [{ "id": "milo", "character": "milo" }, { "id": "june", "character": "june" }]` });
   if (p.template === "me-vs-me" && p.cast.some((c) => !c.label))
     d.push({ level: "error", code: "template-labels", path: "cast", message: `me-vs-me: give both a "label" so viewers can tell them apart`, example: `{ "id": "me", "character": "milo", "label": "me" }, { "id": "brain", "character": "milo", "label": "my brain" }` });
@@ -109,7 +111,7 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
   const marks = solo ? ["center"] : ["left", "right"];
   const n = { gesture: 0 };
   const beats = p.template === "text-slam" ? slamBeats(p) : dress(p, p.lines.map((_, i) => spokenBeat(p, i, n)));
-  const set = p.set ?? DEFAULT_SET[p.template];
+  const set = p.set ?? TEMPLATE_DEFAULT_SET[p.template];
   return {
     schemaVersion: 1,
     meta: { title: p.title, ...(p.description ? { description: p.description } : {}), hashtags: p.hashtags },

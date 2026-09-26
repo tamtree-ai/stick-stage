@@ -128,3 +128,7 @@ Decisions not covered by the plan. Newest last.
 
 ## 2026-09-26 (topic-to-video skill)
 - **`skills/topic-to-video`** takes a topic and delivers a ~30 s skit end to end, **including writing the jokes**. This deliberately relaxes the plan's "humans write premises and punchlines" rule (plan §8), at the team's request. `skit-director` still never writes or changes a line; topic-to-video writes `premise.json` and then hands staging to it. The skill returns the script with the MP4 so a person can judge the joke. Sizing target: 8–11 lines, 55–80 words, 26–33 s compiled.
+
+## 2026-09-26 (catalog for Tamshoot)
+- **`GET /catalog` + `stickstage/data`.** Tamshoot (the Studio app) builds a stick-skit brief from the catalog and validates edits in-process, so the package now ships the registry (`stickstage/data`) and the service serves the same view. Templates' cast size and default set are exported from `templates/stage.ts` (`TEMPLATE_CAST`, `TEMPLATE_DEFAULT_SET`) rather than duplicated.
+- **`catalogVersion` is a content hash, not a semver.** It changes whenever anything a skit is checked or drawn against changes, which is exactly when a pinned draft may no longer be valid. Pure FNV-1a (two lanes, 64 bits) over key-sorted JSON, so it is the same in Node, the browser and the service. `POST /validate` takes an optional `catalog_version` and answers `409 catalog-mismatch` before staging.

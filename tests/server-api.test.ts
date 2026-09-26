@@ -32,6 +32,18 @@ describe("auth", () => {
     expect(sets.find((s) => s.id === "bedroom-1")).toMatchObject({ seated: ["left", "right"] });
     expect(sets.find((s) => s.id === "cafe-1")?.tags).toContain("coffee");
   });
+  it("GET /catalog reports the same version as the shipped data and /healthz", async () => {
+    const { catalog } = await import("../src/data");
+    const res = await svc.call("/catalog");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { version: string; characters: { id: string }[]; templates: { id: string; cast: number }[]; sets: unknown[] };
+    expect(body.version).toMatch(/^c1-[0-9a-f]{16}$/);
+    expect(body.version).toBe(catalog.version);
+    expect(body.characters.map((c) => c.id)).toEqual(expect.arrayContaining(["milo", "june"]));
+    expect(body.templates.find((t) => t.id === "pov-monologue")).toMatchObject({ cast: 1 });
+    expect(body.sets.length).toBeGreaterThanOrEqual(16);
+    expect(await (await svc.call("/healthz", {}, null)).json()).toMatchObject({ catalogVersion: catalog.version });
+  });
   it("unknown routes and methods", async () => {
     expect((await svc.call("/nope")).status).toBe(404);
     expect((await svc.call("/validate")).status).toBe(405);
@@ -60,6 +72,15 @@ describe("POST /validate", () => {
     const res = await svc.call("/validate", json({ skit }));
     expect(res.status).toBe(422);
     expect((await codes(res)).length).toBeGreaterThan(0);
+  });
+  it("checks a pinned catalog_version before anything else", async () => {
+    const { catalog } = await import("../src/data");
+    const ok = await svc.call("/validate", json({ skit: fineParts().skit, catalog_version: catalog.version }));
+    expect(ok.status).toBe(200);
+    expect(((await ok.json()) as { catalogVersion: string }).catalogVersion).toBe(catalog.version);
+    const stale = await svc.call("/validate", json({ skit: fineParts().skit, catalog_version: "c1-0000000000000000" }));
+    expect(stale.status).toBe(409);
+    expect(((await stale.json()) as { error: { code: string; expected: string } }).error).toMatchObject({ code: "catalog-mismatch", expected: catalog.version });
   });
   it("400 unless exactly one of premise / skit", async () => {
     expect((await svc.call("/validate", json({}))).status).toBe(400);

@@ -4,6 +4,7 @@
  *
  *   GET    /healthz                  liveness + tools (no auth)
  *   GET    /sets                     set catalog (id, description, tags, seated marks) for premise writers
+ *   GET    /catalog                  characters, sets, templates, expressions, props + the registry's content version
  *   POST   /validate                 { premise } | { skit } → skit + lines to voice + verdict
  *   POST   /render                   multipart skit + voice + audio files → 202 job
  *   GET    /jobs/:id                 job status
@@ -12,13 +13,13 @@
  */
 import http from "node:http";
 import path from "node:path";
-import { setCatalog } from "../engine/core";
+import { buildCatalog, setCatalog } from "../engine/core";
 import type { Project } from "../node";
 import { requireBearer } from "./auth";
 import { HttpError, readForm, readJson, router, type Ctx } from "./http";
 import { JOB_ID, type Job, type JobQueue } from "./jobs";
 import { parseSubmission, writeSubmission } from "./submit";
-import { validate } from "./validate";
+import { projectCatalogVersion, validate } from "./validate";
 
 export type ServiceOptions = {
   project: Project;
@@ -51,9 +52,12 @@ export const createService = (o: ServiceOptions) => {
     return job;
   };
 
-  r.get("/healthz", () => ({ json: { ok: true, queue: o.queue.depth(), ...o.health?.() } }));
+  r.get("/healthz", () => ({ json: { ok: true, queue: o.queue.depth(), catalogVersion: projectCatalogVersion(o.project), ...o.health?.() } }));
 
   r.get("/sets", () => ({ json: { sets: setCatalog(o.project.sets) } }));
+
+  const catalog = buildCatalog(o.project);
+  r.get("/catalog", () => ({ json: catalog }));
 
   r.post("/validate", async ({ req }) => ({ json: validate(o.project, await readJson(req, jsonLimit)) }));
 

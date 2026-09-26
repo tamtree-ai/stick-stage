@@ -2,7 +2,7 @@
   "name": "stickstage",
   "version": "0.1.0",
   "private": true,
-  "description": "Stick-figure comedy skits from JSON: rig, faces, sets, a director (beats → shots) and self-checks, on Remotion.",
+  "description": "Stick-figure comedy skits from JSON: rig, faces, sets, a director (beats \u2192 shots) and self-checks, on Remotion.",
   "license": "UNLICENSED",
   "type": "module",
   "sideEffects": false,
@@ -25,6 +25,10 @@
     "./node": {
       "types": "./dist/types/node/index.d.ts",
       "import": "./dist/node.js"
+    },
+    "./data": {
+      "types": "./dist/types/data/index.d.ts",
+      "import": "./dist/data.js"
     },
     "./package.json": "./package.json"
   },

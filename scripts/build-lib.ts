@@ -17,6 +17,7 @@ await build({
     schema: path.join(ROOT, "src/engine/schemas.ts"),
     remotion: path.join(ROOT, "src/engine/remotion.ts"),
     node: path.join(ROOT, "src/node/index.ts"),
+    data: path.join(ROOT, "src/data/index.ts"),
   },
   outdir: out,
   bundle: true,

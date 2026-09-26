@@ -7,5 +7,5 @@
     "rootDir": "src",
     "outDir": "packages/stickstage/dist/types"
   },
-  "include": ["src/engine", "src/node"]
+  "include": ["src/engine", "src/node", "src/data"]
 }

@@ -1,4 +1,4 @@
-import { createLibrary, createSets, migrate, SafeAreaProfilesSchema, type SafeAreaProfiles, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type SafeArea, type SetDef, type SfxManifest } from "../engine";
+import { buildCatalog, createLibrary, createSets, migrate, SafeAreaProfilesSchema, type SafeAreaProfiles, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type Catalog, type SafeArea, type SetDef, type SfxManifest } from "../engine/core";
 
 import milo from "./characters/milo.json";
 import june from "./characters/june.json";
@@ -90,3 +90,6 @@ export const reactions: ReactionTable = ReactionTableSchema.parse(migrate("react
 
 /** SFX library manifest (`pnpm sfx` regenerates the synthesized entries). */
 export const sfxLibrary: SfxManifest = SfxManifestSchema.parse(migrate("sfx", sfxJson).doc);
+
+/** The shipped registry as a picker sees it, with its content version (`GET /catalog` reports the same). */
+export const catalog: Catalog = buildCatalog({ lib: library, sets, sfx: sfxLibrary, reactions, safeArea });

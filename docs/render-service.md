@@ -17,12 +17,15 @@ Diagnostic codes are the compiler's own, and they are stable (`voice-stale`, `un
 ## `POST /validate`: before any TTS
 
 Body (JSON): exactly one of `{ "premise": <premise.json> }` (staged with its template, like
-`pnpm new`) or `{ "skit": <skit.json> }`.
+`pnpm new`) or `{ "skit": <skit.json> }`. Optional: `"catalog_version"`, the `version` from `GET /catalog`
+that the client pinned; when it differs from the service's, the answer is `409 catalog-mismatch`
+(`error.expected`, `error.got`) before anything is staged.
 
 `200`:
 ```json
 {
   "ok": true,
+  "catalogVersion": "c1-3f9a…",
   "skit": { "...": "the staged skit.json; send this to /render" },
   "lines": [ { "id": "b1", "speaker": "milo", "character": "milo", "text": "Hey. You okay?", "delivery": "flat",
                "voice": { "provider": "google", "voiceId": "en-US-…", "settings": {} } } ],
@@ -118,9 +121,25 @@ same default set.
 `seated` lists the marks where a cast member starts sitting (premise staging seats them). An
 unknown set id in a premise is a `422` whose diagnostic lists the known ids.
 
+## `GET /catalog`
+
+Everything a brief can pick from, and the registry's content version:
+
+```json
+{ "version": "c1-3f9a0c1e7d2b4a56",
+  "characters": [ { "id": "milo", "name": "Milo" }, { "id": "june", "name": "June" } ],
+  "sets": [ "…as GET /sets…" ],
+  "templates": [ { "id": "exchange", "cast": 2, "defaultSet": "living-1", "description": "Two characters trade lines; …" } ],
+  "expressions": ["neutral", "…"], "props": ["phone", "…"] }
+```
+
+`version` is a hash of the characters, poses, expressions, props, sets, SFX, reactions and safe
+area. The `stickstage/data` package entry exports the same `catalog`, so a client that ships
+the package can check a draft in-process and know the service will agree.
+
 ## `GET /healthz` (no auth)
 
-`{ ok, queue, bundle: "building" | "ready" | "failed", lipSync: "rhubarb" | "estimated", auth }`
+`{ ok, queue, catalogVersion, bundle: "building" | "ready" | "failed", lipSync: "rhubarb" | "estimated", auth }`
 
 ## Running it
 

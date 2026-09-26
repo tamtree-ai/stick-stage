@@ -14,6 +14,7 @@ cuts, and self-checks (safe areas, overlay collisions, contrast, comedy-staging 
 | `stickstage` | Pure core: types, zod schemas, `compileSkit`, diagnostics, `checkSkit`, templates (`fromPremise`), `createLibrary`, migrations, math | React, Node APIs, side effects |
 | `stickstage/schema` | Schemas for every document kind, `jsonSchemaFor(kind)`, `migrate` | React, Node APIs |
 | `stickstage/remotion` | `StickStageComposition` (`SkitProgram`), `calculateStickStageMetadata`, `Skit`, `Stage`, `Actor`, text overlays, `ContactSheet` | `registerRoot`, file paths |
+| `stickstage/data` | The shipped registry: `library`, `sets`, `sfxLibrary`, `reactions`, `safeArea`, and `catalog` (characters, sets, templates, expressions, props + `version`) | React, Node APIs |
 | `stickstage/node` | `workspace`, adapters (`AudioNormalizer`, `MediaProbe`, `LipSyncer`, `Transcriber`), `prepSkit`, `compileSkitIn` / `checkSkitIn`, `remotionBackend` | Side effects on import, downloads |
 
 Anything else (for example `stickstage/dist/...`) is private and not importable.
@@ -47,3 +48,12 @@ with a content-hash cache. TypeScript consumers need `"moduleResolution": "bundl
 Remotion is free for individuals and companies of up to 3 people; larger companies need a
 [company license](https://www.remotion.dev/license). Using `stickstage` means using Remotion under
 those terms.
+
+## Catalog version
+
+`catalog.version` (`c1-<16 hex>`) is a content hash of the registry a skit is checked and drawn
+against (characters, poses, expressions, props, sets, SFX, reactions, safe area). The render
+service reports the same value at `GET /catalog` and `/healthz`, and `POST /validate` refuses a
+body whose `catalog_version` differs (409 `catalog-mismatch`). A client pins it when a project is
+created, so a draft is never voiced against a registry it wasn't written for. Build one from
+your own registries with `buildCatalog` / `catalogVersion` from `stickstage`.
