@@ -16,6 +16,8 @@
     "check": "tsx scripts/check.ts",
     "direct": "tsx scripts/direct.ts",
     "batch": "tsx scripts/batch.ts",
+    "serve": "tsx scripts/serve.ts",
+    "serve:smoke": "tsx scripts/serve-smoke.ts",
     "new": "tsx scripts/new.ts",
     "schema": "tsx scripts/schema.ts",
     "safearea": "tsx scripts/safearea.ts",
