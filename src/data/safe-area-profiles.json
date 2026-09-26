@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "note": "Per-platform UI overlays as fractions of a 9:16 frame. `verified: false` = the starting guess, not yet measured on real screenshots. Measure with SafeAreaLab, update, then run `pnpm safearea` to rebuild safe-area.json (the strictest of all).",
+  "platforms": {
+    "tiktok": { "verified": false, "top": 0.14, "bottom": 0.3, "left": 0.04, "right": 0.12 },
+    "reels": { "verified": false, "top": 0.14, "bottom": 0.3, "left": 0.04, "right": 0.12 },
+    "shorts": { "verified": false, "top": 0.14, "bottom": 0.3, "left": 0.04, "right": 0.12 }
+  }
+}

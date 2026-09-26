@@ -18,3 +18,21 @@ export const safeRect = (sa: SafeArea, width: number, height: number): Rect => (
   w: (1 - sa.left - sa.right) * width,
   h: (1 - sa.top - sa.bottom) * height,
 });
+
+/** Measured platform overlays (`src/data/safe-area-profiles.json`). */
+export const SafeAreaProfilesSchema = z.object({
+  schemaVersion: z.literal(1),
+  note: z.string().optional(),
+  platforms: z.record(
+    z.string(),
+    z.object({ verified: z.boolean(), top: z.number().min(0).max(0.5), bottom: z.number().min(0).max(0.5), left: z.number().min(0).max(0.5), right: z.number().min(0).max(0.5) }),
+  ),
+});
+export type SafeAreaProfiles = z.infer<typeof SafeAreaProfilesSchema>;
+
+/** One profile safe on every platform: the largest margin on each side. */
+export const strictestSafeArea = (p: SafeAreaProfiles): SafeArea => {
+  const all = Object.values(p.platforms);
+  const max = (k: "top" | "bottom" | "left" | "right") => Math.max(...all.map((x) => x[k]));
+  return { schemaVersion: 1, top: max("top"), bottom: max("bottom"), left: max("left"), right: max("right") };
+};

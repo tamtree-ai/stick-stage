@@ -1,4 +1,4 @@
-import { createLibrary, createSets, migrate, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type SafeArea, type SetDef, type SfxManifest } from "../engine";
+import { createLibrary, createSets, migrate, SafeAreaProfilesSchema, type SafeAreaProfiles, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type SafeArea, type SetDef, type SfxManifest } from "../engine";
 
 import milo from "./characters/milo.json";
 import june from "./characters/june.json";
@@ -49,6 +49,7 @@ import park1 from "./sets/park-1.json";
 import street1 from "./sets/street-1.json";
 
 import safeAreaJson from "./safe-area.json";
+import safeAreaProfilesJson from "./safe-area-profiles.json";
 import reactionsJson from "./reactions.json";
 import sfxJson from "./sfx.json";
 
@@ -70,6 +71,9 @@ export const sets: Record<string, SetDef> = createSets([plain1, living1, lounge1
 
 /** One conservative profile for TikTok / Reels / Shorts overlays (verify against real screenshots in M4). */
 export const safeArea: SafeArea = SafeAreaSchema.parse(migrate("safeArea", safeAreaJson).doc);
+
+/** Per-platform overlay measurements; `safeArea` is the strictest of them (`pnpm safearea`). */
+export const safeAreaProfiles: SafeAreaProfiles = SafeAreaProfilesSchema.parse(safeAreaProfilesJson);
 
 /** Listener reaction defaults: speaker expression → listener expression. */
 export const reactions: ReactionTable = ReactionTableSchema.parse(migrate("reactions", reactionsJson).doc);

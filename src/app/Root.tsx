@@ -20,6 +20,7 @@ import { calculateContactSheetMetadata, ContactSheet, contactSheetSchema } from 
 import { SkitComposition } from "./skit/SkitComposition";
 import { calculateSkitMetadata, skitCompositionSchema } from "./skit/skitData";
 import { SFX_LAB_FRAMES, SfxLab } from "./labs/SfxLab";
+import { SafeAreaLab, safeAreaLabSchema } from "./labs/SafeAreaLab";
 
 const FPS = 30;
 const W = 1080;
@@ -197,6 +198,7 @@ export const RemotionRoot: React.FC = () => (
       height={H}
     />
     <Composition id="SfxLab" component={SfxLab} durationInFrames={SFX_LAB_FRAMES} fps={FPS} width={W} height={H} />
+    <Composition id="SafeAreaLab" component={SafeAreaLab} schema={safeAreaLabSchema} defaultProps={{}} durationInFrames={1} fps={FPS} width={W} height={H} />
     <Still
       id="ContactSheet"
       component={ContactSheet}

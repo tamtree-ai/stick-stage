@@ -18,6 +18,7 @@
     "batch": "tsx scripts/batch.ts",
     "new": "tsx scripts/new.ts",
     "schema": "tsx scripts/schema.ts",
+    "safearea": "tsx scripts/safearea.ts",
     "lib:build": "tsx scripts/build-lib.ts",
     "lib:pack-test": "tsx scripts/pack-test.ts",
     "sfx": "tsx scripts/sfx-gen.ts",

@@ -56,3 +56,11 @@ describe("text layout + contrast", () => {
     expect(contrastRatio("#777777", "#777777")).toBeCloseTo(1, 5);
   });
 });
+
+describe("safe-area profiles", async () => {
+  const { safeAreaProfiles } = await import("../src/data");
+  const { strictestSafeArea } = await import("../src/engine");
+  it("safe-area.json is the strictest of the platform profiles (run pnpm safearea after measuring)", () => {
+    expect(strictestSafeArea(safeAreaProfiles)).toEqual(safeArea);
+  });
+});
