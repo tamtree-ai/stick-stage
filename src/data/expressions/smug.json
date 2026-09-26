@@ -1,1 +1,1 @@
-{ "schemaVersion": 1, "id": "smug", "eyes": { "lid": 0.42, "lower": 0.3, "gaze": { "x": 0.3, "y": 0 } }, "brows": { "left": { "raise": -0.1, "tilt": -6 }, "right": { "raise": 0.7, "tilt": 4 } }, "mouth": "smirk" }
+{ "schemaVersion": 1, "id": "smug", "eyes": { "lid": 0.42, "lower": 0.3, "gaze": { "x": 0.3, "y": 0 } }, "brows": { "left": { "raise": -0.1, "tilt": -6 }, "right": { "raise": 0.7, "tilt": 4 } }, "mouth": "smirk", "closeup": "close" }

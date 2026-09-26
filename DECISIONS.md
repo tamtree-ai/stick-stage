@@ -27,3 +27,9 @@ Decisions not covered by the plan. Newest last.
 
 - Set figure height is 720 px at 1080×1920, groundY is 1480, and marks are 0.27 / 0.5 / 0.73.
 - Idle: breath ±0.8% torso length at 0.25 Hz, sway ±1°, head drift ±1.5°, blinks every 2.5–5 s (4 frames).
+
+## 2026-09-26 (face close-ups)
+- **Face framings are tighter than the plan's first guess.** Because the characters are big-headed, a `close` with the head at 45% of frame width showed almost the whole body in 9:16. Tuned values (head width / eye line): `medium` 0.40 / 0.30, `close` 0.62 / 0.36, `extreme` 0.84 / 0.42. `extreme` stops at 0.84 so the head outline and hair stay inside the frame.
+- **Face shots center the head, not the eyes.** The eyes sit forward on the head, so centering on them clipped the back of the head and June's bun. There is 3% lead room in the facing direction.
+- **Closeups are a real camera zoom.** Line weight scales with the shot; there is no stroke compensation. The close-up sheets are the check on whether the 12 px strokes still look right at 3–4× zoom.
+- **Emotion → framing lives in the expression data** (`closeup` hint), so the director (M4) and the skill (M5) read one source.

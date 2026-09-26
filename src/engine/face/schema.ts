@@ -49,6 +49,11 @@ export const ExpressionSchema = z.object({
     MouthParamsSchema.partial().extend({ preset: z.string() }),
   ]),
   symbols: z.array(z.enum(SYMBOLS)).default([]),
+  /**
+   * Direction hint: strong emotions read best on a face close-up. The director cuts to this
+   * framing on the character when the expression lands on a reaction/punchline beat.
+   */
+  closeup: z.enum(["close", "extreme"]).optional(),
 });
 
 export type Expression = z.infer<typeof ExpressionSchema>;

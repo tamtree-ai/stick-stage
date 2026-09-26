@@ -1,1 +1,1 @@
-{ "schemaVersion": 1, "id": "cringe", "eyes": { "shape": "squint" }, "brows": { "raise": 0.1, "tilt": 16 }, "mouth": "grimace", "symbols": ["sweat"] }
+{ "schemaVersion": 1, "id": "cringe", "eyes": { "shape": "squint" }, "brows": { "raise": 0.1, "tilt": 16 }, "mouth": "grimace", "symbols": ["sweat"], "closeup": "extreme" }

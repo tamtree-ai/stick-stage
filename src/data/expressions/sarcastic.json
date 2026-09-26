@@ -1,1 +1,1 @@
-{ "schemaVersion": 1, "id": "sarcastic", "eyes": { "lid": 0.52, "gaze": { "x": 0.5, "y": -0.35 } }, "brows": { "raise": 0.1, "tilt": 0 }, "mouth": { "preset": "flat", "skew": 0.35, "curve": 0.15 } }
+{ "schemaVersion": 1, "id": "sarcastic", "eyes": { "lid": 0.52, "gaze": { "x": 0.5, "y": -0.35 } }, "brows": { "raise": 0.1, "tilt": 0 }, "mouth": { "preset": "flat", "skew": 0.35, "curve": 0.15 }, "closeup": "close" }

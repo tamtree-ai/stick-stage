@@ -1,1 +1,1 @@
-{ "schemaVersion": 1, "id": "crying", "eyes": { "shape": "closed" }, "brows": { "raise": 0.4, "tilt": 28 }, "mouth": "wail", "symbols": ["tears"] }
+{ "schemaVersion": 1, "id": "crying", "eyes": { "shape": "closed" }, "brows": { "raise": 0.4, "tilt": 28 }, "mouth": "wail", "symbols": ["tears"], "closeup": "extreme" }

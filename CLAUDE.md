@@ -23,8 +23,9 @@ Stick-figure comedy-skit engine on Remotion, for our own channel. Plan: `../plan
 - `src/engine/face`: expression schema, parametric mouths (`mouths.ts`), eyes/brows/mouth/symbols
 - `src/engine/set`: set schema, palettes (tokens only, no raw hex in parts), patterns, parts, `<SetLayers>`
 - `src/engine/shots/Stage.tsx`: set background, then actors, then set foreground, under one camera
+- `src/engine/shots/framing.ts`: `frameShot({ framing, on })` → camera for `wide | two | medium | close | extreme`
 - `src/data`: JSON library + `index.ts` loader (validates on import)
-- `src/app`: Remotion root and lab compositions (`CharacterLab`, `FaceLab`, `PoseLab`, `ContactSheet`)
+- `src/app`: Remotion root and lab compositions (`CharacterLab`, `FaceLab`, `CloseupLab`, `CloseupSheet`, `PoseLab`, `ContactSheet`)
 
 ## Rig conventions
 Canonical view faces right; `facing: "left"` mirrors. `L` = back limb, `R` = front limb. Arms: 0° hangs along the torso, +90° forward, 180° up; elbow + flexes forward. Legs are world-relative (0° down, + forward); knee + bends back. The rig lifts the figure so the lowest foot touches `groundY`.

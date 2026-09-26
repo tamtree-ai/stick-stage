@@ -19,3 +19,4 @@ export * from "./set/schema";
 export * from "./set/palettes";
 export { SetLayers, PARTS } from "./set/Set";
 export { Stage, FULL_FRAME, type Camera, type StageActor } from "./shots/Stage";
+export * from "./shots/framing";
