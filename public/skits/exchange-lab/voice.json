@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "milo",
+      "text": "Setup line: the hook, said in the first second.",
+      "audio": "voice/l1.wav",
+      "durationMs": 3437
+    },
+    {
+      "id": "l2",
+      "speaker": "june",
+      "text": "Answer line.",
+      "audio": "voice/l2.wav",
+      "durationMs": 844
+    },
+    {
+      "id": "l3",
+      "speaker": "milo",
+      "text": "Escalation line: it gets worse.",
+      "audio": "voice/l3.wav",
+      "durationMs": 2523
+    },
+    {
+      "id": "l4",
+      "speaker": "june",
+      "text": "Punchline.",
+      "audio": "voice/l4.wav",
+      "durationMs": 766
+    }
+  ]
+}

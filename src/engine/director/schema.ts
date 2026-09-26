@@ -123,6 +123,8 @@ export const CastSchema = z.strictObject({
   /** Start seated on the seat at this mark. */
   seated: z.boolean().default(false),
   holding: z.strictObject({ prop: z.string().min(1), hand }).optional(),
+  /** Name tag above the head in group shots ("me", "my brain", "reporter"). */
+  label: z.string().min(1).max(24).optional(),
 });
 export type CastMember = z.infer<typeof CastSchema>;
 
@@ -143,6 +145,7 @@ export const SceneCastSchema = z.strictObject({
   expression: z.string().optional(),
   seated: z.boolean().optional(),
   holding: z.strictObject({ prop: z.string().min(1), hand }).optional(),
+  label: z.string().min(1).max(24).optional(),
 });
 
 export const SceneSchema = z.strictObject({

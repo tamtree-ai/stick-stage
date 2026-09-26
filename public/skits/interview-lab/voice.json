@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "june",
+      "text": "The interview question.",
+      "audio": "voice/l1.wav",
+      "durationMs": 1218
+    },
+    {
+      "id": "l2",
+      "speaker": "milo",
+      "text": "A reasonable-sounding start.",
+      "audio": "voice/l2.wav",
+      "durationMs": 1780
+    },
+    {
+      "id": "l3",
+      "speaker": "june",
+      "text": "Follow-up question.",
+      "audio": "voice/l3.wav",
+      "durationMs": 1220
+    },
+    {
+      "id": "l4",
+      "speaker": "milo",
+      "text": "Punchline answer.",
+      "audio": "voice/l4.wav",
+      "durationMs": 1126
+    }
+  ]
+}

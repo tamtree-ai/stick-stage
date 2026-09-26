@@ -31,7 +31,7 @@ export const punchlineChecks = (tl: Timeline, skit: Skit): Finding[] => {
     const cuts = tl.shots.filter((s) => s.frame > 0 && inBeat(s.frame));
     const punches = tl.punchIns.filter((p) => inBeat(p.frame));
     if (!cuts.length && !punches.length)
-      out.push({ check: "punchline-camera", level: "error", frame: b.from, message: `punchline "${b.id}" has no shot change or punch-in; add "shot": { "punchIn": { "on": "${b.speaker}" } } or a close-up` });
+      out.push({ check: "punchline-camera", level: "error", frame: b.from, message: `punchline "${b.id}" has no shot change or punch-in; add "shot": { "framing": "two", "punchIn": { "on": "${b.speaker ?? tl.cast[0]!.id}" } } or a close-up` });
     const faceOnSpeaker = cuts.some((c) => isFace(c.framing) && c.on === b.speaker);
     if (faceOnSpeaker && punches.length)
       out.push({ check: "punchline-camera", level: "warning", frame: b.from, message: `punchline "${b.id}" has both a face close-up and a punch-in; use one` });
@@ -56,7 +56,9 @@ export const closeupChecks = (tl: Timeline, skit: Skit, hint: Hint): Finding[] =
   const budget = msToFrame(CLOSEUP_BUDGET_MS, tl.fps);
   const faceCuts = tl.shots.filter((s) => isFace(s.framing));
   tl.beats.forEach((b, i) => {
-    if (b.kind === "line" || skitBeat(skit, b.id)?.shot) return;
+    const sb = skitBeat(skit, b.id);
+    // Skit-directed shots are the author's call; a slam is the beat's one dominant thing.
+    if (b.kind === "line" || sb?.shot || (b.kind === "silent" && !b.punchline && sb?.text.length)) return;
     const ms = emotionMoments(tl, hint, b);
     if (!ms.length) return;
     const covered = ms.some((m) => {
@@ -77,7 +79,9 @@ export const closeupChecks = (tl: Timeline, skit: Skit, hint: Hint): Finding[] =
   const director = faceCuts.filter((s) => s.reason !== "skit shot");
   director.forEach((s, i) => {
     const prev = director[i - 1];
-    if (prev && s.frame - prev.frame < budget && !s.reason.startsWith("reaction close-up"))
+    // Pushing in on the face already in shot (close → extreme) is one escalating close-up.
+    const pushIn = prev && prev.on === s.on && tl.shots[tl.shots.indexOf(s) - 1] === prev;
+    if (prev && !pushIn && s.frame - prev.frame < budget && !s.reason.startsWith("reaction close-up"))
       out.push({ check: "closeup-budget", level: "warning", frame: s.frame, message: `two emotion close-ups ${secs(tl, s.frame - prev.frame)} apart (budget ${CLOSEUP_BUDGET_MS / 1000} s)` });
   });
   // Never on two consecutive plain lines.

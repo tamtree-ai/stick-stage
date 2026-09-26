@@ -24,6 +24,8 @@ export type CastTrack = {
   id: string;
   character: string;
   seed: string;
+  /** Name tag above the head in group shots. */
+  label?: string;
   /** Starting position (fraction of frame width) and facing. */
   x: number;
   facing: Facing;

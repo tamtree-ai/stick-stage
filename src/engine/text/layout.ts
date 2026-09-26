@@ -46,7 +46,7 @@ export const subtitleRect = (text: string, width: number, height: number, sa: Sa
   const lines = wrapLines(text, fontSize, safe.w);
   const w = Math.max(...lines.map((l) => textWidth(l, fontSize)));
   // Outline + drop shadow add ~0.2 em around the glyphs.
-  return { rect: around(width / 2, cy, w + fontSize * 0.2, lines.length * fontSize * SUBTITLE.lineHeight + fontSize * 0.2), lines: lines.length };
+  return { rect: around(safe.x + safe.w / 2, cy, w + fontSize * 0.2, lines.length * fontSize * SUBTITLE.lineHeight + fontSize * 0.2), lines: lines.length };
 };
 
 /** POV card (top of the safe area). */
@@ -58,16 +58,45 @@ export const povRect = (text: string, width: number, height: number, sa: SafeAre
   const lines = wrapLines(text, fontSize, inner);
   const w = Math.min(safe.w * 0.94, Math.max(...lines.map((l) => textWidth(l, fontSize))) + 2 * padX + 2 * border);
   const h = lines.length * fontSize * POV.lineHeight + 2 * fontSize * 0.34 + 2 * border + fontSize * 0.12;
-  return { rect: { x: width / 2 - w / 2, y: safe.y + 16, w, h }, lines: lines.length };
+  return { rect: { x: safe.x + safe.w / 2 - w / 2, y: safe.y + 16, w, h }, lines: lines.length };
+};
+
+/** Smallest slam size we'll shrink to before accepting overflow. */
+export const SLAM_MIN_FONT = 96;
+/** A one-line slam is preferred down to this size, then it may take two lines. */
+const SLAM_ONE_LINE_MIN = 130;
+
+export type SlamLayout = { fontSize: number; lines: number; cy: number; rect: Rect };
+
+/**
+ * Slam text layout: the biggest size (≤ `max`) that fits the safe width on one line (down to
+ * 130 px), else on two lines; the block's center is `y`, pulled up so it stays in the safe area.
+ */
+export const slamLayout = (text: string, width: number, height: number, sa: SafeArea, y: number = SLAM.y, max: number = SLAM.fontSize): SlamLayout => {
+  const safe = safeRect(sa, width, height);
+  const w = safe.w * 0.94;
+  const fits = (fs: number, n: number) => {
+    const lines = wrapLines(text, fs, w);
+    return lines.length <= n && lines.every((l) => textWidth(l, fs) <= w) ? lines : undefined;
+  };
+  let fontSize = SLAM_MIN_FONT;
+  let lines = wrapLines(text, SLAM_MIN_FONT, w);
+  search: for (const [n, floor] of [[1, SLAM_ONE_LINE_MIN], [2, SLAM_MIN_FONT]] as const)
+    for (let fs = max; fs >= floor; fs -= 6) {
+      const got = fits(fs, n);
+      if (got) {
+        [fontSize, lines] = [fs, got];
+        break search;
+      }
+    }
+  const bw = Math.max(...lines.map((l) => textWidth(l, fontSize))) + fontSize * 0.26;
+  const bh = lines.length * fontSize * SLAM.lineHeight + fontSize * 0.2;
+  const cy = Math.max(safe.y + bh / 2, Math.min(y * height, safe.y + safe.h - bh / 2));
+  return { fontSize, lines: lines.length, cy, rect: around(safe.x + safe.w / 2, cy, bw, bh) };
 };
 
 /** Slam text at rest (after the drop-in). */
-export const slamRect = (text: string, width: number, height: number, sa: SafeArea, y: number = SLAM.y, fontSize: number = SLAM.fontSize) => {
-  const safe = safeRect(sa, width, height);
-  const lines = wrapLines(text, fontSize, safe.w);
-  const w = Math.max(...lines.map((l) => textWidth(l, fontSize)));
-  return { rect: around(width / 2, y * height, w + fontSize * 0.26, lines.length * fontSize * SLAM.lineHeight + fontSize * 0.2), lines: lines.length };
-};
+export const slamRect = (text: string, width: number, height: number, sa: SafeArea, y: number = SLAM.y, max: number = SLAM.fontSize) => slamLayout(text, width, height, sa, y, max);
 
 export const overlaps = (a: Rect, b: Rect): boolean => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 

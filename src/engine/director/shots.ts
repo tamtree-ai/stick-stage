@@ -104,7 +104,15 @@ export const planShots = (
 
     const m = strongest(b);
     if (b.punchline) {
-      const speaker = b.beat.speaker!;
+      // A silent punchline (a slam, a look) belongs to whoever reacts in it.
+      const speaker = b.beat.speaker ?? m?.who;
+      if (!speaker) return;
+      if (!b.line) {
+        // Silent punchline: land the reaction on a face (a new framing), else punch in.
+        if (m && (from - lastCloseup >= msToFrame(CLOSEUP_BUDGET_MS, fps) || !onTwo())) return emotionCloseup(m, "punchline emotion");
+        if (onTwo() && from - lastPunch >= msToFrame(MIN_PUNCH_GAP_MS, fps)) return punch(from + 2, speaker, "punchline punch-in");
+        return cut(from, "close", speaker, "punchline close");
+      }
       // The emotion close-up needs room to hold ≥ 1 s before the reaction cut; short lines get the punch-in.
       const cutAt = m ? (onTwo() ? m.frame + LAND_FRAMES : m.frame) : 0;
       const room = msToFrame(b.endMs, fps) - cutAt;
@@ -123,7 +131,8 @@ export const planShots = (
       return emotionCloseup(m, "reaction close-up");
     }
 
-    if (b.kind === "silent" && m) {
+    // A slam is the beat's one dominant thing: no close-up cut away from it.
+    if (b.kind === "silent" && m && b.beat.text.length === 0) {
       const afterPunch = prev?.punchline === true;
       if (afterPunch || from - lastCloseup >= msToFrame(CLOSEUP_BUDGET_MS, fps)) emotionCloseup(m, "reaction emotion");
     }

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "template": "pov-monologue",
+  "title": "Working title",
+  "logline": "One character talks straight to camera.",
+  "pov": "POV: the situation",
+  "cast": [ { "id": "june", "character": "june" } ],
+  "lines": [
+    { "who": "june", "text": "Setup, straight to camera.", "role": "setup" },
+    { "who": "june", "text": "It gets worse.", "role": "escalation" },
+    { "who": "june", "text": "Punchline.", "role": "punchline", "expression": "deadpan" }
+  ]
+}

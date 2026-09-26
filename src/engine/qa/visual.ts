@@ -97,7 +97,7 @@ export const visualChecks = ({ tl, lib, set, safeArea }: Ctx): Finding[] => {
       const { rect, lines } = slamRect(s.text, W, H, safeArea);
       for (const f of faces)
         if (overlaps(rect, f.rect)) once(`slam-${s.from}-${f.id}`, { check: "overlay-collision", level: "warning", frame, message: `slam "${s.text}" covers ${f.id}'s face at ${at(frame)}` });
-      if (lines > 1 || !inside(rect, safe, tol)) once(`slamfit-${s.from}`, { check: "overlay-fit", level: "warning", frame, message: `slam "${s.text}" is too wide for one line (keep slams to a word or two)` });
+      if (lines > 2 || !inside(rect, safe, tol)) once(`slamfit-${s.from}`, { check: "overlay-fit", level: "warning", frame, message: `slam "${s.text}" doesn't fit in two lines even at the smallest size; shorten it` });
     }
   }
   if (tl.pov) {

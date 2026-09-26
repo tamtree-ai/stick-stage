@@ -16,6 +16,7 @@
     "check": "tsx scripts/check.ts",
     "direct": "tsx scripts/direct.ts",
     "batch": "tsx scripts/batch.ts",
+    "new": "tsx scripts/new.ts",
     "sfx": "tsx scripts/sfx-gen.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

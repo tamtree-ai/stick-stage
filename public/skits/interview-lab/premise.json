@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "template": "interview",
+  "title": "Working title",
+  "logline": "A street interview where the answer is not what anyone expected.",
+  "pov": "POV: asking strangers a simple question",
+  "cast": [ { "id": "june", "character": "june", "label": "reporter" }, { "id": "milo", "character": "milo" } ],
+  "lines": [
+    { "who": "june", "text": "The interview question.", "role": "setup" },
+    { "who": "milo", "text": "A reasonable-sounding start.", "role": "setup" },
+    { "who": "june", "text": "Follow-up question.", "role": "escalation" },
+    { "who": "milo", "text": "Punchline answer.", "role": "punchline" }
+  ]
+}

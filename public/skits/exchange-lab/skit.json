@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "meta": {
+    "title": "Working title",
+    "hashtags": [
+      "stickfigure"
+    ]
+  },
+  "set": "living-1",
+  "cast": [
+    {
+      "id": "milo",
+      "character": "milo",
+      "mark": "left"
+    },
+    {
+      "id": "june",
+      "character": "june",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "pov": "POV: the situation in a few words",
+    "subtitles": true
+  },
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "milo",
+      "line": "Setup line: the hook, said in the first second.",
+      "expression": "neutral",
+      "actions": []
+    },
+    {
+      "id": "l2",
+      "speaker": "june",
+      "line": "Answer line.",
+      "expression": "neutral",
+      "actions": []
+    },
+    {
+      "id": "l3",
+      "speaker": "milo",
+      "line": "Escalation line: it gets worse.",
+      "expression": "annoyed",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ]
+    },
+    {
+      "id": "l4",
+      "speaker": "june",
+      "line": "Punchline.",
+      "expression": "deadpan",
+      "actions": [],
+      "punchline": true,
+      "pauseBeforeMs": 450,
+      "holdAfterMs": 300,
+      "text": [
+        {
+          "type": "slam",
+          "value": "OPTIONAL",
+          "at": {
+            "word": "punchline",
+            "occurrence": 1
+          }
+        }
+      ]
+    }
+  ]
+}

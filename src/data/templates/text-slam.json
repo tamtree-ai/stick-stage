@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "template": "text-slam",
+  "title": "Working title",
+  "logline": "Slam text beats with reaction faces; no dialog.",
+  "cast": [ { "id": "milo", "character": "milo" } ],
+  "lines": [
+    { "text": "FIRST BEAT", "expression": "neutral" },
+    { "text": "IT ESCALATES", "expression": "confused" },
+    { "text": "PUNCHLINE", "role": "punchline", "expression": "shocked" }
+  ]
+}

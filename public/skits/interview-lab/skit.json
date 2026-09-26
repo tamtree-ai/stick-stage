@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "meta": {
+    "title": "Working title",
+    "hashtags": []
+  },
+  "set": "street-1",
+  "cast": [
+    {
+      "id": "june",
+      "character": "june",
+      "mark": "left",
+      "label": "reporter",
+      "holding": {
+        "prop": "mic",
+        "hand": "R"
+      },
+      "pose": "hold-chest"
+    },
+    {
+      "id": "milo",
+      "character": "milo",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "pov": "POV: asking strangers a simple question",
+    "subtitles": true
+  },
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "june",
+      "line": "The interview question.",
+      "expression": "neutral",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "hold-chest",
+          "at": {
+            "ms": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "speaker": "milo",
+      "line": "A reasonable-sounding start.",
+      "expression": "neutral",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "hold-out",
+          "at": {
+            "ms": -150
+          }
+        }
+      ]
+    },
+    {
+      "id": "l3",
+      "speaker": "june",
+      "line": "Follow-up question.",
+      "expression": "annoyed",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.15
+          }
+        },
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "hold-chest",
+          "at": {
+            "ms": -150
+          }
+        }
+      ]
+    },
+    {
+      "id": "l4",
+      "speaker": "milo",
+      "line": "Punchline answer.",
+      "expression": "deadpan",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "hold-out",
+          "at": {
+            "ms": -150
+          }
+        }
+      ],
+      "punchline": true,
+      "pauseBeforeMs": 450,
+      "holdAfterMs": 300
+    }
+  ]
+}

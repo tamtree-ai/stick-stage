@@ -64,6 +64,7 @@ const initCast = (ctx: Ctx): CastTrack[] =>
     return {
       id: m.id,
       character: m.character,
+      label: m.label,
       seed: `${m.id}-${ctx.skit.meta.title}`,
       x: x ?? 0.5,
       facing,
