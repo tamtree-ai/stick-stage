@@ -44,11 +44,16 @@ export const remotionBackend = (opts: {
   compositions?: { skit?: string; debug?: string; sheet?: string };
   /** Use this Chrome / headless shell instead of Remotion's download. */
   browserExecutable?: string;
+  /**
+   * Symlink `public/` into the bundle instead of copying it, so skit folders written after the
+   * one-time bundle are still served (long-running services). No effect on Windows.
+   */
+  symlinkPublicDir?: boolean;
 }): RenderBackend => {
   const browserExecutable = opts.browserExecutable ?? null;
   const ids = { skit: "Skit", debug: "SkitDebug", sheet: "ContactSheet", ...opts.compositions };
   let bundled: Promise<string> | undefined;
-  const serveUrl = () => (bundled ??= bundle({ entryPoint: opts.entryPoint }));
+  const serveUrl = () => (bundled ??= bundle({ entryPoint: opts.entryPoint, symlinkPublicDir: opts.symlinkPublicDir ?? false }));
 
   const renderSkit: RenderBackend["renderSkit"] = async (skitId, out, o = {}) => {
     const url = await serveUrl();

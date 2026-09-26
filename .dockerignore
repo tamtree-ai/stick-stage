@@ -1,9 +1,11 @@
 node_modules
 out
+tools
+.git
+.claude
 .env
 .env.*
+**/.DS_Store
 public/skits/*/generated
-.DS_Store
-tools/
-packages/stickstage/dist
 public/skits/_jobs
+packages/stickstage/dist
