@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "confused", "eyes": { "pupil": 0.85, "gaze": { "x": 0.2, "y": -0.45 } }, "brows": { "left": { "raise": -0.3, "tilt": -10 }, "right": { "raise": 0.9, "tilt": 8 } }, "mouth": "wobble" }

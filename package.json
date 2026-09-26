@@ -1,0 +1,45 @@
+{
+  "name": "stickstage",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Stick-figure comedy skit engine on Remotion",
+  "scripts": {
+    "dev": "remotion studio src/app/index.ts",
+    "still": "remotion still src/app/index.ts",
+    "render": "remotion render src/app/index.ts",
+    "sheet": "tsx scripts/sheet.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.529",
+    "@remotion/captions": "4.0.529",
+    "@remotion/cli": "4.0.529",
+    "@remotion/noise": "4.0.529",
+    "@remotion/paths": "4.0.529",
+    "@remotion/renderer": "4.0.529",
+    "@remotion/shapes": "4.0.529",
+    "@remotion/transitions": "4.0.529",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remotion": "4.0.529",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.529",
+    "@types/node": "22.20.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "prettier": "3.9.9",
+    "tsx": "4.23.15",
+    "typescript": "5.7.3",
+    "vitest": "5.0.2"
+  }
+}

@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "hands-on-hips", "torso": -2, "head": -4, "shoulderL": -58, "elbowL": 114, "shoulderR": 58, "elbowR": -114, "hipL": -11, "hipR": 11, "bend": { "armL": 0.1, "armR": 0.1 } }

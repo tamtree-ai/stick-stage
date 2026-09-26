@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "happy", "eyes": { "lower": 0.35 }, "brows": { "raise": 0.35, "tilt": 6 }, "mouth": "grin" }

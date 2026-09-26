@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "living-1",
+  "kit": "interior",
+  "palette": "lilac",
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [
+    { "part": "wall", "pattern": "halftone" },
+    { "part": "floor" },
+    { "part": "window", "x": 0.26, "y": 0.17 },
+    { "part": "frame", "x": 0.78, "y": 0.2 },
+    { "part": "shelf", "x": 0.74, "y": 0.36 },
+    { "part": "plant", "x": 0.93 }
+  ],
+  "foreground": [],
+  "marks": { "left": 0.27, "center": 0.5, "right": 0.73 }
+}

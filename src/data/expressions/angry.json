@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "angry", "eyes": { "lid": 0.28, "lidTilt": 22, "pupil": 0.9 }, "brows": { "raise": -0.6, "tilt": -28 }, "mouth": "shout", "symbols": ["anger"] }

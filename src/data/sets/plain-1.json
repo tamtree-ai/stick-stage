@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "plain-1",
+  "kit": "plain",
+  "palette": "mint",
+  "groundY": 1480,
+  "figureHeightPx": 720,
+  "layers": [{ "part": "plain-wall", "pattern": "halftone" }, { "part": "floor" }],
+  "marks": { "left": 0.27, "center": 0.5, "right": 0.73 }
+}

@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "sad", "eyes": { "lid": 0.25, "lidTilt": -14, "gaze": { "x": 0, "y": 0.45 } }, "brows": { "raise": 0.25, "tilt": 22 }, "mouth": "frown" }

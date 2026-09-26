@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "milo",
+  "displayName": "Milo",
+  "proportions": { "height": 1.0, "headRadius": 0.17, "neck": 0.02, "torso": 0.27, "upperArm": 0.15, "forearm": 0.14, "thigh": 0.17, "shin": 0.17 },
+  "style": {
+    "stroke": "#1b1b1f",
+    "strokeWidth": 12,
+    "headFill": "#ffffff",
+    "torso": { "style": "line" },
+    "limbCurve": 0.3,
+    "hands": "nub",
+    "feet": "oval",
+    "footFill": "#ffffff"
+  },
+  "face": { "eyes": "big-pupil", "brows": true, "mouthSet": "default", "offsetX": 0.14, "eyeSpacing": 0.46, "eyeY": -0.04, "mouthY": 0.44 },
+  "accessories": [{ "slot": "hair", "id": "tuft-01" }]
+}

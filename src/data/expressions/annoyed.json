@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "annoyed", "eyes": { "lid": 0.38, "lidTilt": 8, "gaze": { "x": -0.6, "y": 0 } }, "brows": { "raise": -0.3, "tilt": -12 }, "mouth": "pout" }
