@@ -15,14 +15,15 @@ export const xAt = (c: Pick<CastTrack, "x" | "moveKeys">, frame: number): number
     const until = next && next.frame <= frame ? next.frame : frame;
     const t = (until - k.frame) / k.durationFrames;
     // Snappy cartoon slide: fast start, tiny overshoot at the end.
-    x = t >= 1 ? k.x : lerp(x, k.x, easeOutBack(t, 0.8));
+    x = t >= 1 ? k.x : lerp(x, k.x, k.ease === "linear" ? t : easeOutBack(t, 0.8));
   });
   return x;
 };
 
 export const facingAt = (c: Pick<CastTrack, "facing" | "facingKeys">, frame: number): Facing => {
   let f = c.facing;
-  for (const k of c.facingKeys) if (k.frame <= frame) f = k.facing;
+  let at = -Infinity;
+  for (const k of c.facingKeys) if (k.frame <= frame && k.frame >= at) [f, at] = [k.facing, k.frame];
   return f;
 };
 
@@ -50,6 +51,7 @@ export const actorTracksFor = (c: CastTrack, width: number): ActorTracks => ({
   propKeys: c.propKeys,
   symbolKeys: c.symbolKeys,
   speech: c.speech,
+  gaitKeys: c.gaitKeys,
   rootAt: (f) => ({ x: xAt(c, f) * width, sign: facingAt(c, f) === "left" ? -1 : 1 }),
 });
 

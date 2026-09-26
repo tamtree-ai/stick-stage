@@ -36,6 +36,12 @@ export const ActionSchema = z.discriminatedUnion("do", [
   z.strictObject({ do: z.literal("symbol"), who, symbol: z.enum(SYMBOLS), at, durationMs: z.number().min(100).max(10000).optional() }),
   z.strictObject({ do: z.literal("sit"), who, at }),
   z.strictObject({ do: z.literal("stand"), who, at }),
+  /** Walk (or run) to a mark; `off-left` / `off-right` are entrances and exits. Faces the others on arrival. */
+  z.strictObject({ do: z.literal("walkTo"), who, mark: z.string().min(1), at, speed: z.enum(["walk", "run"]).default("walk"), facing: z.enum(["left", "right"]).optional() }),
+  /** Both step together and slap hands on the anchor. */
+  z.strictObject({ do: z.literal("highFive"), who, with: z.string().min(1), at }),
+  /** Step in and shove `target` on the anchor; they stagger back `distance` (fraction of frame width). */
+  z.strictObject({ do: z.literal("shove"), who, target: z.string().min(1), at, distance: z.number().min(0.03).max(0.4).default(0.14) }),
 ]);
 export type Action = z.infer<typeof ActionSchema>;
 export const ACTION_KINDS = ActionSchema.options.map((o) => o.shape.do.value);

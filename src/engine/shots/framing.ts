@@ -73,8 +73,10 @@ const groupShot = (
   height: number,
   groundY: number,
 ): Camera => {
-  if (actors.length === 0) return { scale: 1, cx: width / 2, cy: height / 2 };
-  const heads = actors.map((a) => headInStage(a, width, groundY));
+  // Characters waiting off stage (entrances, exits) don't widen the shot.
+  const onStage = actors.filter((a) => a.x >= 0 && a.x <= 1);
+  if (onStage.length === 0) return { scale: 1, cx: width / 2, cy: height / 2 };
+  const heads = onStage.map((a) => headInStage(a, width, groundY));
   const R = Math.max(...heads.map((h) => h.R));
   const x0 = Math.min(...heads.map((h) => h.head.x)) - 2.2 * R;
   const x1 = Math.max(...heads.map((h) => h.head.x)) + 2.2 * R;

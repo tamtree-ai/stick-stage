@@ -19,12 +19,23 @@ export const solveShots = (
   height: number,
 ): { shots: ShotKey[]; punchIns: PunchIn[]; shakes: Shake[] } => {
   const actorsAt = (f: number) => stageActorsAt(lib, cast, set, f, fps, width);
+  // A face shot on someone mid-move frames them where they come to rest (the shot is locked off).
+  const settle = (on: string | undefined, f: number) => {
+    const c = cast.find((x) => x.id === on);
+    if (!c) return f;
+    // Moves in progress, and pose changes landing within the close-up's first second.
+    const window = f + Math.round(fps);
+    let at = f;
+    for (const k of c.moveKeys) if (k.frame <= at + 2 && at < k.frame + k.durationFrames) at = k.frame + k.durationFrames;
+    for (const k of c.poseKeys) if (k.frame > f - 6 && k.frame <= window) at = Math.max(at, k.frame + (k.durationFrames ?? 4) + 2);
+    return at;
+  };
   const shots = plan.cuts.map((c) => ({
     frame: c.frame,
     framing: c.framing,
     on: c.on,
     reason: c.reason,
-    camera: frameShot({ framing: c.framing, on: c.on }, actorsAt(c.frame), width, height, set.groundY),
+    camera: frameShot({ framing: c.framing, on: c.on }, actorsAt(c.on ? settle(c.on, c.frame) : c.frame), width, height, set.groundY),
   }));
   const punchIns = plan.punchIns.map((p): PunchIn => {
     const a = actorsAt(p.frame).find((x) => x.id === p.on)!;

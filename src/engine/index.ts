@@ -9,6 +9,7 @@ export * from "./rig/idle";
 export * from "./rig/limbs";
 export * from "./rig/actorState";
 export * from "./rig/seat";
+export * from "./rig/gait";
 export { Actor } from "./rig/Actor";
 export { Rig } from "./rig/Rig";
 export { accessoryIds } from "./rig/accessories";

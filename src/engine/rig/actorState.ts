@@ -2,6 +2,7 @@ import { evalExpressionTrack, type ExpressionKey, type FaceState } from "../face
 import type { Expression, SymbolId } from "../face/schema";
 import { speechMouth } from "../face/visemes";
 import type { MouthCue } from "../voice/schema";
+import { applyGait, type GaitKey } from "./gait";
 import { blinkAmount, idleOffsets } from "./idle";
 import { evalPoseTrack, type PoseKey } from "./pose";
 import type { Character, Pose, PoseAngles } from "./schema";
@@ -49,6 +50,8 @@ export type ActorTracks = {
   propKeys?: readonly PropKey[];
   /** Spoken lines: mouth cues (line-relative ms) starting at `startFrame`. */
   speech?: readonly SpeechClip[];
+  /** Walk / run cycles layered on the pose (the director moves the root). */
+  gaitKeys?: readonly GaitKey[];
 };
 
 export type SymbolKey = { frame: number; symbol: SymbolId; durationFrames?: number };
@@ -149,12 +152,14 @@ export const evalActor = (
   const seed = tracks.seed ?? character.id;
   const getPose = getter("pose", lib.poses);
   const bodyAt = (f: number) => {
-    const base = evalPoseTrack(tracks.poseKeys, f, getPose);
+    const seat = evalSeat(tracks.seatKeys, f);
+    const posed = evalPoseTrack(tracks.poseKeys, f, getPose);
+    const base = seat ? posed : applyGait(posed, tracks.gaitKeys, f, fps);
     const idle = idleOffsets(seed, f, fps, tracks.idle ?? 1);
     const angles: PoseAngles = { ...base, torso: base.torso + idle.torso, head: base.head + idle.head + nodOffset(tracks.nodKeys, f) };
     const joints = solveSkeleton(character, angles, figureHeightPx, {
       torsoScale: idle.torsoScale,
-      seat: evalSeat(tracks.seatKeys, f),
+      seat,
     });
     return { angles, joints };
   };

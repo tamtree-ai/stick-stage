@@ -20,6 +20,8 @@ import sit from "./poses/sit.json";
 import holdOut from "./poses/hold-out.json";
 import holdChest from "./poses/hold-chest.json";
 import holdUp from "./poses/hold-up.json";
+import highFive from "./poses/high-five.json";
+import shove from "./poses/shove.json";
 
 import phone from "./props/phone.json";
 import mic from "./props/mic.json";
@@ -67,13 +69,13 @@ const table = <S extends z.ZodType<{ id: string }>>(kind: string, schema: S, doc
 /** Order matters: labs cycle through poses/expressions in this order. */
 export const POSE_IDS = ["idle", "point", "shrug", "facepalm", "arms-up", "arms-crossed", "think", "lean-in", "recoil", "slump", "hands-on-hips", "hold-phone"];
 /** Poses added after M1 (labs that cycle POSE_IDS skip these). */
-export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up"];
+export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up", "high-five", "shove"];
 export const PROP_IDS = ["phone", "mic", "cup", "laptop", "sign"];
 export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed", "angry", "shocked", "sad", "crying", "cringe", "confused", "deadpan"];
 
 export const library: Library = {
   characters: table("character", CharacterSchema, [milo, june]),
-  poses: table("pose", PoseSchema, [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp]),
+  poses: table("pose", PoseSchema, [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove]),
   expressions: table("expression", ExpressionSchema, [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan]),
   props: table("prop", PropSchema, [phone, mic, cup, laptop, sign]),
 };

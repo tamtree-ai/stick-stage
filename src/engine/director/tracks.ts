@@ -4,6 +4,7 @@ import { seatHeightAt } from "../set/seating";
 import type { SetDef } from "../set/schema";
 import { unknownId, type Diagnostic } from "./diagnostics";
 import { anchorFrame, msToFrame, type Layout, type LaidBeat } from "./layout";
+import { allMarks, highFive, markX, OFF_MARK, shove, walk, type MoveCtx } from "./moves";
 import { facingAt, gazeToward, xAt } from "./placement";
 import type { Action, ReactionTable, Skit } from "./schema";
 import type { CastTrack, Facing } from "./timeline";
@@ -34,6 +35,8 @@ type Ctx = {
   mark: Map<string, string>;
 };
 
+const moveCtx = (ctx: Ctx): MoveCtx => ({ set: ctx.set, lib: ctx.lib, width: ctx.skit.meta.width, fps: ctx.fps, cast: ctx.byId.values() });
+
 const lastExpression = (c: CastTrack, frame: number): string => {
   let e = c.expressionKeys[0]!.expression;
   let at = -1;
@@ -53,8 +56,8 @@ const seatPx = (ctx: Ctx, who: string, path: string): number | undefined => {
 const initCast = (ctx: Ctx): CastTrack[] =>
   ctx.skit.cast.map((m, i) => {
     const path = `cast[${i}]`;
-    const x = ctx.set.marks[m.mark];
-    if (x === undefined) ctx.diags.push(unknownId("mark", m.mark, Object.keys(ctx.set.marks), ["cast", i, "mark"]));
+    const x = markX(ctx.set, m.mark);
+    if (x === undefined) ctx.diags.push(unknownId("mark", m.mark, allMarks(ctx.set), ["cast", i, "mark"]));
     ctx.mark.set(m.id, m.mark);
     const facing: Facing = m.facing ?? ((x ?? 0.5) <= 0.5 ? "right" : "left");
     const seated = m.seated ? seatPx(ctx, m.id, `${path}.seated`) : undefined;
@@ -75,6 +78,7 @@ const initCast = (ctx: Ctx): CastTrack[] =>
       moveKeys: [],
       facingKeys: [],
       hopKeys: [],
+      gaitKeys: [],
     };
   });
 
@@ -118,9 +122,9 @@ const applyAction = (ctx: Ctx, b: LaidBeat, a: Action, path: string, moments: Mo
       c.nodKeys.push({ frame: f });
       return;
     case "slideTo": {
-      const x = ctx.set.marks[a.mark];
+      const x = markX(ctx.set, a.mark);
       if (x === undefined) {
-        ctx.diags.push(unknownId("mark", a.mark, Object.keys(ctx.set.marks), [...path.split("."), "mark"]));
+        ctx.diags.push(unknownId("mark", a.mark, allMarks(ctx.set), [...path.split("."), "mark"]));
         return;
       }
       c.moveKeys.push({ frame: f, x, durationFrames: a.durationFrames ?? DEFAULT_SLIDE_FRAMES });
@@ -148,6 +152,34 @@ const applyAction = (ctx: Ctx, b: LaidBeat, a: Action, path: string, moments: Mo
       c.seatKeys.push({ frame: f, seatPx: null });
       c.poseKeys.push({ frame: f, pose: "idle" });
       return;
+    case "walkTo": {
+      const x = markX(ctx.set, a.mark);
+      if (x === undefined) {
+        ctx.diags.push(unknownId("mark", a.mark, allMarks(ctx.set), [...path.split("."), "mark"]));
+        return;
+      }
+      if (c.seatKeys.length && c.seatKeys[c.seatKeys.length - 1]!.seatPx !== null && c.seatKeys[c.seatKeys.length - 1]!.frame <= f)
+        ctx.diags.push({ level: "warning", path, message: `${a.who} walks while seated; add a "stand" action first` });
+      walk(moveCtx(ctx), c, f, x, a.speed, a.facing);
+      ctx.mark.set(a.who, a.mark);
+      return;
+    }
+    case "highFive":
+    case "shove": {
+      const otherId = a.do === "highFive" ? a.with : a.target;
+      const other = ctx.byId.get(otherId);
+      const key = a.do === "highFive" ? "with" : "target";
+      if (!other || other.id === c.id) {
+        ctx.diags.push(unknownId("cast member", otherId, [...ctx.byId.keys()].filter((k) => k !== c.id), [...path.split("."), key]));
+        return;
+      }
+      if (a.do === "highFive") highFive(moveCtx(ctx), c, other, f);
+      else shove(moveCtx(ctx), c, other, f, a.distance);
+      ctx.mark.set(c.id, OFF_MARK);
+      ctx.mark.set(other.id, OFF_MARK);
+      sortTracks(other);
+      return;
+    }
   }
 };
 
@@ -202,7 +234,12 @@ export const buildTracks = (skit: Skit, layout: Layout, set: SetDef, lib: Librar
       ctx.byId.get(b.reactor)!.expressionKeys.push({ frame: from, expression: b.reactionExpression });
       m.push({ who: b.reactor, expression: b.reactionExpression, frame: from + 1 });
     }
-    b.beat.actions.forEach((a, j) => applyAction(ctx, b, a, `${b.path.join(".").replace(/\.(\d+)/g, "[$1]")}.actions[${j}]`, m));
+    b.beat.actions.forEach((a, j) => {
+      applyAction(ctx, b, a, `${b.path.join(".").replace(/\.(\d+)/g, "[$1]")}.actions[${j}]`, m);
+      // Later actions read positions and facings, so keep every track in frame order.
+      const c = ctx.byId.get(a.who);
+      if (c) sortTracks(c);
+    });
   }
   const cast = [...ctx.byId.values()];
   for (const c of cast) sortTracks(c);
@@ -213,7 +250,7 @@ export const buildTracks = (skit: Skit, layout: Layout, set: SetDef, lib: Librar
 const byFrame = <T extends { frame: number }>(xs: T[]) => xs.sort((a, b) => a.frame - b.frame);
 
 const sortTracks = (c: CastTrack) => {
-  for (const k of ["poseKeys", "expressionKeys", "gazeKeys", "nodKeys", "seatKeys", "propKeys", "symbolKeys", "moveKeys", "facingKeys", "hopKeys"] as const)
+  for (const k of ["poseKeys", "expressionKeys", "gazeKeys", "nodKeys", "seatKeys", "propKeys", "symbolKeys", "moveKeys", "facingKeys", "hopKeys", "gaitKeys"] as const)
     byFrame(c[k] as { frame: number }[]);
   c.speech.sort((a, b) => a.startFrame - b.startFrame);
 };

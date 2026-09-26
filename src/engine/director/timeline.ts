@@ -1,6 +1,7 @@
 import type { ExpressionKey } from "../face/expressions";
 import type { PropKey } from "../props/schema";
 import type { GazeKey, NodKey, SpeechClip, SymbolKey } from "../rig/actorState";
+import type { GaitKey } from "../rig/gait";
 import type { PoseKey } from "../rig/pose";
 import type { SeatKey } from "../rig/seat";
 import type { Camera } from "../shots/Stage";
@@ -15,7 +16,7 @@ import type { CaptionPage } from "../text/captions";
 export type Facing = "left" | "right";
 
 /** Quick cartoon move to a new horizontal position (fraction of frame width). */
-export type MoveKey = { frame: number; x: number; durationFrames: number };
+export type MoveKey = { frame: number; x: number; durationFrames: number; /** Default "snap" (cartoon slide); "linear" for walks. */ ease?: "snap" | "linear" };
 export type FacingKey = { frame: number; facing: Facing };
 export type HopKey = { frame: number; /** Fraction of figure height. */ height: number };
 
@@ -37,6 +38,7 @@ export type CastTrack = {
   moveKeys: MoveKey[];
   facingKeys: FacingKey[];
   hopKeys: HopKey[];
+  gaitKeys: GaitKey[];
 };
 
 export type BeatKind = "line" | "silent" | "reaction";
