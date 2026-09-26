@@ -30,13 +30,18 @@ export const solveShots = (
     for (const k of c.poseKeys) if (k.frame > f - 6 && k.frame <= window) at = Math.max(at, k.frame + (k.durationFrames ?? 4) + 2);
     return at;
   };
-  const shots = plan.cuts.map((c) => ({
-    frame: c.frame,
-    framing: c.framing,
-    on: c.on,
-    reason: c.reason,
-    camera: frameShot({ framing: c.framing, on: c.on }, actorsAt(c.on ? settle(c.on, c.frame) : c.frame), width, height, set.groundY),
-  }));
+  /** A group shot fits everyone at the cut and wherever they walk to before the next cut. */
+  const groupActors = (from: number, to: number) => {
+    const frames = new Set([from, Math.max(from, to - 1)]);
+    for (const c of cast) for (const k of c.moveKeys) if (k.frame + k.durationFrames > from && k.frame < to) frames.add(Math.min(to - 1, k.frame + k.durationFrames));
+    return [...frames].flatMap(actorsAt);
+  };
+  const shots = plan.cuts.map((c, i) => {
+    const next = plan.cuts[i + 1]?.frame ?? Infinity;
+    const end = Number.isFinite(next) ? next : Math.max(c.frame + 1, ...cast.flatMap((x) => x.moveKeys.map((k) => k.frame + k.durationFrames)));
+    const actors = c.on ? actorsAt(settle(c.on, c.frame)) : c.framing === "two" ? groupActors(c.frame, end) : actorsAt(c.frame);
+    return { frame: c.frame, framing: c.framing, on: c.on, reason: c.reason, camera: frameShot({ framing: c.framing, on: c.on }, actors, width, height, set.groundY) };
+  });
   const punchIns = plan.punchIns.map((p): PunchIn => {
     const a = actorsAt(p.frame).find((x) => x.id === p.on)!;
     const { head } = headInStage(a, width, set.groundY);

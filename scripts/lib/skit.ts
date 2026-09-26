@@ -1,7 +1,7 @@
 /** Load and compile a skit from `public/skits/<id>/` (Node side of the director). */
 import fs from "node:fs";
 import path from "node:path";
-import { checkSkit, compileSkit, formatDiagnostics, formatReport, PreparedVoiceSchema, SkitError, type CheckReport, type CompileResult, type Timeline } from "../../src/engine";
+import { checkSkit, compileSkit, formatDiagnostics, formatReport, PreparedVoiceSchema, SkitError, type CheckReport, type CompileResult, type Program, type Timeline } from "../../src/engine";
 import { library, reactions, safeArea, sets, sfxLibrary } from "../../src/data";
 import { ROOT } from "./tools";
 
@@ -18,7 +18,7 @@ export const compileSkitDir = (id: string): CompileResult => {
     const r = compileSkit({ skit, voice, lib: library, sets, sfx: sfxLibrary, reactions });
     if (r.warnings.length) console.warn(formatDiagnostics(r.warnings));
     fs.mkdirSync(path.join(dir, "generated"), { recursive: true });
-    fs.writeFileSync(path.join(dir, "generated/timeline.json"), JSON.stringify(r.timeline));
+    fs.writeFileSync(path.join(dir, "generated/timeline.json"), JSON.stringify(r.program));
     return r;
   } catch (e) {
     if (!(e instanceof SkitError)) throw e;
@@ -27,11 +27,21 @@ export const compileSkitDir = (id: string): CompileResult => {
   }
 };
 
-/** One-screen summary: beats, shots and why, punch-ins, SFX. */
-export const summarize = (tl: Timeline): string => {
-  const s = (f: number) => `${(f / tl.fps).toFixed(2)}s`;
+/** One-screen summary per scene: beats, shots and why, punch-ins, SFX (times are skit-absolute). */
+export const summarize = (p: Program): string => {
+  const head = `"${p.title}": ${p.scenes.length > 1 ? `${p.scenes.length} scenes, ` : ""}${(p.durationInFrames / p.fps).toFixed(2)}s (${p.durationInFrames} frames)`;
+  return [
+    head,
+    ...p.scenes.map((sc) =>
+      summarizeScene(sc.timeline, sc.from, p.scenes.length > 1 ? `scene ${sc.id}${sc.transitionIn ? ` (${sc.transitionIn.type} in)` : ""}` : undefined),
+    ),
+  ].join("\n");
+};
+
+const summarizeScene = (tl: Timeline, offset: number, label?: string): string => {
+  const s = (f: number) => `${((f + offset) / tl.fps).toFixed(2)}s`;
   const rows = [
-    `"${tl.title}": ${tl.beats.length} beats, ${s(tl.durationInFrames)} (${tl.durationInFrames} frames), set ${tl.set}`,
+    `${label ? `${label}: ` : ""}${tl.beats.length} beats, set ${tl.set}`,
     ...tl.beats.map((b) => `  beat ${b.id.padEnd(14)} ${b.kind.padEnd(8)} ${s(b.from)}–${s(b.to)}${b.speaker ? `  ${b.speaker}` : ""}${b.punchline ? "  PUNCHLINE" : ""}`),
     ...tl.shots.map((x) => `  cut  ${s(x.frame).padStart(6)}  ${x.framing}${x.on ? ` on ${x.on}` : ""}  (${x.reason})`),
     ...tl.punchIns.map((p) => `  punch ${s(p.frame).padStart(5)}  on ${p.on}`),

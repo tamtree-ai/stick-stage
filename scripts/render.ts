@@ -21,7 +21,7 @@ if (!id || !isSkit(id)) {
 }
 
 for (const w of prepIfVoiced(id)) console.warn(`WARNING: ${w}`);
-console.log(summarize(compileSkitDir(id).timeline));
+console.log(summarize(compileSkitDir(id).program));
 const frames = flag("frames")?.split("-").map(Number) as [number, number] | undefined;
 const out = await renderSkitMp4(id, { debug: flag("debug") !== undefined, frames: frames?.length === 2 ? frames : undefined, out: outArg });
 console.log(path.relative(ROOT, out));

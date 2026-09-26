@@ -115,33 +115,94 @@ export const CastSchema = z.strictObject({
 });
 export type CastMember = z.infer<typeof CastSchema>;
 
-export const SkitSchema = z.strictObject({
-  schemaVersion: z.literal(1),
-  meta: z.strictObject({
-    title: z.string().min(1),
-    fps: z.number().int().min(12).max(60).default(30),
-    width: z.number().int().min(360).default(1080),
-    height: z.number().int().min(360).default(1920),
-  }),
-  set: z.string().min(1),
-  cast: z.array(CastSchema).min(1).max(4),
-  overlay: z
-    .strictObject({ pov: z.string().max(80).optional(), subtitles: z.boolean().default(true) })
-    .default({ subtitles: true }),
-  timing: z
-    .strictObject({
-      /** Before the first beat. Short: the hook plays within the first second. */
-      leadInMs: z.number().min(0).max(3000).default(300),
-      /** Default silence between beats (a beat's `pauseBeforeMs` replaces it). */
-      gapMs: z.number().min(0).max(3000).default(250),
-      /** After the last beat. */
-      tailMs: z.number().min(0).max(5000).default(700),
-    })
-    .default({ leadInMs: 300, gapMs: 250, tailMs: 700 }),
+export const TRANSITIONS = ["cut", "fade", "slide", "wipe", "clock-wipe"] as const;
+export const TransitionSchema = z.strictObject({
+  type: z.enum(TRANSITIONS).default("fade"),
+  /** Ignored for "cut". */
+  durationMs: z.number().min(100).max(2000).default(400),
+});
+export type Transition = z.infer<typeof TransitionSchema>;
+
+/** A cast member's placement in one scene (omitted fields come from the skit's `cast`). */
+export const SceneCastSchema = z.strictObject({
+  id: z.string().min(1),
+  mark: z.string().min(1).optional(),
+  facing: z.enum(["left", "right"]).optional(),
+  pose: z.string().optional(),
+  expression: z.string().optional(),
+  seated: z.boolean().optional(),
+  holding: z.strictObject({ prop: z.string().min(1), hand }).optional(),
+});
+
+export const SceneSchema = z.strictObject({
+  id: z.string().regex(/^[A-Za-z0-9_-]+$/, "letters, digits, - and _ only"),
+  /** Default: the skit's `set`. */
+  set: z.string().min(1).optional(),
+  /** Who is in this scene and where. Default: the whole cast at their skit marks. */
+  cast: z.array(SceneCastSchema).min(1).optional(),
+  /** How this scene comes in (ignored on the first scene). Default: a 400 ms fade. */
+  // eslint-disable-next-line @remotion/non-pure-animation -- a skit field, not a CSS transition
+  transition: TransitionSchema.optional(),
+  /** POV card for this scene. Default: the skit's `overlay.pov` on the first scene only. */
+  pov: z.string().max(80).optional(),
   beats: z.array(BeatSchema).min(1),
 });
-export type Skit = z.infer<typeof SkitSchema>;
+export type Scene = z.infer<typeof SceneSchema>;
+
+const TimingSchema = z
+  .strictObject({
+    /** Before the first beat. Short: the hook plays within the first second. */
+    leadInMs: z.number().min(0).max(3000).default(300),
+    /** Default silence between beats (a beat's `pauseBeforeMs` replaces it). */
+    gapMs: z.number().min(0).max(3000).default(250),
+    /** After the last beat. */
+    tailMs: z.number().min(0).max(5000).default(700),
+  })
+  .default({ leadInMs: 300, gapMs: 250, tailMs: 700 });
+
+export const MetaSchema = z.strictObject({
+  title: z.string().min(1),
+  fps: z.number().int().min(12).max(60).default(30),
+  width: z.number().int().min(360).default(1080),
+  height: z.number().int().min(360).default(1920),
+  /** Post caption (batch render writes it to `<name>.txt`). Default: the title. */
+  description: z.string().max(2000).optional(),
+  hashtags: z.array(z.string().regex(/^#?[\p{L}\p{N}_]+$/u, "one word, no spaces")).default([]),
+  /** Synthetic (TTS) voices: add the AI-voice disclosure line to the post text. */
+  syntheticVoices: z.boolean().default(true),
+});
+
+/** The skit document (`skit.json`): one scene (`set` + `beats`) or several (`scenes`). */
+export const SkitSchema = z
+  .strictObject({
+    schemaVersion: z.literal(1),
+    meta: MetaSchema,
+    /** The set (single-scene skits), or the default set for scenes. */
+    set: z.string().min(1).optional(),
+    cast: z.array(CastSchema).min(1).max(4),
+    overlay: z
+      .strictObject({ pov: z.string().max(80).optional(), subtitles: z.boolean().default(true) })
+      .default({ subtitles: true }),
+    timing: TimingSchema,
+    beats: z.array(BeatSchema).min(1).optional(),
+    scenes: z.array(SceneSchema).min(1).optional(),
+  })
+  .superRefine((d, ctx) => {
+    if (d.beats && d.scenes) ctx.addIssue({ code: "custom", path: ["scenes"], message: `use either "beats" (one scene) or "scenes", not both` });
+    if (!d.beats && !d.scenes) ctx.addIssue({ code: "custom", path: ["beats"], message: `a skit needs "beats" (or "scenes")` });
+    if (!d.set && !d.scenes) ctx.addIssue({ code: "custom", path: ["set"], message: `a skit needs a "set"` });
+    d.scenes?.forEach((sc, i) => {
+      if (!sc.set && !d.set) ctx.addIssue({ code: "custom", path: ["scenes", i, "set"], message: `scene "${sc.id}" needs a "set" (or give the skit one)` });
+    });
+  });
+export type SkitDoc = z.infer<typeof SkitSchema>;
 export type SkitInput = z.input<typeof SkitSchema>;
+
+/** One resolved scene, as the director compiles it (a single-scene skit is exactly this). */
+export type Skit = Omit<SkitDoc, "set" | "beats" | "scenes"> & { set: string; beats: Beat[] };
+
+/** Every beat of a skit document, across scenes. */
+export const docBeats = (d: SkitDoc): Beat[] => d.beats ?? d.scenes!.flatMap((s) => s.beats);
 
 /** Listener reaction defaults (`src/data/reactions.json`): speaker expression → listener expression. */
 export const ReactionTableSchema = z.object({

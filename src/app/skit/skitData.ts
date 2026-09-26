@@ -1,13 +1,13 @@
 import { staticFile, type CalculateMetadataFunction } from "remotion";
 import { z } from "zod";
-import { compileSkit, formatDiagnostics, PreparedVoiceSchema, type PreparedVoice, type Timeline } from "../../engine";
+import { compileSkit, formatDiagnostics, PreparedVoiceSchema, type PreparedVoice, type Program } from "../../engine";
 import { library, reactions, sets, sfxLibrary } from "../../data";
 
 export const skitCompositionSchema = z.object({
   /** Folder under `public/skits/`. */
   skit: z.string(),
   showLabels: z.boolean(),
-  timeline: z.custom<Timeline>().optional(),
+  program: z.custom<Program>().optional(),
 });
 export type SkitCompositionProps = z.infer<typeof skitCompositionSchema>;
 
@@ -22,13 +22,13 @@ export const calculateSkitMetadata: CalculateMetadataFunction<SkitCompositionPro
   if (skit === undefined) throw new Error(`Missing public/skits/${props.skit}/skit.json`);
   const voiceJson = await fetchJson(`skits/${props.skit}/generated/voice.prepared.json`);
   const voice: PreparedVoice | undefined = voiceJson === undefined ? undefined : PreparedVoiceSchema.parse(voiceJson);
-  const { timeline, warnings } = compileSkit({ skit, voice, lib: library, sets, sfx: sfxLibrary, reactions });
+  const { program, warnings } = compileSkit({ skit, voice, lib: library, sets, sfx: sfxLibrary, reactions });
   if (warnings.length) console.warn(formatDiagnostics(warnings));
   return {
-    durationInFrames: timeline.durationInFrames,
-    fps: timeline.fps,
-    width: timeline.width,
-    height: timeline.height,
-    props: { ...props, timeline },
+    durationInFrames: program.durationInFrames,
+    fps: program.fps,
+    width: program.width,
+    height: program.height,
+    props: { ...props, program },
   };
 };

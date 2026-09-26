@@ -25,7 +25,8 @@ describe("self-check", () => {
   });
   it("flags a punchline with no reaction beat after it", () => {
     const r = compile(exchange);
-    const cut = { ...r, timeline: { ...r.timeline, beats: r.timeline.beats.filter((b) => b.kind !== "reaction") } };
+    const timeline = { ...r.timeline, beats: r.timeline.beats.filter((b) => b.kind !== "reaction") };
+    const cut = { ...r, scenes: [{ ...r.scenes[0]!, timeline }], program: { ...r.program, scenes: [{ ...r.program.scenes[0]!, timeline }] } };
     expect(ids(check(cut))).toContain("punchline-reaction");
   });
   it("reaction: false opts the punchline out of the reaction rule", () => {

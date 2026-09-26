@@ -10,7 +10,7 @@ export const fakeVoice = (lines: { id: string; text: string; durationMs: number;
   }),
 });
 
-type BeatIn = SkitInput["beats"][number];
+type BeatIn = NonNullable<SkitInput["beats"]>[number];
 
 /** A two-person skit in plain-1 plus a voice for every spoken beat (1 s per 3 words). */
 export const skitOf = (beats: BeatIn[], extra: Partial<SkitInput> = {}) => {

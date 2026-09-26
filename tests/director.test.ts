@@ -87,7 +87,7 @@ describe("beat layout", () => {
 describe("schema and library errors are actionable", () => {
   const base = skitOf([{ id: "a", speaker: "milo", line: "Hello there friend." }]);
   const withBeat = (patch: object, beatPatch: object = {}) => () =>
-    compileSkit({ ...base, skit: { ...base.skit, ...patch, beats: [{ ...base.skit.beats[0], ...beatPatch }] }, lib: library, sets, sfx: sfxLibrary, reactions });
+    compileSkit({ ...base, skit: { ...base.skit, ...patch, beats: [{ ...base.skit.beats![0], ...beatPatch }] }, lib: library, sets, sfx: sfxLibrary, reactions });
 
   it("bad enum: path, expected values and an example", () => {
     const [e] = errorsOf(withBeat({}, { shot: { framing: "closeup", on: "milo" } }));

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "s1a",
+      "speaker": "june",
+      "text": "Lunch at noon?",
+      "audio": "voice/s1a.wav",
+      "durationMs": 840
+    },
+    {
+      "id": "s1b",
+      "speaker": "milo",
+      "text": "Sure. Noon.",
+      "audio": "voice/s1b.wav",
+      "durationMs": 1220
+    },
+    {
+      "id": "s2b",
+      "speaker": "milo",
+      "text": "It is four p.m.",
+      "audio": "voice/s2b.wav",
+      "durationMs": 1187
+    }
+  ]
+}

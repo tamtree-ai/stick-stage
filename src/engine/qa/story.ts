@@ -4,7 +4,7 @@ import { CLOSEUP_BUDGET_MS, LAND_FRAMES, MIN_CLOSEUP_MS, MIN_PUNCH_GAP_MS } from
 import { msToFrame } from "../director/layout";
 import { shotAt } from "../director/camera";
 import type { Skit } from "../director/schema";
-import type { BeatSpan, Timeline } from "../director/timeline";
+import type { BeatSpan, Program, Timeline } from "../director/timeline";
 import type { Finding } from "./types";
 
 /**
@@ -122,10 +122,17 @@ export const pacingChecks = (tl: Timeline): Finding[] => {
         for (const kb of tl.cast[b]!.poseKeys.slice(1))
           if (Math.abs(ka.frame - kb.frame) <= 3 && ka.pose !== "idle" && kb.pose !== "idle")
             out.push({ check: "one-thing", level: "warning", frame: ka.frame, message: `${tl.cast[a]!.id} (${ka.pose}) and ${tl.cast[b]!.id} (${kb.pose}) gesture at the same time` });
+  return out;
+};
+
+/** Whole-skit checks: the hook plays in the first second; length. */
+export const programChecks = (p: Program): Finding[] => {
+  const out: Finding[] = [];
+  const tl = p.scenes[0]!.timeline;
   const first = tl.beats.find((b) => b.kind === "line");
   if (first && first.from > tl.fps)
     out.push({ check: "hook", level: "warning", frame: first.from, message: `the first line starts at ${secs(tl, first.from)}; the hook should play within the first second` });
-  const len = tl.durationInFrames / tl.fps;
+  const len = p.durationInFrames / p.fps;
   if (len < 15 || len > 30) out.push({ check: "length", level: "info", message: `${len.toFixed(1)} s long (two-person skits target 15–30 s)` });
   return out;
 };

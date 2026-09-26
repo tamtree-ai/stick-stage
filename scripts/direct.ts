@@ -59,8 +59,8 @@ status.voice = { ok: true, regenerated: stale };
 // 3. Prep → compile → check.
 const warnings = prepIfVoiced(id);
 const result = compileSkitDir(id);
-status.compile = { ok: true, warnings: result.warnings, prepWarnings: warnings, durationSec: result.timeline.durationInFrames / result.timeline.fps };
-console.log(summarize(result.timeline));
+status.compile = { ok: true, warnings: result.warnings, prepWarnings: warnings, durationSec: result.program.durationInFrames / result.program.fps };
+console.log(summarize(result.program));
 const report = checkSkitDir(id, result);
 status.check = report;
 

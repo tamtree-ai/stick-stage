@@ -103,3 +103,25 @@ export type Timeline = {
   slams: SlamEvent[];
   pages: CaptionPage[];
 };
+
+/** How a scene comes in (`cut` has no overlap). */
+export type SceneTransition = { type: "cut" | "fade" | "slide" | "wipe" | "clock-wipe"; durationFrames: number };
+
+export type ProgramScene = {
+  id: string;
+  /** First frame of the scene in the whole skit (transitions overlap the previous scene). */
+  from: number;
+  transitionIn?: SceneTransition;
+  timeline: Timeline;
+};
+
+/** A compiled skit: one or more scene timelines joined by transitions (`generated/timeline.json`). */
+export type Program = {
+  schemaVersion: 1;
+  title: string;
+  fps: number;
+  width: number;
+  height: number;
+  durationInFrames: number;
+  scenes: ProgramScene[];
+};
