@@ -36,3 +36,4 @@ minimumReleaseAgeExclude:
   - '@vitest/mocker@5.0.2'
   - '@vitest/spy@5.0.2'
   - vitest@5.0.2
+  - '@remotion/fonts@4.0.529'

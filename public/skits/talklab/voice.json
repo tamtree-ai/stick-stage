@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "milo",
+      "text": "Good news! I finally read your script.",
+      "audio": "voice/l1.wav",
+      "durationMs": 2650
+    },
+    {
+      "id": "l2",
+      "speaker": "milo",
+      "text": "I loved it. Especially the part where nothing happens.",
+      "audio": "voice/l2.wav",
+      "durationMs": 3385
+    },
+    {
+      "id": "l3",
+      "speaker": "milo",
+      "text": "Forty pages. Forty! And the dog never talks!",
+      "audio": "voice/l3.wav",
+      "durationMs": 3562
+    }
+  ]
+}

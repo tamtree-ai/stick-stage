@@ -17,6 +17,9 @@ importers:
       '@remotion/cli':
         specifier: 4.0.529
         version: 4.0.529(lightningcss@1.33.0)(postcss@8.5.28)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.7.3)
+      '@remotion/fonts':
+        specifier: 4.0.529
+        version: 4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@remotion/noise':
         specifier: 4.0.529
         version: 4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -512,6 +515,9 @@ packages:
     resolution: {integrity: sha512-8//UDiPJLAxcCYBj35oDXeu8yrWRwo5vIDZQ+FaB+MSLecOor1N29q7dXSPJUXLIZ/daR+sj6VUpFxs1TTEpHw==}
     peerDependencies:
       eslint: '>=9'
+
+  '@remotion/fonts@4.0.529':
+    resolution: {integrity: sha512-Kd93oNWS3C2evRMq6fdCviQD/7l+8Z0Ezvj1Pe24lIv+8qhl8NEs0U45FKPiMDnz8e8hFWfbD1X7FgkZu+AKNQ==}
 
   '@remotion/licensing@4.0.529':
     resolution: {integrity: sha512-+hVV68ouCdjeNGKQOdDueH1OZej5biXGXLr9ADdiJr7MEl5l9mWPHa2Z9z45TwBHihMe5wKOQ5fmXHc+TBOjBg==}
@@ -2626,6 +2632,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
       - typescript
+
+  '@remotion/fonts@4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+    dependencies:
+      remotion: 4.0.529(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+    transitivePeerDependencies:
+      - react
+      - react-dom
 
   '@remotion/licensing@4.0.529': {}
 

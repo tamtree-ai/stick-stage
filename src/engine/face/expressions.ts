@@ -21,7 +21,7 @@ export type FaceState = {
 
 export const resolveMouth = (mouth: Expression["mouth"]): MouthParams => {
   if (typeof mouth === "string") {
-    // Lip-sync replaces "speech" in M2; until then it reads as a neutral closed mouth.
+    // "speech" = no expression mouth of its own: neutral at rest, visemes while talking.
     const preset = MOUTH_PRESETS[mouth === "speech" ? "neutral" : mouth];
     if (!preset) throw new Error(`Unknown mouth preset "${mouth}"`);
     return preset;
