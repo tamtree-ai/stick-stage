@@ -87,6 +87,58 @@ describe("POST /validate", () => {
     expect((await svc.call("/validate", json({ skit: {}, premise: {} }))).status).toBe(400);
     expect((await svc.call("/validate", { method: "POST", headers: { "content-type": "application/json" }, body: "{" })).status).toBe(400);
   });
+  it("turns a draft reply into a staged skit and corrects a made-up mood", async () => {
+    const brief = { topic: "returning a gift", template: "exchange", set: "cafe-1", cast: [{ id: "milo", character: "milo" }, { id: "june", character: "june" }] };
+    const reply = JSON.stringify({
+      title: "The receipt",
+      description: "It comes back.",
+      hashtags: ["gift"],
+      scenes: [{ lines: [
+        { who: "milo", text: "I brought the gift back.", expression: "earnest" },
+        { who: "june", text: "The receipt is the point.", expression: "smug", slam: "POINT" },
+      ] }],
+    });
+    const res = await svc.call("/validate", json({ reply, brief }));
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { premise: { set: string; lines: { expression?: string }[] }; skit: { beats: { punchline?: boolean }[] }; warnings: { code: string }[] };
+    expect(body.premise.set).toBe("cafe-1");
+    expect(body.premise.lines[0]?.expression).toBe("neutral");
+    expect(body.skit.beats.at(-1)?.punchline).toBe(true);
+    expect(body.warnings.map((w) => w.code)).toContain("mood");
+  });
+  it("422 invalid-reply carries one repair prompt", async () => {
+    const brief = { topic: "gifts", cast: [{ id: "milo", character: "milo" }, { id: "june", character: "june" }] };
+    const res = await svc.call("/validate", json({ reply: "not json", brief }));
+    expect(res.status).toBe(422);
+    const body = (await res.json()) as { error: { code: string; repair: { prompt: string } } };
+    expect(body.error.code).toBe("invalid-reply");
+    expect(body.error.repair.prompt).toContain("not JSON");
+  });
+});
+
+describe("POST /write/prompt", () => {
+  it("needs the bearer token", async () => {
+    expect((await svc.call("/write/prompt", json({ mode: "draft", brief: { topic: "x", cast: [{ id: "milo", character: "milo" }] } }), null)).status).toBe(401);
+  });
+  it("builds a draft prompt and a lines-only change prompt", async () => {
+    const { catalog } = await import("../src/data");
+    const brief = { topic: "group chats", cast: [{ id: "milo", character: "milo" }, { id: "june", character: "june" }] };
+    const draft = await svc.call("/write/prompt", json({ mode: "draft", brief, catalog_version: catalog.version }));
+    expect(draft.status).toBe(200);
+    const body = (await draft.json()) as { writer: string; system: string; prompt: string; catalogVersion: string };
+    expect(body.writer).toBe("w1");
+    expect(body.catalogVersion).toBe(catalog.version);
+    expect(body.system).toContain("milo");
+    expect(body.prompt).toContain("group chats");
+    const skit = JSON.parse(fs.readFileSync(path.join(ROOT, "public/skits/exchange-lab/skit.json"), "utf8"));
+    const revise = await svc.call("/write/prompt", json({ mode: "revise", skit, note: "Shorter ending." }));
+    expect(revise.status).toBe(200);
+    const change = (await revise.json()) as { prompt: string };
+    expect(change.prompt).toContain("Shorter ending.");
+    expect(change.prompt).not.toContain("pauseBeforeMs");
+    const stale = await svc.call("/write/prompt", json({ mode: "draft", brief, catalog_version: "c1-0000000000000000" }));
+    expect(stale.status).toBe(409);
+  });
 });
 
 describe("POST /render", () => {

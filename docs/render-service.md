@@ -17,9 +17,26 @@ Diagnostic codes are the compiler's own, and they are stable (`voice-stale`, `un
 ## `POST /validate`: before any TTS
 
 Body (JSON): exactly one of `{ "premise": <premise.json> }` (staged with its template, like
-`pnpm new`) or `{ "skit": <skit.json> }`. Optional: `"catalog_version"`, the `version` from `GET /catalog`
+`pnpm new`), `{ "skit": <skit.json> }`, `{ "reply": "<model text>", "brief": <brief> }` or
+`{ "reply": "<model text>", "skit": <skit.json> }`. Optional: `"catalog_version"`, the `version` from `GET /catalog`
 that the client pinned; when it differs from the service's, the answer is `409 catalog-mismatch`
 (`error.expected`, `error.got`) before anything is staged.
+
+A `reply` is the model's words (`POST /write/prompt`). StickStage turns a draft into a premise
+(returned as `premise` alongside `skit`) and a change into a restaged skit. Corrections
+(unknown mood, forced scene count, a set the brief already fixed) arrive as `warnings`.
+A reply that cannot be used is `422 invalid-reply`: `error.repair.prompt` is the one message
+to send the model again. A brief that itself is invalid is `400 bad-request` (the client's fault).
+A skit that fails `parseSkit` on a revise is `422 invalid-skit`.
+
+## `POST /write/prompt`: the words the model is asked to write
+
+Body: `{ "mode": "draft", "brief": {…} }` or `{ "mode": "revise", "skit": {…}, "note": "…" }`.
+Optional `catalog_version` (409 on mismatch, before a prompt is built).
+
+`200`: `{ "system", "prompt", "writer": "w1", "catalogVersion" }`. The caller picks the model,
+sends `system` + `prompt`, and posts the text back to `/validate` as `reply`. `pnpm write` is
+the same contract from the repo.
 
 `200`:
 ```json

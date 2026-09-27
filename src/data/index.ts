@@ -58,6 +58,7 @@ import streetNight1 from "./sets/street-night-1.json";
 import beach1 from "./sets/beach-1.json";
 import stage1 from "./sets/stage-1.json";
 
+import castNotesJson from "./cast-notes.json";
 import safeAreaJson from "./safe-area.json";
 import safeAreaProfilesJson from "./safe-area-profiles.json";
 import reactionsJson from "./reactions.json";
@@ -93,3 +94,6 @@ export const sfxLibrary: SfxManifest = SfxManifestSchema.parse(migrate("sfx", sf
 
 /** The shipped registry as a picker sees it, with its content version (`GET /catalog` reports the same). */
 export const catalog: Catalog = buildCatalog({ lib: library, sets, sfx: sfxLibrary, reactions, safeArea });
+
+/** How each shipped character is played. A character with no entry is played straight. */
+export const castNotes: Readonly<Record<string, string>> = castNotesJson;

@@ -42,7 +42,8 @@ if (fs.existsSync(skitPath) && !args.includes("--force")) {
 try {
   const skit = fromPremise(JSON.parse(fs.readFileSync(premisePath, "utf8")), library, sets);
   fs.writeFileSync(skitPath, JSON.stringify(skit, null, 2) + "\n");
-  console.log(`wrote ${rel(skitPath)} (${skit.beats?.length} beats). Next: pnpm direct ${id} [--say]`);
+  const beats = skit.scenes ? skit.scenes.reduce((n, s) => n + s.beats.length, 0) : skit.beats?.length;
+  console.log(`wrote ${rel(skitPath)} (${beats} beats${skit.scenes ? ` in ${skit.scenes.length} scenes` : ""}). Next: pnpm direct ${id} [--say]`);
 } catch (e) {
   console.error(`${rel(premisePath)}: ${e instanceof SkitError ? formatDiagnostics(e.diagnostics) : e}`);
   process.exit(1);

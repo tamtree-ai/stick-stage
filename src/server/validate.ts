@@ -3,7 +3,7 @@
  * with each character's voice hints, and the director's verdict on placeholder timings. Runs
  * before any TTS is spent, so a bad premise fails here and not after the voices exist.
  */
-import { catalogVersion, checkDraft, fromPremise, SkitError, type CheckReport, type Diagnostic, type skitLines } from "../engine/core";
+import { buildCatalog, catalogVersion, checkDraft, fromPremise, parseBrief, parseSkit, premiseFromReply, repairPrompt, ReplyError, skitFromReply, SkitError, writerWorld, type CheckReport, type Diagnostic, type skitLines } from "../engine/core";
 import type { Project } from "../node";
 import { HttpError } from "./http";
 
@@ -22,6 +22,8 @@ export type ValidateResult = {
   estimatedDurationSec: number;
   warnings: Diagnostic[];
   check: CheckReport;
+  /** The premise a draft reply was turned into, for the record. */
+  premise?: unknown;
 };
 
 type Hints = { provider?: string; voiceId?: string; settings?: Record<string, unknown> } | undefined;
@@ -36,27 +38,69 @@ export const projectCatalogVersion = (p: Project): string => {
   return v;
 };
 
-export const validate = (p: Project, body: unknown): ValidateResult => {
-  const input = (body ?? {}) as { premise?: unknown; skit?: unknown; catalog_version?: unknown };
-  if ((input.premise === undefined) === (input.skit === undefined)) throw new HttpError(400, "bad-request", 'send exactly one of "premise" or "skit"');
+const pin = (version: string, got: unknown) => {
+  if (got !== undefined && got !== version) throw new HttpError(409, "catalog-mismatch", `the skit was written against catalog ${String(got)}; this service has ${version}`, { expected: version, got });
+};
+
+/** `{ premise }` or `{ skit }` as before, or `{ reply, brief }` / `{ reply, skit }` for a model's words. */
+export const validate = (p: Project, body: unknown, notes: Readonly<Record<string, string>> = {}): ValidateResult => {
+  const input = (body ?? {}) as { premise?: unknown; skit?: unknown; reply?: unknown; brief?: unknown; catalog_version?: unknown };
+  const hasReply = typeof input.reply === "string";
+  const hasBrief = input.brief !== undefined;
+  const hasPremise = input.premise !== undefined;
+  const hasSkit = input.skit !== undefined;
+  if (hasReply) {
+    if (hasPremise || hasBrief === hasSkit) throw new HttpError(400, "bad-request", 'send "reply" with exactly one of "brief" or "skit"');
+  } else if (hasPremise === hasSkit) throw new HttpError(400, "bad-request", 'send exactly one of "premise" or "skit", or a "reply" with a brief or a skit');
   const version = projectCatalogVersion(p);
   // A pinned client checked its draft against another registry: stop before any TTS is bought.
-  if (input.catalog_version !== undefined && input.catalog_version !== version)
-    throw new HttpError(409, "catalog-mismatch", `the skit was written against catalog ${String(input.catalog_version)}; this service has ${version}`, { expected: version, got: input.catalog_version });
+  pin(version, input.catalog_version);
+  const world = writerWorld(buildCatalog(p), notes);
+  const reply = hasReply ? (input.reply as string) : "";
   try {
-    const skit = input.premise !== undefined ? fromPremise(input.premise, p.lib, p.sets) : input.skit;
+    let skit: unknown = input.skit;
+    let premise: unknown;
+    let corrected: Diagnostic[] = [];
+    if (hasReply && hasBrief) {
+      let brief;
+      try {
+        brief = parseBrief(input.brief, world);
+      } catch (e) {
+        if (e instanceof SkitError) throw new HttpError(400, "bad-request", "the brief has errors", { diagnostics: e.diagnostics });
+        throw e;
+      }
+      const turned = premiseFromReply(reply, brief, world);
+      premise = turned.premise;
+      corrected = turned.warnings;
+      skit = fromPremise(premise, p.lib, p.sets);
+    } else if (hasReply) {
+      let doc;
+      try {
+        doc = parseSkit(input.skit);
+      } catch (e) {
+        if (e instanceof SkitError) throw new HttpError(422, "invalid-skit", "the skit has errors", { diagnostics: e.diagnostics });
+        throw e;
+      }
+      const turned = skitFromReply(reply, doc, world);
+      skit = turned.skit;
+      corrected = turned.warnings;
+    } else if (hasPremise) skit = fromPremise(input.premise, p.lib, p.sets);
     const d = checkDraft(skit, p);
     return {
       ok: d.ok,
       catalogVersion: version,
       skit,
+      ...(premise !== undefined ? { premise } : {}),
       // Voice-over lines take the skit's narrator voice; the rest their character's.
       lines: d.lines.map((l) => ({ ...l, voice: l.narrator ? hint(d.result.doc.narrator?.voice) : voiceHint(p, l.character) })),
       estimatedDurationSec: d.estimatedDurationSec,
-      warnings: d.warnings,
+      warnings: [...corrected, ...d.warnings],
       check: d.check,
     };
   } catch (e) {
+    if (e instanceof HttpError) throw e;
+    if (e instanceof ReplyError) throw new HttpError(422, "invalid-reply", "the reply could not be used", { repair: { prompt: e.prompt }, diagnostics: e.diagnostics });
+    if (e instanceof SkitError && hasReply) throw new HttpError(422, "invalid-reply", "the reply could not be used", { repair: { prompt: repairPrompt(e.diagnostics, reply) }, diagnostics: e.diagnostics });
     if (e instanceof SkitError) throw new HttpError(422, "invalid-skit", "the skit or premise has errors", { diagnostics: e.diagnostics });
     throw e;
   }

@@ -19,6 +19,7 @@
     "serve": "tsx scripts/serve.ts",
     "serve:smoke": "tsx scripts/serve-smoke.ts",
     "new": "tsx scripts/new.ts",
+    "write": "tsx scripts/write.ts",
     "schema": "tsx scripts/schema.ts",
     "safearea": "tsx scripts/safearea.ts",
     "lib:build": "tsx scripts/build-lib.ts",

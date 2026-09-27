@@ -32,21 +32,38 @@ export const PremiseCastSchema = z.strictObject({
   holding: z.string().optional(),
 });
 
-export const PremiseSchema = z.strictObject({
-  /** Editor hint (JSON Schema path); ignored. */
-  $schema: z.string().optional(),
-  schemaVersion: z.literal(1),
-  template: z.enum(TEMPLATES),
-  title: z.string().min(1),
-  /** The premise in a sentence, for the record (not shown). */
-  logline: z.string().optional(),
-  pov: z.string().max(80).optional(),
-  description: z.string().max(2000).optional(),
-  hashtags: z.array(z.string()).default([]),
-  /** Default per template. */
+/** One scene of a premise. The set falls back to the premise `set`, then the template default. */
+export const PremiseSceneSchema = z.strictObject({
   set: z.string().optional(),
-  cast: z.array(PremiseCastSchema).min(1).max(2),
+  /** POV card for this scene. The first scene falls back to the premise `pov`. */
+  pov: z.string().max(80).optional(),
   lines: z.array(PremiseLineSchema).min(1),
 });
+export type PremiseScene = z.infer<typeof PremiseSceneSchema>;
+
+export const PremiseSchema = z
+  .strictObject({
+    /** Editor hint (JSON Schema path); ignored. */
+    $schema: z.string().optional(),
+    schemaVersion: z.literal(1),
+    template: z.enum(TEMPLATES),
+    title: z.string().min(1),
+    /** The premise in a sentence, for the record (not shown). */
+    logline: z.string().optional(),
+    pov: z.string().max(80).optional(),
+    description: z.string().max(2000).optional(),
+    hashtags: z.array(z.string()).default([]),
+    /** Default per template, and the fallback for a scene that names no set. */
+    set: z.string().optional(),
+    cast: z.array(PremiseCastSchema).min(1).max(2),
+    /** One scene. Mutually exclusive with `scenes`. */
+    lines: z.array(PremiseLineSchema).min(1).optional(),
+    /** 1–4 scenes, staged as `scenes[]`. Mutually exclusive with `lines`. */
+    scenes: z.array(PremiseSceneSchema).min(1).max(4).optional(),
+  })
+  .superRefine((d, ctx) => {
+    if (d.lines && d.scenes) ctx.addIssue({ code: "custom", path: ["scenes"], message: `use either "lines" (one scene) or "scenes", not both` });
+    if (!d.lines && !d.scenes) ctx.addIssue({ code: "custom", path: ["lines"], message: `a premise needs "lines" (or "scenes")` });
+  });
 export type Premise = z.infer<typeof PremiseSchema>;
 export type PremiseInput = z.input<typeof PremiseSchema>;

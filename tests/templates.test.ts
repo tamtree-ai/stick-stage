@@ -55,4 +55,42 @@ describe("templates", () => {
   it("last-word anchors survive punctuation and repeats", () => {
     expect(lastWordAnchor("Fine. I'm fine. Totally FINE!")).toEqual({ word: "fine", occurrence: 3 });
   });
+
+  it("scenes: beat ids and roles run across the skit, and each scene sits on its own set", () => {
+    const skit = fromPremise(
+      {
+        schemaVersion: 1,
+        template: "exchange",
+        title: "Two rooms",
+        pov: "POV: the move",
+        cast: [
+          { id: "milo", character: "milo" },
+          { id: "june", character: "june" },
+        ],
+        scenes: [
+          { set: "office-1", lines: [{ who: "milo", text: "The desk is the setup." }, { who: "june", text: "It gets worse here." }] },
+          { set: "park-1", pov: "POV: outside", lines: [{ who: "milo", text: "The bench is worse." }, { who: "june", text: "The punchline lands.", slam: "LANDS" }] },
+        ],
+      },
+      library,
+      sets,
+    );
+    expect(skit.beats).toBeUndefined();
+    expect(skit.scenes?.map((s) => s.set)).toEqual(["office-1", "park-1"]);
+    expect(skit.scenes?.flatMap((s) => s.beats.map((b) => b.id))).toEqual(["l1", "l2", "l3", "l4"]);
+    expect(skit.scenes?.[0]?.beats[0]).toMatchObject({ expression: "neutral" });
+    expect(skit.scenes?.[0]?.beats[1]?.punchline).toBeUndefined();
+    expect(skit.scenes?.[1]?.beats[1]).toMatchObject({ punchline: true, text: [{ type: "slam", value: "LANDS" }] });
+    expect(skit.scenes?.[0]?.pov).toBe("POV: the move");
+    expect(skit.scenes?.[1]?.pov).toBe("POV: outside");
+    expect(skit.scenes?.[0]?.cast).toEqual([expect.objectContaining({ id: "milo", seated: true }), { id: "june" }]);
+    expect(skit.scenes?.[1]?.cast).toEqual([
+      expect.objectContaining({ id: "milo", seated: true }),
+      expect.objectContaining({ id: "june", seated: true }),
+    ]);
+    expect(skit.cast.every((c) => !("seated" in c) || !c.seated)).toBe(true);
+    const lines = skitLines(parseSkit(skit)).map((l) => ({ id: l.id, text: l.text, durationMs: 800 }));
+    const result = compileSkit({ skit, voice: fakeVoice(lines), lib: library, sets, sfx: sfxLibrary, reactions });
+    expect(checkSkit({ result, lib: library, sets, safeArea }).findings.filter((f) => f.level === "error")).toEqual([]);
+  });
 });

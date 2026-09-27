@@ -60,6 +60,7 @@ export { SkitProgram, type SkitProgramProps } from "./director/Program";
 export * from "./qa";
 export * from "./text/layout";
 export * from "./templates";
+export * from "./writer";
 export * from "./migrate";
 export * from "./library";
 export * from "./director/metadata";

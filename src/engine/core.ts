@@ -51,5 +51,6 @@ export * from "./director/compile";
 export * from "./director/post";
 export * from "./qa";
 export * from "./templates";
+export * from "./writer";
 export * from "./migrate";
 export * from "./library";

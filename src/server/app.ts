@@ -5,7 +5,8 @@
  *   GET    /healthz                  liveness + tools (no auth)
  *   GET    /sets                     set catalog (id, description, tags, seated marks) for premise writers
  *   GET    /catalog                  characters, sets, templates, expressions, props + the registry's content version
- *   POST   /validate                 { premise } | { skit } → skit + lines to voice + verdict
+ *   POST   /write/prompt            { mode: "draft", brief } | { mode: "revise", skit, note } → the model's prompt
+ *   POST   /validate                 { premise } | { skit } | { reply, brief } | { reply, skit } → skit + lines + verdict
  *   POST   /render                   multipart skit + voice + audio files → 202 job
  *   GET    /jobs/:id                 job status
  *   GET    /jobs/:id/files/:name     an output (mp4, srt, txt, manifest, sheet)
@@ -14,12 +15,14 @@
 import http from "node:http";
 import path from "node:path";
 import { buildCatalog, setCatalog } from "../engine/core";
+import { castNotes } from "../data";
 import type { Project } from "../node";
 import { requireBearer } from "./auth";
 import { HttpError, readForm, readJson, router, type Ctx } from "./http";
 import { JOB_ID, type Job, type JobQueue } from "./jobs";
 import { parseSubmission, writeSubmission } from "./submit";
 import { projectCatalogVersion, validate } from "./validate";
+import { writePrompt } from "./write";
 
 export type ServiceOptions = {
   project: Project;
@@ -59,7 +62,9 @@ export const createService = (o: ServiceOptions) => {
   const catalog = buildCatalog(o.project);
   r.get("/catalog", () => ({ json: catalog }));
 
-  r.post("/validate", async ({ req }) => ({ json: validate(o.project, await readJson(req, jsonLimit)) }));
+  r.post("/write/prompt", async ({ req }) => ({ json: writePrompt(o.project, await readJson(req, jsonLimit), castNotes) }));
+
+  r.post("/validate", async ({ req }) => ({ json: validate(o.project, await readJson(req, jsonLimit), castNotes) }));
 
   r.post("/render", async ({ req }) => {
     const submission = await parseSubmission(await readForm(req, uploadLimit));

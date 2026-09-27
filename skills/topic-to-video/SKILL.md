@@ -1,6 +1,6 @@
 ---
 name: topic-to-video
-description: Turn a topic into a finished ~30 second StickStage comedy video, end to end. Input is just a topic ("group chats", "returning a gift", "Monday meetings"); output is a postable MP4 in out/posts/<id>/ plus the script. Writes the premise and jokes, stages them with the skit-director skill, renders, self-checks and packages. Use when asked to make, generate or create a video/skit/short about a topic.
+description: Turn a topic into a finished ~30 second StickStage comedy video, end to end. Input is just a topic ("group chats", "returning a gift", "Monday meetings"); output is a postable MP4 in out/posts/<id>/ plus the script. Asks StickStage for the writer prompt, writes only the words, stages them with the skit-director skill, renders, self-checks and packages. Use when asked to make, generate or create a video/skit/short about a topic.
 ---
 
 # Topic → 30 s video
@@ -8,100 +8,45 @@ description: Turn a topic into a finished ~30 second StickStage comedy video, en
 The person gives you a **topic**. You deliver a **~30 s two-person skit** as a postable MP4, without
 asking questions along the way. You own every step: premise, script, staging, render and packaging.
 
-This skill writes the jokes, which is the one thing `skit-director` refuses to do. The team chose
-that on purpose (see `DECISIONS.md`, "topic-to-video"). Everything after the script follows
-`skills/skit-director/SKILL.md`. **Read that file before staging.**
+StickStage writes the prompt and turns the reply into a premise. You write only the words the
+prompt asks for. `skit-director` still never writes or changes a line. Everything after the
+premise follows `skills/skit-director/SKILL.md`. **Read that file before staging.**
 
 Run everything from the repo root (the folder with `package.json`).
 
 ## 0. Before you start
 
-- Read `src/data/characters/milo.md` and `src/data/characters/june.md` (the cast bible). Every
-  line must sound like the person saying it.
 - Pick a skit id: a lowercase slug of the topic, e.g. `group-chat`. If
   `public/skits/<id>/` already exists, add `-2`, `-3`, and so on. Never overwrite another skit.
 
-## 1. Write the premise (the part that makes it funny)
+## 1. Ask StickStage for the words, then write only those
 
-Work it out in your head first. The person sees only the result.
-
-1. **Find the angle.** List 5 relatable, specific truths about the topic (things people do but don't
-   say). Pick the one with the sharpest gap between what someone *says* and what they *mean or do*.
-   Specific beats generic: "replying 'haha' with a straight face" beats "texting is weird".
-2. **Cast it.** Milo is the sincere straight man who asks the reasonable question. June is deadpan,
-   says the quiet part out loud, and gets the last word. Usually Milo sets up and June lands it. Flip
-   that only if the angle needs it.
-3. **Shape: setup → escalation → punchline → (reaction).**
-   - Line 1 is the **hook**: the situation, clear within the first second. No greetings or preamble.
-   - **Escalate** with 2 or 3 turns that each push the same idea further (the rule of three works:
-     normal, normal, absurd). Every line is either a setup or a laugh. Cut anything that is only
-     connective tissue.
-   - The **punchline** is the last spoken line. Put the funniest word **last**. Short beats long.
-   - Draft **3 candidate punchlines**, pick the strongest, and throw the others away.
-4. **Size it for 30 s.** Target **11–13 lines, about 70–85 spoken words**. Keep each line to 12
-   words or fewer so the subtitles stay readable. Measured with dev voices: 10 lines and 62 words
-   came to 22 s as a draft and 25 s once staged; 12 lines and 73 words, staged with one silent beat,
-   came to 29.3 s. Real TTS may run a little faster or slower, so recheck the length after the first
-   harness-voiced render.
-5. **Keep it safe to post.** Use original material only: no real people, brands, song lyrics or
-   memes quoted word for word. Nothing cruel, sexual, political or about a protected group. Milo is
-   never mean (see the cast bible's "Never" lists).
-
-Write `public/skits/<id>/premise.json` directly. The format is in `src/engine/templates/premise.ts`,
-with an example in `public/skits/exchange-lab/premise.json`:
+Write `public/skits/<id>/brief.json`. A brief is the topic and the cast, plus anything you have
+already decided. Leave `template`, `set` and `scenes` out when you want the reply to choose them.
 
 ```json
 {
-  "schemaVersion": 1,
-  "template": "exchange",
-  "title": "Short title",
-  "logline": "Who wants what, and what goes wrong.",
-  "pov": "POV: the situation in a few words",
-  "description": "One line for the post; don't spoil the punchline.",
-  "hashtags": ["stickfigure", "relatable", "<topic>"],
-  "set": "<pick from the set table>",
-  "cast": [ { "id": "milo", "character": "milo" }, { "id": "june", "character": "june" } ],
-  "lines": [
-    { "who": "milo", "text": "…", "role": "setup", "expression": "neutral" },
-    { "who": "june", "text": "…", "role": "escalation", "expression": "deadpan", "delivery": "flat" },
-    { "who": "june", "text": "…", "role": "punchline", "expression": "smug", "slam": "ONE WORD" }
-  ]
+  "topic": "group chats",
+  "cast": [ { "id": "milo", "character": "milo" }, { "id": "june", "character": "june" } ]
 }
 ```
 
-- **Template:** `exchange` is the default. `interview` is Milo with a mic on the street,
-  `me-vs-me` is one character arguing with themselves, `pov-monologue` is one character talking to
-  the camera, and `text-slam` is meme text only. Use a different template only when the topic
-  clearly calls for it.
-- **Set:** always pick one; never leave it out (the template default makes every video look the same).
-  Choose the place where the situation *happens*, not the topic's subject: a joke about emails
-  sent at midnight lives in `bedroom-1`, not `office-1`. Prefer a set that hasn't been used in the
-  last few videos. Seated sets put both characters on furniture, which suits slow conversations
-  (confessions, late-night talks) better than physical gags. Full list with tags: `src/data/sets/*.json`
-  or `GET /sets`.
+```
+pnpm write prompt --brief=public/skits/<id>/brief.json
+```
 
-| Set | Where | Seated |
-|---|---|---|
-| `plain-1` | abstract backdrop (memes, thoughts, no real place) | no |
-| `stage-1` | comedy-club stage, curtain + spotlight (stand-up, announcements, confessions) | no |
-| `living-1` | living room | no |
-| `living-2` | living room with TV (streaming, gaming, family) | no |
-| `lounge-1` | lounge | both, on the couch |
-| `bedroom-1` | bedroom (sleep, late night, phone, siblings) | both, on the bed |
-| `kitchen-1` | home kitchen (food, cooking, roommates, diet) | no |
-| `cafe-1` | coffee shop, menu board + counter (ordering, dates) | no |
-| `office-1` | office desk | `left` at the desk |
-| `meeting-1` | meeting room, whiteboard (boss, presentations, pitches) | no |
-| `classroom-1` | classroom, chalkboard (school, exams, teachers) | no |
-| `park-1` | sunny park | both, on the bench |
-| `park-2` | autumn park path (walks, weather, dogs) | no |
-| `street-1` | daytime city street | no |
-| `street-night-1` | city street at night (going out, walking home) | no |
-| `beach-1` | beach (summer, vacation) | no |
+Read `system` and `prompt`. Write one JSON object that answers that prompt and nothing else:
+no schema version, no roles, no cameras, no timing. Save it as `public/skits/<id>/reply.json`.
 
-- **Expressions:** `neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe,
-  confused, deadpan`. Use strong ones (`shocked`, `cringe`, `crying`) on one or two peak lines only.
-- **Slam:** one or two words from the punchline, in capitals.
+```
+pnpm write draft --brief=public/skits/<id>/brief.json --reply=public/skits/<id>/reply.json
+```
+
+Stdout is the premise. Write it to `public/skits/<id>/premise.json`. Warnings on stderr
+(`mood`, `line-count`, `set-fallback`, …) are corrections StickStage already applied; keep going.
+
+Exit 2 means the reply cannot be used. Stderr is one repair prompt. Answer that prompt once,
+overwrite `reply.json`, and run `draft` again. Do not invent a third try.
 
 ## 2. Stage it
 
@@ -156,8 +101,15 @@ Keep the reply short:
   `pnpm render <id>`. Then run `pnpm batch <id>` again.
 - Don't claim it's funny. A person judges that by watching it.
 
-If the person asks for changes ("punchier ending", "make June lose it"), edit `premise.json`, run
-`pnpm new <id> --force`, restage, and repeat steps 3–5.
+If the person asks for changes ("punchier ending", "make June lose it"), ask for a lines-only
+prompt and apply the reply. Staging you already did stays, except on lines whose words changed.
+
+```
+pnpm write revise --skit=public/skits/<id>/skit.json --note="punchier ending"
+pnpm write apply --skit=public/skits/<id>/skit.json --reply=public/skits/<id>/reply.json
+```
+
+Write stdout over `skit.json`. Exit 2 is one repair pass, the same as draft. Then repeat steps 3–5.
 
 ## Failure modes
 

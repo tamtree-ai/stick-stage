@@ -19,7 +19,7 @@ export { MouthParamsSchema } from "./face/mouths";
 export { PropSchema } from "./props/schema";
 export { CharacterSchema, PoseSchema, ProportionsSchema, AccessorySchema } from "./rig/schema";
 export { SetSchema, SetPartSchema, PATTERNS } from "./set/schema";
-export { PremiseSchema, PremiseLineSchema, PremiseCastSchema, TEMPLATES } from "./templates/premise";
+export { PremiseSchema, PremiseLineSchema, PremiseCastSchema, PremiseSceneSchema, TEMPLATES } from "./templates/premise";
 export { SafeAreaSchema } from "./text/safeArea";
 export * from "./voice/schema";
 export * from "./migrate";
