@@ -3,15 +3,17 @@ import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
 import type { SafeArea } from "../text/safeArea";
 import { buildCaptionPages } from "../text/captions";
+import { cardLayout } from "../text/layout";
 import type { PreparedLine, PreparedVoice } from "../voice/schema";
 import { solveShots } from "./camera";
+import { DEFAULT_SAFE_AREA } from "./camera";
 import { SkitError, unknownId, type Diagnostic } from "./diagnostics";
-import { anchorFrame, layoutBeats, msToFrame, reactorFor } from "./layout";
+import { anchorFrame, layoutBeats, msToFrame, reactorFor, type LaidBeat } from "./layout";
 import { xAt } from "./placement";
-import type { Beat, ReactionTable, SfxManifest, Skit } from "./schema";
+import { isNarration, type Beat, type ReactionTable, type SfxManifest, type Skit } from "./schema";
 import { planShots } from "./shots";
 import { buildTracks } from "./tracks";
-import type { AudioClip, SfxEvent, SlamEvent, Timeline } from "./timeline";
+import type { AudioClip, CardEvent, ListEvent, SfxEvent, SlamEvent, Timeline } from "./timeline";
 
 export type CompileInput = {
   /** Raw `skit.json` (validated by `compileSkit`). */
@@ -49,9 +51,19 @@ const checkIds = (skit: Skit, input: CompileInput, diags: Diagnostic[]) => {
     need("prop", c.holding?.prop, ids(lib.props), ["cast", i, "holding", "prop"]);
   });
   const sounds = sfx.sounds.map((s) => s.id);
+  const speakers = skit.narrator ? [...castIds, skit.narrator.id] : castIds;
   skit.beats.forEach((b, i) => {
     const p = (...rest: (string | number)[]) => ["beats", i, ...rest];
-    need("speaker", b.speaker, castIds, p("speaker"));
+    if (b.speaker !== undefined && !speakers.includes(b.speaker)) {
+      const d = unknownId("speaker", b.speaker, speakers, p("speaker"));
+      if (!skit.narrator && /narrat|voice/i.test(b.speaker)) d.example = `"narrator": { "id": "${b.speaker}", "voice": { "say": "Alex" } }  (skit level)`;
+      diags.push(d);
+    }
+    need("cast member", b.focus, castIds, p("focus"));
+    if (b.focus !== undefined && !isNarration(skit, b))
+      diags.push({ level: "error", code: "focus-not-narration", path: `beats[${i}].focus`, message: `"focus" is for narrator beats; a cast line already centers its speaker`, expected: `remove "focus", or make the narrator speak this line` });
+    if (isNarration(skit, b) && b.expression)
+      diags.push({ level: "error", code: "narrator-expression", path: `beats[${i}].expression`, message: "the narrator has no face", expected: "an expression action on the cast member on screen", example: `{ "who": "${b.focus ?? castIds[0] ?? "milo"}", "do": "expression", "expression": "${b.expression}" }` });
     need("expression", b.expression, ids(lib.expressions), p("expression"));
     if (typeof b.reaction === "string") need("expression", b.reaction, ids(lib.expressions), p("reaction"));
     if (b.silent && b.expression)
@@ -69,6 +81,27 @@ const checkIds = (skit: Skit, input: CompileInput, diags: Diagnostic[]) => {
     });
     b.sfx.forEach((s, j) => need("sound", s.id, sounds, p("sfx", j, "id")));
   });
+  if (skit.card?.beat !== undefined) need("beat", skit.card.beat, skit.beats.map((b) => b.id), ["card", "beat"]);
+};
+
+/** Card title lines stagger in this far apart when one anchor reveals them all. */
+export const CARD_STAGGER_FRAMES = 5;
+
+/** The scene's title card: lines from the layout, revealed on the card's anchors. */
+const cardEvent = (skit: Skit, laid: readonly LaidBeat[], safeArea: CompileInput["safeArea"], durationInFrames: number, diags: Diagnostic[]): CardEvent | undefined => {
+  const card = skit.card;
+  if (!card) return undefined;
+  const { fps, width, height } = skit.meta;
+  const { lines } = cardLayout(card.title, card.kicker, width, height, safeArea ?? DEFAULT_SAFE_AREA);
+  const id = card.beat ?? skit.beats[0]!.id;
+  const b = laid.find((x) => x.beat.id === id && !x.synthetic)!;
+  const anchors = Array.isArray(card.at) ? card.at : [card.at];
+  if (anchors.length > 1 && anchors.length !== lines.length)
+    diags.push({ level: "error", code: "card-lines", path: "card.at", message: `${anchors.length} anchors for a title of ${lines.length} line${lines.length === 1 ? "" : "s"} (${lines.map((l) => `"${l}"`).join(", ")})`, expected: `one anchor, or one per line (force breaks with "\n")` });
+  const frames = anchors.map((a, i) => anchorFrame(b, a, anchors.length > 1 ? `card.at[${i}]` : "card.at", fps, diags));
+  if (frames.some((f) => f === undefined)) return undefined;
+  const at = lines.map((_, i) => (anchors.length > 1 ? frames[Math.min(i, frames.length - 1)]! : frames[0]! + i * CARD_STAGGER_FRAMES));
+  return { kicker: card.kicker, lines, kickerFrom: Math.min(4, at[0]!), at, to: durationInFrames };
 };
 
 /** The speaker's expression going into beat `index` (for the default punchline reaction). */
@@ -95,7 +128,8 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
   const reactionFor = (beat: Beat, i: number) => {
     const reactor = reactorFor(skit, i, beat.speaker!);
     if (!reactor) return undefined;
-    const e = speakerExpression(skit, i, beat.speaker!);
+    // Voice-over: the focus reacts to what's said about them, from where their face already is.
+    const e = speakerExpression(skit, i, isNarration(skit, beat) ? reactor : beat.speaker!);
     const expression = typeof beat.reaction === "string" ? beat.reaction : (input.reactions.punchline[e] ?? input.reactions.defaultPunchline);
     return { reactor, expression };
   };
@@ -116,6 +150,7 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
   const audio: AudioClip[] = [];
   const sfx: SfxEvent[] = [];
   const slams: SlamEvent[] = [];
+  const lists: ListEvent[] = [];
   const sounds = new Map(input.sfx.sounds.map((s) => [s.id, s]));
   for (const b of layout.beats) {
     const where = b.path.join(".").replace(/\.(\d+)/g, "[$1]");
@@ -130,6 +165,11 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
         sfx.push({ frame: Math.max(0, frame), id: s.id, src: snd.file, volume: s.volume * snd.gain, durationFrames: Math.ceil((snd.durationMs / 1000) * fps) + 1 });
     });
     b.beat.text.forEach((t, j) => {
+      if (t.type === "list") {
+        const at = t.at.map((a, k) => anchorFrame(b, a, `${where}.text[${j}].at[${k}]`, fps, diags));
+        if (at.every((f) => f !== undefined)) lists.push({ items: t.items, at: at as number[], to: 0 });
+        return;
+      }
       const frame = anchorFrame(b, t.at, `${where}.text[${j}].at`, fps, diags);
       if (frame !== undefined) slams.push({ text: t.value, from: frame, to: frame + msToFrame(t.durationMs, fps) });
     });
@@ -142,6 +182,9 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
   if (order(0) !== order(durationInFrames))
     diags.push({ level: "warning", code: "screen-direction", path: "beats", message: "a slideTo swaps the characters' sides; screen direction breaks across cuts" });
 
+  const card = cardEvent(skit, layout.beats, input.safeArea, durationInFrames, diags);
+  if (fail()) throw new SkitError(diags);
+  const nextCut = (f: number) => shots.find((c) => c.frame > f)?.frame ?? durationInFrames;
   const spoken = layout.beats.filter((b) => b.kind === "line" && b.line);
   const timeline: Timeline = {
     schemaVersion: 1,
@@ -160,6 +203,7 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
       from: msToFrame(b.fromMs, fps),
       to: msToFrame(b.endMs, fps),
       speaker: b.beat.speaker,
+      ...(b.narrator ? { narrator: true } : {}),
       audioFrom: b.line ? msToFrame(b.zeroMs, fps) : undefined,
       audioTo: b.line ? msToFrame(b.zeroMs + b.line.durationMs, fps) : undefined,
     })),
@@ -172,10 +216,14 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
     // A slam belongs to its shot: it ends at the next cut.
     slams: slams
       .sort((a, b) => a.from - b.from)
-      .map((sl) => ({ ...sl, to: Math.min(sl.to, shots.find((c) => c.frame > sl.from)?.frame ?? sl.to) })),
+      .map((sl) => ({ ...sl, to: Math.min(sl.to, nextCut(sl.from)) })),
+    // A list belongs to its shot too: it leaves at the first cut after its first item.
+    lists: lists.map((l) => ({ ...l, to: nextCut(l.at[0]!) })),
+    ...(card ? { card } : {}),
     pages: skit.overlay.subtitles
-      ? buildCaptionPages(spoken.map((b) => ({ startMs: (msToFrame(b.zeroMs, fps) / fps) * 1000, words: b.line!.words })))
+      ? buildCaptionPages(spoken.map((b) => ({ startMs: (msToFrame(b.zeroMs, fps) / fps) * 1000, words: b.line!.words, narrator: b.narrator })))
       : [],
+    ...(skit.narrator ? { narratorCaption: skit.narrator.captionStyle } : {}),
   };
   return { timeline, warnings: diags };
 };

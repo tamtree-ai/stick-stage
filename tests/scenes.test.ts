@@ -4,7 +4,7 @@ import { compileSkit, SkitError, skitLines, parseSkit, type Diagnostic, type Ski
 import { fakeVoice } from "./director-fixtures";
 
 const doc = (scenes: SkitInput["scenes"], extra: Partial<SkitInput> = {}): SkitInput => ({
-  schemaVersion: 1,
+  schemaVersion: 2,
   meta: { title: "scenes" },
   cast: [
     { id: "milo", character: "milo", mark: "left" },

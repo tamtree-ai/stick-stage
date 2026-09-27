@@ -1,7 +1,7 @@
 import { migrate } from "../migrate";
 import { fromZodIssues, SkitError, type Diagnostic } from "./diagnostics";
 import { msToFrame } from "./layout";
-import { docBeats, SkitSchema, type Beat, type CastMember, type Skit, type SkitDoc } from "./schema";
+import { docBeats, isNarration, SkitSchema, type Beat, type CastMember, type Skit, type SkitDoc } from "./schema";
 import { compileScene, type CompileInput } from "./scene";
 import type { Program, SceneTransition, Timeline } from "./timeline";
 
@@ -55,8 +55,10 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[]): Resolved[] => 
   const transMs = (i: number) => ((trans[i]?.durationFrames ?? 0) / fps) * 1000;
   return doc.scenes.map((sc, s) => {
     const castPath = new Map<number, string>();
-    const cast: CastMember[] = sc.cast
-      ? sc.cast.flatMap((o, j) => {
+    // A card scene is text over the set: nobody on stage unless the scene says so.
+    const sceneCast = sc.cast ?? (sc.card ? [] : undefined);
+    const cast: CastMember[] = sceneCast
+      ? sceneCast.flatMap((o, j) => {
           const base = doc.cast.find((c) => c.id === o.id);
           if (!base) {
             diags.push({ level: "error", code: "unknown-cast-member", path: `scenes[${s}].cast[${j}].id`, message: `"${o.id}" is not in the skit's cast`, expected: `one of ${doc.cast.map((c) => c.id).join(", ")}` });
@@ -73,6 +75,7 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[]): Resolved[] => 
       set: sc.set ?? doc.set!,
       cast,
       beats,
+      card: sc.card,
       overlay: { ...doc.overlay, pov: sc.pov ?? (s === 0 ? doc.overlay.pov : undefined) },
       timing: {
         gapMs: gap,
@@ -83,7 +86,7 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[]): Resolved[] => 
     const remap = (p: string) => {
       const m = p.match(/^cast\[(\d+)\](.*)$/);
       if (m) return `${castPath.get(Number(m[1])) ?? `scenes[${s}].cast`}${m[2]}`;
-      return /^(beats|set)\b/.test(p) ? `scenes[${s}].${p}` : p;
+      return /^(beats|set|card)\b/.test(p) ? `scenes[${s}].${p}` : p;
     };
     return { id: sc.id, skit, enter: trans[s], remap };
   });
@@ -128,10 +131,22 @@ export const compileSkit = (input: CompileInput): CompileResult => {
   return { timeline: scenes[0]!.timeline, skit: scenes[0]!.skit, scenes, program, doc, warnings: diags };
 };
 
+export type SkitLine = {
+  id: string;
+  speaker: string;
+  /** Character id, or the narrator's id for voice-over lines. */
+  character: string;
+  text: string;
+  delivery?: string;
+  /** A voice-over line: voice it with `doc.narrator.voice`, not a character's voice. */
+  narrator?: true;
+};
+
 /** The lines a voice source must synthesize: one per spoken TTS beat (id = beat id = voice file name). */
-export const skitLines = (doc: SkitDoc) =>
+export const skitLines = (doc: SkitDoc): SkitLine[] =>
   docBeats(doc).flatMap((b) => {
     if (b.silent || !b.speaker || !b.line || b.audio.source !== "tts") return [];
+    if (isNarration(doc, b)) return [{ id: b.id, speaker: b.speaker, character: b.speaker, text: b.line, delivery: b.delivery, narrator: true as const }];
     const character = doc.cast.find((c) => c.id === b.speaker)?.character ?? b.speaker;
     return [{ id: b.id, speaker: b.speaker, character, text: b.line, delivery: b.delivery }];
   });

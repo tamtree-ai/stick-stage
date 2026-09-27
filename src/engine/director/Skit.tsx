@@ -4,6 +4,7 @@ import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
 import { Stage } from "../shots/Stage";
 import { CastLabels } from "../text/CastLabels";
+import { CardText, ListText } from "../text/ExplainerText";
 import { PovCard } from "../text/PovCard";
 import type { SafeArea } from "../text/safeArea";
 import { SlamText } from "../text/SlamText";
@@ -59,7 +60,11 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
         fontFamily={fontFamily}
       />
       {tl.pov && !faceShot ? <PovCard text={tl.pov.text} frame={frame} from={tl.pov.from} to={tl.pov.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} /> : null}
-      <Subtitles hidden={slamUp} pages={tl.pages} frame={frame} fps={fps} width={W} height={H} safeArea={safeArea} style={{ fontFamily }} />
+      {tl.card ? <CardText card={tl.card} title={tl.card.lines.join("\n")} frame={frame} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} /> : null}
+      {tl.lists.map((l, i) => (
+        <ListText key={`list-${i}`} list={l} frame={frame} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} />
+      ))}
+      <Subtitles hidden={slamUp} pages={tl.pages} frame={frame} fps={fps} width={W} height={H} safeArea={safeArea} style={{ fontFamily }} narratorStyle={tl.narratorCaption} />
       {tl.slams.map((s, i) => (
         <SlamText key={i} seed={`${tl.title}-${i}`} text={s.text} frame={frame} from={s.from} to={s.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} />
       ))}

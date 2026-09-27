@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "h1",
+      "speaker": "narrator",
+      "text": "Your company announces: \"We're changing the team structure.\"",
+      "audio": "voice/h1.wav",
+      "durationMs": 3615
+    },
+    {
+      "id": "h2",
+      "speaker": "narrator",
+      "text": "And suddenly… the project you complained about for six months… is now \"my project.\"",
+      "audio": "voice/h2.wav",
+      "durationMs": 4975
+    },
+    {
+      "id": "o1",
+      "speaker": "manager",
+      "text": "Would you be okay handing this project to Sarah?",
+      "audio": "voice/o1.wav",
+      "durationMs": 2417
+    },
+    {
+      "id": "o2",
+      "speaker": "you",
+      "text": "Actually… I think there are some risks.",
+      "audio": "voice/o2.wav",
+      "durationMs": 2488
+    },
+    {
+      "id": "o3",
+      "speaker": "manager",
+      "text": "Didn't you say this project was a nightmare?",
+      "audio": "voice/o3.wav",
+      "durationMs": 2302
+    },
+    {
+      "id": "o4",
+      "speaker": "you",
+      "text": "That's different.",
+      "audio": "voice/o4.wav",
+      "durationMs": 940
+    },
+    {
+      "id": "y1",
+      "speaker": "you",
+      "text": "This dashboard is useless.",
+      "audio": "voice/y1.wav",
+      "durationMs": 1658
+    },
+    {
+      "id": "t1",
+      "speaker": "you",
+      "text": "Sarah wants to change the dashboard?",
+      "audio": "voice/t1.wav",
+      "durationMs": 2102
+    },
+    {
+      "id": "t2",
+      "speaker": "you",
+      "text": "Absolutely not.",
+      "audio": "voice/t2.wav",
+      "durationMs": 1106
+    },
+    {
+      "id": "w1",
+      "speaker": "narrator",
+      "text": "Why? Because once something becomes ours… we tend to value it more.",
+      "audio": "voice/w1.wav",
+      "durationMs": 4414
+    },
+    {
+      "id": "w2",
+      "speaker": "narrator",
+      "text": "Our project. Our process. Our spreadsheet. Even our terrible old workflow.",
+      "audio": "voice/w2.wav",
+      "durationMs": 5487
+    },
+    {
+      "id": "e1",
+      "speaker": "narrator",
+      "text": "Psychologists call this the: Endowment Effect.",
+      "audio": "voice/e1.wav",
+      "durationMs": 3263
+    },
+    {
+      "id": "e2",
+      "speaker": "narrator",
+      "text": "We don't just evaluate things based on what they're worth.",
+      "audio": "voice/e2.wav",
+      "durationMs": 3134
+    },
+    {
+      "id": "e3",
+      "speaker": "narrator",
+      "text": "We also value them differently… because we own them.",
+      "audio": "voice/e3.wav",
+      "durationMs": 3054
+    },
+    {
+      "id": "c1",
+      "speaker": "narrator",
+      "text": "That's why replacing your team's old system can feel like: \"We're improving the business.\"",
+      "audio": "voice/c1.wav",
+      "durationMs": 4831
+    },
+    {
+      "id": "c2",
+      "speaker": "narrator",
+      "text": "But replacing your system feels like: \"They're destroying everything I've built.\"",
+      "audio": "voice/c2.wav",
+      "durationMs": 4445
+    },
+    {
+      "id": "f1",
+      "speaker": "narrator",
+      "text": "Sometimes… the hardest thing to let go of isn't a bad idea.",
+      "audio": "voice/f1.wav",
+      "durationMs": 3663
+    },
+    {
+      "id": "f2",
+      "speaker": "narrator",
+      "text": "It's our bad idea.",
+      "audio": "voice/f2.wav",
+      "durationMs": 1359
+    }
+  ]
+}

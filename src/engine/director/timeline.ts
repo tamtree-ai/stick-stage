@@ -55,6 +55,8 @@ export type BeatSpan = {
   /** Exclusive. */
   to: number;
   speaker?: string;
+  /** A voice-over line (the skit's narrator). */
+  narrator?: boolean;
   /** Spoken beats: audio start/end frames. */
   audioFrom?: number;
   audioTo?: number;
@@ -85,6 +87,10 @@ export type Shake = { frame: number; durationFrames: number; intensity: number }
 export type AudioClip = { frame: number; durationFrames: number; src: string; beatId: string };
 export type SfxEvent = { frame: number; id: string; src: string; volume: number; durationFrames: number };
 export type SlamEvent = { text: string; from: number; to: number };
+/** A list reveal: item `i` pops in at `at[i]`; the list leaves at `to` (the next cut). */
+export type ListEvent = { items: string[]; at: number[]; to: number };
+/** A title card: the kicker from `kickerFrom`, title line `i` from `at[i]`, all until `to`. */
+export type CardEvent = { kicker?: string; lines: string[]; kickerFrom: number; at: number[]; to: number };
 
 export type Timeline = {
   schemaVersion: 1;
@@ -103,7 +109,11 @@ export type Timeline = {
   sfx: SfxEvent[];
   pov?: { text: string; from: number; to: number };
   slams: SlamEvent[];
+  lists: ListEvent[];
+  card?: CardEvent;
   pages: CaptionPage[];
+  /** How narrator caption pages are drawn (skits with a narrator). */
+  narratorCaption?: "italic" | "boxed";
 };
 
 /** How a scene comes in (`cut` has no overlap). */

@@ -19,7 +19,10 @@ const secs = (tl: Timeline, f: number) => `${(f / tl.fps).toFixed(2)}s`;
 
 type Hint = (expression: string) => Expression["closeup"];
 
-export const STORY_CHECKS = ["punchline-camera", "punchline-reaction", "emotion-closeups", "closeup-budget", "closeup-hold", "punch-gap", "one-thing", "hook", "length"];
+export const STORY_CHECKS = ["punchline-camera", "punchline-reaction", "emotion-closeups", "closeup-budget", "closeup-hold", "punch-gap", "one-thing", "hook", "length", "narrator-dominant"];
+
+/** Above this share of the spoken time, voice-over turns the skit into a slideshow. */
+export const NARRATOR_MAX_SHARE = 0.6;
 
 const CONTACT_POSES = ["high-five"];
 
@@ -32,15 +35,32 @@ export const punchlineChecks = (tl: Timeline, skit: Skit): Finding[] => {
     const inBeat = (f: number) => f >= b.from && f <= b.to;
     const cuts = tl.shots.filter((s) => s.frame > 0 && inBeat(s.frame));
     const punches = tl.punchIns.filter((p) => inBeat(p.frame));
-    if (!cuts.length && !punches.length)
-      out.push({ check: "punchline-camera", level: "error", frame: b.from, message: `punchline "${b.id}" has no shot change or punch-in; add "shot": { "framing": "two", "punchIn": { "on": "${b.speaker ?? tl.cast[0]!.id}" } } or a close-up` });
+    // A voice-over punchline may land on its slam instead.
+    const slam = b.narrator && tl.slams.some((sl) => inBeat(sl.from));
+    const target = b.narrator ? (skitBeat(skit, b.id)?.focus ?? tl.cast[0]?.id ?? "milo") : (b.speaker ?? tl.cast[0]!.id);
+    if (!cuts.length && !punches.length && !slam)
+      out.push({
+        check: "punchline-camera",
+        level: "error",
+        frame: b.from,
+        message: b.narrator
+          ? `voice-over punchline "${b.id}" has no punch-in, close-up or slam; give the beat "focus": "${target}", or a slam`
+          : `punchline "${b.id}" has no shot change or punch-in; add "shot": { "framing": "two", "punchIn": { "on": "${target}" } } or a close-up`,
+      });
     const faceOnSpeaker = cuts.some((c) => isFace(c.framing) && c.on === b.speaker);
     if (faceOnSpeaker && punches.length)
       out.push({ check: "punchline-camera", level: "warning", frame: b.from, message: `punchline "${b.id}" has both a face close-up and a punch-in; use one` });
     const next = tl.beats[i + 1];
     const optedOut = skitBeat(skit, b.id)?.reaction === false || tl.cast.length < 2;
     if (!optedOut && (!next || next.kind === "line"))
-      out.push({ check: "punchline-reaction", level: "error", frame: b.to, message: `no reaction beat after punchline "${b.id}"; add a silent beat, or set "reaction" on the punchline` });
+      out.push({
+        check: "punchline-reaction",
+        level: "error",
+        frame: b.to,
+        message: b.narrator
+          ? `no reaction beat after voice-over punchline "${b.id}"; give it a "focus" (who reacts), add a silent beat, or set "reaction": false`
+          : `no reaction beat after punchline "${b.id}"; add a silent beat, or set "reaction" on the punchline`,
+      });
   });
   return out;
 };
@@ -59,8 +79,10 @@ export const closeupChecks = (tl: Timeline, skit: Skit, hint: Hint): Finding[] =
   const faceCuts = tl.shots.filter((s) => isFace(s.framing));
   tl.beats.forEach((b, i) => {
     const sb = skitBeat(skit, b.id);
-    // Skit-directed shots are the author's call; a slam is the beat's one dominant thing.
-    if (b.kind === "line" || sb?.shot || (b.kind === "silent" && !b.punchline && sb?.text.length)) return;
+    // Skit-directed shots are the author's call; a slam (or list) is the beat's one dominant thing.
+    // Voice-over beats count like silent ones: the emotion is acted, not spoken.
+    const actedOnly = b.kind === "silent" || (b.narrator && !b.punchline);
+    if ((b.kind === "line" && !actedOnly) || sb?.shot || (actedOnly && !b.punchline && sb?.text.length)) return;
     const ms = emotionMoments(tl, hint, b);
     if (!ms.length) return;
     const covered = ms.some((m) => {
@@ -69,6 +91,11 @@ export const closeupChecks = (tl: Timeline, skit: Skit, hint: Hint): Finding[] =
       return faceCuts.some((s) => s.on === m.who && s.frame >= m.frame - 1 && s.frame <= m.frame + LAND_FRAMES + 3);
     });
     if (covered) return;
+    // Voice-over: the director skips a close-up the scene ends too soon to hold.
+    if (b.narrator && ms[0]!.frame + LAND_FRAMES + msToFrame(MIN_CLOSEUP_MS, tl.fps) > tl.durationInFrames) {
+      out.push({ check: "emotion-closeups", level: "info", frame: ms[0]!.frame, message: `${ms[0]!.who}'s ${ms[0]!.expression} in "${b.id}" is too near the scene end for a close-up` });
+      return;
+    }
     const afterPunch = tl.beats[i - 1]?.punchline === true;
     const recent = faceCuts.some((s) => s.frame < ms[0]!.frame && ms[0]!.frame - s.frame < budget);
     if (recent && !afterPunch && b.kind !== "reaction") {
@@ -133,14 +160,22 @@ export const pacingChecks = (tl: Timeline): Finding[] => {
   return out;
 };
 
-/** Whole-skit checks: the hook plays in the first second; length. */
+/** Whole-skit checks: the hook plays in the first second; length; voice-over share. */
 export const programChecks = (p: Program): Finding[] => {
   const out: Finding[] = [];
   const tl = p.scenes[0]!.timeline;
   const first = tl.beats.find((b) => b.kind === "line");
   if (first && first.from > tl.fps)
     out.push({ check: "hook", level: "warning", frame: first.from, message: `the first line starts at ${secs(tl, first.from)}; the hook should play within the first second` });
+  const spoken = p.scenes.flatMap((sc) => sc.timeline.beats).filter((b) => b.kind === "line" && b.audioTo !== undefined);
+  const time = (bs: BeatSpan[]) => bs.reduce((t, b) => t + b.audioTo! - b.audioFrom!, 0);
+  const narrated = time(spoken.filter((b) => b.narrator));
+  // A skit with a narrator is an explainer: it may run longer.
+  const [lo, hi, kind] = narrated > 0 ? [30, 60, "explainers"] : [15, 30, "two-person skits"];
   const len = p.durationInFrames / p.fps;
-  if (len < 15 || len > 30) out.push({ check: "length", level: "info", message: `${len.toFixed(1)} s long (two-person skits target 15–30 s)` });
+  if (len < lo || len > hi) out.push({ check: "length", level: "info", message: `${len.toFixed(1)} s long (${kind} target ${lo}–${hi} s)` });
+  const share = narrated / (time(spoken) || 1);
+  if (share > NARRATOR_MAX_SHARE)
+    out.push({ check: "narrator-dominant", level: "warning", message: `${Math.round(share * 100)}% of the spoken time is voice-over (max ${NARRATOR_MAX_SHARE * 100}%); give the characters more of it or it plays like a slideshow` });
   return out;
 };

@@ -30,7 +30,7 @@ export const writePostFiles = (base: string, o: Parameters<typeof postManifest>[
   fs.mkdirSync(path.dirname(base), { recursive: true });
   const files = { txt: `${base}.txt`, srt: `${base}.srt`, json: `${base}.json` };
   fs.writeFileSync(files.txt, postText(o.doc, o.lib));
-  fs.writeFileSync(files.srt, programSrt(o.program));
+  fs.writeFileSync(files.srt, programSrt(o.program, o.doc.narrator?.name));
   fs.writeFileSync(files.json, JSON.stringify(postManifest(o), null, 2) + "\n");
   return files;
 };

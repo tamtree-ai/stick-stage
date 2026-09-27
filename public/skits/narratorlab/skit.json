@@ -1,0 +1,49 @@
+{
+  "$schema": "../../../schemas/skit.schema.json",
+  "schemaVersion": 2,
+  "meta": { "title": "Narrator lab", "description": "Lab: voice-over, a list reveal and a title card." },
+  "narrator": { "id": "narrator", "voice": { "say": "Reed (English (US))" }, "captionStyle": "italic" },
+  "cast": [
+    { "id": "milo", "character": "milo", "mark": "left" },
+    { "id": "june", "character": "june", "mark": "right" }
+  ],
+  "scenes": [
+    {
+      "id": "office", "set": "office-1",
+      "cast": [ { "id": "milo", "seated": true }, { "id": "june" } ],
+      "beats": [
+        { "id": "n1", "speaker": "narrator", "line": "This is Milo. Milo owns one stapler.",
+          "actions": [ { "who": "milo", "do": "hold", "prop": "cup", "at": { "word": "owns" } } ] },
+        { "id": "m1", "speaker": "june", "line": "Can I borrow your stapler?" },
+        { "id": "m2", "speaker": "milo", "line": "Absolutely not.", "expression": "angry",
+          "text": [ { "type": "slam", "value": "ABSOLUTELY NOT.", "at": { "word": "Absolutely" } } ] }
+      ]
+    },
+    {
+      "id": "why", "set": "plain-1",
+      "transition": { "type": "slide", "durationMs": 350 },
+      "cast": [ { "id": "milo", "mark": "center", "pose": "hold-chest", "holding": { "prop": "laptop", "hand": "R" } } ],
+      "beats": [
+        { "id": "n2", "speaker": "narrator", "line": "Our stapler. Our desk. Our chair.", "focus": "milo",
+          "text": [ { "type": "list", "items": ["Our stapler.", "Our desk.", "Our chair."], "at": [ { "word": "Our", "occurrence": 1 }, { "word": "Our", "occurrence": 2 }, { "word": "Our", "occurrence": 3 } ] } ],
+          "actions": [ { "who": "milo", "do": "symbol", "symbol": "blush", "at": { "word": "chair." } } ] }
+      ]
+    },
+    {
+      "id": "term", "set": "classroom-1",
+      "transition": { "type": "fade", "durationMs": 300 },
+      "card": { "kicker": "Scientists call it", "title": "Stapler Syndrome", "at": [ { "word": "Stapler" }, { "word": "Syndrome." } ] },
+      "beats": [
+        { "id": "n3", "speaker": "narrator", "line": "Scientists call it Stapler Syndrome." }
+      ]
+    },
+    {
+      "id": "end", "set": "office-1",
+      "transition": { "type": "cut" },
+      "cast": [ { "id": "milo", "seated": true }, { "id": "june" } ],
+      "beats": [
+        { "id": "n4", "speaker": "narrator", "line": "He has never used it.", "focus": "milo", "punchline": true }
+      ]
+    }
+  ]
+}

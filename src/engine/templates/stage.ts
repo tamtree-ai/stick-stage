@@ -113,7 +113,7 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
   const beats = p.template === "text-slam" ? slamBeats(p) : dress(p, p.lines.map((_, i) => spokenBeat(p, i, n)));
   const set = p.set ?? TEMPLATE_DEFAULT_SET[p.template];
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     meta: { title: p.title, ...(p.description ? { description: p.description } : {}), hashtags: p.hashtags },
     set,
     cast: p.cast.map((c, i) => ({

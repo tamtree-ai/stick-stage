@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "n1",
+      "speaker": "narrator",
+      "text": "This is Milo. Milo owns one stapler.",
+      "audio": "voice/n1.wav",
+      "durationMs": 3295
+    },
+    {
+      "id": "m1",
+      "speaker": "june",
+      "text": "Can I borrow your stapler?",
+      "audio": "voice/m1.wav",
+      "durationMs": 1532
+    },
+    {
+      "id": "m2",
+      "speaker": "milo",
+      "text": "Absolutely not.",
+      "audio": "voice/m2.wav",
+      "durationMs": 1106
+    },
+    {
+      "id": "n2",
+      "speaker": "narrator",
+      "text": "Our stapler. Our desk. Our chair.",
+      "audio": "voice/n2.wav",
+      "durationMs": 3215
+    },
+    {
+      "id": "n3",
+      "speaker": "narrator",
+      "text": "Scientists call it Stapler Syndrome.",
+      "audio": "voice/n3.wav",
+      "durationMs": 2863
+    },
+    {
+      "id": "n4",
+      "speaker": "narrator",
+      "text": "He has never used it.",
+      "audio": "voice/n4.wav",
+      "durationMs": 1727
+    }
+  ]
+}

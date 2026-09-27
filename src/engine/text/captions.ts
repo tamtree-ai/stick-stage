@@ -6,6 +6,8 @@ export type CaptionLine = {
   startMs: number;
   /** Line-relative word timings (script tokens, from prepare). */
   words: readonly WordTiming[];
+  /** A voice-over line: its pages are styled apart from dialog. */
+  narrator?: boolean;
 };
 
 export type CaptionOptions = {
@@ -17,7 +19,13 @@ export type CaptionOptions = {
   lingerMs?: number;
 };
 
-export type CaptionPage = TikTokPage & { endMs: number };
+export type CaptionPage = TikTokPage & {
+  endMs: number;
+  /** The page belongs to a voice-over line. */
+  narrator?: boolean;
+  /** The first page of its line (the `.srt` names the narrator there). */
+  lineStart?: boolean;
+};
 
 /**
  * Word-timed subtitle pages built from **script tokens** (so subtitles show the script
@@ -28,7 +36,9 @@ export const buildCaptionPages = (lines: readonly CaptionLine[], opts: CaptionOp
   const maxChars = opts.maxPageChars ?? 26;
   const linger = opts.lingerMs ?? 350;
   const captions: Caption[] = [];
-  for (const line of lines) {
+  /** Per caption: its line's index. */
+  const lineOf: number[] = [];
+  for (const [n, line] of lines.entries()) {
     let pageStart = 0;
     let chars = 0;
     line.words.forEach((w, i) => {
@@ -42,16 +52,26 @@ export const buildCaptionPages = (lines: readonly CaptionLine[], opts: CaptionOp
         line.startMs + next.endMs - pageStart <= maxMs &&
         nextChars + 1 + next.text.length <= maxChars;
       captions.push({ text: " " + w.text, startMs, endMs, timestampMs: startMs, confidence: 1, pageBreakAfter: !nextFits });
+      lineOf.push(n);
       chars = nextFits ? nextChars : 0;
       if (!nextFits && next) pageStart = line.startMs + next.startMs;
     });
   }
   // Breaks are all explicit (pageBreakAfter), so the time rule never fires on its own.
   const { pages } = createTikTokStyleCaptions({ captions, combineTokensWithinMilliseconds: Number.MAX_SAFE_INTEGER });
+  // Pages never span two lines, so each page's first token maps back to its line.
+  let token = 0;
+  let prevLine = -1;
   return pages.map((p, i) => {
     const lastWord = p.tokens[p.tokens.length - 1]?.toMs ?? p.startMs;
     const nextStart = pages[i + 1]?.startMs ?? Infinity;
-    return { ...p, endMs: Math.min(nextStart, lastWord + linger) };
+    const n = lineOf[token] ?? -1;
+    token += p.tokens.length;
+    const page: CaptionPage = { ...p, endMs: Math.min(nextStart, lastWord + linger) };
+    if (lines[n]?.narrator) page.narrator = true;
+    if (n !== prevLine) page.lineStart = true;
+    prevLine = n;
+    return page;
   });
 };
 

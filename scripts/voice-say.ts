@@ -6,6 +6,7 @@
  * Reads `skit.json` (one line per spoken beat, voice = the character's `voice.say`) or, for
  * labs, `script.json` (`voices`: speaker → voice, `lines`: [{ id, speaker, text }]).
  * `say` gives no word timings, so prep estimates them.
+ * `--narrator-rate=<wpm>` speeds up the voice-over lines (dev voices only; the harness picks its own pace).
  */
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
@@ -23,22 +24,30 @@ const ScriptSchema = z.object({
   lines: z.array(z.object({ id: z.string(), speaker: z.string(), text: z.string() }).passthrough()),
 });
 
-type Line = { id: string; speaker: string; text: string; voice: string };
+type Line = { id: string; speaker: string; text: string; voice: string; rate?: number };
 
 const skitId = process.argv[2];
+const narratorRate = Number(process.argv.find((a) => a.startsWith("--narrator-rate="))?.split("=")[1]) || undefined;
 if (!skitId) {
-  console.error("usage: pnpm voice:say <skitId>");
+  console.error("usage: pnpm voice:say <skitId> [--narrator-rate=<wpm>]");
   process.exit(1);
 }
 const skitDir = path.join(ROOT, "public/skits", skitId);
 const read = (f: string) => JSON.parse(fs.readFileSync(path.join(skitDir, f), "utf8"));
 
 const DEFAULT_VOICE = "Samantha";
+// Ships with every macOS; a skit picks a better one in `narrator.voice.say`.
+const DEFAULT_NARRATOR = "Fred";
 let lines: Line[];
 let rate: number | undefined;
 if (fs.existsSync(path.join(skitDir, "skit.json"))) {
   try {
-    lines = skitLines(parseSkit(read("skit.json"))).map((l) => ({ ...l, voice: library.characters[l.character]?.voice?.say ?? DEFAULT_VOICE }));
+    const doc = parseSkit(read("skit.json"));
+    lines = skitLines(doc).map((l) => ({
+      ...l,
+      voice: l.narrator ? (doc.narrator?.voice?.say ?? DEFAULT_NARRATOR) : (library.characters[l.character]?.voice?.say ?? DEFAULT_VOICE),
+      rate: l.narrator ? narratorRate : undefined,
+    }));
   } catch (e) {
     console.error(e instanceof SkitError ? formatDiagnostics(e.diagnostics) : e);
     process.exit(1);
@@ -59,7 +68,8 @@ const manifest: VoiceManifest = {
   schemaVersion: 1,
   lines: lines.map((line) => {
     const wav = path.join(voiceDir, `${line.id}.wav`);
-    const r = rate ? ["-r", String(rate)] : [];
+    const wpm = line.rate ?? rate;
+    const r = wpm ? ["-r", String(wpm)] : [];
     execFileSync("say", ["-v", line.voice, ...r, "--file-format=WAVE", "--data-format=LEI16@22050", "-o", wav, line.text]);
     return { id: line.id, speaker: line.speaker, text: line.text, audio: `voice/${line.id}.wav`, durationMs: wavDurationMs(wav) };
   }),

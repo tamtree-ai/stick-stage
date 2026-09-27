@@ -16,7 +16,7 @@ Example: `public/skits/fine/skit.json`.
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "meta": { "title": "Not being sarcastic" },
   "set": "office-1",
   "cast": [
@@ -69,6 +69,24 @@ Default: the beat start.
 
 **SFX:** `{ "id": "record-scratch", "at": …, "volume": 1 }`. Sounds: `pnpm render SfxLab out/SfxLab.mp4`, or see `src/data/sfx.json`.
 **Text:** `{ "type": "slam", "value": "SURE.", "at": { "word": "Sure" } }`. Subtitles hide while a slam is up, and a slam ends at the next cut.
+**List reveal:** `{ "type": "list", "items": ["Our project.", "Our process."], "at": [{ "word": "Our" }, { "word": "Our", "occurrence": 2 }] }`: one anchor per item (≤ 5 items, ≤ 40 characters each). Items stack from the top of the safe area, each pops in on its anchor, and the list leaves at the next cut. The director goes `wide` for the beat so faces sit under the list.
+
+## Narrator, cards and explainers (schema v2)
+
+```json
+"narrator": { "id": "narrator", "voice": { "provider": "…", "voiceId": "…", "say": "Reed (English (US))" }, "captionStyle": "italic" }
+```
+
+- A beat with `"speaker": "narrator"` is **voice-over**: nobody on stage mouths it, listeners don't look at it or react to it, and it has no `expression` (act it with an `expression` action on someone on stage). Actions still run under it.
+- `focus` (narrator beats only) names the cast member it's about. A voice-over punchline punches in on `focus` (or lands on its slam), and `focus` gives the reaction beat. Without `focus` the camera holds the scene's shot.
+- An emotion acted under voice-over gets its close-up like a silent beat's, unless the scene ends before it can hold 1 s.
+- Narrator captions are italic (or `"boxed"`) in the dialog's place; post text and `.srt` say "Narrator:" (`narrator.name`).
+- Self-check: `narrator-dominant` warns above 60% voice-over; skits with a narrator target 30–60 s.
+
+**Card scenes:** `{ "id": "term", "set": "classroom-1", "card": { "kicker": "Psychologists call this the:", "title": "Endowment Effect.", "at": [{ "word": "Endowment" }, { "word": "Effect." }] }, "beats": [ … ] }`.
+The set dims and the title stacks in big words (190 → 96 px, up to 3 lines; `\n` forces breaks) above the subtitles. `at` is one anchor (lines stagger 5 frames apart) or one per line, in the beat `card.beat` (default the scene's first). A card scene's cast defaults to nobody; `"cast": []` empties any scene.
+
+Example: `public/skits/endowment-effect/skit.json` (lab: `narratorlab`). `pnpm voice:say <id> --narrator-rate=215` speeds up the dev narrator.
 
 ## What the director does by default
 

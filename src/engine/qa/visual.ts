@@ -7,7 +7,7 @@ import { getPalette } from "../set/palettes";
 import type { SetDef } from "../set/schema";
 import { faceRect } from "../shots/framing";
 import { pageAt } from "../text/captions";
-import { inside, overlaps, povRect, slamRect, SLAM, SUBTITLE, subtitleRect } from "../text/layout";
+import { cardLayout, inside, LIST, listLayout, overlaps, povRect, slamRect, SLAM, SUBTITLE, subtitleRect } from "../text/layout";
 import { safeRect, type Rect, type SafeArea } from "../text/safeArea";
 import type { Finding } from "./types";
 
@@ -29,6 +29,8 @@ export const sampleFrames = (tl: Timeline): number[] => {
   });
   for (const p of tl.punchIns) fs.add(p.frame + p.durationFrames + 1);
   for (const s of tl.slams) fs.add(s.from + 1);
+  for (const l of tl.lists) for (const f of l.at) fs.add(f + 1);
+  if (tl.card) fs.add(tl.card.at[tl.card.at.length - 1]! + 1);
   for (const p of tl.pages) fs.add(Math.round(((p.startMs + p.endMs) / 2000) * tl.fps));
   return [...fs].filter((f) => f >= 0 && f < tl.durationInFrames).sort((a, b) => a - b);
 };
@@ -89,11 +91,46 @@ export const visualChecks = ({ tl, lib, set, safeArea }: Ctx): Finding[] => {
       if (lines > 2 || !inside(rect, safe, tol)) once(`slamfit-${s.from}`, { check: "overlay-fit", level: "warning", frame, message: `slam "${s.text}" doesn't fit in two lines even at the smallest size; shorten it` });
     }
   }
+  out.push(...explainerChecks(tl, safeArea, frameFaces(tl, lib, set)));
   if (tl.pov) {
     const { lines } = povRect(tl.pov.text, W, H, safeArea);
     if (lines > 2) out.push({ check: "overlay-fit", level: "warning", message: `POV card wraps to ${lines} lines; shorten it` });
   }
   out.push(...contrastChecks(tl, lib, set));
+  return out;
+};
+
+type Faces = (frame: number) => { id: string; rect: Rect }[];
+
+const frameFaces = (tl: Timeline, lib: Library, set: SetDef): Faces => (frame) => {
+  const cam = cameraAt(tl, frame);
+  return stageActorsAt(lib, tl.cast, set, frame, tl.fps, tl.width)
+    .map((a) => ({ id: a.id, rect: faceRect(a, cam, tl.width, tl.height, set.groundY) }))
+    .filter((f) => onScreen(f.rect, tl.width, tl.height));
+};
+
+/** Cards and lists fit their band, every list item shows before the list leaves, and they don't cover faces. */
+export const explainerChecks = (tl: Timeline, safeArea: SafeArea, faces: Faces): Finding[] => {
+  const out: Finding[] = [];
+  const { width: W, height: H } = tl;
+  const at = (f: number) => `${(f / tl.fps).toFixed(2)}s`;
+  for (const l of tl.lists) {
+    const layout = listLayout(l.items, W, H, safeArea);
+    if (!layout.fits) out.push({ check: "overlay-fit", level: "warning", frame: l.at[0], message: `list doesn't fit above the subtitles even at ${LIST.minFontSize} px; shorten the items or use fewer` });
+    const late = l.items.filter((_, i) => l.at[i]! >= l.to);
+    if (late.length) out.push({ check: "overlay-fit", level: "warning", frame: l.to, message: `the list leaves at the cut at ${at(l.to)} before ${late.map((x) => `"${x}"`).join(", ")} appear${late.length === 1 ? "s" : ""}` });
+    const last = Math.min(l.to - 1, l.at[l.at.length - 1]! + 1);
+    const hit = faces(last).filter((f) => layout.rects.some((r, i) => l.at[i]! <= last && overlaps(r, f.rect)));
+    for (const f of hit) out.push({ check: "overlay-collision", level: "warning", frame: last, message: `list covers ${f.id}'s face at ${at(last)}` });
+  }
+  if (tl.card) {
+    const c = tl.card;
+    const layout = cardLayout(c.lines.join("\n"), c.kicker, W, H, safeArea);
+    if (!layout.fits) out.push({ check: "overlay-fit", level: "warning", frame: c.at[0], message: `card title "${c.lines.join(" ")}" doesn't fit in ${layout.lines.length} line(s) above the subtitles; shorten it` });
+    const f0 = c.at[c.at.length - 1]! + 1;
+    const hit = f0 < c.to ? faces(f0).filter((f) => overlaps(layout.rect, f.rect)) : [];
+    for (const f of hit) out.push({ check: "overlay-collision", level: "warning", frame: f0, message: `card covers ${f.id}'s face at ${at(f0)}` });
+  }
   return out;
 };
 

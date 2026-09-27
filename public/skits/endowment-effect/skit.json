@@ -1,0 +1,117 @@
+{
+  "$schema": "../../../schemas/skit.schema.json",
+  "schemaVersion": 2,
+  "meta": {
+    "title": "The Endowment Effect",
+    "description": "The project you complained about for six months is now YOUR project. Why? The endowment effect.",
+    "hashtags": ["endowmenteffect", "psychology", "worklife", "corporatehumor"]
+  },
+  "narrator": { "id": "narrator", "voice": { "say": "Reed (English (US))" }, "captionStyle": "italic" },
+  "cast": [
+    { "id": "you", "character": "milo", "mark": "left" },
+    { "id": "manager", "character": "june", "mark": "right" }
+  ],
+  "scenes": [
+    {
+      "id": "hook", "set": "meeting-1",
+      "beats": [
+        { "id": "h1", "speaker": "narrator", "line": "Your company announces: \"We're changing the team structure.\"",
+          "actions": [
+            { "who": "manager", "do": "pose", "pose": "arms-up", "at": { "word": "We're" } },
+            { "who": "you", "do": "expression", "expression": "shocked", "at": { "word": "structure." } }
+          ] },
+        { "id": "h2", "speaker": "narrator", "line": "And suddenly… the project you complained about for six months… is now \"my project.\"",
+          "focus": "you", "punchline": true, "reaction": "cringe",
+          "actions": [ { "who": "manager", "do": "pose", "pose": "idle", "at": { "word": "suddenly…" } } ],
+          "text": [ { "type": "slam", "value": "MY project.", "at": { "word": "my" } } ] }
+      ]
+    },
+    {
+      "id": "office", "set": "office-1",
+      "cast": [ { "id": "manager", "mark": "left", "seated": true }, { "id": "you", "mark": "right" } ],
+      "beats": [
+        { "id": "o1", "speaker": "manager", "line": "Would you be okay handing this project to Sarah?" },
+        { "id": "o2", "speaker": "you", "line": "Actually… I think there are some risks.", "expression": "cringe" },
+        { "id": "o3", "speaker": "manager", "line": "Didn't you say this project was a nightmare?", "expression": "smug" },
+        { "id": "o4", "speaker": "you", "line": "That's different.", "expression": "deadpan", "punchline": true, "pauseBeforeMs": 450, "holdAfterMs": 300 }
+      ]
+    },
+    {
+      "id": "yesterday", "set": "lounge-1", "pov": "Yesterday:",
+      "cast": [ { "id": "you", "mark": "left", "seated": true, "holding": { "prop": "laptop", "hand": "R" } } ],
+      "beats": [
+        { "id": "y1", "speaker": "you", "line": "This dashboard is useless.", "expression": "annoyed",
+          "actions": [ { "who": "you", "do": "look", "to": "camera", "at": { "ms": 0 } } ] }
+      ]
+    },
+    {
+      "id": "today", "set": "cafe-1", "pov": "Today:",
+      "transition": { "type": "slide", "durationMs": 350 },
+      "cast": [ { "id": "you", "mark": "center", "pose": "hold-chest", "holding": { "prop": "laptop", "hand": "R" } } ],
+      "beats": [
+        { "id": "t1", "speaker": "you", "line": "Sarah wants to change the dashboard?", "expression": "confused",
+          "actions": [ { "who": "you", "do": "look", "to": "camera", "at": { "ms": 0 } } ] },
+        { "id": "t2", "speaker": "you", "line": "Absolutely not.", "expression": "angry", "punchline": true, "pauseBeforeMs": 350,
+          "text": [ { "type": "slam", "value": "ABSOLUTELY NOT.", "at": { "word": "Absolutely" } } ] }
+      ]
+    },
+    {
+      "id": "why", "set": "plain-1",
+      "cast": [ { "id": "you", "mark": "center", "pose": "hold-chest", "holding": { "prop": "laptop", "hand": "R" } } ],
+      "beats": [
+        { "id": "w1", "speaker": "narrator", "line": "Why? Because once something becomes ours… we tend to value it more.", "focus": "you" },
+        { "id": "w2", "speaker": "narrator", "line": "Our project. Our process. Our spreadsheet. Even our terrible old workflow.", "focus": "you",
+          "actions": [ { "who": "you", "do": "symbol", "symbol": "blush", "at": { "word": "terrible" }, "durationMs": 1400 } ],
+          "text": [ { "type": "list",
+            "items": ["Our project.", "Our process.", "Our spreadsheet.", "Our terrible old workflow."],
+            "at": [ { "word": "Our", "occurrence": 1 }, { "word": "Our", "occurrence": 2 }, { "word": "Our", "occurrence": 3 }, { "word": "our", "occurrence": 1 } ] } ] }
+      ]
+    },
+    {
+      "id": "term", "set": "classroom-1",
+      "card": { "kicker": "Psychologists call this the:", "title": "Endowment Effect.", "at": [ { "word": "Endowment" }, { "word": "Effect." } ] },
+      "beats": [
+        { "id": "e1", "speaker": "narrator", "line": "Psychologists call this the: Endowment Effect.", "holdAfterMs": 1000 }
+      ]
+    },
+    {
+      "id": "board", "set": "classroom-1",
+      "transition": { "type": "cut" },
+      "cast": [ { "id": "you", "mark": "center", "pose": "think" } ],
+      "beats": [
+        { "id": "e2", "speaker": "narrator", "line": "We don't just evaluate things based on what they're worth.", "focus": "you" },
+        { "id": "e3", "speaker": "narrator", "line": "We also value them differently… because we own them.", "focus": "you",
+          "actions": [ { "who": "you", "do": "pose", "pose": "hold-chest", "at": { "word": "own" } }, { "who": "you", "do": "expression", "expression": "smug", "at": { "word": "own" } } ] }
+      ]
+    },
+    {
+      "id": "business", "set": "stage-1",
+      "transition": { "type": "slide", "durationMs": 300 },
+      "cast": [ { "id": "manager", "mark": "center", "expression": "happy" } ],
+      "beats": [
+        { "id": "c1", "speaker": "narrator", "line": "That's why replacing your team's old system can feel like: \"We're improving the business.\"", "focus": "manager",
+          "actions": [ { "who": "manager", "do": "pose", "pose": "arms-up", "at": { "word": "improving" } } ],
+          "text": [ { "type": "slam", "value": "We're improving the business.", "at": { "word": "improving" }, "durationMs": 1600 } ] }
+      ]
+    },
+    {
+      "id": "destroying", "set": "street-1",
+      "transition": { "type": "slide", "durationMs": 300 },
+      "cast": [ { "id": "you", "mark": "center", "pose": "hold-chest", "holding": { "prop": "laptop", "hand": "R" } } ],
+      "beats": [
+        { "id": "c2", "speaker": "narrator", "line": "But replacing your system feels like: \"They're destroying everything I've built.\"", "focus": "you",
+          "actions": [ { "who": "you", "do": "expression", "expression": "crying", "at": { "word": "destroying" } } ],
+          "text": [ { "type": "slam", "value": "EVERYTHING I'VE BUILT.", "at": { "word": "everything" }, "durationMs": 1800 } ] }
+      ]
+    },
+    {
+      "id": "ours", "set": "plain-1",
+      "cast": [ { "id": "you", "mark": "center", "pose": "hold-chest", "holding": { "prop": "laptop", "hand": "R" }, "expression": "sad" } ],
+      "beats": [
+        { "id": "f1", "speaker": "narrator", "line": "Sometimes… the hardest thing to let go of isn't a bad idea.", "focus": "you" },
+        { "id": "f2", "speaker": "narrator", "line": "It's our bad idea.", "focus": "you", "punchline": true, "pauseBeforeMs": 400,
+          "text": [ { "type": "slam", "value": "OUR bad idea.", "at": { "word": "our" }, "durationMs": 1500 } ] }
+      ]
+    }
+  ]
+}

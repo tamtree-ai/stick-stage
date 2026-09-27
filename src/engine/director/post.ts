@@ -20,6 +20,7 @@ const tag = (h: string) => (h.startsWith("#") ? h : `#${h}`);
 /** Caption text for the platform post: description, hashtags, disclosure, then the script. */
 export const postText = (doc: SkitDoc, lib: Library): string => {
   const name = (castId: string) => {
+    if (doc.narrator && castId === doc.narrator.id) return doc.narrator.name;
     const c = doc.cast.find((x) => x.id === castId);
     return (c && lib.characters[c.character]?.displayName) ?? castId;
   };
@@ -38,11 +39,14 @@ const srtTime = (ms: number) => {
   return `${p(Math.floor(t / 3600000))}:${p(Math.floor(t / 60000) % 60)}:${p(Math.floor(t / 1000) % 60)},${p(t % 1000, 3)}`;
 };
 
-/** SubRip captions from the compiled pages (script text exactly, skit-absolute times). */
-export const programSrt = (p: Program): string => {
+/**
+ * SubRip captions from the compiled pages (script text exactly, skit-absolute times). A voice-over
+ * line's first cue is labelled with the narrator's name.
+ */
+export const programSrt = (p: Program, narratorName = "Narrator"): string => {
   const cues = p.scenes.flatMap((sc) => {
     const offset = (sc.from / p.fps) * 1000;
-    return sc.timeline.pages.map((pg) => ({ from: pg.startMs + offset, to: pg.endMs + offset, text: pg.text.trim() }));
+    return sc.timeline.pages.map((pg) => ({ from: pg.startMs + offset, to: pg.endMs + offset, text: `${pg.narrator && pg.lineStart ? `${narratorName}: ` : ""}${pg.text.trim()}` }));
   });
   return cues.map((c, i) => `${i + 1}\n${srtTime(c.from)} --> ${srtTime(c.to)}\n${c.text}\n`).join("\n");
 };

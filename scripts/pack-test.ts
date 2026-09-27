@@ -81,7 +81,7 @@ export const sfx = SfxManifestSchema.parse(sfxJson);
 `,
 );
 const skit = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   meta: { title: "Consumer demo" },
   set: "plain-1",
   cast: [

@@ -267,7 +267,7 @@ describe("diagnostic codes", () => {
     expect(codes([{ id: "a", speaker: "milo", line: "Hi there.", actions: [{ who: "milo", do: "pose", pose: "shurg" }] }])).toEqual(["unknown-pose"]);
     expect(codes([{ id: "b", speaker: "june", line: "No voice here." }], "b")).toEqual(["voice-missing"]);
     try {
-      parseSkit({ schemaVersion: 1, meta: { title: "x" }, set: "plain-1", cast: [], beats: [] });
+      parseSkit({ schemaVersion: 2, meta: { title: "x" }, set: "plain-1", cast: [], beats: [] });
     } catch (e) {
       expect((e as SkitError).diagnostics.every((d) => d.code.startsWith("schema/"))).toBe(true);
     }

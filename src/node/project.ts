@@ -44,10 +44,12 @@ const summarizeScene = (tl: Timeline, offset: number, label?: string): string =>
   const s = (f: number) => `${((f + offset) / tl.fps).toFixed(2)}s`;
   return [
     `${label ? `${label}: ` : ""}${tl.beats.length} beats, set ${tl.set}`,
-    ...tl.beats.map((b) => `  beat ${b.id.padEnd(14)} ${b.kind.padEnd(8)} ${s(b.from)}–${s(b.to)}${b.speaker ? `  ${b.speaker}` : ""}${b.punchline ? "  PUNCHLINE" : ""}`),
+    ...tl.beats.map((b) => `  beat ${b.id.padEnd(14)} ${b.kind.padEnd(8)} ${s(b.from)}–${s(b.to)}${b.speaker ? `  ${b.speaker}${b.narrator ? " (voice-over)" : ""}` : ""}${b.punchline ? "  PUNCHLINE" : ""}`),
     ...tl.shots.map((x) => `  cut  ${s(x.frame).padStart(6)}  ${x.framing}${x.on ? ` on ${x.on}` : ""}  (${x.reason})`),
     ...tl.punchIns.map((x) => `  punch ${s(x.frame).padStart(5)}  on ${x.on}`),
     ...tl.sfx.map((x) => `  sfx  ${s(x.frame).padStart(6)}  ${x.id}`),
     ...tl.slams.map((x) => `  slam ${s(x.from).padStart(6)}  ${x.text}`),
+    ...tl.lists.flatMap((l) => l.items.map((it, i) => `  list ${s(l.at[i]!).padStart(6)}  ${it}`)),
+    ...(tl.card ? [`  card ${s(tl.card.at[0]!).padStart(6)}  ${tl.card.kicker ? `${tl.card.kicker} / ` : ""}${tl.card.lines.join(" / ")}`] : []),
   ].join("\n");
 };

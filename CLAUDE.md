@@ -38,7 +38,7 @@ TTS is **not** called from this repo. The tamtree agent harness generates audio 
 - `src/engine/face`: expression schema, parametric mouths (`mouths.ts`), eyes/brows/mouth/symbols (`Emanata.tsx`: !, ?, speed lines)
 - `src/engine/face/visemes.ts`: Rhubarb A–H/X → mouth params, `speechMouth` layers speech on the expression mouth
 - `src/engine/voice`: voice contract schemas, `tokenize` / `alignWords` / `estimateWordsInSpans`
-- `src/engine/text`: `buildCaptionPages` (script tokens + timings → `@remotion/captions` pages), `Subtitles`, `PovCard`, `SlamText`, safe area
+- `src/engine/text`: `buildCaptionPages` (script tokens + timings → `@remotion/captions` pages), `Subtitles` (narrator pages italic/boxed), `PovCard`, `SlamText`, `ExplainerText` (title cards, list reveals; geometry in `layout.ts`), safe area
 - `src/engine/set`: set schema (with `description` / `tags` for set pickers; `catalog.ts` → `GET /sets`), palettes (tokens + `derived()` tones; no raw hex in parts), patterns, `<SetLayers>`, `seatHeightAt`
 - `src/engine/set/parts`: part components by kit (`room`, `decor`, `office`, `furniture`, `outdoor`, `street`, `home`, `venue`) and `registry.ts` (`PART_INFO`, `KIT_BACKDROP`). New part → add to `PART_INFO`; it shows up in SetLab
 - `src/engine/shots/Stage.tsx`: set background, then actors, then set foreground, under one camera

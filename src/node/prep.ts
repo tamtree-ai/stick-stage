@@ -12,6 +12,7 @@ import {
   estimateMouthCues,
   estimateWords,
   estimateWordsInSpans,
+  isNarration,
   parseSkit,
   PreparedLineSchema,
   VoiceManifestSchema,
@@ -53,18 +54,19 @@ const cachedOr = (ctx: Ctx, key: string, extraFile: string | undefined, make: ()
 
 const mouths = (ctx: Ctx, mono: string, text: string, words: PreparedLine["words"]) => (ctx.a.lipSync ? ctx.a.lipSync.cues(mono, text, ctx.gen) : estimateMouthCues(words));
 
-/** A TTS line from the harness (or `pnpm voice:say`). */
-const prepTtsLine = (ctx: Ctx, line: VoiceLine) => {
+/** A TTS line from the harness (or `pnpm voice:say`). Voice-over lines skip lip-sync: nobody mouths them. */
+const prepTtsLine = (ctx: Ctx, line: VoiceLine, voiceOver: boolean) => {
   const audio = path.join(ctx.dir, line.audio);
   if (!fs.existsSync(audio)) throw new Error(`Line "${line.id}": audio not found at ${path.relative(ctx.ws.root, audio)}`);
-  const key = hashOf(fs.readFileSync(audio), JSON.stringify({ line: { ...line, audio: undefined }, mouthTool: ctx.mouthTool, PREP_VERSION }));
+  const mouthTool = voiceOver ? "none" : ctx.mouthTool;
+  const key = hashOf(fs.readFileSync(audio), JSON.stringify({ line: { ...line, audio: undefined }, mouthTool, PREP_VERSION }));
   return cachedOr(ctx, key, undefined, () => {
     const mono = path.join(ctx.gen, `${key}.wav`);
     ctx.a.normalizer.toWav(audio, mono, { rate: 22050 });
     const durationMs = line.durationMs ?? ctx.a.probe.durationMs(mono);
     const spans = ctx.a.probe.speechSpans(mono);
     const words = line.words?.length ? alignWords(line.text, durationMs, line.words) : spans.length ? estimateWordsInSpans(line.text, spans, durationMs) : estimateWords(line.text, durationMs);
-    const mouthCues = mouths(ctx, mono, line.text, words);
+    const mouthCues = voiceOver ? [] : mouths(ctx, mono, line.text, words);
     fs.rmSync(mono);
     return {
       id: line.id,
@@ -74,7 +76,7 @@ const prepTtsLine = (ctx: Ctx, line: VoiceLine) => {
       durationMs,
       words,
       mouthCues,
-      source: { words: line.words?.length ? "tts" : "estimated", mouth: ctx.a.lipSync ? "rhubarb" : "estimated" },
+      source: { words: line.words?.length ? "tts" : "estimated", mouth: voiceOver ? "none" : ctx.a.lipSync ? "rhubarb" : "estimated" },
     };
   });
 };
@@ -156,7 +158,10 @@ export const prepSkit = (ws: Workspace, skitId: string, opts: PrepOptions = {}):
       throw new Error(`Invalid ${path.relative(ws.root, manifestPath)}:\n${parsed.error.issues.map((i) => `  ${i.path.join(".")}: ${i.message}`).join("\n")}`);
     tts = parsed.data.lines;
   }
-  const results = [...tts.map((l) => prepTtsLine(ctx, l)), ...clips.map((b) => prepClip(ctx, b))];
+  // Voice-over lines: the manifest's speaker is the narrator, or the beat says so.
+  const narration = new Set(doc?.narrator ? docBeats(doc).filter((b) => isNarration(doc, b)).map((b) => b.id) : []);
+  const voiceOver = (l: VoiceLine) => narration.has(l.id) || (!!doc?.narrator && l.speaker === doc.narrator.id);
+  const results = [...tts.map((l) => prepTtsLine(ctx, l, voiceOver(l))), ...clips.map((b) => prepClip(ctx, b))];
   if (results.some((r) => r.line.source.words === "estimated" && clips.some((c) => c.id === r.line.id)) && !a.transcriber)
     warnings.push("Word timings for file-audio beats are ESTIMATED (set WHISPER_MODEL + whisper-cli, or give audio.words).");
   const voice: PreparedVoice = { schemaVersion: 1, lines: results.map((r) => r.line) };

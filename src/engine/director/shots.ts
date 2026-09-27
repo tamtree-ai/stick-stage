@@ -100,13 +100,41 @@ export const planShots = (
       return at;
     };
 
-    if (b.kind === "line" && !b.punchline) {
+    if (b.kind === "line" && !b.punchline && !b.narrator) {
       // Plain back-and-forth stays on (or returns to) the two-shot.
       backToTwo("back to two for the next line");
       return;
     }
 
+    // A list reveal fills the upper band: go wide so the faces sit under it, and let it be the beat's one thing.
+    if (b.beat.text.some((t) => t.type === "list")) {
+      if (cam.framing !== "wide" || cam.punched) cut(from, "wide", undefined, "wide under the list");
+      return;
+    }
+
     const m = strongest(b);
+    const budgetOk = from - lastCloseup >= msToFrame(CLOSEUP_BUDGET_MS, fps);
+    if (b.narrator && !b.punchline) {
+      // Voice-over holds the scene's shot; an emotion acted under it lands like a silent beat's.
+      // …unless the scene ends before the close-up could hold.
+      const room = m !== undefined && (onTwo() ? m.frame + LAND_FRAMES : m.frame) + minHold <= msToFrame(layout.totalMs, fps);
+      if (m && room && b.beat.text.length === 0 && (prev?.punchline === true || budgetOk)) return emotionCloseup(m, "voice-over emotion");
+      backToTwo("back to two under the voice-over");
+      return;
+    }
+    if (b.narrator) {
+      // A voice-over punchline: an emotion close-up, else a punch-in on `focus`, else its slam carries it.
+      const cutAt = m ? (onTwo() ? m.frame + LAND_FRAMES : m.frame) : 0;
+      if (m && budgetOk && msToFrame(b.endMs, fps) - cutAt >= minHold) return emotionCloseup(m, "punchline emotion");
+      const who = b.beat.focus;
+      if (!who) return;
+      const twoAt = backToTwo("back to two before the punchline");
+      const lastWord = b.line?.words[b.line.words.length - 1];
+      const pf = from + msToFrame(lastWord?.startMs ?? 0, fps);
+      if (onTwo() && pf - twoAt >= 6 && pf - lastPunch >= msToFrame(MIN_PUNCH_GAP_MS, fps)) return punch(pf, who, "voice-over punchline punch-in");
+      if (onTwo()) cut(Math.max(from, pf), "close", who, "punchline close");
+      return;
+    }
     if (b.punchline) {
       // A silent punchline (a slam, a look) belongs to whoever reacts in it.
       const speaker = b.beat.speaker ?? m?.who;

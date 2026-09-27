@@ -55,6 +55,12 @@ For a skit, the lines are the spoken beats of `skit.json`: `id` = beat id, `text
 `delivery` is a free-form hint ("flat", "whispered"). `skitLines(skit)` in the engine returns
 exactly this list.
 
+**Voice-over lines** are beats whose `speaker` is the skit's `narrator.id` (default `"narrator"`).
+They come out of `skitLines` with `narrator: true` and take their hints from the skit's
+`narrator.voice` (same fields as a character's `voice`). The manifest line looks like any other,
+with `speaker` = the narrator's id. Prep aligns their words (captions, anchors) but runs no
+lip-sync: the prepared line has `mouthCues: []` and `source.mouth: "none"`.
+
 ## Then
 
 ```

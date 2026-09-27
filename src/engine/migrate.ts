@@ -9,7 +9,7 @@ export const DOC_KINDS = ["skit", "premise", "character", "pose", "expression", 
 export type DocKind = (typeof DOC_KINDS)[number];
 
 export const CURRENT_VERSIONS: Readonly<Record<DocKind, number>> = {
-  skit: 1,
+  skit: 2,
   premise: 1,
   character: 1,
   pose: 1,
@@ -27,8 +27,10 @@ type Doc = Record<string, unknown>;
 export type Migration = { from: number; to: number; note: string; up: (doc: Doc) => Doc };
 export type MigrationRegistry = Partial<Record<DocKind, readonly Migration[]>>;
 
-/** No incompatible changes yet: every kind is at version 1. */
-export const MIGRATIONS: MigrationRegistry = {};
+export const MIGRATIONS: MigrationRegistry = {
+  // v2 adds `narrator`, beat `focus`, scene `card`, list text cues and empty scene casts. Every v1 skit is a valid v2 skit.
+  skit: [{ from: 1, to: 2, note: "narrator, cards and list text (no changes to v1 fields)", up: (doc) => doc }],
+};
 
 export type Migrated<T = unknown> = { doc: T; applied: string[] };
 

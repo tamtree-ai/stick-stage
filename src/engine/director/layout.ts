@@ -1,7 +1,7 @@
 import type { PreparedLine } from "../voice/schema";
 import { resolveAnchor, type AnchorContext } from "./anchors";
 import type { Diagnostic } from "./diagnostics";
-import type { Anchor, Beat, Skit } from "./schema";
+import { isNarration, type Anchor, type Beat, type Skit } from "./schema";
 import type { BeatKind } from "./timeline";
 
 export const DEFAULT_SILENT_MS = 900;
@@ -15,6 +15,8 @@ export type LaidBeat = {
   kind: BeatKind;
   synthetic: boolean;
   punchline: boolean;
+  /** A voice-over line: nobody on stage speaks it. */
+  narrator: boolean;
   /** Absolute ms where anchors are measured from: line start (spoken) or beat start (silent). */
   zeroMs: number;
   /** Beat start/end in absolute ms (end includes the hold after). */
@@ -37,11 +39,17 @@ export const punchlineIndexes = (skit: Skit): Set<number> => {
   return new Set();
 };
 
-/** The listener who reacts to `speaker`: whoever spoke last before them, else the first other cast member. */
+/**
+ * The listener who reacts to `speaker`: whoever spoke last before them, else the first other
+ * cast member. Nobody reacts to the narrator except the beat's `focus`.
+ */
 export const reactorFor = (skit: Skit, beatIndex: number, speaker: string): string | undefined => {
+  const beat = skit.beats[beatIndex];
+  if (beat && isNarration(skit, beat)) return beat.focus;
+  const onStage = (id: string) => skit.cast.some((c) => c.id === id);
   for (let i = beatIndex - 1; i >= 0; i--) {
     const s = skit.beats[i]!.speaker;
-    if (s && s !== speaker) return s;
+    if (s && s !== speaker && onStage(s)) return s;
   }
   return skit.cast.find((c) => c.id !== speaker)?.id;
 };
@@ -76,6 +84,7 @@ export const layoutBeats = (
       kind,
       synthetic,
       punchline: isPunch,
+      narrator: kind === "line" && isNarration(skit, beat),
       zeroMs: fromMs,
       fromMs,
       endMs: fromMs + durMs + hold,
@@ -123,7 +132,7 @@ export const layoutBeats = (
     if (next?.silent) return; // The skit already has its own reaction beat.
     const r = reactionFor(beat, i);
     if (!r) return;
-    const synthetic: Beat = { ...beat, id: `${beat.id}-reaction`, speaker: undefined, line: undefined, silent: true, durationMs: REACTION_MS, pauseBeforeMs: 0, holdAfterMs: 0, shot: undefined, actions: [], sfx: [], text: [], punchline: false };
+    const synthetic: Beat = { ...beat, id: `${beat.id}-reaction`, speaker: undefined, focus: undefined, line: undefined, silent: true, durationMs: REACTION_MS, pauseBeforeMs: 0, holdAfterMs: 0, shot: undefined, actions: [], sfx: [], text: [], punchline: false };
     push(synthetic, path, "reaction", true, false, { reactor: r.reactor, reactionExpression: r.expression });
   });
   return { beats: out, totalMs: cursor + skit.timing.tailMs };

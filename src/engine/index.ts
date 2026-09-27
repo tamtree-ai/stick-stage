@@ -29,6 +29,7 @@ export * from "./text/safeArea";
 export { Subtitles } from "./text/Subtitles";
 export { PovCard } from "./text/PovCard";
 export { SlamText } from "./text/SlamText";
+export { CardText, ListText } from "./text/ExplainerText";
 export { CastLabels } from "./text/CastLabels";
 export { Face } from "./face/Face";
 export * from "./set/schema";

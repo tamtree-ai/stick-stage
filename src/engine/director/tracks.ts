@@ -217,7 +217,8 @@ export const buildTracks = (skit: Skit, layout: Layout, set: SetDef, lib: Librar
     const m: Moment[] = [];
     moments.set(b, m);
     const from = msToFrame(b.fromMs, fps);
-    if (b.kind === "line") {
+    // Voice-over: no mouth, no body, and nobody on stage turns to it.
+    if (b.kind === "line" && !b.narrator) {
       const speaker = ctx.byId.get(b.beat.speaker!);
       if (!speaker) {
         diags.push(unknownId("speaker", b.beat.speaker!, [...ctx.byId.keys()], [...b.path, "speaker"]));

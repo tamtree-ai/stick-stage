@@ -61,12 +61,25 @@ export const ShotSchema = z.strictObject({
 export type Shot = z.infer<typeof ShotSchema>;
 
 export const SfxCueSchema = z.strictObject({ id: z.string().min(1), at, volume: z.number().min(0).max(2).default(1) });
-export const TextCueSchema = z.strictObject({
-  type: z.literal("slam"),
-  value: z.string().min(1).max(40),
-  at,
-  durationMs: z.number().min(200).max(5000).default(1100),
-});
+export const MAX_LIST_ITEMS = 5;
+export const TextCueSchema = z.discriminatedUnion("type", [
+  z.strictObject({
+    type: z.literal("slam"),
+    value: z.string().min(1).max(40),
+    at,
+    durationMs: z.number().min(200).max(5000).default(1100),
+  }),
+  /** Items stack in the upper-middle band; each pops in on its anchor and stays until the next cut. */
+  z
+    .strictObject({
+      type: z.literal("list"),
+      items: z.array(z.string().min(1).max(40)).min(1).max(MAX_LIST_ITEMS),
+      /** One anchor per item. */
+      at: z.array(AnchorSchema).min(1).max(MAX_LIST_ITEMS),
+    })
+    .refine((t) => t.items.length === t.at.length, { message: `"at" needs one anchor per item`, path: ["at"] }),
+]);
+export type TextCue = z.infer<typeof TextCueSchema>;
 
 export const AudioSourceSchema = z.discriminatedUnion("source", [
   z.strictObject({ source: z.literal("tts") }),
@@ -102,6 +115,11 @@ export const BeatSchema = z.strictObject({
   audio: AudioSourceSchema.default({ source: "tts" }),
   /** Free-form delivery hint for the TTS in the harness (e.g. "whispered", "flat"). */
   delivery: z.string().optional(),
+  /**
+   * Narrator beats: the cast member the voice-over is about. They get the punchline punch-in
+   * and the reaction beat; without `focus` the camera holds the scene's shot.
+   */
+  focus: z.string().min(1).optional(),
   /** Listeners' reaction expression on the last word, or `false` for none. Default from `reactions.json`. */
   reaction: z.union([z.string().min(1), z.literal(false)]).optional(),
   /** Optional: the default shot policy frames the beat when omitted. */
@@ -136,6 +154,38 @@ export const TransitionSchema = z.strictObject({
 });
 export type Transition = z.infer<typeof TransitionSchema>;
 
+/**
+ * Title card: an optional small kicker line, then the title stacked in big words. The kicker
+ * shows from the scene start; the title pops in on `at` (in the beat `beat`, default the scene's
+ * first beat). One anchor per title line reveals the lines one by one; `\n` forces a break.
+ */
+export const CardSchema = z.strictObject({
+  kicker: z.string().min(1).max(60).optional(),
+  title: z.string().min(1).max(60),
+  beat: z.string().min(1).optional(),
+  at: z.union([AnchorSchema, z.array(AnchorSchema).min(1).max(3)]).optional(),
+});
+export type Card = z.infer<typeof CardSchema>;
+
+/** The off-screen voice: beats whose `speaker` is the narrator's `id` are voice-over. */
+export const NarratorSchema = z.strictObject({
+  id: z.string().min(1).default("narrator"),
+  /** Hints for the harness TTS, like a character's `voice`; `say` is the macOS dev voice. */
+  voice: z
+    .strictObject({
+      provider: z.string().optional(),
+      voiceId: z.string().optional(),
+      settings: z.record(z.string(), z.unknown()).default({}),
+      say: z.string().optional(),
+    })
+    .optional(),
+  /** How narrator subtitles differ from dialog. */
+  captionStyle: z.enum(["italic", "boxed"]).default("italic"),
+  /** Name in the post text and `.srt`. */
+  name: z.string().min(1).max(24).default("Narrator"),
+});
+export type Narrator = z.infer<typeof NarratorSchema>;
+
 /** A cast member's placement in one scene (omitted fields come from the skit's `cast`). */
 export const SceneCastSchema = z.strictObject({
   id: z.string().min(1),
@@ -152,13 +202,15 @@ export const SceneSchema = z.strictObject({
   id: z.string().regex(/^[A-Za-z0-9_-]+$/, "letters, digits, - and _ only"),
   /** Default: the skit's `set`. */
   set: z.string().min(1).optional(),
-  /** Who is in this scene and where. Default: the whole cast at their skit marks. */
-  cast: z.array(SceneCastSchema).min(1).optional(),
+  /** Who is in this scene and where. Default: the whole cast at their skit marks (none on a card scene). `[]`: nobody (narrator-only). */
+  cast: z.array(SceneCastSchema).optional(),
   /** How this scene comes in (ignored on the first scene). Default: a 400 ms fade. */
   // eslint-disable-next-line @remotion/non-pure-animation -- a skit field, not a CSS transition
   transition: TransitionSchema.optional(),
   /** POV card for this scene. Default: the skit's `overlay.pov` on the first scene only. */
   pov: z.string().max(80).optional(),
+  /** A full-frame title card over the set, timed by the scene's (narrator) beats. */
+  card: CardSchema.optional(),
   beats: z.array(BeatSchema).min(1),
 });
 export type Scene = z.infer<typeof SceneSchema>;
@@ -191,11 +243,13 @@ export const SkitSchema = z
   .strictObject({
     /** Editor hint (JSON Schema path); ignored. */
     $schema: z.string().optional(),
-    schemaVersion: z.literal(1),
+    schemaVersion: z.literal(2),
     meta: MetaSchema,
     /** The set (single-scene skits), or the default set for scenes. */
     set: z.string().min(1).optional(),
     cast: z.array(CastSchema).min(1).max(4),
+    /** Off-screen voice-over (optional). */
+    narrator: NarratorSchema.optional(),
     overlay: z
       .strictObject({ pov: z.string().max(80).optional(), subtitles: z.boolean().default(true) })
       .default({ subtitles: true }),
@@ -210,12 +264,17 @@ export const SkitSchema = z
     d.scenes?.forEach((sc, i) => {
       if (!sc.set && !d.set) ctx.addIssue({ code: "custom", path: ["scenes", i, "set"], message: `scene "${sc.id}" needs a "set" (or give the skit one)` });
     });
+    if (d.narrator && d.cast.some((c) => c.id === d.narrator!.id))
+      ctx.addIssue({ code: "custom", path: ["narrator", "id"], message: `the narrator's id "${d.narrator.id}" is also a cast id; rename one` });
   });
 export type SkitDoc = z.infer<typeof SkitSchema>;
 export type SkitInput = z.input<typeof SkitSchema>;
 
 /** One resolved scene, as the director compiles it (a single-scene skit is exactly this). */
-export type Skit = Omit<SkitDoc, "set" | "beats" | "scenes"> & { set: string; beats: Beat[] };
+export type Skit = Omit<SkitDoc, "set" | "beats" | "scenes"> & { set: string; beats: Beat[]; card?: Card };
+
+/** Is this beat a voice-over (spoken by the skit's narrator)? */
+export const isNarration = (skit: Pick<SkitDoc, "narrator">, b: Pick<Beat, "speaker">): boolean => !!skit.narrator && b.speaker === skit.narrator.id;
 
 /** Every beat of a skit document, across scenes. */
 export const docBeats = (d: SkitDoc): Beat[] => d.beats ?? d.scenes!.flatMap((s) => s.beats);

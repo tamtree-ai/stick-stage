@@ -24,10 +24,9 @@ export type ValidateResult = {
   check: CheckReport;
 };
 
-const voiceHint = (p: Project, character: string): VoiceHint | undefined => {
-  const v = p.lib.characters[character]?.voice;
-  return v && { provider: v.provider, voiceId: v.voiceId, settings: v.settings };
-};
+type Hints = { provider?: string; voiceId?: string; settings?: Record<string, unknown> } | undefined;
+const hint = (v: Hints): VoiceHint | undefined => v && { provider: v.provider, voiceId: v.voiceId, settings: v.settings };
+const voiceHint = (p: Project, character: string): VoiceHint | undefined => hint(p.lib.characters[character]?.voice);
 
 const versions = new WeakMap<Project, string>();
 /** The project's registry is fixed for the life of the service, so hash it once. */
@@ -51,7 +50,8 @@ export const validate = (p: Project, body: unknown): ValidateResult => {
       ok: d.ok,
       catalogVersion: version,
       skit,
-      lines: d.lines.map((l) => ({ ...l, voice: voiceHint(p, l.character) })),
+      // Voice-over lines take the skit's narrator voice; the rest their character's.
+      lines: d.lines.map((l) => ({ ...l, voice: l.narrator ? hint(d.result.doc.narrator?.voice) : voiceHint(p, l.character) })),
       estimatedDurationSec: d.estimatedDurationSec,
       warnings: d.warnings,
       check: d.check,

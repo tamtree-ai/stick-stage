@@ -39,6 +39,8 @@ that the client pinned; when it differs from the service's, the answer is `409 c
   say, and what `voice.json` must repeat verbatim.
 - `voice` holds the character's hints from `src/data/characters/<id>.json`. It is absent when the
   character has none, and then the plugin picks a voice.
+- A voice-over line has `"narrator": true`, `speaker` = the narrator's id, and `voice` from the
+  skit's `narrator.voice` (not a character). Voice it like any other line; prep skips lip-sync for it.
 - `check` runs the self-check with placeholder timings (~160 wpm). The real check runs again at
   render with the real audio.
 - `422 invalid-skit` means the premise or skit has errors. File-clip beats (`audio.source: "file"`) are

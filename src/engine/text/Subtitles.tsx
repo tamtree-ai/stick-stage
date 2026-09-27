@@ -27,6 +27,8 @@ export type SubtitlesProps = {
   fontSize?: number;
   /** Hide (e.g. while slam text shows the same word). */
   hidden?: boolean;
+  /** How narrator (voice-over) pages differ from dialog. Default italic. */
+  narratorStyle?: "italic" | "boxed";
 };
 
 /** Frames for a new page to pop in. */
@@ -37,7 +39,7 @@ const POP_FRAMES = 3;
  * lifts and grows slightly, so it still reads without color (and in grayscale previews).
  * Spaces are separate text nodes so the grown word never eats its neighbours' gaps.
  */
-export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, height, safeArea, style, y = SUBTITLE.y, fontSize = SUBTITLE.fontSize, hidden }) => {
+export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, height, safeArea, style, y = SUBTITLE.y, fontSize = SUBTITLE.fontSize, hidden, narratorStyle = "italic" }) => {
   if (hidden) return null;
   const ms = (frame / fps) * 1000;
   const page = pageAt(pages, ms);
@@ -47,26 +49,15 @@ export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, 
   const pageFrame = frame - (page.startMs / 1000) * fps;
   const pop = 0.86 + 0.14 * easeOutBack(pageFrame / POP_FRAMES, 2);
   const outline = style.outline ?? SUBTITLE.outline;
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: safe.x,
-        width: safe.w,
-        top: cy,
-        transform: `translateY(-50%) scale(${pop.toFixed(3)})`,
-        textAlign: "center",
-        fontFamily: style.fontFamily,
-        fontWeight: 800,
-        fontSize,
-        lineHeight: SUBTITLE.lineHeight,
-        color: style.color ?? SUBTITLE.fill,
-        WebkitTextStroke: `${Math.round(fontSize * 0.2)}px ${outline}`,
-        paintOrder: "stroke fill",
-        whiteSpace: "pre-wrap",
-        textShadow: `0 ${Math.round(fontSize * 0.08)}px 0 ${outline}`,
-      }}
-    >
+  // Voice-over reads apart from dialog: italic, or on a dark box, in the same place.
+  const boxed = page.narrator && narratorStyle === "boxed";
+  const voiceOver: React.CSSProperties = !page.narrator
+    ? {}
+    : boxed
+      ? { WebkitTextStroke: undefined, textShadow: undefined, fontWeight: 700 }
+      : { fontStyle: "italic" };
+  const words = (
+    <>
       {page.tokens.map((t, i) => {
         const active = ms >= t.fromMs && ms < t.toMs;
         const word = t.text.trimStart();
@@ -85,6 +76,44 @@ export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, 
           </React.Fragment>
         );
       })}
+    </>
+  );
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: safe.x,
+        width: safe.w,
+        top: cy,
+        transform: `translateY(-50%) scale(${pop.toFixed(3)})`,
+        textAlign: "center",
+        fontFamily: style.fontFamily,
+        fontWeight: 800,
+        fontSize,
+        lineHeight: SUBTITLE.lineHeight,
+        color: style.color ?? SUBTITLE.fill,
+        WebkitTextStroke: `${Math.round(fontSize * 0.2)}px ${outline}`,
+        paintOrder: "stroke fill",
+        whiteSpace: "pre-wrap",
+        textShadow: `0 ${Math.round(fontSize * 0.08)}px 0 ${outline}`,
+        ...voiceOver,
+      }}
+    >
+      {boxed ? (
+        <span
+          style={{
+            display: "inline-block",
+            background: SUBTITLE.box,
+            borderRadius: fontSize * 0.3,
+            padding: `${fontSize * 0.12}px ${fontSize * 0.36}px`,
+            boxShadow: `0 ${Math.round(fontSize * 0.08)}px 0 ${outline}`,
+          }}
+        >
+          {words}
+        </span>
+      ) : (
+        words
+      )}
     </div>
   );
 };

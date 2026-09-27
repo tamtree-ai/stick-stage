@@ -64,7 +64,8 @@ export const PreparedLineSchema = z.object({
   source: z.object({
     /** tts: provider timings; manual: given in skit.json; whisper: transcribed; estimated: from silences. */
     words: z.enum(["tts", "manual", "whisper", "estimated"]),
-    mouth: z.enum(["rhubarb", "estimated"]),
+    /** none: a voice-over line (the narrator has no mouth). */
+    mouth: z.enum(["rhubarb", "estimated", "none"]),
   }),
 });
 export type PreparedLine = z.infer<typeof PreparedLineSchema>;

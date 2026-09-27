@@ -16,6 +16,7 @@ export { Stage, FULL_FRAME, type Camera, type StageActor, type StageProps } from
 export { Subtitles, type SubtitlesProps, type TextStyle } from "./text/Subtitles";
 export { PovCard } from "./text/PovCard";
 export { SlamText } from "./text/SlamText";
+export { CardText, ListText } from "./text/ExplainerText";
 export { CastLabels } from "./text/CastLabels";
 export { Skit, type SkitProps } from "./director/Skit";
 export { SkitProgram, SkitProgram as StickStageComposition, type SkitProgramProps } from "./director/Program";

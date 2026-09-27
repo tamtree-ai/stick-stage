@@ -68,4 +68,33 @@ describe("prepare step behind adapters", () => {
     expect(r.warnings[0]).toContain("ESTIMATED");
     expect(() => prepSkit(ws, "t", { adapters: { ...fake, lipSync: undefined }, requireLipSync: true })).toThrow("Rhubarb not found");
   });
+  it("narrator lines get word timings but no lip-sync", () => {
+    const n = ws.skitDir("n");
+    fs.mkdirSync(path.join(n, "voice"), { recursive: true });
+    fs.copyFileSync(path.join(dir, "voice/a.wav"), path.join(n, "voice/v.wav"));
+    fs.copyFileSync(path.join(dir, "voice/a.wav"), path.join(n, "voice/m.wav"));
+    const skit = {
+      schemaVersion: 2,
+      meta: { title: "n" },
+      set: "plain-1",
+      narrator: { id: "narrator" },
+      cast: [{ id: "milo", character: "milo", mark: "center" }],
+      beats: [
+        { id: "v", speaker: "narrator", line: "Hello there. Friend." },
+        { id: "m", speaker: "milo", line: "Hello there. Friend." },
+      ],
+    };
+    fs.writeFileSync(path.join(n, "skit.json"), JSON.stringify(skit));
+    const lines = [
+      { id: "v", speaker: "narrator", text: "Hello there. Friend.", audio: "voice/v.wav" },
+      { id: "m", speaker: "milo", text: "Hello there. Friend.", audio: "voice/m.wav" },
+    ];
+    fs.writeFileSync(path.join(n, "voice.json"), JSON.stringify({ schemaVersion: 1, lines }));
+    calls.length = 0;
+    const [v, m] = prepSkit(ws, "n", { adapters: fake }).voice.lines;
+    expect(v).toMatchObject({ mouthCues: [], source: { mouth: "none" } });
+    expect(v!.words).toHaveLength(3);
+    expect(m!.source.mouth).toBe("rhubarb");
+    expect(calls.filter((c) => c === "lipsync")).toHaveLength(1);
+  });
 });

@@ -5,7 +5,7 @@ import { safeRect, type Rect, type SafeArea } from "./safeArea";
  * Text overlay geometry shared by the components and the visual QA checks, so the checks
  * measure what is drawn. Widths are estimates for the bold sans text font (Montserrat 700–900).
  */
-export const SUBTITLE = { y: 0.62, fontSize: 74, lineHeight: 1.15, fill: "#ffffff", highlight: "#ffd84a", outline: "#111114" } as const;
+export const SUBTITLE = { y: 0.62, fontSize: 74, lineHeight: 1.15, fill: "#ffffff", highlight: "#ffd84a", outline: "#111114", box: "#16161aee" } as const;
 export const POV = { fontSize: 52, lineHeight: 1.18, fill: "#16161a", card: "#ffffff" } as const;
 export const SLAM = { y: 0.64, fontSize: 190, lineHeight: 1, fill: "#ffffff", outline: "#111114" } as const;
 
@@ -103,3 +103,96 @@ export const overlaps = (a: Rect, b: Rect): boolean => a.x < b.x + b.w && b.x < 
 /** `inner` inside `outer`, allowing `tol` px of overhang. */
 export const inside = (inner: Rect, outer: Rect, tol = 0): boolean =>
   inner.x >= outer.x - tol && inner.y >= outer.y - tol && inner.x + inner.w <= outer.x + outer.w + tol && inner.y + inner.h <= outer.y + outer.h + tol;
+
+/**
+ * Explainer text (cards, lists) lives in the upper-middle band: from the top safe edge down to
+ * just above the subtitles, which keep their place under it.
+ */
+export const textBand = (width: number, height: number, sa: SafeArea): Rect => {
+  const safe = safeRect(sa, width, height);
+  const bottom = SUBTITLE.y * height - SUBTITLE.fontSize * 1.5;
+  return { x: safe.x, y: safe.y, w: safe.w, h: Math.max(0, bottom - safe.y) };
+};
+
+export const CARD = { fontSize: 190, minFontSize: 96, lineHeight: 1, kickerSize: 56, maxLines: 3, fill: "#ffffff", outline: "#111114", scrim: "rgba(17,17,20,0.62)" } as const;
+
+export type CardLayout = {
+  fontSize: number;
+  lines: string[];
+  /** Center of each title line (px). */
+  lineY: number[];
+  kicker?: { fontSize: number; lines: string[]; rect: Rect };
+  /** The title block. */
+  rect: Rect;
+  /** Fits the band at `minFontSize` or larger, in at most `maxLines` lines. */
+  fits: boolean;
+};
+
+/**
+ * Title card: the biggest title size (190 → 96 px) whose stacked lines fit the band under the
+ * kicker. `\n` in the title forces the line breaks; otherwise words wrap.
+ */
+export const cardLayout = (title: string, kicker: string | undefined, width: number, height: number, sa: SafeArea): CardLayout => {
+  const band = textBand(width, height, sa);
+  const w = band.w * 0.94;
+  const forced = title.includes("\n") ? title.split("\n").map((l) => l.trim()).filter(Boolean) : undefined;
+  const kLines = kicker ? wrapLines(kicker, CARD.kickerSize, w) : [];
+  const kH = kLines.length ? kLines.length * CARD.kickerSize * 1.2 + CARD.kickerSize * 0.6 : 0;
+  const titleH = (n: number, fs: number) => n * fs * CARD.lineHeight + fs * 0.2;
+  const tryAt = (fs: number) => {
+    const lines = forced ?? wrapLines(title, fs, w);
+    const ok = lines.length <= CARD.maxLines && lines.every((l) => textWidth(l, fs) <= w) && kH + titleH(lines.length, fs) <= band.h;
+    return { lines, ok };
+  };
+  let fontSize: number = CARD.minFontSize;
+  let { lines, ok: fits } = tryAt(fontSize);
+  for (let fs = CARD.fontSize; fs >= CARD.minFontSize; fs -= 6) {
+    const got = tryAt(fs);
+    if (got.ok) {
+      [fontSize, lines, fits] = [fs, got.lines, true];
+      break;
+    }
+  }
+  const tH = titleH(lines.length, fontSize);
+  // The block (kicker + title) sits centered in the band.
+  const top = band.y + Math.max(0, (band.h - kH - tH) / 2);
+  const cx = band.x + band.w / 2;
+  const tw = Math.max(...lines.map((l) => textWidth(l, fontSize))) + fontSize * 0.26;
+  const rect = { x: cx - tw / 2, y: top + kH, w: tw, h: tH };
+  const lineY = lines.map((_, i) => top + kH + fontSize * 0.1 + (i + 0.5) * fontSize * CARD.lineHeight);
+  const kw = kLines.length ? Math.max(...kLines.map((l) => textWidth(l, CARD.kickerSize))) + CARD.kickerSize : 0;
+  return {
+    fontSize,
+    lines,
+    lineY,
+    kicker: kLines.length ? { fontSize: CARD.kickerSize, lines: kLines, rect: { x: cx - kw / 2, y: top, w: kw, h: kH - CARD.kickerSize * 0.4 } } : undefined,
+    rect,
+    fits,
+  };
+};
+
+export const LIST = { fontSize: 104, minFontSize: 60, lineHeight: 1.3, fill: "#ffffff", outline: "#111114" } as const;
+
+export type ListLayout = { fontSize: number; itemY: number[]; rects: Rect[]; fits: boolean };
+
+/** List reveal: one line per item, the biggest size (104 → 60 px) that fits them all, from the top of the band (faces go under it). */
+export const listLayout = (items: readonly string[], width: number, height: number, sa: SafeArea): ListLayout => {
+  const band = textBand(width, height, sa);
+  const w = band.w * 0.94;
+  const blockH = (fs: number) => items.length * fs * LIST.lineHeight;
+  const fitsAt = (fs: number) => items.every((t) => textWidth(t, fs) <= w) && blockH(fs) + fs * 0.2 <= band.h;
+  let fontSize: number = LIST.minFontSize;
+  for (let fs = LIST.fontSize; fs >= LIST.minFontSize; fs -= 4)
+    if (fitsAt(fs)) {
+      fontSize = fs;
+      break;
+    }
+  const top = band.y + fontSize * 0.2;
+  const cx = band.x + band.w / 2;
+  const itemY = items.map((_, i) => top + (i + 0.5) * fontSize * LIST.lineHeight);
+  const rects = items.map((t, i) => {
+    const tw = textWidth(t, fontSize) + fontSize * 0.3;
+    return around(cx, itemY[i]!, tw, fontSize * 1.1);
+  });
+  return { fontSize, itemY, rects, fits: fitsAt(fontSize) };
+};

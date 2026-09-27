@@ -18,7 +18,10 @@ cuts (two-shots, punch-ins, emotion close-ups), subtitles, SFX and rendering.
 ```sh
 pnpm install
 pnpm dev            # Remotion Studio
+scripts/start.sh    # render service in the background (scripts/stop.sh to stop)
 ```
+
+Step by step, with the service and troubleshooting: [docs/getting-started.md](docs/getting-started.md).
 
 ## Make a skit
 
