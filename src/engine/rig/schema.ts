@@ -25,7 +25,7 @@ export const TorsoStyleSchema = z.discriminatedUnion("style", [
 ]);
 
 export const AccessorySchema = z.object({
-  slot: z.enum(["hair", "eyewear", "headwear", "neck"]),
+  slot: z.enum(["hair", "eyewear", "headwear", "neck", "body"]),
   id: z.string(),
   color: hex.optional(),
 });

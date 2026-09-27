@@ -1,8 +1,11 @@
 import React from "react";
-import { f2 } from "../lib/math";
+import { f2, type Vec2 } from "../lib/math";
 import type { Accessory, Character } from "./schema";
 
-export type AccessoryLayer = "back" | "front" | "eyewear";
+export type AccessoryLayer = "back" | "front" | "eyewear" | "body";
+
+/** Torso segment in figure space. Only the body layer uses it. */
+export type BodyAnchor = { hip: Vec2; neck: Vec2; heightPx: number };
 
 type AccessoryDraw = (a: {
   R: number;
@@ -10,6 +13,9 @@ type AccessoryDraw = (a: {
   sw: number;
   color: string;
   character: Character;
+  hip?: Vec2;
+  neck?: Vec2;
+  heightPx?: number;
 }) => React.ReactNode;
 
 type AccessoryDef = { slot: Accessory["slot"]; layers: Partial<Record<AccessoryLayer, AccessoryDraw>> };
@@ -91,6 +97,138 @@ const REGISTRY: Record<string, AccessoryDef> = {
       },
     },
   },
+  "pigtails-01": {
+    slot: "hair",
+    layers: {
+      back: ({ R, stroke, sw, color }) => (
+        <g>
+          {[
+            { deg: -112, r: 0.34 },
+            { deg: 58, r: 0.3 },
+          ].map((p) => {
+            const c = onHead(R, p.deg, 1.05);
+            return <circle key={p.deg} cx={c.x} cy={c.y} r={p.r * R} fill={color} stroke={stroke} strokeWidth={sw} />;
+          })}
+        </g>
+      ),
+      front: ({ R, stroke, sw, color }) => {
+        const outer: string[] = [];
+        const inner: string[] = [];
+        for (let i = 0; i <= 6; i++) {
+          const deg = -28 + (78 * i) / 6;
+          const o = onHead(R, deg, 1.06);
+          const inn = onHead(R, deg, 0.72);
+          outer.push(`${f2(o.x)},${f2(o.y)}`);
+          inner.push(`${f2(inn.x)},${f2(inn.y)}`);
+        }
+        inner.reverse();
+        return <polygon points={[...outer, ...inner].join(" ")} fill={color} stroke={stroke} strokeWidth={sw} strokeLinejoin="round" />;
+      },
+    },
+  },
+  "crop-01": {
+    slot: "hair",
+    layers: {
+      front: ({ R, stroke, sw, color }) => {
+        // A cap on the crown only. The old span ran down over the facing eye.
+        const outer: string[] = [];
+        const inner: string[] = [];
+        const n = 7;
+        const start = -70;
+        const end = 36;
+        for (let i = 0; i <= n; i++) {
+          const deg = start + ((end - start) * i) / n;
+          const tuft = i === n - 1 ? 0.22 : 0;
+          const o = onHead(R, deg, 1.08 + tuft);
+          const inn = onHead(R, deg, 0.8);
+          outer.push(`${f2(o.x)},${f2(o.y)}`);
+          inner.push(`${f2(inn.x)},${f2(inn.y)}`);
+        }
+        inner.reverse();
+        return <polygon points={[...outer, ...inner].join(" ")} fill={color} stroke={stroke} strokeWidth={sw} strokeLinejoin="round" />;
+      },
+    },
+  },
+  "ears-long-01": {
+    slot: "hair",
+    layers: {
+      back: ({ R, stroke, sw, color }) => {
+        const ear = (side: number, scaleEar: number) => {
+          const w = 0.2 * R * scaleEar;
+          const h = 1.4 * R * scaleEar;
+          const cx = side * 0.36 * R;
+          const baseY = -0.62 * R;
+          const top = baseY - h;
+          const outer =
+            `M ${f2(cx - w)} ${f2(baseY)} ` +
+            `Q ${f2(cx - w * 1.05)} ${f2(top + h * 0.2)} ${f2(cx)} ${f2(top)} ` +
+            `Q ${f2(cx + w * 1.05)} ${f2(top + h * 0.2)} ${f2(cx + w)} ${f2(baseY)} Z`;
+          const inner =
+            `M ${f2(cx - w * 0.42)} ${f2(baseY - h * 0.12)} ` +
+            `Q ${f2(cx - w * 0.42)} ${f2(top + h * 0.32)} ${f2(cx)} ${f2(top + h * 0.22)} ` +
+            `Q ${f2(cx + w * 0.42)} ${f2(top + h * 0.32)} ${f2(cx + w * 0.42)} ${f2(baseY - h * 0.12)} Z`;
+          return (
+            <g key={side}>
+              <path d={outer} fill={color} stroke={stroke} strokeWidth={sw} strokeLinejoin="round" />
+              <path d={inner} fill="#f3b7c8" />
+            </g>
+          );
+        };
+        return (
+          <g>
+            {ear(-1, 0.9)}
+            {ear(1, 1)}
+          </g>
+        );
+      },
+    },
+  },
+  "shell-01": {
+    slot: "body",
+    layers: {
+      body: ({ stroke, sw, color, hip, neck, heightPx }) => {
+        if (!hip || !neck || heightPx == null) return null;
+        const dx = neck.x - hip.x;
+        const dy = neck.y - hip.y;
+        const torsoLen = Math.hypot(dx, dy) || 1;
+        const angle = (Math.atan2(dx, -dy) * 180) / Math.PI;
+        const rx = heightPx * 0.2;
+        const ry = heightPx * 0.15;
+        const chord = (y: number) => {
+          const x = rx * Math.sqrt(Math.max(0, 1 - (y * y) / (ry * ry))) * 0.86;
+          return `M ${f2(-x)} ${f2(y)} L ${f2(x)} ${f2(y)}`;
+        };
+        return (
+          <g transform={`translate(${f2(hip.x)} ${f2(hip.y)}) rotate(${f2(angle)})`}>
+            <g transform={`translate(${f2(-heightPx * 0.04)} ${f2(-torsoLen * 0.42)})`}>
+              <ellipse cx={0} cy={0} rx={rx} ry={ry} fill={color} stroke={stroke} strokeWidth={sw} />
+              <path
+                d={`${chord(-ry * 0.32)} ${chord(ry * 0.28)} M 0 ${f2(-ry * 0.78)} L 0 ${f2(ry * 0.78)}`}
+                fill="none"
+                stroke={stroke}
+                strokeWidth={sw * 0.45}
+                strokeLinecap="round"
+              />
+            </g>
+          </g>
+        );
+      },
+    },
+  },
+  "tail-puff-01": {
+    slot: "body",
+    layers: {
+      body: ({ stroke, sw, color, hip, neck, heightPx }) => {
+        if (!hip || !neck || heightPx == null) return null;
+        const angle = (Math.atan2(neck.x - hip.x, hip.y - neck.y) * 180) / Math.PI;
+        return (
+          <g transform={`translate(${f2(hip.x)} ${f2(hip.y)}) rotate(${f2(angle)})`}>
+            <circle cx={-heightPx * 0.075} cy={heightPx * 0.02} r={heightPx * 0.038} fill={color} stroke={stroke} strokeWidth={sw * 0.65} />
+          </g>
+        );
+      },
+    },
+  },
   "glasses-round": {
     slot: "eyewear",
     layers: {
@@ -119,6 +257,7 @@ export const renderAccessories = (
   character: Character,
   layer: AccessoryLayer,
   R: number,
+  body?: BodyAnchor,
 ): React.ReactNode =>
   character.accessories.map((a, i) => {
     const def = REGISTRY[a.id];
@@ -133,6 +272,9 @@ export const renderAccessories = (
           sw: character.style.strokeWidth,
           color: a.color ?? character.style.stroke,
           character,
+          hip: body?.hip,
+          neck: body?.neck,
+          heightPx: body?.heightPx,
         })}
       </g>
     );

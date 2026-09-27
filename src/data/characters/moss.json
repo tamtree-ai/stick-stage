@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "moss",
+  "displayName": "Moss",
+  "proportions": { "height": 0.8, "headRadius": 0.155, "neck": 0.008, "torso": 0.2, "upperArm": 0.11, "forearm": 0.1, "thigh": 0.12, "shin": 0.11 },
+  "style": {
+    "stroke": "#1b1b1f",
+    "strokeWidth": 12,
+    "headFill": "#d7ecc4",
+    "torso": { "style": "bean", "fill": "#7dba62", "width": 0.16 },
+    "limbCurve": 0.2,
+    "hands": "nub",
+    "feet": "oval",
+    "footFill": "#3f6b34"
+  },
+  "face": { "eyes": "dot", "brows": true, "mouthSet": "default", "offsetX": 0.1, "eyeSpacing": 0.42, "eyeY": 0.02, "mouthY": 0.48 },
+  "accessories": [{ "slot": "body", "id": "shell-01", "color": "#3e6a38" }],
+  "voice": { "say": "Fred" }
+}

@@ -16,6 +16,8 @@ Run everything from the repo root (the folder with `package.json`).
 
 ## 0. Before you start
 
+- The house pair is Milo and June. Lila and Theo (kids) and Moss and Dash (turtle and hare) are
+  in the catalog when the bit needs them. The writer prompt already says how each one is played.
 - Pick a skit id: a lowercase slug of the topic, e.g. `group-chat`. If
   `public/skits/<id>/` already exists, add `-2`, `-3`, and so on. Never overwrite another skit.
 

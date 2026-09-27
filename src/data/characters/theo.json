@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "theo",
+  "displayName": "Theo",
+  "proportions": { "height": 0.74, "headRadius": 0.2, "neck": 0.012, "torso": 0.23, "upperArm": 0.12, "forearm": 0.11, "thigh": 0.14, "shin": 0.13 },
+  "style": {
+    "stroke": "#1b1b1f",
+    "strokeWidth": 12,
+    "headFill": "#fff6ee",
+    "torso": { "style": "bean", "fill": "#4c8dff", "width": 0.145 },
+    "limbCurve": 0.35,
+    "hands": "nub",
+    "feet": "oval",
+    "footFill": "#e85d4c"
+  },
+  "face": { "eyes": "big-pupil", "brows": true, "mouthSet": "default", "offsetX": 0.12, "eyeSpacing": 0.48, "eyeY": -0.02, "mouthY": 0.42 },
+  "accessories": [{ "slot": "hair", "id": "crop-01", "color": "#3a2e28" }],
+  "voice": { "say": "Junior" }
+}
