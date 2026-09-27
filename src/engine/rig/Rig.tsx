@@ -135,6 +135,7 @@ export const Rig: React.FC<RigProps> = ({
 
   return (
     <g>
+      {renderAccessories(character, "body", R, { hip: j.hip, neck: j.neck, heightPx: m.heightPx })}
       {leg("L")}
       {arm("L")}
       {body}

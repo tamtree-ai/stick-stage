@@ -16,8 +16,9 @@ Run everything from the repo root (the folder with `package.json`).
 
 ## 0. Before you start
 
-- Read `src/data/characters/milo.md` and `src/data/characters/june.md` (the cast bible). Every
-  line must sound like the person saying it.
+- Read the cast bible for everyone who speaks: `src/data/characters/<id>.md`. The house pair is
+  Milo and June. Lila and Theo (kids) and Moss and Dash (turtle and hare) are for bits that need
+  them. Every line must sound like the person saying it.
 - Pick a skit id: a lowercase slug of the topic, e.g. `group-chat`. If
   `public/skits/<id>/` already exists, add `-2`, `-3`, and so on. Never overwrite another skit.
 

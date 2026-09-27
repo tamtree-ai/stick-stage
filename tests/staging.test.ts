@@ -46,7 +46,7 @@ describe("two-bone leg IK", () => {
 describe("seating", () => {
   for (const c of chars) {
     for (const [kind, h] of Object.entries(SEAT_HEIGHT)) {
-      it(`${c} on a ${kind}: body rests on the seat, feet on the floor`, () => {
+      it(`${c} on a ${kind}: body rests on the seat, feet on or above the floor`, () => {
         const seatPx = h * FIG;
         const s = evalActor(
           library,
@@ -57,8 +57,11 @@ describe("seating", () => {
         );
         const contact = seatContact(s.character, rigMetrics(s.character, FIG));
         expect(s.joints.hip.y + contact).toBeCloseTo(-seatPx, 3);
-        // Our characters' legs reach the floor from every seat height.
-        expect(Math.abs(footBottom(s))).toBeLessThan(0.5);
+        const feet = footBottom(s);
+        // Never through the floor. Milo and June were proportioned to plant on every seat.
+        // Shorter characters (kids, Moss) dangle when the seat is too high; seat.ts allows that.
+        expect(feet).toBeLessThan(0.5);
+        if (c === "milo" || c === "june") expect(Math.abs(feet)).toBeLessThan(0.5);
         // Upper-body pose still applies (sit pose), feet in front of the hip.
         expect(s.joints.footR.x).toBeGreaterThan(s.joints.hip.x);
       });

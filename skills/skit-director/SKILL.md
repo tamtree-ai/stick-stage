@@ -30,7 +30,7 @@ reaction close-up after the punchline); your job is to add what the joke needs a
 - A premise. Either `public/skits/<id>/premise.json` (template, cast, lines with roles, see
   `src/engine/templates/premise.ts`), or lines pasted by a person, which you copy **verbatim** into a
   `premise.json` first.
-- Cast: character ids from `src/data/characters/*.json` (currently `milo`, `june`).
+- Cast: character ids from `src/data/characters/*.json` (`milo`, `june`, `lila`, `theo`, `moss`, `dash`).
 - Set: `src/data/sets/*.json`; each has a `description` and `tags` (the service lists them at
   `GET /sets`). Seats: `office-1` (chair at `left`), `lounge-1` (couch), `park-1` (bench) and
   `bedroom-1` (bed) seat whoever stands on a seated mark; premise staging sets `seated` for you.

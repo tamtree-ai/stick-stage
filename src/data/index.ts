@@ -2,6 +2,10 @@ import { buildCatalog, createLibrary, createSets, migrate, SafeAreaProfilesSchem
 
 import milo from "./characters/milo.json";
 import june from "./characters/june.json";
+import lila from "./characters/lila.json";
+import theo from "./characters/theo.json";
+import moss from "./characters/moss.json";
+import dash from "./characters/dash.json";
 
 import idle from "./poses/idle.json";
 import point from "./poses/point.json";
@@ -71,7 +75,7 @@ export const PROP_IDS = ["phone", "mic", "cup", "laptop", "sign"];
 export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed", "angry", "shocked", "sad", "crying", "cringe", "confused", "deadpan"];
 
 export const library: Library = createLibrary({
-  characters: [milo, june],
+  characters: [milo, june, lila, theo, moss, dash],
   poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove],
   expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan],
   props: [phone, mic, cup, laptop, sign],
