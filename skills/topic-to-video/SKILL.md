@@ -113,6 +113,20 @@ pnpm write apply --skit=public/skits/<id>/skit.json --reply=public/skits/<id>/re
 
 Write stdout over `skit.json`. Exit 2 is one repair pass, the same as draft. Then repeat steps 3–5.
 
+## Series
+
+Do not invent a series. If the person names one, read `src/data/series/<id>.json` and set `meta.series` (`id`, `season`, `episode`) on the skit. The post manifest carries it. This skill still does not post. Shipped shows: `milo-june`, `park-fables`.
+
+## When they ask for kids, a fable, or three people
+
+Milo and June stay the default. Do not add a seventh character.
+
+- Kids or a family bit: template `family`. Cast one of Milo or June, plus Lila, Theo, or both. Set `classroom-1` or `kitchen-1`. The kid asks. The adult answers badly.
+- A fable: template `fable`. Cast Dash, then Moss. Set `park-1`. Dash is sure and leaves. Moss says the last true line.
+- Three people: template `trio`. Set `living-1`.
+
+Read `src/data/characters/<id>.md` before writing those. An explainer (`explainer`) needs the cast to say the hook and the twist, and one narrator line for the concept. Keep narration under about 60% of the spoken time.
+
 ## Failure modes
 
 - `pnpm direct` says a voice is missing or stale: you forgot `--say`.

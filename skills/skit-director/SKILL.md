@@ -179,6 +179,12 @@ The example lines illustrate staging only; they are not material to post.
 }
 ```
 
+## Series and in-world words
+
+If the person names a series, read `src/data/series/<id>.json` before staging and set `meta.series` to `{ id, season, episode }`. Do not invent a series, a season, or a catchphrase. Words that are the joke go on the object: `text` on a sign hold (one line), `screen` on a laptop hold, and a scene `labels` entry for a `board` (`text`), `desk` or `tv` (`screen`). See `docs/skits.md`.
+
+A cast beat with `"voiceOver": true` is a thought: their own voice, mouth shut, italic caption. `"music": "room"` is the one original bed. It ducks under dialog and drops out on the punchline. Do not add another track.
+
 ## Reference
 
 - Authoring guide and every field: `docs/skits.md`. Voice contract: `docs/voice-contract.md`.
