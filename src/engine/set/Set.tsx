@@ -3,7 +3,8 @@ import { getPalette } from "./palettes";
 import { PARTS } from "./parts/registry";
 import type { PartComponent } from "./parts/types";
 import { PatternDefs } from "./patterns";
-import type { SetDef, SetPart } from "./schema";
+import { applyPartLabels } from "./labels";
+import type { PartLabel, SetDef, SetPart } from "./schema";
 
 export type SetLayersProps = {
   set: SetDef;
@@ -11,6 +12,9 @@ export type SetLayersProps = {
   height: number;
   /** "background" draws defs + layers; "foreground" draws parts that overlap characters. */
   layer: "background" | "foreground";
+  /** Scene words painted onto matching parts. The shared set document stays unchanged. */
+  labels?: readonly PartLabel[];
+  fontFamily?: string;
 };
 
 const renderPart = (p: SetPart, i: number, props: Omit<React.ComponentProps<PartComponent>, "part" | "seed">, setId: string) => {
@@ -19,17 +23,18 @@ const renderPart = (p: SetPart, i: number, props: Omit<React.ComponentProps<Part
   return <Part key={`${p.part}-${i}`} part={p} seed={`${setId}:${p.part}:${p.seed ?? i}`} {...props} />;
 };
 
-export const SetLayers: React.FC<SetLayersProps> = ({ set, width, height, layer }) => {
+export const SetLayers: React.FC<SetLayersProps> = ({ set, width, height, layer, labels, fontFamily }) => {
   const palette = getPalette(set.palette);
   const prefix = `set-${set.id}`;
-  const common = { palette, W: width, H: height, groundY: set.groundY, fig: set.figureHeightPx, prefix, marks: set.marks };
+  const common = { palette, W: width, H: height, groundY: set.groundY, fig: set.figureHeightPx, prefix, marks: set.marks, fontFamily };
+  const paint = (p: SetPart) => applyPartLabels(p, labels);
   if (layer === "foreground") {
-    return <g>{set.foreground.map((p, i) => renderPart(p, i, common, set.id))}</g>;
+    return <g>{set.foreground.map((p, i) => renderPart(paint(p), i, common, set.id))}</g>;
   }
   return (
     <g>
       <PatternDefs prefix={prefix} palette={palette} width={width} height={height} />
-      {set.layers.map((p, i) => renderPart(p, i, common, set.id))}
+      {set.layers.map((p, i) => renderPart(paint(p), i, common, set.id))}
     </g>
   );
 };

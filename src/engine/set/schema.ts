@@ -1,6 +1,17 @@
 import { z } from "zod";
+import { ScreenTextSchema } from "../lib/screenText";
 
 export const PATTERNS = ["none", "halftone", "stripes", "dots"] as const;
+
+/** Words drawn on one part for this scene. `text` is the chalkboard. `screen` is a desk or TV. */
+export const PartLabelSchema = z
+  .strictObject({
+    part: z.string().min(1),
+    text: ScreenTextSchema.optional(),
+    screen: ScreenTextSchema.optional(),
+  })
+  .refine((label) => label.text !== undefined || label.screen !== undefined, { message: "a label needs text or screen" });
+export type PartLabel = z.infer<typeof PartLabelSchema>;
 
 export const SetPartSchema = z.object({
   part: z.string(),
@@ -19,6 +30,10 @@ export const SetPartSchema = z.object({
   dx: z.number().min(-1).max(1).default(0),
   /** Part-specific look, e.g. window "blinds", desk "clear". */
   variant: z.string().optional(),
+  /** Chalkboard words. Up to three short lines; `\n` breaks. */
+  text: ScreenTextSchema.optional(),
+  /** Desk or TV screen words. Up to three short lines; `\n` breaks. */
+  screen: ScreenTextSchema.optional(),
   /** Marks whose cast member sits on this part (seat parts only: chair, bench, couch). */
   seatFor: z.array(z.string()).default([]),
 });

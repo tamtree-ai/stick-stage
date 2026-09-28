@@ -49,6 +49,31 @@
         "syntheticVoices": {
           "default": true,
           "type": "boolean"
+        },
+        "series": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "season": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99
+            },
+            "episode": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 999
+            }
+          },
+          "required": [
+            "id",
+            "season",
+            "episode"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -110,6 +135,15 @@
                   "L",
                   "R"
                 ]
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 24
+              },
+              "screen": {
+                "type": "string",
+                "minLength": 1
               }
             },
             "required": [
@@ -224,6 +258,35 @@
         }
       },
       "additionalProperties": false
+    },
+    "labels": {
+      "maxItems": 6,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "part": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "screen": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "part"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "music": {
+      "type": "string",
+      "minLength": 1
     },
     "beats": {
       "minItems": 1,
@@ -344,6 +407,9 @@
           "focus": {
             "type": "string",
             "minLength": 1
+          },
+          "voiceOver": {
+            "type": "boolean"
           },
           "reaction": {
             "anyOf": [
@@ -1167,6 +1233,15 @@
                           "additionalProperties": false
                         }
                       ]
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 24
+                    },
+                    "screen": {
+                      "type": "string",
+                      "minLength": 1
                     }
                   },
                   "required": [
@@ -2082,6 +2157,15 @@
                         "L",
                         "R"
                       ]
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 24
+                    },
+                    "screen": {
+                      "type": "string",
+                      "minLength": 1
                     }
                   },
                   "required": [
@@ -2258,6 +2342,31 @@
             ],
             "additionalProperties": false
           },
+          "labels": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "part": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "screen": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "part"
+              ],
+              "additionalProperties": false
+            }
+          },
           "beats": {
             "minItems": 1,
             "type": "array",
@@ -2377,6 +2486,9 @@
                 "focus": {
                   "type": "string",
                   "minLength": 1
+                },
+                "voiceOver": {
+                  "type": "boolean"
                 },
                 "reaction": {
                   "anyOf": [
@@ -3200,6 +3312,15 @@
                                 "additionalProperties": false
                               }
                             ]
+                          },
+                          "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 24
+                          },
+                          "screen": {
+                            "type": "string",
+                            "minLength": 1
                           }
                         },
                         "required": [

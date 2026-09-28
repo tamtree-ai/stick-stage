@@ -1,3 +1,4 @@
+import type { MusicBed } from "../audio/music";
 import { migrate } from "../migrate";
 import { fromZodIssues, SkitError, type Diagnostic } from "./diagnostics";
 import { msToFrame } from "./layout";
@@ -40,6 +41,8 @@ const spoken = (b: Beat) => !b.silent && !!b.line;
  */
 export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[]): Resolved[] => {
   if (!doc.scenes) return [{ id: "main", skit: { ...doc, set: doc.set!, beats: doc.beats! }, remap: (p) => p }];
+  if (doc.labels?.length)
+    diags.push({ level: "warning", code: "label-root", path: "labels", message: "labels on a multi-scene skit are ignored; put them on each scene" });
   const all = docBeats(doc);
   const ids = all.map((b) => b.id);
   ids.forEach((id, i) => ids.indexOf(id) !== i && diags.push({ level: "error", code: "duplicate-id", path: "scenes", message: `duplicate beat id "${id}" (beat ids name voice files, so they are unique across scenes)` }));
@@ -76,6 +79,7 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[]): Resolved[] => 
       cast,
       beats,
       card: sc.card,
+      labels: sc.labels,
       overlay: { ...doc.overlay, pov: sc.pov ?? (s === 0 ? doc.overlay.pov : undefined) },
       timing: {
         gapMs: gap,
@@ -110,7 +114,11 @@ export const compileSkit = (input: CompileInput): CompileResult => {
     }
     diags.push(...found.map((d) => ({ ...d, path: r.remap(d.path) })));
   }
+  const bed = doc.music ? input.music?.beds.find((b) => b.id === doc.music) : undefined;
+  if (doc.music && !bed)
+    diags.push({ level: "error", code: "unknown-music", path: "music", message: `unknown music bed "${doc.music}"`, expected: input.music?.beds.map((b) => b.id).join(", ") || "pass a music manifest" });
   if (diags.some((d) => d.level === "error")) throw new SkitError(diags);
+  const music: MusicBed | undefined = bed ? { src: bed.file, gain: bed.gain, ducked: bed.ducked } : undefined;
 
   let from = 0;
   const programScenes = scenes.map((sc, i) => {
@@ -127,6 +135,7 @@ export const compileSkit = (input: CompileInput): CompileResult => {
     height: doc.meta.height,
     durationInFrames: lastScene.from + lastScene.timeline.durationInFrames,
     scenes: programScenes,
+    ...(music ? { music } : {}),
   };
   return { timeline: scenes[0]!.timeline, skit: scenes[0]!.skit, scenes, program, doc, warnings: diags };
 };

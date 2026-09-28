@@ -25,6 +25,7 @@
     "lib:build": "tsx scripts/build-lib.ts",
     "lib:pack-test": "tsx scripts/pack-test.ts",
     "sfx": "tsx scripts/sfx-gen.ts",
+    "music": "tsx scripts/music-gen.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

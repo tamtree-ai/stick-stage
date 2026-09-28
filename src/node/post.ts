@@ -12,6 +12,8 @@ export type PostManifest = {
   check?: { ok: boolean; errors: number; warnings: number };
   syntheticVoices?: boolean;
   reminder?: string;
+  /** Present when the skit names a season and episode. The harness can pass these to YouTube. */
+  series?: { id: string; season: number; episode: number };
 };
 
 export const postManifest = (o: { skit: string; doc: SkitDoc; program: Program; report?: CheckReport; hash?: string }): PostManifest => ({
@@ -23,6 +25,7 @@ export const postManifest = (o: { skit: string; doc: SkitDoc; program: Program; 
   check: o.report && { ok: o.report.ok, errors: o.report.errors, warnings: o.report.warnings },
   syntheticVoices: o.doc.meta.syntheticVoices,
   reminder: o.doc.meta.syntheticVoices ? "Tick the platform's AI-generated / synthetic-media label when posting." : undefined,
+  ...(o.doc.meta.series ? { series: o.doc.meta.series } : {}),
 });
 
 /** Writes `<base>.txt` (post caption), `<base>.srt` (script-exact subtitles) and `<base>.json` (manifest). */

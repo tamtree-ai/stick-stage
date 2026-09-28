@@ -17,6 +17,8 @@ export type LaidBeat = {
   punchline: boolean;
   /** A voice-over line: nobody on stage speaks it. */
   narrator: boolean;
+  /** A thought: the speaker is on stage, mouth shut. */
+  thought: boolean;
   /** Absolute ms where anchors are measured from: line start (spoken) or beat start (silent). */
   zeroMs: number;
   /** Beat start/end in absolute ms (end includes the hold after). */
@@ -85,6 +87,7 @@ export const layoutBeats = (
       synthetic,
       punchline: isPunch,
       narrator: kind === "line" && isNarration(skit, beat),
+      thought: kind === "line" && !!beat.voiceOver && !isNarration(skit, beat),
       zeroMs: fromMs,
       fromMs,
       endMs: fromMs + durMs + hold,

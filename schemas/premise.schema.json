@@ -16,7 +16,11 @@
         "interview",
         "me-vs-me",
         "pov-monologue",
-        "text-slam"
+        "text-slam",
+        "explainer",
+        "family",
+        "fable",
+        "trio"
       ]
     },
     "title": {
@@ -46,7 +50,7 @@
     },
     "cast": {
       "minItems": 1,
-      "maxItems": 2,
+      "maxItems": 3,
       "type": "array",
       "items": {
         "type": "object",
@@ -107,10 +111,82 @@
           },
           "delivery": {
             "type": "string"
+          },
+          "voiceOver": {
+            "type": "boolean"
           }
         },
         "required": [
           "text"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "scenes": {
+      "minItems": 1,
+      "maxItems": 4,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "set": {
+            "type": "string"
+          },
+          "pov": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "card": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "lines": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "who": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "setup",
+                    "escalation",
+                    "punchline"
+                  ]
+                },
+                "expression": {
+                  "type": "string"
+                },
+                "slam": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "delivery": {
+                  "type": "string"
+                },
+                "voiceOver": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "lines"
         ],
         "additionalProperties": false
       }
@@ -120,8 +196,7 @@
     "schemaVersion",
     "template",
     "title",
-    "cast",
-    "lines"
+    "cast"
   ],
   "additionalProperties": false,
   "$id": "https://stickstage.dev/schemas/premise.schema.json",

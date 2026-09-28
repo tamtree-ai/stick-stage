@@ -73,13 +73,18 @@ export const evalProps = (
 ): PropState => {
   const state: PropState = { held: {}, dropped: [] };
   if (!keys || keys.length === 0) return state;
+  const painted = (id: string, key: Pick<PropKey, "text" | "screen">): PropDef => {
+    const def = getProp(id);
+    if (key.text === undefined && key.screen === undefined) return def;
+    return { ...def, ...(key.text !== undefined ? { text: key.text } : {}), ...(key.screen !== undefined ? { screen: key.screen } : {}) };
+  };
   const past = keys.filter((k) => k.frame <= frame);
   for (const hand of ["L", "R"] as const) {
     const last = [...past].reverse().find((k) => k.hand === hand);
     if (last?.prop) {
       const age = frame - last.frame;
       const pop = age >= POP_FRAMES ? 1 : 0.4 + 0.6 * easeOutBack((age + 1) / POP_FRAMES, 2);
-      state.held[hand] = { def: getProp(last.prop), hand, pop };
+      state.held[hand] = { def: painted(last.prop, last), hand, pop };
     }
   }
   past.forEach((k, i) => {
@@ -88,7 +93,7 @@ export const evalProps = (
     if (!before?.prop) return;
     const id = before.prop;
     if (past.slice(i + 1).some((p) => p.prop === id)) return;
-    const def = getProp(id);
+    const def = painted(id, before);
     const at = handAt(k.frame, k.hand);
     const pose = fallPose(def, at.hand, propAngle(def, at.elbow, at.hand), (frame - k.frame) / fps, figurePx);
     state.dropped.push({ def, ...(reframe ? reframe(pose, k.frame) : pose) });

@@ -18,7 +18,13 @@ const castBlock = (brief: Brief, notes: WriterWorld["notes"]): string =>
     .join("\n");
 
 const fittingTemplates = (brief: Brief, world: WriterWorld) =>
-  world.templates.filter((t) => t.cast === brief.cast.length && (t.id !== "me-vs-me" || brief.cast.every((c) => c.label)));
+  world.templates.filter((t) => {
+    if (brief.cast.length < t.cast || brief.cast.length > t.castMax) return false;
+    if (t.id === "me-vs-me" && !brief.cast.every((c) => c.label)) return false;
+    if (t.id === "fable" && (brief.cast[0]?.character !== "dash" || brief.cast[1]?.character !== "moss")) return false;
+    if (t.id === "family" && !brief.cast.some((c) => c.character === "lila" || c.character === "theo")) return false;
+    return true;
+  });
 
 /** Sets the model is allowed to name. */
 const openSets = (brief: Brief, world: WriterWorld): string[] => {

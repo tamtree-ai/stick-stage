@@ -52,5 +52,7 @@ export * from "./director/post";
 export * from "./qa";
 export * from "./templates";
 export * from "./writer";
+export * from "./series/schema";
+export * from "./audio/music";
 export * from "./migrate";
 export * from "./library";

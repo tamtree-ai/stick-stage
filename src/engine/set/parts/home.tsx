@@ -2,6 +2,7 @@ import React from "react";
 import { darken, lighten, mix } from "../../lib/color";
 import { randRange } from "../../lib/seed";
 import { derived } from "../palettes";
+import { FittedLines } from "../../text/FittedLines";
 import { SEAT_HEIGHT } from "./seats";
 import { edge, flipAt, partBase, partX, SET_LINE, type PartComponent } from "./types";
 
@@ -133,7 +134,7 @@ export const Bed: PartComponent = ({ part, palette, W, H, groundY, fig, seed, ma
 };
 
 /** Flat TV on a low media console. */
-export const Tv: PartComponent = ({ part, palette, W, H, groundY, fig, marks }) => {
+export const Tv: PartComponent = ({ part, palette, W, H, groundY, fig, marks, fontFamily }) => {
   const s = fig * part.size;
   const cx = partX(part, W, marks, 0.82);
   const base = partBase(part, H, groundY);
@@ -151,7 +152,11 @@ export const Tv: PartComponent = ({ part, palette, W, H, groundY, fig, marks }) 
       <rect x={cx - s * 0.015} y={screenTop + th} width={s * 0.03} height={s * 0.05} fill={bezel} />
       <rect x={cx - tw / 2} y={screenTop} width={tw} height={th} rx={s * 0.01} fill={bezel} stroke={edge(bezel)} strokeWidth={SET_LINE} />
       <rect x={cx - tw / 2 + s * 0.015} y={screenTop + s * 0.015} width={tw - s * 0.03} height={th - s * 0.03} fill={screen} />
-      <path d={`M ${cx - tw * 0.3} ${screenTop + s * 0.015} L ${cx - tw * 0.12} ${screenTop + s * 0.015} L ${cx - tw * 0.36} ${screenTop + th - s * 0.015} L ${cx - tw * 0.48 + s * 0.015} ${screenTop + th - s * 0.015} Z`} fill={lighten(screen, 0.25)} />
+      {part.screen ? (
+        <FittedLines text={part.screen} cx={cx} cy={screenTop + th / 2} width={(tw - s * 0.03) * 0.86} height={(th - s * 0.03) * 0.72} fill={lighten(screen, 0.55)} fontFamily={fontFamily ?? "sans-serif"} mirrored={part.flip} />
+      ) : (
+        <path d={`M ${cx - tw * 0.3} ${screenTop + s * 0.015} L ${cx - tw * 0.12} ${screenTop + s * 0.015} L ${cx - tw * 0.36} ${screenTop + th - s * 0.015} L ${cx - tw * 0.48 + s * 0.015} ${screenTop + th - s * 0.015} Z`} fill={lighten(screen, 0.25)} />
+      )}
       <rect x={cx - cw / 2} y={standTop} width={cw} height={ch} rx={s * 0.01} fill={wood} stroke={edge(wood)} strokeWidth={SET_LINE} />
       {[0.25, 0.75].map((f) => (
         <rect key={f} x={cx - cw / 2 + cw * f - s * 0.12} y={standTop + s * 0.03} width={s * 0.24} height={ch - s * 0.06} rx={s * 0.01} fill={lighten(wood, 0.08)} stroke={edge(wood, 0.08)} strokeWidth={SET_LINE * 0.7} />

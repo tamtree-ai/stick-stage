@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Working title",
+    "hashtags": [
+      "stickfigure"
+    ]
+  },
+  "set": "living-1",
+  "cast": [
+    {
+      "id": "milo",
+      "character": "milo",
+      "mark": "left"
+    },
+    {
+      "id": "june",
+      "character": "june",
+      "mark": "center"
+    },
+    {
+      "id": "theo",
+      "character": "theo",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "subtitles": true
+  },
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "theo",
+      "line": "Who ate the last slice?",
+      "actions": [],
+      "expression": "neutral"
+    },
+    {
+      "id": "l2",
+      "speaker": "milo",
+      "line": "Not me.",
+      "actions": [],
+      "expression": "neutral"
+    },
+    {
+      "id": "l3",
+      "speaker": "june",
+      "line": "Also not me.",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ],
+      "expression": "annoyed"
+    },
+    {
+      "id": "l4",
+      "speaker": "theo",
+      "line": "Then the slice confessed.",
+      "actions": [],
+      "expression": "deadpan",
+      "punchline": true,
+      "pauseBeforeMs": 450,
+      "holdAfterMs": 300
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import { Actor } from "../rig/Actor";
 import type { ActorState } from "../rig/actorState";
 import { f2 } from "../lib/math";
 import { SetLayers } from "../set/Set";
-import type { SetDef } from "../set/schema";
+import type { PartLabel, SetDef } from "../set/schema";
 
 export type StageActor = {
   id: string;
@@ -32,22 +32,24 @@ export type StageProps = {
   height: number;
   frame: number;
   camera?: Camera;
-  /** Font for text on props (signs). */
+  /** Font for text on props, boards, and screens. */
   fontFamily?: string;
+  /** Scene words for boards, desks, and TVs. */
+  labels?: readonly PartLabel[];
 };
 
 /** Set background → actors → set foreground, under one camera transform. */
-export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame, camera, fontFamily }) => {
+export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame, camera, fontFamily, labels }) => {
   const cam = camera ?? FULL_FRAME(width, height);
   const t = `translate(${f2(width / 2)} ${f2(height / 2)}) scale(${f2(cam.scale)}) translate(${f2(-cam.cx)} ${f2(-cam.cy)})`;
   return (
     <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} style={{ display: "block" }}>
       <g transform={t}>
-        <SetLayers set={set} width={width} height={height} layer="background" />
+        <SetLayers set={set} width={width} height={height} layer="background" labels={labels} fontFamily={fontFamily} />
         {actors.map((a) => (
           <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY + (a.dy ?? 0)} facing={a.facing} frame={frame} fontFamily={fontFamily} />
         ))}
-        <SetLayers set={set} width={width} height={height} layer="foreground" />
+        <SetLayers set={set} width={width} height={height} layer="foreground" labels={labels} fontFamily={fontFamily} />
       </g>
     </svg>
   );

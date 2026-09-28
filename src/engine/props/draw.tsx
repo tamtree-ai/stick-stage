@@ -1,5 +1,6 @@
 import React from "react";
 import { darken, lighten } from "../lib/color";
+import { FittedLines } from "../text/FittedLines";
 import type { PropDef, PropKind } from "./schema";
 
 export { PROP_BOUNDS } from "./bounds";
@@ -61,14 +62,17 @@ const Cup: React.FC<PropDrawProps> = ({ def, u, stroke, sw }) => {
   );
 };
 
-const Laptop: React.FC<PropDrawProps> = ({ def, u, stroke, sw }) => {
+const Laptop: React.FC<PropDrawProps> = ({ def, u, stroke, sw, mirrored, fontFamily }) => {
   const w = 0.17 * u;
   const h = 0.11 * u;
   const base = -0.004 * u;
+  const screenTop = base - 0.015 * u - h + 0.012 * u;
+  const screenH = h - 0.024 * u;
   return (
     <g strokeLinejoin="round">
       <rect x={-w / 2} y={base - 0.015 * u - h} width={w} height={h} rx={0.01 * u} fill={def.colors.body} stroke={stroke} strokeWidth={sw} />
-      <rect x={-w / 2 + 0.012 * u} y={base - 0.015 * u - h + 0.012 * u} width={w - 0.024 * u} height={h - 0.024 * u} rx={0.004 * u} fill={def.colors.screen ?? lighten(def.colors.body, 0.6)} />
+      <rect x={-w / 2 + 0.012 * u} y={screenTop} width={w - 0.024 * u} height={screenH} rx={0.004 * u} fill={def.colors.screen ?? lighten(def.colors.body, 0.6)} />
+      {def.screen ? <FittedLines text={def.screen} cx={0} cy={screenTop + screenH / 2} width={w - 0.03 * u} height={screenH * 0.86} fill={stroke} fontFamily={fontFamily} mirrored={mirrored} /> : null}
       <path d={`M ${-w * 0.58} ${base - 0.015 * u} L ${w * 0.58} ${base - 0.015 * u} L ${w * 0.52} ${base + 0.012 * u} L ${-w * 0.52} ${base + 0.012 * u} Z`} fill={def.colors.body} stroke={stroke} strokeWidth={sw} />
     </g>
   );

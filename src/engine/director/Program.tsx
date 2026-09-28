@@ -4,6 +4,7 @@ import { slide } from "@remotion/transitions/slide";
 import { wipe } from "@remotion/transitions/wipe";
 import { linearTiming, TransitionSeries, type TransitionPresentation } from "@remotion/transitions";
 import React from "react";
+import { AbsoluteFill, Html5Audio, staticFile } from "remotion";
 import { Skit, type SkitProps } from "./Skit";
 import type { Program, SceneTransition } from "./timeline";
 import type { SetDef } from "../set/schema";
@@ -28,13 +29,23 @@ const presentation = (t: SceneTransition, width: number, height: number): Transi
   }
 };
 
+/** Quiet in the gaps, ducked under dialog, silent on the punchline. */
+const Bed: React.FC<{ program: Program; audio?: boolean }> = ({ program, audio = true }) => {
+  const bed = program.music;
+  if (!audio || !bed) return null;
+  const talking = (frame: number) =>
+    program.scenes.some((sc) => sc.timeline.audio.some((a) => frame >= sc.from + a.frame && frame < sc.from + a.frame + a.durationFrames));
+  const punch = (frame: number) =>
+    program.scenes.some((sc) => sc.timeline.beats.some((b) => b.punchline && b.kind === "line" && frame >= sc.from + b.from && frame < sc.from + b.to));
+  return <Html5Audio src={staticFile(bed.src)} loop volume={(f) => (punch(f) ? 0 : talking(f) ? bed.ducked : bed.gain)} />;
+};
+
 /** A compiled skit: its scenes in order, joined by their transitions. */
 export const SkitProgram: React.FC<SkitProgramProps> = ({ program, sets, ...rest }) => {
-  if (program.scenes.length === 1) {
-    const tl = program.scenes[0]!.timeline;
-    return <Skit timeline={tl} set={sets[tl.set]!} {...rest} />;
-  }
-  return (
+  const picture =
+    program.scenes.length === 1 ? (
+      <Skit timeline={program.scenes[0]!.timeline} set={sets[program.scenes[0]!.timeline.set]!} {...rest} />
+    ) : (
     <TransitionSeries>
       {program.scenes.map((sc) => (
         <React.Fragment key={sc.id}>
@@ -50,5 +61,11 @@ export const SkitProgram: React.FC<SkitProgramProps> = ({ program, sets, ...rest
         </React.Fragment>
       ))}
     </TransitionSeries>
+    );
+  return (
+    <AbsoluteFill>
+      {picture}
+      <Bed program={program} audio={rest.audio} />
+    </AbsoluteFill>
   );
 };

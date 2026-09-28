@@ -17,6 +17,8 @@ export type PartProps = {
   seed: string;
   /** Set marks (fractions of frame width) for parts placed with `mark`. */
   marks: Record<string, number>;
+  /** Font for words on a board, desk, or TV. */
+  fontFamily?: string;
 };
 
 export type PartComponent = React.FC<PartProps>;

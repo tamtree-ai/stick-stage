@@ -3,6 +3,7 @@ import { darken, lighten, mix } from "../../lib/color";
 import { rand, randRange } from "../../lib/seed";
 import { derived } from "../palettes";
 import { horizonY } from "./outdoor";
+import { FittedLines } from "../../text/FittedLines";
 import { edge, partBase, partX, SET_LINE, type PartComponent } from "./types";
 
 /** Stage kit backdrop: pleated curtain with a scalloped valance; `variant: "spot"` adds a spotlight cone on center. */
@@ -40,7 +41,7 @@ export const Curtain: PartComponent = ({ part, palette, W, groundY, fig }) => {
 };
 
 /** Wall chalkboard; `variant: "menu"` is a café menu (title + priced rows), else scribbled sums. */
-export const Board: PartComponent = ({ part, palette, W, H, fig, seed, marks }) => {
+export const Board: PartComponent = ({ part, palette, W, H, fig, seed, marks, fontFamily }) => {
   const s = fig * part.size;
   const w = s * 0.78;
   const h = s * 0.5;
@@ -56,7 +57,9 @@ export const Board: PartComponent = ({ part, palette, W, H, fig, seed, marks }) 
     <g>
       <rect x={x0 - s * 0.025} y={top - s * 0.025} width={w + s * 0.05} height={h + s * 0.05} rx={s * 0.012} fill={wood} stroke={edge(wood)} strokeWidth={SET_LINE} />
       <rect x={x0} y={top} width={w} height={h} fill={slate} />
-      {part.variant === "menu" ? (
+      {part.text ? (
+        <FittedLines text={part.text} cx={cx} cy={top + h / 2} width={w * 0.86} height={h * 0.78} fill={chalk} fontFamily={fontFamily ?? "sans-serif"} mirrored={part.flip} />
+      ) : part.variant === "menu" ? (
         <g>
           <line x1={x0 + w * 0.3} x2={x0 + w * 0.7} y1={top + h * 0.14} y2={top + h * 0.14} {...stroke} strokeWidth={SET_LINE * 2.4} />
           {rows.map((i) => {

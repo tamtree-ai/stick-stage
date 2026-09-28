@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "cast": {
+      "minItems": 1,
+      "maxItems": 4,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "homeSets": {
+      "minItems": 1,
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "coldOpen": {
+      "default": "none",
+      "type": "string",
+      "enum": [
+        "pov",
+        "none"
+      ]
+    },
+    "bible": {
+      "type": "string",
+      "maxLength": 2000
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "title",
+    "cast",
+    "homeSets"
+  ],
+  "$id": "https://stickstage.dev/schemas/series.schema.json",
+  "title": "StickStage series"
+}

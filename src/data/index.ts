@@ -1,4 +1,4 @@
-import { buildCatalog, createLibrary, createSets, migrate, SafeAreaProfilesSchema, type SafeAreaProfiles, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type Catalog, type SafeArea, type SetDef, type SfxManifest } from "../engine/core";
+import { buildCatalog, createLibrary, createSets, migrate, MusicManifestSchema, SafeAreaProfilesSchema, SeriesSchema, type MusicManifest, type SafeAreaProfiles, type Series, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type Catalog, type SafeArea, type SetDef, type SfxManifest } from "../engine/core";
 
 import milo from "./characters/milo.json";
 import june from "./characters/june.json";
@@ -31,6 +31,8 @@ import mic from "./props/mic.json";
 import cup from "./props/cup.json";
 import laptop from "./props/laptop.json";
 import sign from "./props/sign.json";
+import miloJune from "./series/milo-june.json";
+import parkFables from "./series/park-fables.json";
 
 import neutral from "./expressions/neutral.json";
 import happy from "./expressions/happy.json";
@@ -67,6 +69,7 @@ import safeAreaJson from "./safe-area.json";
 import safeAreaProfilesJson from "./safe-area-profiles.json";
 import reactionsJson from "./reactions.json";
 import sfxJson from "./sfx.json";
+import musicJson from "./music.json";
 
 /** Order matters: labs cycle through poses/expressions in this order. */
 export const POSE_IDS = ["idle", "point", "shrug", "facepalm", "arms-up", "arms-crossed", "think", "lean-in", "recoil", "slump", "hands-on-hips", "hold-phone"];
@@ -96,8 +99,17 @@ export const reactions: ReactionTable = ReactionTableSchema.parse(migrate("react
 /** SFX library manifest (`pnpm sfx` regenerates the synthesized entries). */
 export const sfxLibrary: SfxManifest = SfxManifestSchema.parse(migrate("sfx", sfxJson).doc);
 
+/** One original bed (`pnpm music`). Not part of the catalog hash. */
+export const musicLibrary: MusicManifest = MusicManifestSchema.parse(migrate("music", musicJson).doc);
+
 /** The shipped registry as a picker sees it, with its content version (`GET /catalog` reports the same). */
 export const catalog: Catalog = buildCatalog({ lib: library, sets, sfx: sfxLibrary, reactions, safeArea });
+
+/** Shows the skill reads. Not part of the catalog hash: a skit may name a series the registry does not ship. */
+export const series: Readonly<Record<string, Series>> = {
+  "milo-june": SeriesSchema.parse(migrate("series", miloJune).doc),
+  "park-fables": SeriesSchema.parse(migrate("series", parkFables).doc),
+};
 
 /** How each shipped character is played. A character with no entry is played straight. */
 export const castNotes: Readonly<Record<string, string>> = castNotesJson;

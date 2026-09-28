@@ -5,7 +5,7 @@ import { z } from "zod";
  * punchline are human work; a template stages them into a draft `skit.json` that the
  * skit-director skill (or a person) then refines.
  */
-export const TEMPLATES = ["exchange", "interview", "me-vs-me", "pov-monologue", "text-slam"] as const;
+export const TEMPLATES = ["exchange", "interview", "me-vs-me", "pov-monologue", "text-slam", "explainer", "family", "fable", "trio"] as const;
 export type TemplateId = (typeof TEMPLATES)[number];
 
 export const ROLES = ["setup", "escalation", "punchline"] as const;
@@ -22,6 +22,8 @@ export const PremiseLineSchema = z.strictObject({
   slam: z.string().min(1).max(40).optional(),
   /** Hint for the TTS in the harness. */
   delivery: z.string().optional(),
+  /** Thought: their own voice, mouth shut. The off-screen narrator is `who: "narrator"` on an explainer. */
+  voiceOver: z.boolean().optional(),
 });
 export type PremiseLine = z.infer<typeof PremiseLineSchema>;
 
@@ -37,6 +39,8 @@ export const PremiseSceneSchema = z.strictObject({
   set: z.string().optional(),
   /** POV card for this scene. The first scene falls back to the premise `pov`. */
   pov: z.string().max(80).optional(),
+  /** Title card over this scene. */
+  card: z.string().min(1).max(60).optional(),
   lines: z.array(PremiseLineSchema).min(1),
 });
 export type PremiseScene = z.infer<typeof PremiseSceneSchema>;
@@ -55,7 +59,7 @@ export const PremiseSchema = z
     hashtags: z.array(z.string()).default([]),
     /** Default per template, and the fallback for a scene that names no set. */
     set: z.string().optional(),
-    cast: z.array(PremiseCastSchema).min(1).max(2),
+    cast: z.array(PremiseCastSchema).min(1).max(3),
     /** One scene. Mutually exclusive with `scenes`. */
     lines: z.array(PremiseLineSchema).min(1).optional(),
     /** 1–4 scenes, staged as `scenes[]`. Mutually exclusive with `lines`. */

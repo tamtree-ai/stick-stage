@@ -63,12 +63,22 @@ Default: the beat start.
 | `turn` | `facing?` (default: flip) |
 | `hop`, `nod` | |
 | `slideTo` | `mark`, `durationFrames?` (default 8) |
-| `hold` / `putAway` / `drop` | `prop` (phone, mic, cup, laptop, sign), `hand?` (`R` default) |
+| `hold` / `putAway` / `drop` | `prop` (phone, mic, cup, laptop, sign), `hand?` (`R` default). A sign `hold` may set `text` (one line, ≤ 24 characters). A laptop `hold` may set `screen` (≤ 3 lines, `\n` breaks, ≤ 24 characters each) |
 | `symbol` | `symbol` (tears, sweat, blush, anger, exclaim, question, speed-lines), `durationMs?` |
 | `sit` / `stand` | Needs a seat at the character's mark |
 
 **SFX:** `{ "id": "record-scratch", "at": …, "volume": 1 }`. Sounds: `pnpm render SfxLab out/SfxLab.mp4`, or see `src/data/sfx.json`.
 **Text:** `{ "type": "slam", "value": "SURE.", "at": { "word": "Sure" } }`. Subtitles hide while a slam is up, and a slam ends at the next cut.
+**In-world words:** a scene `labels` entry paints one part for that scene and leaves the shared set alone. `{ "part": "board", "text": "POP QUIZ" }` is the chalkboard. `{ "part": "desk", "screen": "INBOX\n999" }` or `"part": "tv"` is a screen. A single-scene skit puts `labels` on the skit. A multi-scene skit puts them on each scene.
+
+**Series:** `meta.series` is `{ "id", "season", "episode" }`. The post `.json` copies it so the harness can tell YouTube which episode this is. The show notes live in `src/data/series/<id>.json`. StickStage does not post.
+
+**A thought:** `"voiceOver": true` on a cast beat. Their voice, mouth shut, italic caption.
+
+**Music:** `"music": "room"` is the one bed. It ducks under dialog and is silent on the punchline.
+
+**Templates** a premise can name, besides the two-handers: `explainer`, `family`, `fable`, `trio`. `pnpm new` stages them.
+
 **List reveal:** `{ "type": "list", "items": ["Our project.", "Our process."], "at": [{ "word": "Our" }, { "word": "Our", "occurrence": 2 }] }`: one anchor per item (≤ 5 items, ≤ 40 characters each). Items stack from the top of the safe area, each pops in on its anchor, and the list leaves at the next cut. The director goes `wide` for the beat so faces sit under the list.
 
 ## Narrator, cards and explainers (schema v2)

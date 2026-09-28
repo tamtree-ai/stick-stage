@@ -158,6 +158,21 @@ Plan: `../planning/2026-09-27-writer-contract/plan.md`. Writer version `w1`.
 - **`POST /write/prompt`** (`mode: draft | revise`) returns `{system, prompt, writer, catalogVersion}`. `POST /validate` also accepts `{reply, brief}` and `{reply, skit}`. `pnpm write` is the same contract from the repo. `skills/topic-to-video` calls it and no longer carries the joke recipe or the set table.
 - **Model profile pin is `MiniMax M3`** (`openrouter`, `minimax/minimax-m3:exacto`). The Tamtree Dev workspace default is OpenRouter gpt-4o-mini, and the old flow noted that gpt-4o-mini under-writes. The stick-script flow pins MiniMax M3 on both chat nodes. Short set tags stay deferred until after the evaluation.
 
+## 2026-09-28 (formats, thoughts, one bed)
+The next-phase slice stayed. These are the evolve-plan formats, built because the rest of that plan was asked for in the same pass. Narrator-dominant stays at 60%. Nothing here posts, and `POST /render` still refuses file clips.
+- **Templates.** `explainer` (cast hook, one narrator concept line, cast twist), `family` (one adult, one or two of Lila and Theo; the kid asks), `fable` (Dash then Moss; Dash walks off on the last line), `trio` (three marks: left, center, right). Premise cast max is 3. The skit cap stays 4. One listener still reacts.
+- **A thought.** `voiceOver: true` on a cast beat uses that person's voice, shuts their mouth, and captions the line in italic. It does not count toward `narrator-dominant`.
+- **One bed.** `music: "room"` names the only stem in `src/data/music.json` (CC0, synthesized, `pnpm music`). The program ducks it under dialog and silences it on the punchline. It is not in the catalog hash. Not a library, not a trending sound.
+- **Series.** `park-fables` sits beside `milo-june`. No catchphrases.
+
+## 2026-09-28 (joke text and episode document)
+Plan: the next-phase slice in `reports/Stick Stage next phase.md`. The writer contract was already on this branch (`w1`).
+- **A sign says the line.** `hold` and starting `holding` take optional `text` (one line, ≤ 24 characters). It overrides `sign.json` for that hold, including after a drop. `text` on any other prop is a `prop-text` warning and is not drawn.
+- **A laptop screen says the subject.** The same places take optional `screen` (≤ 3 lines, `\n` breaks, ≤ 24 characters a line). Drawn on the laptop prop. `screen` on any other prop is a `prop-screen` warning.
+- **A board, desk, or TV says it for one scene.** `labels` on a single-scene skit, or on each scene: `{ part, text? }` for `board`, `{ part, screen? }` for `desk` and `tv`. The shared set is not edited. An unknown part is `label-part`. Text on a non-board, or a screen on anything but a desk or TV, is `label-unused`. Root `labels` on a multi-scene skit warn `label-root` and are ignored.
+- **An episode is a document, not a poster.** `src/data/series/<id>.json` (schema `series` v1) is what the skill reads: cast, home sets, cold open, optional bible. `meta.series` is `{ id, season, episode }`. The post manifest copies it for the harness to hand to YouTube. The shipped example is `milo-june`. It is not in the catalog hash. Nothing here posts, picks music, or adds a template.
+- Lab: `public/skits/signlab`.
+
 ## 2026-09-27 (more characters)
 There is no `planning/2026-09-27-more-characters-scenes` doc. Cast grew from Milo and June because shorts need more than one pair, and the rig can do it without a new body.
 - **Kids are short sticks, not a new species.** Lila (girl, height 0.68, pigtails, yellow shirt) and Theo (boy, height 0.74, crop, blue shirt, red shoes). Bigger heads, stubbier limbs. Dev voices: Kathy and Junior, both installed `say` voices. Posting voices stay in the harness. Their legs do not reach every adult seat, so they dangle (`seat.ts` already did this). Milo and June still plant. The seating test checks that, and that nobody sinks through the floor.

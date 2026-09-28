@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ScreenTextSchema } from "../lib/screenText";
 
 const hex = z.string().regex(/^#[0-9a-fA-F]{3,8}$/, "expected a hex color like #1b1b1f");
 
@@ -20,10 +21,12 @@ export const PropSchema = z.object({
   align: z.enum(["forearm", "upright"]),
   /** Extra rotation in degrees (+ = clockwise in the right-facing view). */
   angle: z.number().default(0),
-  /** Sign text. */
+  /** Sign text. A hold can override it for one use. */
   text: z.string().max(24).optional(),
+  /** Laptop screen words. A hold can override them for one use. */
+  screen: ScreenTextSchema.optional(),
 });
 export type PropDef = z.infer<typeof PropSchema>;
 
 /** Hold a prop in a hand, put it away (`prop: null`), or drop it (`drop: true`) so it falls. */
-export type PropKey = { frame: number; hand: "L" | "R"; prop: string | null; drop?: boolean };
+export type PropKey = { frame: number; hand: "L" | "R"; prop: string | null; drop?: boolean; text?: string; screen?: string };

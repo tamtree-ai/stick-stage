@@ -3,10 +3,12 @@
  * migrations. No React, no Node APIs.
  */
 import { z } from "zod";
+import { MusicManifestSchema } from "./audio/music";
 import { SkitSchema, ReactionTableSchema, SfxManifestSchema } from "./director/schema";
 import { ExpressionSchema } from "./face/schema";
 import { PropSchema } from "./props/schema";
 import { CharacterSchema, PoseSchema } from "./rig/schema";
+import { SeriesSchema } from "./series/schema";
 import { SetSchema } from "./set/schema";
 import { PremiseSchema } from "./templates/premise";
 import { SafeAreaSchema } from "./text/safeArea";
@@ -18,7 +20,9 @@ export { ExpressionSchema, EYE_SHAPES, SYMBOLS } from "./face/schema";
 export { MouthParamsSchema } from "./face/mouths";
 export { PropSchema } from "./props/schema";
 export { CharacterSchema, PoseSchema, ProportionsSchema, AccessorySchema } from "./rig/schema";
-export { SetSchema, SetPartSchema, PATTERNS } from "./set/schema";
+export { SeriesSchema, SeriesRefSchema } from "./series/schema";
+export { MusicManifestSchema } from "./audio/music";
+export { SetSchema, SetPartSchema, PartLabelSchema, PATTERNS } from "./set/schema";
 export { PremiseSchema, PremiseLineSchema, PremiseCastSchema, PremiseSceneSchema, TEMPLATES } from "./templates/premise";
 export { SafeAreaSchema } from "./text/safeArea";
 export * from "./voice/schema";
@@ -38,6 +42,8 @@ export const DOC_SCHEMAS: Record<DocKind, z.ZodType> = {
   reactions: ReactionTableSchema,
   sfx: SfxManifestSchema,
   safeArea: SafeAreaSchema,
+  series: SeriesSchema,
+  music: MusicManifestSchema,
 };
 
 /** JSON Schema (draft 2020-12) of a document kind, for editors and other languages. */

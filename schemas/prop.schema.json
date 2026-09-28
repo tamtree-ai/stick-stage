@@ -59,6 +59,10 @@
     "text": {
       "type": "string",
       "maxLength": 24
+    },
+    "screen": {
+      "type": "string",
+      "minLength": 1
     }
   },
   "required": [

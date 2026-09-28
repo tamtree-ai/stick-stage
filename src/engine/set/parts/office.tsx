@@ -2,6 +2,7 @@ import React from "react";
 import { darken, lighten, mix } from "../../lib/color";
 import { rand, randRange } from "../../lib/seed";
 import { derived } from "../palettes";
+import { FittedLines } from "../../text/FittedLines";
 import { SEAT_HEIGHT } from "./seats";
 import { edge, flipAt, partBase, partX, SET_LINE, type PartComponent } from "./types";
 
@@ -127,7 +128,7 @@ export const Cabinet: PartComponent = ({ part, palette, W, H, groundY, fig, mark
  * facing right, the monitor on the right; `flip` mirrors for a left-facing sitter.
  * Variants: "monitor" (default), "laptop", "clear".
  */
-export const Desk: PartComponent = ({ part, palette, W, H, groundY, fig, seed, marks }) => {
+export const Desk: PartComponent = ({ part, palette, W, H, groundY, fig, seed, marks, fontFamily }) => {
   const s = fig * part.size;
   const w = s * 0.76;
   const topH = s * 0.34;
@@ -168,7 +169,11 @@ export const Desk: PartComponent = ({ part, palette, W, H, groundY, fig, seed, m
           <rect x={monX + monW * 0.44} y={top - s * 0.06} width={monW * 0.12} height={s * 0.06} fill={metal} stroke={edge(metal)} strokeWidth={SET_LINE * 0.8} />
           <rect x={monX + monW * 0.25} y={top - s * 0.012} width={monW * 0.5} height={s * 0.012} rx={s * 0.006} fill={metal} stroke={edge(metal)} strokeWidth={SET_LINE * 0.8} />
           <rect x={monX} y={top - s * 0.06 - monH} width={monW} height={monH} rx={s * 0.014} fill={mix(metal, palette.wallA, 0.25)} stroke={edge(metal)} strokeWidth={SET_LINE} />
-          <circle cx={monX + monW / 2} cy={top - s * 0.06 - monH / 2} r={s * 0.012} fill={lighten(metal, 0.3)} />
+          {part.screen ? (
+            <FittedLines text={part.screen} cx={monX + monW / 2} cy={top - s * 0.06 - monH / 2} width={monW * 0.82} height={monH * 0.72} fill={lighten(paper, 0.2)} fontFamily={fontFamily ?? "sans-serif"} mirrored={part.flip} />
+          ) : (
+            <circle cx={monX + monW / 2} cy={top - s * 0.06 - monH / 2} r={s * 0.012} fill={lighten(metal, 0.3)} />
+          )}
           <rect x={x0 + w * 0.2} y={top - s * 0.012} width={w * 0.26} height={s * 0.012} rx={s * 0.005} fill={lighten(metal, 0.2)} stroke={edge(metal)} strokeWidth={SET_LINE * 0.7} />
         </g>
       ) : variant === "laptop" ? (

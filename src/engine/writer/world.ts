@@ -5,7 +5,7 @@ import type { TemplateId } from "../templates/premise";
 export type WriterWorld = {
   characters: readonly string[];
   sets: readonly string[];
-  templates: readonly { id: TemplateId; cast: 1 | 2; description: string }[];
+  templates: readonly { id: TemplateId; cast: 1 | 2 | 3; castMax: 1 | 2 | 3; description: string }[];
   expressions: readonly string[];
   /** Character id → how they are played. Missing: played straight. */
   notes: Readonly<Record<string, string>>;

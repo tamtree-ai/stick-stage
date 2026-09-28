@@ -6,6 +6,7 @@ import type { PoseKey } from "../rig/pose";
 import type { SeatKey } from "../rig/seat";
 import type { Camera } from "../shots/Stage";
 import type { Framing } from "../shots/framing";
+import type { PartLabel } from "../set/schema";
 import type { CaptionPage } from "../text/captions";
 
 /**
@@ -100,6 +101,8 @@ export type Timeline = {
   height: number;
   durationInFrames: number;
   set: string;
+  /** Per-scene words on set parts. Absent when the scene has none. */
+  labels?: PartLabel[];
   cast: CastTrack[];
   beats: BeatSpan[];
   shots: ShotKey[];
@@ -136,4 +139,6 @@ export type Program = {
   height: number;
   durationInFrames: number;
   scenes: ProgramScene[];
+  /** Original bed. Absent when the skit names none. */
+  music?: { src: string; gain: number; ducked: number };
 };

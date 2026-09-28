@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { Diagnostic } from "../director/diagnostics";
 import { SkitError, fromZodIssues, pathString, unknownId } from "../director/diagnostics";
 import { TEMPLATES, type TemplateId } from "../templates/premise";
-import { TEMPLATE_CAST } from "../templates/stage";
+import { TEMPLATE_CAST, TEMPLATE_CAST_MAX } from "../templates/stage";
 import type { WriterWorld } from "./world";
 
 const BriefCastSchema = z.strictObject({
@@ -18,7 +18,7 @@ export const BriefSchema = z
     description: z.string().max(2000).optional(),
     tone: z.string().optional(),
     template: z.enum(TEMPLATES).optional(),
-    cast: z.array(BriefCastSchema).min(1).max(2),
+    cast: z.array(BriefCastSchema).min(1).max(3),
     set: z.string().min(1).optional(),
     scenes: z.number().int().min(2).max(4).optional(),
     sets: z.array(z.string().min(1)).min(1).max(4).optional(),
@@ -55,8 +55,12 @@ export const parseBrief = (json: unknown, world: WriterWorld): Brief => {
   brief.cast.forEach((c, i) => {
     if (!world.characters.includes(c.character)) d.push(unknownId("character", c.character, world.characters, ["cast", i, "character"]));
   });
-  if (brief.template && TEMPLATE_CAST[brief.template] !== brief.cast.length)
-    d.push({ level: "error", code: "template-cast", path: "template", message: `template "${brief.template}" needs ${TEMPLATE_CAST[brief.template]} cast members` });
+  if (brief.template) {
+    const need = TEMPLATE_CAST[brief.template];
+    const most = TEMPLATE_CAST_MAX[brief.template];
+    if (brief.cast.length < need || brief.cast.length > most)
+      d.push({ level: "error", code: "template-cast", path: "template", message: need === most ? `template "${brief.template}" needs ${need} cast members` : `template "${brief.template}" needs ${need} to ${most} cast members` });
+  }
   if (brief.template === "me-vs-me" && brief.cast.some((c) => !c.label))
     d.push({ level: "error", code: "template-labels", path: "cast", message: `me-vs-me needs a "label" on each cast member` });
   const setOk = (id: string, path: (string | number)[]) => {

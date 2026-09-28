@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "template": "explainer",
+  "title": "The name of the thing",
+  "logline": "They notice it, the narrator names it, then the twist.",
+  "hashtags": ["stickfigure"],
+  "cast": [ { "id": "milo", "character": "milo" }, { "id": "june", "character": "june" } ],
+  "scenes": [
+    {
+      "set": "living-1",
+      "lines": [
+        { "who": "milo", "text": "I would not sell this mug.", "role": "setup" },
+        { "who": "june", "text": "You bought it for a dollar.", "role": "setup" }
+      ]
+    },
+    {
+      "set": "plain-1",
+      "card": "THE MUG",
+      "lines": [
+        { "who": "narrator", "text": "Owning it makes the mug feel rarer." }
+      ]
+    },
+    {
+      "set": "living-1",
+      "lines": [
+        { "who": "milo", "text": "Then why is it in the sink.", "role": "escalation" },
+        { "who": "june", "text": "Because it is mine now.", "role": "punchline", "slam": "MINE" }
+      ]
+    }
+  ]
+}

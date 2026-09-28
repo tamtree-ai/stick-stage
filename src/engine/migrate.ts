@@ -5,7 +5,7 @@ import { SkitError, type Diagnostic } from "./director/diagnostics";
  * incompatibly, bump `CURRENT_VERSIONS[kind]` and add a migration `n → n+1` that rewrites old
  * documents. Loading runs the chain, so old skits keep working.
  */
-export const DOC_KINDS = ["skit", "premise", "character", "pose", "expression", "prop", "set", "voice", "preparedVoice", "reactions", "sfx", "safeArea"] as const;
+export const DOC_KINDS = ["skit", "premise", "character", "pose", "expression", "prop", "set", "voice", "preparedVoice", "reactions", "sfx", "safeArea", "series", "music"] as const;
 export type DocKind = (typeof DOC_KINDS)[number];
 
 export const CURRENT_VERSIONS: Readonly<Record<DocKind, number>> = {
@@ -21,6 +21,8 @@ export const CURRENT_VERSIONS: Readonly<Record<DocKind, number>> = {
   reactions: 1,
   sfx: 1,
   safeArea: 1,
+  series: 1,
+  music: 1,
 };
 
 type Doc = Record<string, unknown>;

@@ -97,6 +97,14 @@
           "variant": {
             "type": "string"
           },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "screen": {
+            "type": "string",
+            "minLength": 1
+          },
           "seatFor": {
             "default": [],
             "type": "array",
@@ -165,6 +173,14 @@
           },
           "variant": {
             "type": "string"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "screen": {
+            "type": "string",
+            "minLength": 1
           },
           "seatFor": {
             "default": [],

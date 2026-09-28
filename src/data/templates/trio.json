@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "template": "trio",
+  "title": "Working title",
+  "logline": "Three people, one room, one of them lands it.",
+  "hashtags": ["stickfigure"],
+  "set": "living-1",
+  "cast": [
+    { "id": "milo", "character": "milo" },
+    { "id": "june", "character": "june" },
+    { "id": "theo", "character": "theo" }
+  ],
+  "lines": [
+    { "who": "theo", "text": "Who ate the last slice?", "role": "setup" },
+    { "who": "milo", "text": "Not me.", "role": "setup" },
+    { "who": "june", "text": "Also not me.", "role": "escalation" },
+    { "who": "theo", "text": "Then the slice confessed.", "role": "punchline" }
+  ]
+}

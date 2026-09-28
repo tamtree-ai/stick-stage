@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "id": "milo-june",
+  "title": "Milo and June",
+  "cast": ["milo", "june"],
+  "homeSets": ["living-1", "office-1", "cafe-1"],
+  "coldOpen": "pov"
+}

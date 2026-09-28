@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "The name of the thing",
+    "hashtags": [
+      "stickfigure"
+    ]
+  },
+  "cast": [
+    {
+      "id": "milo",
+      "character": "milo",
+      "mark": "left"
+    },
+    {
+      "id": "june",
+      "character": "june",
+      "mark": "right"
+    }
+  ],
+  "narrator": {
+    "id": "narrator"
+  },
+  "overlay": {
+    "subtitles": true
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "set": "living-1",
+      "beats": [
+        {
+          "id": "l1",
+          "speaker": "milo",
+          "line": "I would not sell this mug.",
+          "actions": [],
+          "expression": "neutral"
+        },
+        {
+          "id": "l2",
+          "speaker": "june",
+          "line": "You bought it for a dollar.",
+          "actions": [],
+          "expression": "neutral"
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "set": "plain-1",
+      "card": {
+        "title": "THE MUG"
+      },
+      "beats": [
+        {
+          "id": "l3",
+          "speaker": "narrator",
+          "line": "Owning it makes the mug feel rarer.",
+          "actions": []
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "set": "living-1",
+      "beats": [
+        {
+          "id": "l4",
+          "speaker": "milo",
+          "line": "Then why is it in the sink.",
+          "actions": [
+            {
+              "who": "milo",
+              "do": "pose",
+              "pose": "point",
+              "at": {
+                "fraction": 0.15
+              }
+            }
+          ],
+          "expression": "annoyed"
+        },
+        {
+          "id": "l5",
+          "speaker": "june",
+          "line": "Because it is mine now.",
+          "actions": [],
+          "expression": "deadpan",
+          "punchline": true,
+          "pauseBeforeMs": 450,
+          "holdAfterMs": 300,
+          "text": [
+            {
+              "type": "slam",
+              "value": "MINE",
+              "at": {
+                "word": "now",
+                "occurrence": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

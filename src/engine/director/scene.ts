@@ -1,4 +1,5 @@
 /** Compile one resolved scene (a single-scene skit is one scene). */
+import type { MusicManifest } from "../audio/music";
 import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
 import type { SafeArea } from "../text/safeArea";
@@ -24,6 +25,8 @@ export type CompileInput = {
   sets: Readonly<Record<string, SetDef>>;
   sfx: SfxManifest;
   reactions: ReactionTable;
+  /** Beds a skit may name. Omitted when the skit has no `music`. */
+  music?: MusicManifest;
   /** Face shots keep the face in this area. Default: `DEFAULT_SAFE_AREA`. */
   safeArea?: SafeArea;
 };
@@ -124,6 +127,17 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
 
   const { fps, width, height } = skit.meta;
   const set = input.sets[skit.set]!;
+  const partNames = new Set([...set.layers, ...set.foreground].map((p) => p.part));
+  skit.labels?.forEach((label, i) => {
+    const path = `labels[${i}]`;
+    if (!partNames.has(label.part))
+      diags.push({ level: "error", code: "label-part", path, message: `set "${set.id}" has no part "${label.part}"`, expected: [...partNames].join(", ") });
+    if (label.text && label.part !== "board")
+      diags.push({ level: "warning", code: "label-unused", path: `${path}.text`, message: `"text" is drawn on a board; "${label.part}" ignores it` });
+    if (label.screen && label.part !== "desk" && label.part !== "tv")
+      diags.push({ level: "warning", code: "label-unused", path: `${path}.screen`, message: `"screen" is drawn on a desk or a tv; "${label.part}" ignores it` });
+  });
+  if (fail()) throw new SkitError(diags);
   const lines = new Map<string, PreparedLine>((input.voice?.lines ?? []).map((l) => [l.id, l]));
   const reactionFor = (beat: Beat, i: number) => {
     const reactor = reactorFor(skit, i, beat.speaker!);
@@ -194,6 +208,7 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
     height,
     durationInFrames,
     set: skit.set,
+    ...(skit.labels?.length ? { labels: skit.labels } : {}),
     cast,
     beats: layout.beats.map((b) => ({
       id: b.beat.id,
@@ -221,7 +236,7 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
     lists: lists.map((l) => ({ ...l, to: nextCut(l.at[0]!) })),
     ...(card ? { card } : {}),
     pages: skit.overlay.subtitles
-      ? buildCaptionPages(spoken.map((b) => ({ startMs: (msToFrame(b.zeroMs, fps) / fps) * 1000, words: b.line!.words, narrator: b.narrator })))
+      ? buildCaptionPages(spoken.map((b) => ({ startMs: (msToFrame(b.zeroMs, fps) / fps) * 1000, words: b.line!.words, narrator: b.narrator || b.thought })))
       : [],
     ...(skit.narrator ? { narratorCaption: skit.narrator.captionStyle } : {}),
   };

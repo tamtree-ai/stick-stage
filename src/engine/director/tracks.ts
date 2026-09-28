@@ -61,6 +61,11 @@ const initCast = (ctx: Ctx): CastTrack[] =>
     ctx.mark.set(m.id, m.mark);
     const facing: Facing = m.facing ?? ((x ?? 0.5) <= 0.5 ? "right" : "left");
     const seated = m.seated ? seatPx(ctx, m.id, `${path}.seated`) : undefined;
+    const heldKind = m.holding ? ctx.lib.props[m.holding.prop]?.kind : undefined;
+    if (m.holding?.text && heldKind && heldKind !== "sign")
+      ctx.diags.push({ level: "warning", code: "prop-text", path: `${path}.holding.text`, message: `"text" is drawn on a sign; "${m.holding.prop}" is a ${heldKind}` });
+    if (m.holding?.screen && heldKind && heldKind !== "laptop")
+      ctx.diags.push({ level: "warning", code: "prop-screen", path: `${path}.holding.screen`, message: `"screen" is drawn on a laptop; "${m.holding.prop}" is a ${heldKind}` });
     return {
       id: m.id,
       character: m.character,
@@ -73,7 +78,7 @@ const initCast = (ctx: Ctx): CastTrack[] =>
       gazeKeys: [],
       nodKeys: [],
       seatKeys: seated !== undefined ? [{ frame: 0, seatPx: seated }] : [],
-      propKeys: m.holding ? [{ frame: 0, hand: m.holding.hand, prop: m.holding.prop }] : [],
+      propKeys: m.holding ? [{ frame: 0, hand: m.holding.hand, prop: m.holding.prop, text: m.holding.text, screen: m.holding.screen }] : [],
       symbolKeys: [],
       speech: [],
       moveKeys: [],
@@ -132,9 +137,15 @@ const applyAction = (ctx: Ctx, b: LaidBeat, a: Action, path: string, moments: Mo
       ctx.mark.set(a.who, a.mark);
       return;
     }
-    case "hold":
-      c.propKeys.push({ frame: f, hand: a.hand, prop: a.prop });
+    case "hold": {
+      const kind = ctx.lib.props[a.prop]?.kind;
+      if (a.text && kind && kind !== "sign")
+        ctx.diags.push({ level: "warning", code: "prop-text", path, message: `"text" is drawn on a sign; "${a.prop}" is a ${kind}`, expected: `prop "sign", or omit "text"` });
+      if (a.screen && kind && kind !== "laptop")
+        ctx.diags.push({ level: "warning", code: "prop-screen", path, message: `"screen" is drawn on a laptop; "${a.prop}" is a ${kind}`, expected: `prop "laptop", or omit "screen"` });
+      c.propKeys.push({ frame: f, hand: a.hand, prop: a.prop, text: a.text, screen: a.screen });
       return;
+    }
     case "putAway":
     case "drop":
       c.propKeys.push({ frame: f, hand: a.hand, prop: null, drop: a.do === "drop" });
@@ -218,7 +229,19 @@ export const buildTracks = (skit: Skit, layout: Layout, set: SetDef, lib: Librar
     moments.set(b, m);
     const from = msToFrame(b.fromMs, fps);
     // Voice-over: no mouth, no body, and nobody on stage turns to it.
-    if (b.kind === "line" && !b.narrator) {
+    // A thought keeps the body and the face, and shuts the mouth.
+    if (b.kind === "line" && b.thought) {
+      const speaker = ctx.byId.get(b.beat.speaker!);
+      if (!speaker) {
+        diags.push(unknownId("speaker", b.beat.speaker!, [...ctx.byId.keys()], [...b.path, "speaker"]));
+        continue;
+      }
+      if (b.beat.expression) {
+        speaker.expressionKeys.push({ frame: Math.max(0, from - EXPR_LEAD), expression: b.beat.expression });
+        m.push({ who: speaker.id, expression: b.beat.expression, frame: from });
+      }
+    }
+    if (b.kind === "line" && !b.narrator && !b.thought) {
       const speaker = ctx.byId.get(b.beat.speaker!);
       if (!speaker) {
         diags.push(unknownId("speaker", b.beat.speaker!, [...ctx.byId.keys()], [...b.path, "speaker"]));

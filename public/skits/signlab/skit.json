@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Read the sign",
+    "description": "Lab: the joke is on the sign, the board, the laptop and the desk.",
+    "hashtags": ["stickfigure"],
+    "series": { "id": "milo-june", "season": 1, "episode": 1 }
+  },
+  "cast": [
+    { "id": "milo", "character": "milo", "mark": "left" },
+    { "id": "june", "character": "june", "mark": "right" }
+  ],
+  "scenes": [
+    {
+      "id": "class",
+      "set": "classroom-1",
+      "labels": [{ "part": "board", "text": "POP QUIZ" }],
+      "cast": [
+        { "id": "milo", "holding": { "prop": "laptop", "screen": "NO\nSIGNAL" } },
+        { "id": "june", "holding": { "prop": "sign", "text": "HELP" } }
+      ],
+      "beats": [
+        { "id": "b1", "speaker": "milo", "line": "What does the board say?", "expression": "confused" },
+        {
+          "id": "b2",
+          "speaker": "june",
+          "line": "Read the sign.",
+          "expression": "deadpan",
+          "actions": [{ "who": "june", "do": "hold", "prop": "sign", "text": "OUR FAULT", "at": { "word": "sign" } }]
+        }
+      ]
+    },
+    {
+      "id": "desk",
+      "set": "office-1",
+      "labels": [{ "part": "desk", "screen": "INBOX\n999" }],
+      "cast": [
+        { "id": "milo", "mark": "left", "seated": true },
+        { "id": "june", "mark": "right" }
+      ],
+      "beats": [{ "id": "b3", "speaker": "milo", "line": "Nine hundred and ninety nine.", "expression": "shocked" }]
+    },
+    {
+      "id": "home",
+      "set": "living-2",
+      "labels": [{ "part": "tv", "screen": "LIVE" }],
+      "beats": [{ "id": "b4", "speaker": "june", "line": "The television agrees.", "expression": "smug" }]
+    }
+  ]
+}

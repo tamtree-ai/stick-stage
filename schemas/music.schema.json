@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "beds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "durationMs": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "gain": {
+            "default": 0.18,
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "ducked": {
+            "default": 0.05,
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "license": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "file",
+          "durationMs",
+          "license",
+          "source"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "beds"
+  ],
+  "$id": "https://stickstage.dev/schemas/music.schema.json",
+  "title": "StickStage music"
+}

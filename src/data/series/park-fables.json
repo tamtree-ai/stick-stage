@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "id": "park-fables",
+  "title": "Park fables",
+  "cast": ["moss", "dash"],
+  "homeSets": ["park-1", "park-2"],
+  "coldOpen": "pov"
+}

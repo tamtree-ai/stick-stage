@@ -1,5 +1,8 @@
 import { z } from "zod";
 import { SYMBOLS } from "../face/schema";
+import { ScreenTextSchema, SignTextSchema } from "../lib/screenText";
+import { SeriesRefSchema } from "../series/schema";
+import { PartLabelSchema } from "../set/schema";
 import { FRAMINGS } from "../shots/framing";
 
 /**
@@ -30,7 +33,7 @@ export const ActionSchema = z.discriminatedUnion("do", [
   z.strictObject({ do: z.literal("hop"), who, at, height: z.number().min(0.02).max(0.4).optional() }),
   z.strictObject({ do: z.literal("nod"), who, at }),
   z.strictObject({ do: z.literal("slideTo"), who, mark: z.string().min(1), at, durationFrames: z.number().int().min(3).max(30).optional() }),
-  z.strictObject({ do: z.literal("hold"), who, prop: z.string().min(1), hand, at }),
+  z.strictObject({ do: z.literal("hold"), who, prop: z.string().min(1), hand, at, text: SignTextSchema.optional(), screen: ScreenTextSchema.optional() }),
   z.strictObject({ do: z.literal("putAway"), who, hand, at }),
   z.strictObject({ do: z.literal("drop"), who, hand, at }),
   z.strictObject({ do: z.literal("symbol"), who, symbol: z.enum(SYMBOLS), at, durationMs: z.number().min(100).max(10000).optional() }),
@@ -45,7 +48,6 @@ export const ActionSchema = z.discriminatedUnion("do", [
 ]);
 export type Action = z.infer<typeof ActionSchema>;
 export const ACTION_KINDS = ActionSchema.options.map((o) => o.shape.do.value);
-
 export const ShotSchema = z.strictObject({
   framing: z.enum(FRAMINGS),
   /** Cast member for face framings (`medium`, `close`, `extreme`). */
@@ -120,6 +122,8 @@ export const BeatSchema = z.strictObject({
    * and the reaction beat; without `focus` the camera holds the scene's shot.
    */
   focus: z.string().min(1).optional(),
+  /** A thought: this cast member's voice, mouth shut, italic caption. Not the off-screen narrator. */
+  voiceOver: z.boolean().optional(),
   /** Listeners' reaction expression on the last word, or `false` for none. Default from `reactions.json`. */
   reaction: z.union([z.string().min(1), z.literal(false)]).optional(),
   /** Optional: the default shot policy frames the beat when omitted. */
@@ -140,7 +144,7 @@ export const CastSchema = z.strictObject({
   expression: z.string().optional(),
   /** Start seated on the seat at this mark. */
   seated: z.boolean().default(false),
-  holding: z.strictObject({ prop: z.string().min(1), hand }).optional(),
+  holding: z.strictObject({ prop: z.string().min(1), hand, text: SignTextSchema.optional(), screen: ScreenTextSchema.optional() }).optional(),
   /** Name tag above the head in group shots ("me", "my brain", "reporter"). */
   label: z.string().min(1).max(24).optional(),
 });
@@ -194,7 +198,7 @@ export const SceneCastSchema = z.strictObject({
   pose: z.string().optional(),
   expression: z.string().optional(),
   seated: z.boolean().optional(),
-  holding: z.strictObject({ prop: z.string().min(1), hand }).optional(),
+  holding: z.strictObject({ prop: z.string().min(1), hand, text: SignTextSchema.optional(), screen: ScreenTextSchema.optional() }).optional(),
   label: z.string().min(1).max(24).optional(),
 });
 
@@ -211,6 +215,8 @@ export const SceneSchema = z.strictObject({
   pov: z.string().max(80).optional(),
   /** A full-frame title card over the set, timed by the scene's (narrator) beats. */
   card: CardSchema.optional(),
+  /** Words on a set part for this scene only. The shared set is unchanged. */
+  labels: z.array(PartLabelSchema).max(6).optional(),
   beats: z.array(BeatSchema).min(1),
 });
 export type Scene = z.infer<typeof SceneSchema>;
@@ -236,6 +242,8 @@ export const MetaSchema = z.strictObject({
   hashtags: z.array(z.string().regex(/^#?[\p{L}\p{N}_]+$/u, "one word, no spaces")).default([]),
   /** Synthetic (TTS) voices: add the AI-voice disclosure line to the post text. */
   syntheticVoices: z.boolean().default(true),
+  /** Season and episode for the post manifest. Does not post. */
+  series: SeriesRefSchema.optional(),
 });
 
 /** The skit document (`skit.json`): one scene (`set` + `beats`) or several (`scenes`). */
@@ -254,6 +262,10 @@ export const SkitSchema = z
       .strictObject({ pov: z.string().max(80).optional(), subtitles: z.boolean().default(true) })
       .default({ subtitles: true }),
     timing: TimingSchema,
+    /** Words on a set part. Single-scene skits only; a multi-scene skit puts `labels` on each scene. */
+    labels: z.array(PartLabelSchema).max(6).optional(),
+    /** One bed from the music manifest. Ducked under dialog; silent on the punchline. */
+    music: z.string().min(1).optional(),
     beats: z.array(BeatSchema).min(1).optional(),
     scenes: z.array(SceneSchema).min(1).optional(),
   })
@@ -279,33 +291,4 @@ export const isNarration = (skit: Pick<SkitDoc, "narrator">, b: Pick<Beat, "spea
 /** Every beat of a skit document, across scenes. */
 export const docBeats = (d: SkitDoc): Beat[] => d.beats ?? d.scenes!.flatMap((s) => s.beats);
 
-/** Listener reaction defaults (`src/data/reactions.json`): speaker expression → listener expression. */
-export const ReactionTableSchema = z.object({
-  schemaVersion: z.literal(1),
-  /** Listener's expression on the speaker's last word, for ordinary lines. */
-  listen: z.record(z.string(), z.string()),
-  defaultListen: z.string(),
-  /** Listener's expression in the reaction close-up after the punchline. */
-  punchline: z.record(z.string(), z.string()),
-  defaultPunchline: z.string(),
-});
-export type ReactionTable = z.infer<typeof ReactionTableSchema>;
-
-/** SFX library manifest (`src/data/sfx.json`). Every file records its license. */
-export const SfxManifestSchema = z.object({
-  schemaVersion: z.literal(1),
-  sounds: z.array(
-    z.object({
-      id: z.string(),
-      /** Relative to `public/`. */
-      file: z.string(),
-      durationMs: z.number().positive(),
-      /** Playback gain so stings sit under dialog. */
-      gain: z.number().min(0).max(2).default(0.8),
-      license: z.string().min(1),
-      source: z.string().min(1),
-      tags: z.array(z.string()).default([]),
-    }),
-  ),
-});
-export type SfxManifest = z.infer<typeof SfxManifestSchema>;
+export { ReactionTableSchema, SfxManifestSchema, type ReactionTable, type SfxManifest } from "./librarySchemas";

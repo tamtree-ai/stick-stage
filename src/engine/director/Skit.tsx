@@ -39,7 +39,7 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
   const faceShot = FACE_FRAMINGS.includes(shotAt(tl, frame).framing);
   return (
     <AbsoluteFill style={{ background: "#ffffff" }}>
-      <Stage set={set} actors={actors} width={W} height={H} frame={frame} camera={camera} fontFamily={fontFamily} />
+      <Stage set={set} actors={actors} width={W} height={H} frame={frame} camera={camera} fontFamily={fontFamily} labels={tl.labels} />
       {audio && tl.audio.map((a) => (
         <Sequence key={`v-${a.beatId}`} from={a.frame} durationInFrames={a.durationFrames} layout="none">
           <Html5Audio src={staticFile(a.src)} />

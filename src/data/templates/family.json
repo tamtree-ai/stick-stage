@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "template": "family",
+  "title": "Working title",
+  "logline": "The kid asks. The adult answers badly.",
+  "hashtags": ["stickfigure"],
+  "set": "classroom-1",
+  "cast": [ { "id": "june", "character": "june" }, { "id": "lila", "character": "lila" } ],
+  "lines": [
+    { "who": "lila", "text": "Why is the sky blue?", "role": "setup" },
+    { "who": "june", "text": "Because it is tired.", "role": "escalation" },
+    { "who": "lila", "text": "The sky gets tired?", "role": "escalation" },
+    { "who": "june", "text": "Ask it after bedtime.", "role": "punchline" }
+  ]
+}

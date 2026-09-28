@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "template": "fable",
+  "title": "Working title",
+  "logline": "Dash is sure and leaves. Moss has the last true line.",
+  "hashtags": ["stickfigure"],
+  "set": "park-1",
+  "cast": [ { "id": "dash", "character": "dash" }, { "id": "moss", "character": "moss" } ],
+  "lines": [
+    { "who": "dash", "text": "The shortcut is faster.", "role": "setup" },
+    { "who": "moss", "text": "The shortcut is a pond.", "role": "escalation" },
+    { "who": "dash", "text": "I do not mind wet.", "role": "escalation" },
+    { "who": "moss", "text": "The path was the point.", "role": "punchline" }
+  ]
+}

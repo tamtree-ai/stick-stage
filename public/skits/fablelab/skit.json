@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Working title",
+    "hashtags": [
+      "stickfigure"
+    ]
+  },
+  "set": "park-1",
+  "cast": [
+    {
+      "id": "dash",
+      "character": "dash",
+      "mark": "left"
+    },
+    {
+      "id": "moss",
+      "character": "moss",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "subtitles": true
+  },
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "dash",
+      "line": "The shortcut is faster.",
+      "actions": [],
+      "expression": "neutral"
+    },
+    {
+      "id": "l2",
+      "speaker": "moss",
+      "line": "The shortcut is a pond.",
+      "actions": [
+        {
+          "who": "moss",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ],
+      "expression": "annoyed"
+    },
+    {
+      "id": "l3",
+      "speaker": "dash",
+      "line": "I do not mind wet.",
+      "actions": [
+        {
+          "who": "dash",
+          "do": "pose",
+          "pose": "hands-on-hips",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ],
+      "expression": "annoyed"
+    },
+    {
+      "id": "l4",
+      "speaker": "moss",
+      "line": "The path was the point.",
+      "actions": [
+        {
+          "who": "dash",
+          "do": "walkTo",
+          "mark": "off-right",
+          "at": {
+            "fraction": 0.2
+          }
+        }
+      ],
+      "expression": "deadpan",
+      "punchline": true,
+      "pauseBeforeMs": 450,
+      "holdAfterMs": 300
+    }
+  ]
+}

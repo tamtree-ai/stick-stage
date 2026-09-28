@@ -160,7 +160,8 @@ export const prepSkit = (ws: Workspace, skitId: string, opts: PrepOptions = {}):
   }
   // Voice-over lines: the manifest's speaker is the narrator, or the beat says so.
   const narration = new Set(doc?.narrator ? docBeats(doc).filter((b) => isNarration(doc, b)).map((b) => b.id) : []);
-  const voiceOver = (l: VoiceLine) => narration.has(l.id) || (!!doc?.narrator && l.speaker === doc.narrator.id);
+  const thoughts = new Set(doc ? docBeats(doc).filter((b) => b.voiceOver).map((b) => b.id) : []);
+  const voiceOver = (l: VoiceLine) => narration.has(l.id) || thoughts.has(l.id) || (!!doc?.narrator && l.speaker === doc.narrator.id);
   const results = [...tts.map((l) => prepTtsLine(ctx, l, voiceOver(l))), ...clips.map((b) => prepClip(ctx, b))];
   if (results.some((r) => r.line.source.words === "estimated" && clips.some((c) => c.id === r.line.id)) && !a.transcriber)
     warnings.push("Word timings for file-audio beats are ESTIMATED (set WHISPER_MODEL + whisper-cli, or give audio.words).");

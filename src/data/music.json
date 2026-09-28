@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "beds": [
+    {
+      "id": "room",
+      "file": "music/room.wav",
+      "durationMs": 8400,
+      "gain": 0.18,
+      "ducked": 0.05,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/music-gen.ts (StickStage, original)"
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import type { Library } from "./rig/actorState";
 import { setCatalog, type SetCatalogEntry } from "./set/catalog";
 import type { SetDef } from "./set/schema";
 import { TEMPLATES, type TemplateId } from "./templates/premise";
-import { TEMPLATE_CAST, TEMPLATE_DEFAULT_SET } from "./templates/stage";
+import { TEMPLATE_CAST, TEMPLATE_CAST_MAX, TEMPLATE_DEFAULT_SET } from "./templates/stage";
 import type { SafeArea } from "./text/safeArea";
 
 /** Everything a skit is validated and rendered against. Two registries with equal content have equal versions. */
@@ -16,7 +16,7 @@ export type CatalogSource = {
 };
 
 export type CatalogCharacter = { id: string; name: string };
-export type CatalogTemplate = { id: TemplateId; cast: 1 | 2; defaultSet: string; description: string };
+export type CatalogTemplate = { id: TemplateId; cast: 1 | 2 | 3; castMax: 1 | 2 | 3; defaultSet: string; description: string };
 
 /** What a brief can pick from: the picker's view of a registry, pinned by `version`. */
 export type Catalog = {
@@ -34,6 +34,10 @@ const TEMPLATE_DESCRIPTION: Record<TemplateId, string> = {
   "me-vs-me": "One character argues with a labelled version of themselves.",
   "pov-monologue": "One character talks straight to camera under a POV caption.",
   "text-slam": "Words slam on screen while one face reacts.",
+  explainer: "A short hook, a narrator concept, and a twist the characters say.",
+  family: "A kid asks. An adult answers badly. One or two kids.",
+  fable: "Dash is sure and leaves. Moss has the last true line.",
+  trio: "Three people in one room. One of them lands it.",
 };
 
 /** JSON with object keys sorted, so the hash does not depend on key order. */
@@ -71,7 +75,7 @@ export const buildCatalog = (src: CatalogSource): Catalog => ({
   version: catalogVersion(src),
   characters: Object.values(src.lib.characters).map((c) => ({ id: c.id, name: c.displayName ?? c.id })),
   sets: setCatalog(src.sets),
-  templates: TEMPLATES.map((id) => ({ id, cast: TEMPLATE_CAST[id], defaultSet: TEMPLATE_DEFAULT_SET[id], description: TEMPLATE_DESCRIPTION[id] })),
+  templates: TEMPLATES.map((id) => ({ id, cast: TEMPLATE_CAST[id], castMax: TEMPLATE_CAST_MAX[id], defaultSet: TEMPLATE_DEFAULT_SET[id], description: TEMPLATE_DESCRIPTION[id] })),
   expressions: Object.keys(src.lib.expressions),
   props: Object.keys(src.lib.props),
 });
