@@ -10,7 +10,7 @@
 Status: draft, team to confirm
 
 ## Look
-Tall and lanky, a bit above Milo. Cream head, long ears with pink insides, big-pupil eyes, a line torso, cream feet, a small white tail. The ears are the silhouette.
+Tall and lanky, a bit above Milo. Hare, not bunny: brown fur on the head, a slim body and thin limbs, a cream belly and muzzle, a pink nose, whiskers, big-pupil eyes. Long swept-back ears with pink insides and black tips, long feet and a white puff tail. The ears are the silhouette.
 
 ## Voice
 Dev voice: macOS `say` "Superstar". For posting, the tamtree harness picks the TTS voice. Delivery: already finished, a little pleased with himself, cuts in early.

@@ -32,7 +32,7 @@ TTS is **not** called from this repo. The tamtree agent harness generates audio 
 
 ## Layout
 - `src/engine/lib`: math (angle convention in `math.ts`), easing, seeds, colors
-- `src/engine/rig`: schema, FK skeleton (`solveSkeleton`), pose tracks, idle/blinks, Bézier limbs, accessories, `evalActor` (`actorState.ts`: pose, expression, speech, seat, prop and symbol tracks), `<Actor>`
+- `src/engine/rig`: schema, FK skeleton (`solveSkeleton`), pose tracks, idle/blinks, Bézier limbs (or `style.limbs` tubes for animals), accessories (animal parts in `animalParts.tsx` / `animalHeads.tsx`), `evalActor` (`actorState.ts`: pose, expression, speech, seat, prop and symbol tracks), `<Actor>`
 - `src/engine/rig/seat.ts`: seat track + seated-leg IK (hip on the seat, feet planted)
 - `src/engine/props`: prop schema, per-kind drawings (`draw.tsx`), hold/drop track + fall (`track.ts`), `<PropView>`
 - `src/engine/face`: expression schema, parametric mouths (`mouths.ts`), eyes/brows/mouth/symbols (`Emanata.tsx`: !, ?, speed lines)

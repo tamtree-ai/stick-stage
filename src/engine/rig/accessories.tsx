@@ -1,30 +1,10 @@
 import React from "react";
-import { f2, type Vec2 } from "../lib/math";
-import type { Accessory, Character } from "./schema";
+import { f2 } from "../lib/math";
+import { onHead, type AccessoryDef, type AccessoryLayer, type BodyAnchor } from "./accessoryKit";
+import { ANIMAL_PARTS } from "./animalParts";
+import type { Character } from "./schema";
 
-export type AccessoryLayer = "back" | "front" | "eyewear" | "body";
-
-/** Torso segment in figure space. Only the body layer uses it. */
-export type BodyAnchor = { hip: Vec2; neck: Vec2; heightPx: number };
-
-type AccessoryDraw = (a: {
-  R: number;
-  stroke: string;
-  sw: number;
-  color: string;
-  character: Character;
-  hip?: Vec2;
-  neck?: Vec2;
-  heightPx?: number;
-}) => React.ReactNode;
-
-type AccessoryDef = { slot: Accessory["slot"]; layers: Partial<Record<AccessoryLayer, AccessoryDraw>> };
-
-/** Arc point on the head circle at angle `deg` (0 = top, + = toward facing). */
-const onHead = (R: number, deg: number, k = 1) => {
-  const a = (deg * Math.PI) / 180;
-  return { x: Math.sin(a) * R * k, y: -Math.cos(a) * R * k };
-};
+export type { AccessoryLayer, BodyAnchor } from "./accessoryKit";
 
 const REGISTRY: Record<string, AccessoryDef> = {
   "tuft-01": {
@@ -149,86 +129,6 @@ const REGISTRY: Record<string, AccessoryDef> = {
       },
     },
   },
-  "ears-long-01": {
-    slot: "hair",
-    layers: {
-      back: ({ R, stroke, sw, color }) => {
-        const ear = (side: number, scaleEar: number) => {
-          const w = 0.2 * R * scaleEar;
-          const h = 1.4 * R * scaleEar;
-          const cx = side * 0.36 * R;
-          const baseY = -0.62 * R;
-          const top = baseY - h;
-          const outer =
-            `M ${f2(cx - w)} ${f2(baseY)} ` +
-            `Q ${f2(cx - w * 1.05)} ${f2(top + h * 0.2)} ${f2(cx)} ${f2(top)} ` +
-            `Q ${f2(cx + w * 1.05)} ${f2(top + h * 0.2)} ${f2(cx + w)} ${f2(baseY)} Z`;
-          const inner =
-            `M ${f2(cx - w * 0.42)} ${f2(baseY - h * 0.12)} ` +
-            `Q ${f2(cx - w * 0.42)} ${f2(top + h * 0.32)} ${f2(cx)} ${f2(top + h * 0.22)} ` +
-            `Q ${f2(cx + w * 0.42)} ${f2(top + h * 0.32)} ${f2(cx + w * 0.42)} ${f2(baseY - h * 0.12)} Z`;
-          return (
-            <g key={side}>
-              <path d={outer} fill={color} stroke={stroke} strokeWidth={sw} strokeLinejoin="round" />
-              <path d={inner} fill="#f3b7c8" />
-            </g>
-          );
-        };
-        return (
-          <g>
-            {ear(-1, 0.9)}
-            {ear(1, 1)}
-          </g>
-        );
-      },
-    },
-  },
-  "shell-01": {
-    slot: "body",
-    layers: {
-      body: ({ stroke, sw, color, hip, neck, heightPx }) => {
-        if (!hip || !neck || heightPx == null) return null;
-        const dx = neck.x - hip.x;
-        const dy = neck.y - hip.y;
-        const torsoLen = Math.hypot(dx, dy) || 1;
-        const angle = (Math.atan2(dx, -dy) * 180) / Math.PI;
-        const rx = heightPx * 0.2;
-        const ry = heightPx * 0.15;
-        const chord = (y: number) => {
-          const x = rx * Math.sqrt(Math.max(0, 1 - (y * y) / (ry * ry))) * 0.86;
-          return `M ${f2(-x)} ${f2(y)} L ${f2(x)} ${f2(y)}`;
-        };
-        return (
-          <g transform={`translate(${f2(hip.x)} ${f2(hip.y)}) rotate(${f2(angle)})`}>
-            <g transform={`translate(${f2(-heightPx * 0.04)} ${f2(-torsoLen * 0.42)})`}>
-              <ellipse cx={0} cy={0} rx={rx} ry={ry} fill={color} stroke={stroke} strokeWidth={sw} />
-              <path
-                d={`${chord(-ry * 0.32)} ${chord(ry * 0.28)} M 0 ${f2(-ry * 0.78)} L 0 ${f2(ry * 0.78)}`}
-                fill="none"
-                stroke={stroke}
-                strokeWidth={sw * 0.45}
-                strokeLinecap="round"
-              />
-            </g>
-          </g>
-        );
-      },
-    },
-  },
-  "tail-puff-01": {
-    slot: "body",
-    layers: {
-      body: ({ stroke, sw, color, hip, neck, heightPx }) => {
-        if (!hip || !neck || heightPx == null) return null;
-        const angle = (Math.atan2(neck.x - hip.x, hip.y - neck.y) * 180) / Math.PI;
-        return (
-          <g transform={`translate(${f2(hip.x)} ${f2(hip.y)}) rotate(${f2(angle)})`}>
-            <circle cx={-heightPx * 0.075} cy={heightPx * 0.02} r={heightPx * 0.038} fill={color} stroke={stroke} strokeWidth={sw * 0.65} />
-          </g>
-        );
-      },
-    },
-  },
   "glasses-round": {
     slot: "eyewear",
     layers: {
@@ -249,6 +149,7 @@ const REGISTRY: Record<string, AccessoryDef> = {
       },
     },
   },
+  ...ANIMAL_PARTS,
 };
 
 export const accessoryIds = (): string[] => Object.keys(REGISTRY);

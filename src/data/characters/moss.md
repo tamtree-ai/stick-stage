@@ -10,7 +10,7 @@
 Status: draft, team to confirm
 
 ## Look
-Short and wide. Light green head, dot eyes, a green bean body, darker green shell on the back, short limbs, dark feet. The shell is the silhouette. No hair.
+Short and wide. A sage-green head stretched forward into a snout (nostril at the tip), dot eyes, a pale yellow plastron belly, and a domed dark-green shell on the back with a pale rim and hex scutes. The head pokes out of the top of the shell. Thick green limbs and stubby feet. The shell is the silhouette. No hair.
 
 ## Voice
 Dev voice: macOS `say` "Fred". For posting, the tamtree harness picks the TTS voice. Delivery: unhurried, one idea per line, never talks over the other person.
