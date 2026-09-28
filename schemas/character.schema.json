@@ -236,6 +236,15 @@
         ]
       }
     },
+    "energy": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "personality": {
+      "type": "string",
+      "maxLength": 160
+    },
     "voice": {
       "type": "object",
       "properties": {

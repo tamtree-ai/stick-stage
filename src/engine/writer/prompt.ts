@@ -1,3 +1,4 @@
+import { GAG_IDS } from "../director/gags";
 import type { SkitDoc } from "../director/schema";
 import { docBeats } from "../director/schema";
 import type { Brief, ScenePlan } from "./brief";
@@ -12,7 +13,8 @@ const castBlock = (brief: Brief, notes: WriterWorld["notes"]): string =>
   brief.cast
     .map((m) => {
       const label = m.label ? ` (shown as "${m.label}")` : "";
-      const note = notes[m.character] ?? "no notes; play it straight.";
+      const inline = brief.characters?.find((c) => c.id === m.character)?.personality;
+      const note = inline ?? notes[m.character] ?? "no notes; play it straight.";
       return `- ${m.id}${label}, played by ${m.character}: ${note}`;
     })
     .join("\n");
@@ -87,6 +89,7 @@ who: ${brief.cast.map((c) => c.id).join(" or ")}.
 expression: ${world.expressions.join(", ")}. No other word.
 pov: optional, at most 80 characters, starts with "POV: ".
 slam: optional, one or two words, only on the last line.
+gag: optional, at most one per line, one of: ${GAG_IDS.join(", ")}.
 delivery: optional ("flat", "whispered").
 Do not write schemaVersion, cast, role, or anything about shots, actions or timing.`;
 
@@ -123,6 +126,7 @@ Change only what the note asks. Return every line you keep, in play order. Leave
 
 who: ${who.join(" or ") || "a cast id"}.
 expression: ${world.expressions.join(", ")}.
-The last line is the punchline. slam (one or two words) is optional, and only on that line.`;
+The last line is the punchline. slam (one or two words) is optional, and only on that line.
+gag is optional, at most one per line: ${GAG_IDS.join(", ")}.`;
   return { system, prompt: `Note: ${note}\n\nLines:\n${JSON.stringify(lines)}` };
 };

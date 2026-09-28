@@ -15,5 +15,6 @@
   },
   "face": { "eyes": "dot", "brows": true, "mouthSet": "default", "offsetX": 0.1, "eyeSpacing": 0.42, "eyeY": 0.02, "mouthY": 0.48 },
   "accessories": [{ "slot": "body", "id": "shell-01", "color": "#3e6a38" }],
-  "voice": { "say": "Fred" }
+  "voice": { "say": "Fred" },
+  "energy": 0.22
 }

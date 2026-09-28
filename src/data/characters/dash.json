@@ -18,5 +18,6 @@
     { "slot": "hair", "id": "ears-long-01", "color": "#f7efe2" },
     { "slot": "body", "id": "tail-puff-01", "color": "#ffffff" }
   ],
-  "voice": { "say": "Superstar" }
+  "voice": { "say": "Superstar" },
+  "energy": 0.92
 }

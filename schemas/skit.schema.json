@@ -74,6 +74,11 @@
             "episode"
           ],
           "additionalProperties": false
+        },
+        "language": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 16
         }
       },
       "required": [
@@ -287,6 +292,376 @@
     "music": {
       "type": "string",
       "minLength": 1
+    },
+    "speechMotion": {
+      "type": "string",
+      "enum": [
+        "auto",
+        "off"
+      ]
+    },
+    "style": {
+      "type": "string",
+      "enum": [
+        "classic",
+        "deadpan",
+        "snappy",
+        "chaotic",
+        "sitcom"
+      ]
+    },
+    "coldOpen": {
+      "type": "string",
+      "enum": [
+        "pov",
+        "none",
+        "teaser"
+      ]
+    },
+    "characters": {
+      "maxItems": 4,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "type": "number",
+            "const": 1
+          },
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "proportions": {
+            "type": "object",
+            "properties": {
+              "height": {
+                "default": 1,
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 1.5
+              },
+              "headRadius": {
+                "type": "number",
+                "minimum": 0.08,
+                "maximum": 0.25
+              },
+              "neck": {
+                "default": 0.02,
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0.1
+              },
+              "torso": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 0.5
+              },
+              "upperArm": {
+                "type": "number",
+                "minimum": 0.05,
+                "maximum": 0.3
+              },
+              "forearm": {
+                "type": "number",
+                "minimum": 0.05,
+                "maximum": 0.3
+              },
+              "thigh": {
+                "type": "number",
+                "minimum": 0.05,
+                "maximum": 0.35
+              },
+              "shin": {
+                "type": "number",
+                "minimum": 0.05,
+                "maximum": 0.35
+              }
+            },
+            "required": [
+              "headRadius",
+              "torso",
+              "upperArm",
+              "forearm",
+              "thigh",
+              "shin"
+            ]
+          },
+          "style": {
+            "type": "object",
+            "properties": {
+              "stroke": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              },
+              "strokeWidth": {
+                "type": "number",
+                "minimum": 2,
+                "maximum": 30
+              },
+              "headFill": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              },
+              "torso": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "style": {
+                        "type": "string",
+                        "const": "line"
+                      }
+                    },
+                    "required": [
+                      "style"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "style": {
+                        "type": "string",
+                        "const": "bean"
+                      },
+                      "fill": {
+                        "type": "string",
+                        "pattern": "^#[0-9a-fA-F]{3,8}$"
+                      },
+                      "width": {
+                        "default": 0.13,
+                        "type": "number",
+                        "minimum": 0.04,
+                        "maximum": 0.3
+                      }
+                    },
+                    "required": [
+                      "style",
+                      "fill"
+                    ]
+                  }
+                ]
+              },
+              "limbCurve": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "hands": {
+                "type": "string",
+                "enum": [
+                  "nub"
+                ]
+              },
+              "feet": {
+                "type": "string",
+                "enum": [
+                  "oval"
+                ]
+              },
+              "footFill": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              },
+              "cheek": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              }
+            },
+            "required": [
+              "stroke",
+              "strokeWidth",
+              "headFill",
+              "torso",
+              "limbCurve",
+              "hands",
+              "feet",
+              "footFill"
+            ]
+          },
+          "face": {
+            "type": "object",
+            "properties": {
+              "eyes": {
+                "type": "string",
+                "enum": [
+                  "big-pupil",
+                  "dot"
+                ]
+              },
+              "brows": {
+                "type": "boolean"
+              },
+              "mouthSet": {
+                "default": "default",
+                "type": "string"
+              },
+              "offsetX": {
+                "default": 0.14,
+                "type": "number",
+                "minimum": -0.5,
+                "maximum": 0.5
+              },
+              "eyeSpacing": {
+                "default": 0.44,
+                "type": "number",
+                "minimum": 0.2,
+                "maximum": 0.8
+              },
+              "eyeY": {
+                "default": -0.06,
+                "type": "number",
+                "minimum": -0.5,
+                "maximum": 0.5
+              },
+              "mouthY": {
+                "default": 0.42,
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0.8
+              }
+            },
+            "required": [
+              "eyes",
+              "brows"
+            ]
+          },
+          "accessories": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "slot": {
+                  "type": "string",
+                  "enum": [
+                    "hair",
+                    "eyewear",
+                    "headwear",
+                    "neck",
+                    "body"
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                },
+                "color": {
+                  "type": "string",
+                  "pattern": "^#[0-9a-fA-F]{3,8}$"
+                }
+              },
+              "required": [
+                "slot",
+                "id"
+              ]
+            }
+          },
+          "energy": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "personality": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "voice": {
+            "type": "object",
+            "properties": {
+              "provider": {
+                "type": "string"
+              },
+              "voiceId": {
+                "type": "string"
+              },
+              "settings": {
+                "default": {},
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              "say": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "schemaVersion",
+          "id",
+          "proportions",
+          "style",
+          "face"
+        ]
+      }
+    },
+    "i18n": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 16
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "lines": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "slams": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40
+            }
+          },
+          "pov": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "cards": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            }
+          },
+          "labels": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            }
+          }
+        },
+        "required": [
+          "lines"
+        ],
+        "additionalProperties": false
+      }
     },
     "beats": {
       "minItems": 1,
@@ -1421,7 +1796,8 @@
                         "anger",
                         "exclaim",
                         "question",
-                        "speed-lines"
+                        "speed-lines",
+                        "spray"
                       ]
                     },
                     "at": {
@@ -1854,6 +2230,152 @@
                     "do",
                     "who",
                     "target"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "do": {
+                      "type": "string",
+                      "const": "fall"
+                    },
+                    "who": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "at": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "word": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "occurrence": {
+                              "default": 1,
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": [
+                            "word"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "ms": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "ms"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "fraction": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            }
+                          },
+                          "required": [
+                            "fraction"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "do",
+                    "who"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "do": {
+                      "type": "string",
+                      "const": "gag"
+                    },
+                    "who": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "gag": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "at": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "word": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "occurrence": {
+                              "default": 1,
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": [
+                            "word"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "ms": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "ms"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "fraction": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            }
+                          },
+                          "required": [
+                            "fraction"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    },
+                    "side": {
+                      "type": "string",
+                      "enum": [
+                        "left",
+                        "right"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "do",
+                    "who",
+                    "gag"
                   ],
                   "additionalProperties": false
                 }
@@ -3500,7 +4022,8 @@
                               "anger",
                               "exclaim",
                               "question",
-                              "speed-lines"
+                              "speed-lines",
+                              "spray"
                             ]
                           },
                           "at": {
@@ -3933,6 +4456,152 @@
                           "do",
                           "who",
                           "target"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "do": {
+                            "type": "string",
+                            "const": "fall"
+                          },
+                          "who": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "at": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "word": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "occurrence": {
+                                    "default": 1,
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 9007199254740991
+                                  }
+                                },
+                                "required": [
+                                  "word"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "ms": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": [
+                                  "ms"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "fraction": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 1
+                                  }
+                                },
+                                "required": [
+                                  "fraction"
+                                ],
+                                "additionalProperties": false
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "do",
+                          "who"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "do": {
+                            "type": "string",
+                            "const": "gag"
+                          },
+                          "who": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "gag": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "at": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "word": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "occurrence": {
+                                    "default": 1,
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 9007199254740991
+                                  }
+                                },
+                                "required": [
+                                  "word"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "ms": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": [
+                                  "ms"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "fraction": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 1
+                                  }
+                                },
+                                "required": [
+                                  "fraction"
+                                ],
+                                "additionalProperties": false
+                              }
+                            ]
+                          },
+                          "side": {
+                            "type": "string",
+                            "enum": [
+                              "left",
+                              "right"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "do",
+                          "who",
+                          "gag"
                         ],
                         "additionalProperties": false
                       }

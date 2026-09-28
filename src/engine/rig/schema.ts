@@ -58,6 +58,10 @@ export const CharacterSchema = z.object({
     mouthY: frac(0, 0.8).default(0.42),
   }),
   accessories: z.array(AccessorySchema).default([]),
+  /** How much speech motion this character does. 1 is Dash, near 0 is Moss. Default 0.55. */
+  energy: z.number().min(0).max(1).optional(),
+  /** One line the writer reads the way it reads cast notes. Not drawn. */
+  personality: z.string().max(160).optional(),
   /**
    * Voice hints. TTS runs in the tamtree harness, which reads `provider` / `voiceId` / `settings`;
    * `say` is the macOS voice `pnpm voice:say` uses for local dev.

@@ -1,0 +1,20 @@
+{
+  "id": "snappy",
+  "reactionMs": 900,
+  "gapMs": 120,
+  "fadeMs": 160,
+  "minPunchGapMs": 800,
+  "closeupBudgetMs": 1800,
+  "minCloseupMs": 1000,
+  "oneThingFrames": 8,
+  "sfx": "all",
+  "punchIns": "more",
+  "emotion": "default",
+  "coverage": "default",
+  "shakes": false,
+  "speedLines": false,
+  "reactors": 1,
+  "transition": "slide",
+  "punchSfx": "rimshot",
+  "length": [12, 25]
+}

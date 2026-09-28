@@ -10,8 +10,10 @@ export const SeriesSchema = z.object({
   title: z.string().min(1).max(80),
   cast: z.array(z.string().min(1)).min(1).max(4),
   homeSets: z.array(z.string().min(1)).min(1).max(8),
-  /** How episodes usually open. The skill may ignore it. */
-  coldOpen: z.enum(["pov", "none"]).default("none"),
+  /** How episodes usually open. `teaser` flashes the punchline reaction, then rewinds. */
+  coldOpen: z.enum(["pov", "none", "teaser"]).default("none"),
+  /** How the show is cut. A skit inherits this unless it names its own `style`. */
+  style: z.enum(["classic", "deadpan", "snappy", "chaotic", "sitcom"]).optional(),
   /** Notes for the skill. Not drawn. */
   bible: z.string().max(2000).optional(),
 });

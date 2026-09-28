@@ -6,13 +6,16 @@ import type { SafeArea } from "../text/safeArea";
 import { buildCaptionPages } from "../text/captions";
 import { cardLayout } from "../text/layout";
 import type { PreparedLine, PreparedVoice } from "../voice/schema";
+import { fontFor } from "../text/fonts";
 import { solveShots } from "./camera";
 import { DEFAULT_SAFE_AREA } from "./camera";
 import { SkitError, unknownId, type Diagnostic } from "./diagnostics";
+import { expandBeatGags, GAGS, type GagDef } from "./gags";
 import { anchorFrame, layoutBeats, msToFrame, reactorFor, type LaidBeat } from "./layout";
 import { xAt } from "./placement";
 import { isNarration, type Beat, type ReactionTable, type SfxManifest, type Skit } from "./schema";
 import { planShots } from "./shots";
+import { CLASSIC, type DirectingStyle } from "./style";
 import { buildTracks } from "./tracks";
 import type { AudioClip, CardEvent, ListEvent, SfxEvent, SlamEvent, Timeline } from "./timeline";
 
@@ -29,6 +32,14 @@ export type CompileInput = {
   music?: MusicManifest;
   /** Face shots keep the face in this area. Default: `DEFAULT_SAFE_AREA`. */
   safeArea?: SafeArea;
+  /** Named gags. Default: the shipped library. */
+  gags?: readonly GagDef[];
+  /** Resolved directing style. Default: classic. */
+  style?: DirectingStyle;
+  /** Render this language's dub (`skit.i18n`) before compiling. */
+  lang?: string;
+  /** Series documents, so a skit can inherit `style` and `coldOpen`. */
+  series?: Readonly<Record<string, { style?: string; coldOpen?: string }>>;
 };
 
 
@@ -119,8 +130,16 @@ const speakerExpression = (skit: Skit, index: number, speaker: string): string =
 };
 
 /** One resolved scene + prepared voice + library → frame-indexed timeline. Throws `SkitError` on errors. */
-export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timeline; warnings: Diagnostic[] } => {
+export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Timeline; warnings: Diagnostic[] } => {
   const diags: Diagnostic[] = [];
+  const gags = input.gags ?? GAGS;
+  const style = input.style ?? CLASSIC;
+  const beats = skitIn.beats.map((b) => {
+    const exp = expandBeatGags(b, gags, (who) => skitIn.beats.find((x) => x.speaker && x.speaker !== who)?.speaker ?? skitIn.cast.find((c) => c.id !== who)?.id);
+    for (const name of exp.unknown) diags.push({ level: "error", code: "unknown-gag", path: "actions", message: `unknown gag "${name}"`, expected: gags.map((g) => g.id).join(", ") });
+    return exp.beat;
+  });
+  const skit: Skit = { ...skitIn, beats };
   checkIds(skit, input, diags);
   const fail = () => diags.some((d) => d.level === "error");
   if (fail()) throw new SkitError(diags);
@@ -147,17 +166,17 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
     const expression = typeof beat.reaction === "string" ? beat.reaction : (input.reactions.punchline[e] ?? input.reactions.defaultPunchline);
     return { reactor, expression };
   };
-  const layout = layoutBeats(skit, lines, reactionFor, diags);
+  const layout = layoutBeats(skit, lines, reactionFor, diags, style);
   if (fail()) throw new SkitError(diags);
 
-  const { cast, moments } = buildTracks(skit, layout, set, input.lib, input.reactions, fps, diags);
+  const { cast, moments } = buildTracks(skit, layout, set, input.lib, input.reactions, fps, diags, style);
   const hint = (e: string) => input.lib.expressions[e]?.closeup;
   const settleAt = (who: string, f: number) => {
     let at = f;
     for (const k of cast.find((c) => c.id === who)?.moveKeys ?? []) if (k.frame <= at && at < k.frame + k.durationFrames) at = k.frame + k.durationFrames;
     return at;
   };
-  const plan = planShots(layout, moments, hint, fps, diags, settleAt);
+  const plan = planShots(layout, moments, hint, fps, diags, settleAt, style);
   if (fail()) throw new SkitError(diags);
   const { shots, punchIns, shakes } = solveShots(plan, cast, input.lib, set, fps, width, height, input.safeArea, msToFrame(layout.totalMs, fps));
 
@@ -172,12 +191,18 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
       // Clips from a source file (audio.source "file") are trimmed copies prepared like TTS lines.
       audio.push({ frame: msToFrame(b.zeroMs, fps), durationFrames: Math.ceil((b.line.durationMs / 1000) * fps) + 1, src: b.line.audio, beatId: b.beat.id });
     }
-    b.beat.sfx.forEach((s, j) => {
-      const frame = anchorFrame(b, s.at, `${where}.sfx[${j}].at`, fps, diags);
-      const snd = sounds.get(s.id)!;
-      if (frame !== undefined)
-        sfx.push({ frame: Math.max(0, frame), id: s.id, src: snd.file, volume: s.volume * snd.gain, durationFrames: Math.ceil((snd.durationMs / 1000) * fps) + 1 });
-    });
+    const punchlineOnly = style.sfx === "punchline" && !b.punchline;
+    if (!punchlineOnly)
+      b.beat.sfx.forEach((s, j) => {
+        const frame = anchorFrame(b, s.at, `${where}.sfx[${j}].at`, fps, diags);
+        const snd = sounds.get(s.id)!;
+        if (frame !== undefined)
+          sfx.push({ frame: Math.max(0, frame), id: s.id, src: snd.file, volume: s.volume * snd.gain, durationFrames: Math.ceil((snd.durationMs / 1000) * fps) + 1 });
+      });
+    if (b.punchline && style.punchSfx && !b.beat.sfx.some((s) => s.id === style.punchSfx) && sounds.has(style.punchSfx)) {
+      const snd = sounds.get(style.punchSfx)!;
+      sfx.push({ frame: msToFrame(b.fromMs, fps), id: style.punchSfx, src: snd.file, volume: snd.gain, durationFrames: Math.ceil((snd.durationMs / 1000) * fps) + 1 });
+    }
     b.beat.text.forEach((t, j) => {
       if (t.type === "list") {
         const at = t.at.map((a, k) => anchorFrame(b, a, `${where}.text[${j}].at[${k}]`, fps, diags));
@@ -239,6 +264,8 @@ export const compileScene = (skit: Skit, input: CompileInput): { timeline: Timel
       ? buildCaptionPages(spoken.map((b) => ({ startMs: (msToFrame(b.zeroMs, fps) / fps) * 1000, words: b.line!.words, narrator: b.narrator || b.thought })))
       : [],
     ...(skit.narrator ? { narratorCaption: skit.narrator.captionStyle } : {}),
+    directing: { id: style.id, closeupBudgetMs: style.closeupBudgetMs, minPunchGapMs: style.minPunchGapMs, minCloseupMs: style.minCloseupMs, oneThingFrames: style.oneThingFrames, length: style.length },
+    ...(skit.meta.language ? { language: skit.meta.language, direction: fontFor(skit.meta.language).direction } : {}),
   };
   return { timeline, warnings: diags };
 };

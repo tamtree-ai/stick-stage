@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CharacterSchema } from "../rig/schema";
 import type { Diagnostic } from "../director/diagnostics";
 import { SkitError, fromZodIssues, pathString, unknownId } from "../director/diagnostics";
 import { TEMPLATES, type TemplateId } from "../templates/premise";
@@ -23,6 +24,8 @@ export const BriefSchema = z
     scenes: z.number().int().min(2).max(4).optional(),
     sets: z.array(z.string().min(1)).min(1).max(4).optional(),
     allowed_sets: z.array(z.string().min(1)).optional(),
+    /** Workspace characters. Their one-line `personality` is a cast note. They are not the house cast. */
+    characters: z.array(CharacterSchema).max(4).optional(),
   })
   .superRefine((d, ctx) => {
     if (d.scenes && d.set) ctx.addIssue({ code: "custom", path: ["set"], message: "pick one set, or a set per scene, not both" });

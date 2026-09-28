@@ -1,0 +1,11 @@
+{
+  "id": "slow-clap",
+  "steps": [
+    { "do": "expression", "expression": "deadpan", "atMs": 0 },
+    { "do": "pose", "pose": "hold-out", "atMs": 0, "durationFrames": 6 },
+    { "do": "pose", "pose": "idle", "atMs": 280 },
+    { "do": "pose", "pose": "hold-out", "atMs": 620, "durationFrames": 8 },
+    { "do": "pose", "pose": "idle", "atMs": 1100 },
+    { "do": "pose", "pose": "hold-out", "atMs": 1700, "durationFrames": 10 }
+  ]
+}

@@ -2,13 +2,13 @@ import fs from "node:fs";
 import type { AddressInfo } from "node:net";
 import os from "node:os";
 import path from "node:path";
-import { library, reactions, safeArea, sets, sfxLibrary } from "../src/data";
+import { library, reactions, safeArea, series, sets, sfxLibrary } from "../src/data";
 import { workspace, type Project } from "../src/node";
 import { createService } from "../src/server/app";
 import { jobQueue, type JobRun } from "../src/server/jobs";
 
 export const ROOT = path.resolve(import.meta.dirname, "..");
-export const PROJECT: Project = { ws: workspace(ROOT), lib: library, sets, sfx: sfxLibrary, reactions, safeArea };
+export const PROJECT: Project = { ws: workspace(ROOT), lib: library, sets, sfx: sfxLibrary, reactions, safeArea, series };
 export const TOKEN = "test-token";
 export const FINE = path.join(ROOT, "public/skits/fine");
 

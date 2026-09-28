@@ -17,6 +17,7 @@ import { SetLab, setLabSchema, setLabSize } from "./labs/SetLab";
 import { PROP_LAB_FRAMES, PropLab, propLabSchema } from "./labs/PropLab";
 import { STAGING_LAB_FRAMES, StagingLab, stagingLabSchema } from "./labs/StagingLab";
 import { calculateContactSheetMetadata, ContactSheet, contactSheetSchema } from "../engine";
+import { CoverStill, ThumbnailStill } from "./skit/Cover";
 import { SkitComposition } from "./skit/SkitComposition";
 import { calculateSkitMetadata, skitCompositionSchema } from "./skit/skitData";
 import { SFX_LAB_FRAMES, SfxLab } from "./labs/SfxLab";
@@ -196,6 +197,24 @@ export const RemotionRoot: React.FC = () => (
       fps={FPS}
       width={W}
       height={H}
+    />
+    <Still
+      id="Cover"
+      component={CoverStill}
+      schema={skitCompositionSchema}
+      defaultProps={{ skit: "fine", showLabels: false }}
+      calculateMetadata={async (args) => ({ ...(await calculateSkitMetadata(args)), durationInFrames: 1, width: 1080, height: 1920 })}
+      width={1080}
+      height={1920}
+    />
+    <Still
+      id="Thumbnail"
+      component={ThumbnailStill}
+      schema={skitCompositionSchema}
+      defaultProps={{ skit: "fine", showLabels: false }}
+      calculateMetadata={async (args) => ({ ...(await calculateSkitMetadata(args)), durationInFrames: 1, width: 1280, height: 720 })}
+      width={1280}
+      height={720}
     />
     <Composition id="SfxLab" component={SfxLab} durationInFrames={SFX_LAB_FRAMES} fps={FPS} width={W} height={H} />
     <Composition id="SafeAreaLab" component={SafeAreaLab} schema={safeAreaLabSchema} defaultProps={{}} durationInFrames={1} fps={FPS} width={W} height={H} />

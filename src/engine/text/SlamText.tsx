@@ -21,6 +21,7 @@ export type SlamTextProps = {
   y?: number;
   fontSize?: number;
   seed?: string;
+  direction?: "ltr" | "rtl";
 };
 
 const SLAM_FRAMES = 4;
@@ -44,6 +45,7 @@ export const SlamText: React.FC<SlamTextProps> = ({
   y = SLAM.y,
   fontSize = SLAM.fontSize,
   seed = text,
+  direction = "ltr",
 }) => {
   const start = from - SLAM_FRAMES;
   if (frame < start || frame >= to) return null;
@@ -68,6 +70,7 @@ export const SlamText: React.FC<SlamTextProps> = ({
         transform: `translate(${dx.toFixed(1)}px, calc(-50% + ${dy.toFixed(1)}px)) rotate(-4deg) scale(${(slam * (0.7 + 0.3 * out)).toFixed(3)})`,
         opacity,
         textAlign: "center",
+        direction,
         fontFamily,
         fontWeight: 900,
         fontSize: size,

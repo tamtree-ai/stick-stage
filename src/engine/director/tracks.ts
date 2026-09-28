@@ -6,7 +6,9 @@ import { unknownId, type Diagnostic } from "./diagnostics";
 import { anchorFrame, msToFrame, type Layout, type LaidBeat } from "./layout";
 import { allMarks, highFive, markX, OFF_MARK, shove, walk, type MoveCtx } from "./moves";
 import { facingAt, gazeToward, xAt } from "./placement";
+import { stageSpeech } from "./speech";
 import type { Action, ReactionTable, Skit } from "./schema";
+import { CLASSIC, type DirectingStyle } from "./style";
 import type { CastTrack, Facing } from "./timeline";
 
 /** Poses start this many frames before their anchor, so the 4-frame move lands on it. */
@@ -85,6 +87,8 @@ const initCast = (ctx: Ctx): CastTrack[] =>
       facingKeys: [],
       hopKeys: [],
       gaitKeys: [],
+      browKeys: [],
+      fallKeys: [],
     };
   });
 
@@ -164,6 +168,12 @@ const applyAction = (ctx: Ctx, b: LaidBeat, a: Action, path: string, moments: Mo
       c.seatKeys.push({ frame: f, seatPx: null });
       c.poseKeys.push({ frame: f, pose: "idle" });
       return;
+    case "fall":
+      c.fallKeys.push({ frame: f });
+      c.poseKeys.push({ frame: f, pose: "faint" });
+      return;
+    case "gag":
+      return;
     case "walkTo": {
       const x = markX(ctx.set, a.mark);
       if (x === undefined) {
@@ -220,7 +230,7 @@ const autoListen = (ctx: Ctx, b: LaidBeat, reactions: ReactionTable, from: numbe
 };
 
 /** Beats + actions → per-cast tracks, and the expression moments the shot policy reads. */
-export const buildTracks = (skit: Skit, layout: Layout, set: SetDef, lib: Library, reactions: ReactionTable, fps: number, diags: Diagnostic[]): TrackResult => {
+export const buildTracks = (skit: Skit, layout: Layout, set: SetDef, lib: Library, reactions: ReactionTable, fps: number, diags: Diagnostic[], style: DirectingStyle = CLASSIC): TrackResult => {
   const ctx: Ctx = { skit, set, lib, fps, diags, byId: new Map(), mark: new Map() };
   for (const c of initCast(ctx)) ctx.byId.set(c.id, c);
   const moments = new Map<LaidBeat, Moment[]>();
@@ -253,13 +263,24 @@ export const buildTracks = (skit: Skit, layout: Layout, set: SetDef, lib: Librar
       }
       speaker.gazeKeys.push({ frame: Math.max(0, from - 2), x: null, y: null });
       speaker.speech.push({ startFrame: from, cues: b.line!.mouthCues });
+      stageSpeech(ctx.skit, b, speaker, ctx.lib.characters[speaker.character], from, ctx.fps, POSE_LEAD);
       autoListen(ctx, b, reactions, from);
     }
-    if (b.kind === "reaction" && b.reactor && b.reactionExpression) {
-      ctx.byId.get(b.reactor)!.expressionKeys.push({ frame: from, expression: b.reactionExpression });
-      m.push({ who: b.reactor, expression: b.reactionExpression, frame: from + 1 });
+    if (b.kind === "reaction" && b.reactionExpression) {
+      const reactors = b.reactors ?? (b.reactor ? [b.reactor] : []);
+      reactors.forEach((id, n) => {
+        const who = ctx.byId.get(id);
+        if (!who) return;
+        who.expressionKeys.push({ frame: from + n * 6, expression: b.reactionExpression! });
+        if (n === 0) m.push({ who: id, expression: b.reactionExpression!, frame: from + 1 });
+      });
     }
     b.beat.actions.forEach((a, j) => {
+      if (style.speedLines && a.do === "pose") {
+        const c = ctx.byId.get(a.who);
+        const frame = anchorFrame(b, a.at, "speed", fps, []);
+        if (c && frame !== undefined) c.symbolKeys.push({ frame, symbol: "speed-lines", durationFrames: 10 });
+      }
       applyAction(ctx, b, a, `${b.path.join(".").replace(/\.(\d+)/g, "[$1]")}.actions[${j}]`, m);
       // Later actions read positions and facings, so keep every track in frame order.
       const c = ctx.byId.get(a.who);
@@ -275,7 +296,7 @@ export const buildTracks = (skit: Skit, layout: Layout, set: SetDef, lib: Librar
 const byFrame = <T extends { frame: number }>(xs: T[]) => xs.sort((a, b) => a.frame - b.frame);
 
 const sortTracks = (c: CastTrack) => {
-  for (const k of ["poseKeys", "expressionKeys", "gazeKeys", "nodKeys", "seatKeys", "propKeys", "symbolKeys", "moveKeys", "facingKeys", "hopKeys", "gaitKeys"] as const)
+  for (const k of ["poseKeys", "expressionKeys", "gazeKeys", "nodKeys", "seatKeys", "propKeys", "symbolKeys", "moveKeys", "facingKeys", "hopKeys", "gaitKeys", "browKeys", "fallKeys"] as const)
     byFrame(c[k] as { frame: number }[]);
   c.speech.sort((a, b) => a.startFrame - b.startFrame);
 };

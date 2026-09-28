@@ -117,7 +117,8 @@ const spokenBeat = (p: Premise, line: PremiseLine, role: Role, id: string, n: { 
   const beat: Beat = { id, speaker: who, line: l.text, actions, ...(thought ? {} : { expression: l.expression ?? ROLE_EXPRESSION[role] }) };
   if (l.delivery) beat.delivery = l.delivery;
   if (l.voiceOver && !thought) beat.voiceOver = true;
-  if (!thought && role === "escalation") actions.push({ who, do: "pose", pose: GESTURES[n.gesture++ % GESTURES.length]!, at: { fraction: 0.15 } });
+  if (!thought && l.gag) actions.push({ who, do: "gag", gag: l.gag, at: { fraction: 0.2 } });
+  else if (!thought && role === "escalation") actions.push({ who, do: "pose", pose: GESTURES[n.gesture++ % GESTURES.length]!, at: { fraction: 0.15 } });
   if (role === "punchline") Object.assign(beat, { punchline: true, pauseBeforeMs: PUNCH_PAUSE_MS, holdAfterMs: PUNCH_HOLD_MS });
   if (l.slam) beat.text = [{ type: "slam", value: l.slam, at: lastWordAnchor(l.text) }];
   return beat;

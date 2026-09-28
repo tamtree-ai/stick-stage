@@ -11,10 +11,12 @@ export type ActorProps = {
   facing: "left" | "right";
   frame: number;
   fontFamily?: string;
+  /** Forward tilt in degrees, around the feet. */
+  tilt?: number;
 };
 
-export const Actor: React.FC<ActorProps> = ({ state, x, groundY, facing, frame, fontFamily }) => (
-  <g transform={`translate(${f2(x)} ${f2(groundY)}) scale(${facing === "left" ? -1 : 1} 1)`}>
+export const Actor: React.FC<ActorProps> = ({ state, x, groundY, facing, frame, fontFamily, tilt = 0 }) => (
+  <g transform={`translate(${f2(x)} ${f2(groundY)}) scale(${facing === "left" ? -1 : 1} 1) rotate(${f2(tilt)})`}>
     <Rig
       character={state.character}
       joints={state.joints}

@@ -108,6 +108,16 @@ export const Symbols: React.FC<SymbolsProps> = ({
         </g>
       ) : null}
       {symbols.includes("speed-lines") ? <SpeedLines {...mark} age={ageOf("speed-lines")} seed={seed} /> : null}
+      {symbols.includes("spray") ? (
+        <g>
+          {[0, 1, 2, 3, 4].map((i) => {
+            const age = ageOf("spray");
+            const t = Math.min(1, age / 8);
+            const ang = (-0.6 + i * 0.3) * Math.PI;
+            return <circle key={i} cx={f2(Math.cos(ang) * R * 0.55 * t)} cy={f2(0.35 * R + Math.sin(ang) * R * 0.35 * t)} r={f2(0.06 * R)} fill={WATER} />;
+          })}
+        </g>
+      ) : null}
       {symbols.includes("exclaim") ? <Exclaim {...mark} age={ageOf("exclaim")} /> : null}
       {symbols.includes("question") && !symbols.includes("exclaim") ? <Question {...mark} age={ageOf("question")} /> : null}
     </g>

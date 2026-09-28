@@ -1,0 +1,20 @@
+{
+  "id": "chaotic",
+  "reactionMs": 1000,
+  "gapMs": 140,
+  "fadeMs": 400,
+  "minPunchGapMs": 1500,
+  "closeupBudgetMs": 3000,
+  "minCloseupMs": 1000,
+  "oneThingFrames": 0,
+  "sfx": "actions",
+  "punchIns": "default",
+  "emotion": "default",
+  "coverage": "default",
+  "shakes": true,
+  "speedLines": true,
+  "reactors": 2,
+  "transition": "fade",
+  "punchSfx": "boom",
+  "length": [12, 30]
+}

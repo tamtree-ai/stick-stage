@@ -1,7 +1,7 @@
 import type { CalculateMetadataFunction } from "remotion";
 import { z } from "zod";
 import { formatDiagnostics } from "./diagnostics";
-import { compileSkit } from "./compile";
+import { compileSkit, type SeriesStyle } from "./compile";
 import type { ReactionTable, SfxManifest } from "./schema";
 import type { Program } from "./timeline";
 import type { Library } from "../rig/actorState";
@@ -14,6 +14,10 @@ export const skitCompositionSchema = z.object({
   skit: z.string(),
   showLabels: z.boolean(),
   program: z.custom<Program>().optional(),
+  /** Render the scenes without a teaser or slam prefix, so a scene cache can share those frames. */
+  omitHook: z.boolean().optional(),
+  /** BCP 47 dub (`skit.i18n`) to compile. */
+  lang: z.string().min(2).max(16).optional(),
 });
 export type SkitCompositionProps = z.infer<typeof skitCompositionSchema>;
 
@@ -28,6 +32,8 @@ export type StickStageContext = {
   safeArea?: SafeArea;
   /** Where skit folders are, relative to the served root. Default "skits". */
   skitsPath?: string;
+  /** Series documents, so a skit can inherit style and cold open. */
+  series?: Readonly<Record<string, SeriesStyle>>;
 };
 
 /**
@@ -42,7 +48,9 @@ export const calculateStickStageMetadata =
     if (skit === undefined) throw new Error(`Missing ${base}/skit.json`);
     const voiceJson = await ctx.load(`${base}/generated/voice.prepared.json`);
     const voice = voiceJson === undefined ? undefined : PreparedVoiceSchema.parse(voiceJson);
-    const { program, warnings } = compileSkit({ skit, voice, lib: ctx.lib, sets: ctx.sets, sfx: ctx.sfx, reactions: ctx.reactions, safeArea: ctx.safeArea });
-    if (warnings.length) console.warn(formatDiagnostics(warnings));
+    const compiled = compileSkit({ skit, voice, lib: ctx.lib, sets: ctx.sets, sfx: ctx.sfx, reactions: ctx.reactions, safeArea: ctx.safeArea, series: ctx.series, lang: props.lang });
+    if (compiled.warnings.length) console.warn(formatDiagnostics(compiled.warnings));
+    const hook = compiled.program.hook;
+    const program = props.omitHook && hook ? { ...compiled.program, hook: undefined, durationInFrames: compiled.program.durationInFrames - hook.prefixFrames + hook.transitionFrames } : compiled.program;
     return { durationInFrames: program.durationInFrames, fps: program.fps, width: program.width, height: program.height, props: { ...props, program } };
   };

@@ -24,6 +24,8 @@ export const PremiseLineSchema = z.strictObject({
   delivery: z.string().optional(),
   /** Thought: their own voice, mouth shut. The off-screen narrator is `who: "narrator"` on an explainer. */
   voiceOver: z.boolean().optional(),
+  /** One named gag on the line. The compiler expands it. */
+  gag: z.string().min(1).optional(),
 });
 export type PremiseLine = z.infer<typeof PremiseLineSchema>;
 

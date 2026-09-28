@@ -1,0 +1,19 @@
+{
+  "id": "deadpan",
+  "reactionMs": 1800,
+  "gapMs": 480,
+  "fadeMs": 400,
+  "minPunchGapMs": 2200,
+  "closeupBudgetMs": 5000,
+  "minCloseupMs": 1000,
+  "oneThingFrames": 8,
+  "sfx": "punchline",
+  "punchIns": "default",
+  "emotion": "punchline",
+  "coverage": "default",
+  "shakes": false,
+  "speedLines": false,
+  "reactors": 1,
+  "transition": "fade",
+  "length": [15, 35]
+}

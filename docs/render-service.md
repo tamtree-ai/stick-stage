@@ -93,6 +93,18 @@ and nothing is queued:
 
 `413` means the body is over 100 MB. Voice lines for non-spoken beats are dropped, with a job warning.
 
+## `POST /prepare`
+
+Same multipart body as `POST /render`. Runs prep only and returns when `voice.prepared.json` (and the audio files) are ready. `options.mode` is forced to `prepare`.
+
+## `POST /render` options
+
+`options` may also set `quality` (`draft` is 540×960, faster encoder), `lang` (BCP 47 dub), `variants` (`pov`, `teaser`, `slam` — one MP4 each), `callback` (`{ url, secret }`, HMAC-SHA256 in `x-stickstage-signature`, three tries), `covers` (default on: `cover` and `thumbnail` stills), and `sceneCache` (default on for multi-scene jobs).
+
+## `GET /jobs/:id/events`
+
+Server-sent events. Each `data:` line is the same JSON as `GET /jobs/:id`. The stream ends when the job succeeds, fails, or is cancelled. The callback secret is not included.
+
 ## `GET /jobs/:id`: status
 
 ```json

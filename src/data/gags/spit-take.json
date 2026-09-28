@@ -1,0 +1,11 @@
+{
+  "id": "spit-take",
+  "prop": "cup",
+  "steps": [
+    { "do": "holdProp", "prop": "cup", "atMs": 0 },
+    { "do": "pose", "pose": "recoil", "atMs": 180 },
+    { "do": "symbol", "symbol": "spray", "atMs": 220 },
+    { "do": "expression", "expression": "shocked", "atMs": 180 },
+    { "do": "sfx", "id": "pop", "atMs": 220 }
+  ]
+}

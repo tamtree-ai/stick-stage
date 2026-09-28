@@ -22,6 +22,8 @@ export type ValidateResult = {
   estimatedDurationSec: number;
   warnings: Diagnostic[];
   check: CheckReport;
+  /** Camera events on placeholder timings, for the review strip. */
+  cuts: { frame: number; kind: "cut" | "punch-in"; framing: string; on?: string; reason: string; scene: string }[];
   /** The premise a draft reply was turned into, for the record. */
   premise?: unknown;
 };
@@ -96,6 +98,7 @@ export const validate = (p: Project, body: unknown, notes: Readonly<Record<strin
       estimatedDurationSec: d.estimatedDurationSec,
       warnings: [...corrected, ...d.warnings],
       check: d.check,
+      cuts: d.cuts,
     };
   } catch (e) {
     if (e instanceof HttpError) throw e;

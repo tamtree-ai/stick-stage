@@ -1,0 +1,9 @@
+{
+  "id": "look-to-camera",
+  "steps": [
+    { "do": "look", "to": "camera", "atMs": 0 },
+    { "do": "expression", "expression": "deadpan", "atMs": 80 },
+    { "do": "holdMs", "ms": 1000 },
+    { "do": "punchIn", "atMs": 200 }
+  ]
+}

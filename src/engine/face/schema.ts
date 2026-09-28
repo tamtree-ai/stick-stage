@@ -13,7 +13,7 @@ export const EYE_SHAPES = [
 ] as const;
 export type EyeShape = (typeof EYE_SHAPES)[number];
 
-export const SYMBOLS = ["tears", "sweat", "blush", "anger", "exclaim", "question", "speed-lines"] as const;
+export const SYMBOLS = ["tears", "sweat", "blush", "anger", "exclaim", "question", "speed-lines", "spray"] as const;
 export type SymbolId = (typeof SYMBOLS)[number];
 
 const Brow = z.object({

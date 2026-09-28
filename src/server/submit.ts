@@ -8,7 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { parseSkit, skitLines, SkitError, VoiceManifestSchema, type Diagnostic, type VoiceManifest } from "../engine/core";
 import { HttpError } from "./http";
-import type { JobOptions } from "./jobs";
+import type { HookVariant, JobOptions } from "./jobs";
 import { unsupportedBeats } from "./validate";
 
 const AUDIO_PATH = /^voice\/([A-Za-z0-9_-][A-Za-z0-9_.-]{0,99}\.(wav|mp3|ogg))$/i;
@@ -20,6 +20,31 @@ export const audioKind = (b: Uint8Array): "wav" | "mp3" | "ogg" | undefined => {
   if (ascii(0, 4) === "OggS") return "ogg";
   if (ascii(0, 3) === "ID3" || (b[0] === 0xff && ((b[1] ?? 0) & 0xe0) === 0xe0)) return "mp3";
   return undefined;
+};
+
+const HOOKS = new Set(["pov", "teaser", "slam"]);
+
+/** Options the multipart `options` field may set. Unknown keys are ignored. */
+export const parseOptions = (raw: Record<string, unknown>): JobOptions => {
+  const callback = raw.callback;
+  let cb: JobOptions["callback"];
+  if (callback && typeof callback === "object") {
+    const c = callback as Record<string, unknown>;
+    if (typeof c.url === "string" && c.url.startsWith("http") && typeof c.secret === "string" && c.secret.length >= 8) cb = { url: c.url, secret: c.secret };
+  }
+  const variants = Array.isArray(raw.variants) ? raw.variants.filter((v): v is HookVariant => typeof v === "string" && HOOKS.has(v)) : undefined;
+  return {
+    skipCheck: raw.skipCheck === true,
+    debug: raw.debug === true,
+    sheet: raw.sheet === true,
+    mode: raw.mode === "prepare" ? "prepare" : "render",
+    quality: raw.quality === "draft" ? "draft" : "final",
+    ...(typeof raw.lang === "string" && raw.lang.length >= 2 ? { lang: raw.lang.slice(0, 16) } : {}),
+    ...(variants?.length ? { variants } : {}),
+    ...(cb ? { callback: cb } : {}),
+    sceneCache: raw.sceneCache !== false,
+    covers: raw.covers !== false,
+  };
 };
 
 const invalid = (diagnostics: Diagnostic[]) => new HttpError(422, "invalid-render-request", "the render request has errors", { diagnostics });
@@ -59,7 +84,7 @@ export const parseSubmission = async (form: FormData): Promise<Submission> => {
   const voice = voiceParse.data;
 
   const rawOptions = ((await jsonField(form, "options", false)) ?? {}) as Record<string, unknown>;
-  const options: JobOptions = { skipCheck: rawOptions.skipCheck === true, debug: rawOptions.debug === true, sheet: rawOptions.sheet === true };
+  const options = parseOptions(rawOptions);
 
   const uploads = new Map<string, File>();
   form.forEach((v) => typeof v !== "string" && v.name && uploads.set(v.name, v));

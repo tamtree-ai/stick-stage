@@ -17,6 +17,7 @@ const charEm = (ch: string): number => {
   if (/[A-Z0-9?]/.test(ch)) return 0.72;
   if (/[mw]/.test(ch)) return 0.88;
   if (/[ijlft]/.test(ch)) return 0.34;
+  if (ch.charCodeAt(0) > 0x2ff) return 1;
   return 0.6;
 };
 
@@ -26,12 +27,17 @@ export const textWidth = (text: string, fontSize: number): number => [...text].r
 export const wrapLines = (text: string, fontSize: number, maxWidth: number): string[] => {
   const lines: string[] = [];
   let cur = "";
-  for (const word of text.trim().split(/\s+/)) {
-    const next = cur ? `${cur} ${word}` : word;
+  const push = (word: string, spaced: boolean) => {
+    const next = cur ? (spaced ? `${cur} ${word}` : cur + word) : word;
     if (cur && textWidth(next, fontSize) > maxWidth) {
       lines.push(cur);
       cur = word;
     } else cur = next;
+  };
+  for (const word of text.trim().split(/\s+/)) {
+    const breakChars = /[\u3000-\u9fff\u3040-\u30ff\uac00-\ud7af]/.test(word) && textWidth(word, fontSize) > maxWidth;
+    if (!breakChars) push(word, true);
+    else for (const ch of word) push(ch, false);
   }
   if (cur) lines.push(cur);
   return lines;

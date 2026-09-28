@@ -8,9 +8,8 @@ import type { WriterWorld } from "./world";
 
 const PUNCH_PAUSE_MS = 450;
 const PUNCH_HOLD_MS = 300;
-const GESTURES = ["point", "hands-on-hips", "shrug", "arms-crossed"];
 
-type RawLine = { id?: string; who?: string; text: string; expression?: string; slam?: string; delivery?: string };
+type RawLine = { id?: string; who?: string; text: string; expression?: string; slam?: string; delivery?: string; gag?: string };
 type Unit = { beat: Beat; trail: Beat[] };
 
 const asString = (v: unknown): string | undefined => (typeof v === "string" && v.trim() ? v.trim() : undefined);
@@ -37,7 +36,7 @@ const linesOf = (data: unknown): RawLine[] => {
     if (!raw || typeof raw !== "object") return [];
     const o = raw as Record<string, unknown>;
     const text = typeof o.text === "string" ? o.text.trim() : typeof o.line === "string" ? o.line.trim() : "";
-    return [{ id: asString(o.id), who: asString(o.who) ?? asString(o.speaker), text, expression: asString(o.expression), slam: asString(o.slam), delivery: asString(o.delivery) }];
+    return [{ id: asString(o.id), who: asString(o.who) ?? asString(o.speaker), text, expression: asString(o.expression), slam: asString(o.slam), delivery: asString(o.delivery), gag: asString(o.gag) }];
   });
 };
 
@@ -71,14 +70,14 @@ const moodOf = (mood: string | undefined, path: string, world: WriterWorld, warn
   return "neutral";
 };
 
-const freshSpoken = (id: string, who: string, text: string, expression: string | undefined, gesture: number): Beat => ({
+const freshSpoken = (id: string, who: string, text: string, expression: string | undefined, gag?: string): Beat => ({
   id,
   silent: false,
   speaker: who,
   line: text,
   expression: expression ?? "neutral",
   audio: { source: "tts" },
-  actions: [{ who, do: "pose", pose: GESTURES[gesture % GESTURES.length]!, at: { fraction: 0.15 } }],
+  actions: gag ? [{ who, do: "gag", gag, at: { fraction: 0.2 } }] : [],
   sfx: [],
   text: [],
 });
@@ -115,7 +114,7 @@ const patch = (beat: Beat, line: RawLine, who: string, expression: string | unde
     return next;
   }
   warnings.push({ level: "warning", code: "restage", path: `beats.${beat.id}`, message: `line "${beat.id}" changed, so it was staged again` });
-  const next = freshSpoken(beat.id, who, line.text, expression, 0);
+  const next = freshSpoken(beat.id, who, line.text, expression, line.gag);
   if (line.delivery) next.delivery = line.delivery;
   return next;
 };
@@ -169,7 +168,6 @@ export const skitFromReply = (reply: string, doc: SkitDoc, world: WriterWorld): 
   const used = new Set<string>();
   const buckets: Unit[][] = scenes.map(() => []);
   let scene = 0;
-  let gesture = 0;
   incoming.forEach((line, i) => {
     if (!line.text) {
       errors.push({ level: "error", code: "reply-line", path: `lines[${i}].text`, message: "a line needs words" });
@@ -194,7 +192,7 @@ export const skitFromReply = (reply: string, doc: SkitDoc, world: WriterWorld): 
     const id = freshId(line.id, new Set([...byId.keys(), ...used, ...buckets.flat().map((u) => u.beat.id)]));
     if (line.id && line.id !== id) warnings.push({ level: "warning", code: "line-id", path: `lines[${i}].id`, message: `id "${line.id}" is already used; the new line is "${id}"` });
     used.add(id);
-    const beat = slamMode ? freshSlam(id, who, line.text, expression) : freshSpoken(id, who, line.text, expression, gesture++);
+    const beat = slamMode ? freshSlam(id, who, line.text, expression) : freshSpoken(id, who, line.text, expression, line.gag);
     if (line.delivery && spoken(beat)) beat.delivery = line.delivery;
     if (line.slam && i !== incoming.length - 1) warnings.push({ level: "warning", code: "slam", path: `lines[${i}].slam`, message: "a slam belongs on the last line; this one was dropped" });
     buckets[scene]!.push({ beat, trail: [] });

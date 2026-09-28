@@ -1,0 +1,7 @@
+{
+  "id": "walk-out",
+  "steps": [
+    { "do": "turn", "atMs": 0 },
+    { "do": "walkOut", "atMs": 160 }
+  ]
+}

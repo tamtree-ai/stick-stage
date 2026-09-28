@@ -29,6 +29,19 @@ export const facingAt = (c: Pick<CastTrack, "facing" | "facingKeys">, frame: num
 
 export const HOP_FRAMES = 10;
 
+const FALL_FRAMES = 8;
+const FALL_DEG = 78;
+
+/** Degrees of forward tilt for a stiff fall. 0 until the fall key, then down to the ground. */
+export const fallAt = (c: Pick<CastTrack, "fallKeys">, frame: number): number => {
+  let deg = 0;
+  for (const k of c.fallKeys) {
+    const t = (frame - k.frame) / FALL_FRAMES;
+    if (t > 0) deg = Math.max(deg, Math.min(1, t) * FALL_DEG);
+  }
+  return deg;
+};
+
 /** Root lift in px (negative = up) from hops: a quick parabola. */
 export const hopAt = (c: Pick<CastTrack, "hopKeys">, frame: number, figurePx: number): number => {
   let dy = 0;
@@ -47,6 +60,7 @@ export const actorTracksFor = (c: CastTrack, width: number): ActorTracks => ({
   expressionKeys: c.expressionKeys,
   gazeKeys: c.gazeKeys,
   nodKeys: c.nodKeys,
+  browKeys: c.browKeys,
   seatKeys: c.seatKeys,
   propKeys: c.propKeys,
   symbolKeys: c.symbolKeys,
@@ -69,6 +83,7 @@ export const stageActorsAt = (
     x: xAt(c, frame),
     facing: facingAt(c, frame),
     dy: hopAt(c, frame, set.figureHeightPx),
+    tilt: fallAt(c, frame),
     state: evalActor(lib, actorTracksFor(c, width), frame, fps, set.figureHeightPx),
   }));
 

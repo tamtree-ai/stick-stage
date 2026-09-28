@@ -182,6 +182,18 @@
       ]
     },
     {
+      "id": "laugh",
+      "file": "sfx/laugh.wav",
+      "durationMs": 750,
+      "gain": 0.55,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "sitcom",
+        "punchline"
+      ]
+    },
+    {
       "id": "sparkle",
       "file": "sfx/sparkle.wav",
       "durationMs": 900,

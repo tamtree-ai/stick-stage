@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "faint",
+  "torso": 8,
+  "head": 12,
+  "shoulderL": 6,
+  "elbowL": 4,
+  "shoulderR": 8,
+  "elbowR": 4,
+  "hipL": -4,
+  "kneeL": 2,
+  "hipR": 4,
+  "kneeR": 2
+}

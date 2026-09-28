@@ -57,14 +57,16 @@ Default: the beat start.
 
 | `do` | Fields |
 |---|---|
-| `pose` | `pose` (idle, point, shrug, facepalm, arms-up, arms-crossed, think, lean-in, recoil, slump, hands-on-hips, hold-phone, sit, hold-out, hold-chest, hold-up), `durationFrames?` |
+| `pose` | `pose` (idle, point, shrug, facepalm, arms-up, arms-crossed, think, lean-in, recoil, slump, hands-on-hips, hold-phone, sit, hold-out, hold-chest, hold-up, faint), `durationFrames?` |
+| `gag` | `gag` (`double-take`, `look-to-camera`, `spit-take`, `faint`, `slow-clap`, `walk-out`, `freeze-frame`). The compiler expands it. `spit-take` holds the cup. |
+| `fall` | Stiff pose, then a tilt onto the ground. `faint` uses this. |
 | `expression` | `expression` (neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan) |
 | `look` | `to`: a cast id, `"camera"`, or `{ "x": 0.5, "y": 0.2 }` |
 | `turn` | `facing?` (default: flip) |
 | `hop`, `nod` | |
 | `slideTo` | `mark`, `durationFrames?` (default 8) |
 | `hold` / `putAway` / `drop` | `prop` (phone, mic, cup, laptop, sign), `hand?` (`R` default). A sign `hold` may set `text` (one line, ≤ 24 characters). A laptop `hold` may set `screen` (≤ 3 lines, `\n` breaks, ≤ 24 characters each) |
-| `symbol` | `symbol` (tears, sweat, blush, anger, exclaim, question, speed-lines), `durationMs?` |
+| `symbol` | `symbol` (tears, sweat, blush, anger, exclaim, question, speed-lines, spray), `durationMs?` |
 | `sit` / `stand` | Needs a seat at the character's mark |
 
 **SFX:** `{ "id": "record-scratch", "at": …, "volume": 1 }`. Sounds: `pnpm render SfxLab out/SfxLab.mp4`, or see `src/data/sfx.json`.
@@ -76,6 +78,16 @@ Default: the beat start.
 **A thought:** `"voiceOver": true` on a cast beat. Their voice, mouth shut, italic caption.
 
 **Music:** `"music": "room"` is the one bed. It ducks under dialog and is silent on the punchline.
+
+**Speech motion:** omitted means on. Speakers nod on a stressed word and make one gesture. `"speechMotion": "off"` leaves the body to the actions you wrote. An authored pose, gag, fall, or prop move wins.
+
+**Style:** `"style": "classic" | "deadpan" | "snappy" | "chaotic" | "sitcom"`. Omitted: the series style, else classic. Numbers live in `src/data/styles/`.
+
+**Cold open:** `"coldOpen": "pov" | "none" | "teaser"`. `teaser` flashes the punchline reaction, then slides into beat one. A series `coldOpen` applies when the skit omits its own.
+
+**Language:** `meta.language` is BCP 47 (default English). `i18n.<lang>` holds `lines` (by beat id), `slams`, `pov`, `cards`, and `labels`. `pnpm render <id> --lang=es` compiles that dub. Japanese, Chinese, Korean, Arabic, Hebrew, Devanagari, and Sinhala use the Noto files in `public/fonts/`.
+
+**Workspace characters:** `characters` is a list of character documents. They resolve before the catalog and are not copied into `src/data/`. The house cast stays the six shipped faces.
 
 **Templates** a premise can name, besides the two-handers: `explainer`, `family`, `fable`, `trio`. `pnpm new` stages them.
 

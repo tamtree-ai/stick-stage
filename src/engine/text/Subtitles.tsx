@@ -29,6 +29,7 @@ export type SubtitlesProps = {
   hidden?: boolean;
   /** How narrator (voice-over) pages differ from dialog. Default italic. */
   narratorStyle?: "italic" | "boxed";
+  direction?: "ltr" | "rtl";
 };
 
 /** Frames for a new page to pop in. */
@@ -39,7 +40,7 @@ const POP_FRAMES = 3;
  * lifts and grows slightly, so it still reads without color (and in grayscale previews).
  * Spaces are separate text nodes so the grown word never eats its neighbours' gaps.
  */
-export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, height, safeArea, style, y = SUBTITLE.y, fontSize = SUBTITLE.fontSize, hidden, narratorStyle = "italic" }) => {
+export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, height, safeArea, style, y = SUBTITLE.y, fontSize = SUBTITLE.fontSize, hidden, narratorStyle = "italic", direction = "ltr" }) => {
   if (hidden) return null;
   const ms = (frame / fps) * 1000;
   const page = pageAt(pages, ms);
@@ -87,6 +88,7 @@ export const Subtitles: React.FC<SubtitlesProps> = ({ pages, frame, fps, width, 
         top: cy,
         transform: `translateY(-50%) scale(${pop.toFixed(3)})`,
         textAlign: "center",
+        direction,
         fontFamily: style.fontFamily,
         fontWeight: 800,
         fontSize,

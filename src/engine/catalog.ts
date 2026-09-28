@@ -1,4 +1,6 @@
+import { GAGS } from "./director/gags";
 import type { ReactionTable, SfxManifest } from "./director/schema";
+import { STYLES } from "./director/style";
 import type { Library } from "./rig/actorState";
 import { setCatalog, type SetCatalogEntry } from "./set/catalog";
 import type { SetDef } from "./set/schema";
@@ -13,6 +15,10 @@ export type CatalogSource = {
   sfx: SfxManifest;
   reactions: ReactionTable;
   safeArea: SafeArea;
+  /** Directing styles. Part of the hash: they change what renders. */
+  styles?: typeof STYLES;
+  /** Named gags. Part of the hash. */
+  gags?: typeof GAGS;
 };
 
 export type CatalogCharacter = { id: string; name: string };
@@ -26,6 +32,8 @@ export type Catalog = {
   templates: CatalogTemplate[];
   expressions: string[];
   props: string[];
+  gags: string[];
+  styles: string[];
 };
 
 const TEMPLATE_DESCRIPTION: Record<TemplateId, string> = {
@@ -69,7 +77,7 @@ const fnv64 = (s: string): string => {
  * it; a mismatch means the skit would be checked or drawn against different characters or sets.
  */
 export const catalogVersion = (src: CatalogSource): string =>
-  `c1-${fnv64(stable({ lib: src.lib, sets: src.sets, sfx: src.sfx, reactions: src.reactions, safeArea: src.safeArea }))}`;
+  `c1-${fnv64(stable({ lib: src.lib, sets: src.sets, sfx: src.sfx, reactions: src.reactions, safeArea: src.safeArea, styles: src.styles ?? STYLES, gags: src.gags ?? GAGS }))}`;
 
 export const buildCatalog = (src: CatalogSource): Catalog => ({
   version: catalogVersion(src),
@@ -78,4 +86,6 @@ export const buildCatalog = (src: CatalogSource): Catalog => ({
   templates: TEMPLATES.map((id) => ({ id, cast: TEMPLATE_CAST[id], castMax: TEMPLATE_CAST_MAX[id], defaultSet: TEMPLATE_DEFAULT_SET[id], description: TEMPLATE_DESCRIPTION[id] })),
   expressions: Object.keys(src.lib.expressions),
   props: Object.keys(src.lib.props),
+  gags: (src.gags ?? GAGS).map((g) => g.id),
+  styles: Object.keys(src.styles ?? STYLES),
 });

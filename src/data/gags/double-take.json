@@ -1,0 +1,10 @@
+{
+  "id": "double-take",
+  "steps": [
+    { "do": "look", "to": "speaker", "atMs": 0 },
+    { "do": "look", "to": "away", "atMs": 200 },
+    { "do": "look", "to": "speaker", "atMs": 400 },
+    { "do": "expression", "expression": "shocked", "atMs": 400 },
+    { "do": "sfx", "id": "swish", "atMs": 400 }
+  ]
+}

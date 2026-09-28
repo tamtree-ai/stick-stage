@@ -1,4 +1,5 @@
 import type { Diagnostic } from "../director/diagnostics";
+import { GAG_IDS } from "../director/gags";
 import type { PremiseInput } from "../templates/premise";
 import type { TemplateId } from "../templates/premise";
 import { TEMPLATE_DEFAULT_SET } from "../templates/stage";
@@ -23,7 +24,7 @@ const LINE_MIN = 11;
 const LINE_MAX = 13;
 const HASHTAG = /^#?[\p{L}\p{N}_]+$/u;
 
-type RawLine = { who?: string; text: string; expression?: string; slam?: string; delivery?: string };
+type RawLine = { who?: string; text: string; expression?: string; slam?: string; delivery?: string; gag?: string };
 type RawGroup = { set?: string; pov?: string; lines: RawLine[] };
 
 const asString = (v: unknown): string | undefined => (typeof v === "string" && v.trim() ? v.trim() : undefined);
@@ -31,7 +32,7 @@ const asString = (v: unknown): string | undefined => (typeof v === "string" && v
 const asLine = (raw: unknown): RawLine | undefined => {
   if (!raw || typeof raw !== "object") return undefined;
   const o = raw as Record<string, unknown>;
-  return { who: asString(o.who), text: typeof o.text === "string" ? o.text.trim() : "", expression: asString(o.expression), slam: asString(o.slam), delivery: asString(o.delivery) };
+  return { who: asString(o.who), text: typeof o.text === "string" ? o.text.trim() : "", expression: asString(o.expression), slam: asString(o.slam), delivery: asString(o.delivery), gag: asString(o.gag) };
 };
 
 const asGroup = (raw: unknown): RawGroup => {
@@ -124,9 +125,14 @@ export const premiseFromReply = (reply: string, brief: Brief, world: WriterWorld
         warnings.push({ level: "warning", code: "slam-length", path: linePath(plan.count, s, i, "slam"), message: "a slam is at most 40 characters; this one was dropped" });
         slam = undefined;
       }
+      let gag = l.gag;
+      if (gag && !GAG_IDS.includes(gag)) {
+        warnings.push({ level: "warning", code: "gag", path: linePath(plan.count, s, i, "gag"), message: `gag "${gag}" is not one StickStage has; it was dropped` });
+        gag = undefined;
+      }
       global++;
       const role = global - 1 === 0 ? "setup" : last ? "punchline" : "escalation";
-      return { ...(who ? { who } : {}), text: l.text || "…", ...(expression ? { expression } : {}), role: role as "setup" | "escalation" | "punchline", ...(slam ? { slam } : {}), ...(l.delivery ? { delivery: l.delivery } : {}) };
+      return { ...(who ? { who } : {}), text: l.text || "…", ...(expression ? { expression } : {}), role: role as "setup" | "escalation" | "punchline", ...(slam ? { slam } : {}), ...(gag ? { gag } : {}), ...(l.delivery ? { delivery: l.delivery } : {}) };
     });
     return { set, ...(pov ? { pov } : {}), lines };
   });

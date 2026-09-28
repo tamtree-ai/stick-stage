@@ -1,0 +1,19 @@
+{
+  "id": "classic",
+  "reactionMs": 1300,
+  "gapMs": 250,
+  "fadeMs": 400,
+  "minPunchGapMs": 1500,
+  "closeupBudgetMs": 3000,
+  "minCloseupMs": 1000,
+  "oneThingFrames": 8,
+  "sfx": "all",
+  "punchIns": "default",
+  "emotion": "default",
+  "coverage": "default",
+  "shakes": false,
+  "speedLines": false,
+  "reactors": 1,
+  "transition": "fade",
+  "length": [15, 30]
+}

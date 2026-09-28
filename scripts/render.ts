@@ -1,5 +1,5 @@
 /**
- * Render: pnpm render <skitId> [out.mp4] [--frames=a-b] [--debug]
+ * Render: pnpm render <skitId> [out.mp4] [--frames=a-b] [--debug] [--lang=es] [--quality=draft]
  *   prepare (voice → mouths + word timings, cached) → compile (diagnostics) → render MP4.
  *   Default output: out/<skitId>.mp4 (`--debug` burns in beat/shot labels: out/<skitId>-debug.mp4).
  * Anything that isn't a skit id is passed through to `remotion render` (labs):
@@ -21,7 +21,8 @@ if (!id || !isSkit(id)) {
 }
 
 for (const w of prepIfVoiced(id)) console.warn(`WARNING: ${w}`);
-console.log(summarize(compileSkitDir(id).program));
+const lang = flag("lang");
+console.log(summarize(compileSkitDir(id, { lang }).program));
 const frames = flag("frames")?.split("-").map(Number) as [number, number] | undefined;
-const out = await renderSkitMp4(id, { debug: flag("debug") !== undefined, frames: frames?.length === 2 ? frames : undefined, out: outArg });
+const out = await renderSkitMp4(id, { debug: flag("debug") !== undefined, frames: frames?.length === 2 ? frames : undefined, out: outArg, lang, quality: flag("quality") === "draft" ? "draft" : undefined });
 console.log(path.relative(ROOT, out));

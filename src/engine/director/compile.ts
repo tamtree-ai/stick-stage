@@ -1,12 +1,19 @@
 import type { MusicBed } from "../audio/music";
+import { applyLanguage } from "../i18n/apply";
 import { migrate } from "../migrate";
+import { CharacterSchema } from "../rig/schema";
+import { coverOf } from "./cover";
 import { fromZodIssues, SkitError, type Diagnostic } from "./diagnostics";
+import { applyHook, type HookKind } from "./hooks";
 import { msToFrame } from "./layout";
 import { docBeats, isNarration, SkitSchema, type Beat, type CastMember, type Skit, type SkitDoc } from "./schema";
 import { compileScene, type CompileInput } from "./scene";
+import { styleById, type StyleId } from "./style";
 import type { Program, SceneTransition, Timeline } from "./timeline";
 
 export type { CompileInput } from "./scene";
+
+export type SeriesStyle = { style?: StyleId; coldOpen?: HookKind };
 
 export type CompiledScene = { id: string; skit: Skit; timeline: Timeline };
 
@@ -39,7 +46,7 @@ const spoken = (b: Beat) => !b.silent && !!b.line;
  * spoken beat of the skit); later scenes start after their transition, and each scene's tail
  * leaves room for the next transition.
  */
-export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[]): Resolved[] => {
+export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[], style = styleById(doc.style)): Resolved[] => {
   if (!doc.scenes) return [{ id: "main", skit: { ...doc, set: doc.set!, beats: doc.beats! }, remap: (p) => p }];
   if (doc.labels?.length)
     diags.push({ level: "warning", code: "label-root", path: "labels", message: "labels on a multi-scene skit are ignored; put them on each scene" });
@@ -52,7 +59,7 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[]): Resolved[] => 
   const gap = doc.timing.gapMs;
   const trans = doc.scenes.map((sc, i) => {
     if (i === 0) return undefined;
-    const t = sc.transition ?? { type: "fade" as const, durationMs: 400 };
+    const t = sc.transition ?? { type: style.transition, durationMs: style.fadeMs };
     return { type: t.type, durationFrames: t.type === "cut" ? 0 : msToFrame(t.durationMs, fps) } satisfies SceneTransition;
   });
   const transMs = (i: number) => ((trans[i]?.durationFrames ?? 0) / fps) * 1000;
@@ -97,15 +104,30 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[]): Resolved[] => 
 };
 
 /** skit.json + prepared voice + library → program (scene timelines). Throws `SkitError` on any error. */
+const withCharacters = (input: CompileInput, doc: SkitDoc): CompileInput => {
+  if (!doc.characters?.length) return input;
+  const characters = { ...input.lib.characters };
+  for (const raw of doc.characters) {
+    const parsed = CharacterSchema.safeParse(raw);
+    if (parsed.success) characters[parsed.data.id] = parsed.data;
+  }
+  return { ...input, lib: { ...input.lib, characters } };
+};
+
 export const compileSkit = (input: CompileInput): CompileResult => {
-  const doc = parseSkit(input.skit);
+  const parsed = parseSkit(input.skit);
+  const doc = input.lang ? applyLanguage(parsed, input.lang) : parsed;
+  const show = doc.meta.series ? input.series?.[doc.meta.series.id] : undefined;
+  const style = styleById(doc.style ?? show?.style);
+  const cold = (doc.coldOpen ?? show?.coldOpen) as HookKind | undefined;
+  const sceneInput = withCharacters({ ...input, style }, doc);
   const diags: Diagnostic[] = [];
-  const resolved = resolveScenes(doc, diags);
+  const resolved = resolveScenes(doc, diags, style);
   const scenes: CompiledScene[] = [];
   for (const r of resolved) {
     let found: Diagnostic[];
     try {
-      const out = compileScene(r.skit, input);
+      const out = compileScene(r.skit, sceneInput);
       scenes.push({ id: r.id, skit: r.skit, timeline: out.timeline });
       found = out.warnings;
     } catch (e) {
@@ -137,7 +159,9 @@ export const compileSkit = (input: CompileInput): CompileResult => {
     scenes: programScenes,
     ...(music ? { music } : {}),
   };
-  return { timeline: scenes[0]!.timeline, skit: scenes[0]!.skit, scenes, program, doc, warnings: diags };
+  const covered = { ...program, cover: coverOf(program, doc.meta.series) };
+  const hooked = cold && cold !== "pov" ? applyHook(covered, cold) : covered;
+  return { timeline: scenes[0]!.timeline, skit: scenes[0]!.skit, scenes, program: hooked, doc, warnings: diags };
 };
 
 export type SkitLine = {

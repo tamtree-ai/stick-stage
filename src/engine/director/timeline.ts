@@ -1,6 +1,6 @@
 import type { ExpressionKey } from "../face/expressions";
 import type { PropKey } from "../props/schema";
-import type { GazeKey, NodKey, SpeechClip, SymbolKey } from "../rig/actorState";
+import type { BrowKey, GazeKey, NodKey, SpeechClip, SymbolKey } from "../rig/actorState";
 import type { GaitKey } from "../rig/gait";
 import type { PoseKey } from "../rig/pose";
 import type { SeatKey } from "../rig/seat";
@@ -42,7 +42,13 @@ export type CastTrack = {
   facingKeys: FacingKey[];
   hopKeys: HopKey[];
   gaitKeys: GaitKey[];
+  /** A brow lift on a question, added on top of the expression. */
+  browKeys: BrowKey[];
+  /** A stiff fall, rotating the body down onto the ground. */
+  fallKeys: FallKey[];
 };
+
+export type FallKey = { frame: number };
 
 export type BeatKind = "line" | "silent" | "reaction";
 
@@ -117,6 +123,11 @@ export type Timeline = {
   pages: CaptionPage[];
   /** How narrator caption pages are drawn (skits with a narrator). */
   narratorCaption?: "italic" | "boxed";
+  /** The style's targets, so QA checks the cut it was directed with. */
+  directing?: { id: string; closeupBudgetMs: number; minPunchGapMs: number; minCloseupMs: number; oneThingFrames: number; length: [number, number] };
+  /** BCP 47. Captions and cards follow `direction`. */
+  language?: string;
+  direction?: "ltr" | "rtl";
 };
 
 /** How a scene comes in (`cut` has no overlap). */
@@ -141,4 +152,8 @@ export type Program = {
   scenes: ProgramScene[];
   /** Original bed. Absent when the skit names none. */
   music?: { src: string; gain: number; ducked: number };
+  /** A flash of a later frame, then a slide into beat one. */
+  hook?: { kind: "teaser" | "slam"; scene: number; frame: number; prefixFrames: number; transitionFrames: number };
+  /** The still the cover and thumbnail are framed from. */
+  cover?: { scene: number; frame: number; title: string; badge?: string };
 };

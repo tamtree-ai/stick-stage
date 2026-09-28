@@ -1,9 +1,12 @@
 import { z } from "zod";
 import { SYMBOLS } from "../face/schema";
 import { ScreenTextSchema, SignTextSchema } from "../lib/screenText";
+import { CharacterSchema } from "../rig/schema";
 import { SeriesRefSchema } from "../series/schema";
 import { PartLabelSchema } from "../set/schema";
 import { FRAMINGS } from "../shots/framing";
+import { I18nSchema } from "../i18n/pack";
+import { STYLE_IDS } from "./style";
 
 /**
  * Skit document (`public/skits/<id>/skit.json`). Library ids (poses, expressions, props, sets,
@@ -45,6 +48,10 @@ export const ActionSchema = z.discriminatedUnion("do", [
   z.strictObject({ do: z.literal("highFive"), who, with: z.string().min(1), at }),
   /** Step in and shove `target` on the anchor; they stagger back `distance` (fraction of frame width). */
   z.strictObject({ do: z.literal("shove"), who, target: z.string().min(1), at, distance: z.number().min(0.03).max(0.4).default(0.14) }),
+  /** A stiff fall onto the ground (the faint). */
+  z.strictObject({ do: z.literal("fall"), who, at }),
+  /** A named gag. The compiler expands it into actions, a camera and SFX. */
+  z.strictObject({ do: z.literal("gag"), who, gag: z.string().min(1), at, side: z.enum(["left", "right"]).optional() }),
 ]);
 export type Action = z.infer<typeof ActionSchema>;
 export const ACTION_KINDS = ActionSchema.options.map((o) => o.shape.do.value);
@@ -63,6 +70,7 @@ export const ShotSchema = z.strictObject({
 export type Shot = z.infer<typeof ShotSchema>;
 
 export const SfxCueSchema = z.strictObject({ id: z.string().min(1), at, volume: z.number().min(0).max(2).default(1) });
+export type SfxCue = z.infer<typeof SfxCueSchema>;
 export const MAX_LIST_ITEMS = 5;
 export const TextCueSchema = z.discriminatedUnion("type", [
   z.strictObject({
@@ -244,6 +252,8 @@ export const MetaSchema = z.strictObject({
   syntheticVoices: z.boolean().default(true),
   /** Season and episode for the post manifest. Does not post. */
   series: SeriesRefSchema.optional(),
+  /** BCP 47. Tokenizing, timing and the font follow it. Default English. */
+  language: z.string().min(2).max(16).optional(),
 });
 
 /** The skit document (`skit.json`): one scene (`set` + `beats`) or several (`scenes`). */
@@ -266,6 +276,19 @@ export const SkitSchema = z
     labels: z.array(PartLabelSchema).max(6).optional(),
     /** One bed from the music manifest. Ducked under dialog; silent on the punchline. */
     music: z.string().min(1).optional(),
+    /** Head beats and one gesture per line. Omitted means on. */
+    speechMotion: z.enum(["auto", "off"]).optional(),
+    /** How the director cuts. Omitted: the series style, else classic. */
+    style: z.enum(STYLE_IDS).optional(),
+    /** Opening. Omitted: the series `coldOpen`, else the POV card when the skit has one. */
+    coldOpen: z.enum(["pov", "none", "teaser"]).optional(),
+    /**
+     * Workspace characters. Resolved before the catalog, so the catalog hash does not change.
+     * Not shipped in `src/data/`.
+     */
+    characters: z.array(CharacterSchema).max(4).optional(),
+    /** Dubbed words, keyed by BCP 47. Staging stays; timing follows the new voice. */
+    i18n: I18nSchema.optional(),
     beats: z.array(BeatSchema).min(1).optional(),
     scenes: z.array(SceneSchema).min(1).optional(),
   })

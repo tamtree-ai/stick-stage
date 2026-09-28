@@ -1,0 +1,8 @@
+{
+  "id": "freeze-frame",
+  "steps": [
+    { "do": "freeze", "text": "yep, that's me", "atMs": 0 },
+    { "do": "sfx", "id": "record-scratch", "atMs": 0 },
+    { "do": "holdMs", "ms": 1200 }
+  ]
+}

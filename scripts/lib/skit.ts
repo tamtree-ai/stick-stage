@@ -9,9 +9,9 @@ export const skitDir = (id: string) => WS.skitDir(id);
 export const isSkit = (id: string) => isSkitIn(PROJECT, id);
 
 /** Compile, printing diagnostics. Exits the process on errors (or rethrows, with `exitOnError: false`). */
-export const compileSkitDir = (id: string, { exitOnError = true } = {}): CompileResult => {
+export const compileSkitDir = (id: string, { exitOnError = true, lang }: { exitOnError?: boolean; lang?: string } = {}): CompileResult => {
   try {
-    const r = compileSkitIn(PROJECT, id);
+    const r = compileSkitIn(PROJECT, id, { lang });
     if (r.warnings.length) console.warn(formatDiagnostics(r.warnings));
     return r;
   } catch (e) {

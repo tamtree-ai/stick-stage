@@ -176,6 +176,21 @@ const SOUNDS: Sound[] = [
     make: () => mix(0.35, [env(osc(0.35, (t) => 45 + 45 * Math.exp(-t * 25)), perc(0.002, 12))], [env(filter(noise(0.1, 11), "lp", () => 600), perc(0.001, 40)), 0.5]),
   },
   {
+    id: "laugh",
+    gain: 0.55,
+    tags: ["sitcom", "punchline"],
+    make: () => {
+      const bursts: [number, number][] = [[0, 220], [0.18, 196], [0.36, 247], [0.52, 185]];
+      const T = 0.75;
+      const parts = bursts.map(([at, hz]) => {
+        const tone = env(osc(0.16, () => hz), perc(0.012, 12));
+        const air = env(filter(noise(0.14, 4), "bp", () => 1200, 1.4), perc(0.004, 16));
+        return [mix(0.16, [tone, 0.65], [air, 0.4]), 0.8, at] as [Sig, number, number];
+      });
+      return mix(T, ...parts);
+    },
+  },
+  {
     id: "sparkle",
     gain: 0.45,
     tags: ["idea", "magic"],

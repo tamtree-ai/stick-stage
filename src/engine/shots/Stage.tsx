@@ -13,6 +13,8 @@ export type StageActor = {
   facing: "left" | "right";
   /** Vertical root offset in stage px (negative = up), e.g. a hop. */
   dy?: number;
+  /** Forward tilt in degrees, around the feet (a faint). */
+  tilt?: number;
 };
 
 export type Camera = {
@@ -47,7 +49,7 @@ export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame,
       <g transform={t}>
         <SetLayers set={set} width={width} height={height} layer="background" labels={labels} fontFamily={fontFamily} />
         {actors.map((a) => (
-          <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY + (a.dy ?? 0)} facing={a.facing} frame={frame} fontFamily={fontFamily} />
+          <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY + (a.dy ?? 0)} facing={a.facing} frame={frame} fontFamily={fontFamily} tilt={a.tilt} />
         ))}
         <SetLayers set={set} width={width} height={height} layer="foreground" labels={labels} fontFamily={fontFamily} />
       </g>

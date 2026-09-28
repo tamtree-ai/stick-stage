@@ -1,7 +1,7 @@
 /** A project: a workspace plus its registries. Loads, compiles, checks and summarizes skits. */
 import fs from "node:fs";
 import path from "node:path";
-import { checkSkit, compileSkit, PreparedVoiceSchema, type CheckReport, type CompileResult, type Library, type Program, type ReactionTable, type SafeArea, type SetDef, type SfxManifest, type Timeline } from "../engine/core";
+import { applyLanguage, checkSkit, compileSkit, parseSkit, placeholderVoice, PreparedVoiceSchema, skitLines, type CheckReport, type CompileResult, type Library, type Program, type ReactionTable, type SafeArea, type SeriesStyle, type SetDef, type SfxManifest, type Timeline } from "../engine/core";
 import type { Workspace } from "./workspace";
 
 export type Project = {
@@ -11,17 +11,24 @@ export type Project = {
   sfx: SfxManifest;
   reactions: ReactionTable;
   safeArea: SafeArea;
+  /** Series documents, so a skit can inherit style and cold open. */
+  series?: Readonly<Record<string, SeriesStyle>>;
 };
 
 export const isSkit = (p: Project, id: string) => fs.existsSync(path.join(p.ws.skitDir(id), "skit.json"));
 
 /** Compile `skit.json` with its prepared voice; writes `generated/timeline.json` (the program). Throws `SkitError`. */
-export const compileSkitIn = (p: Project, id: string): CompileResult => {
+export const compileSkitIn = (p: Project, id: string, extra?: { lang?: string; coldOpen?: "pov" | "none" | "teaser" | "slam" }): CompileResult => {
   const dir = p.ws.skitDir(id);
-  const skit = JSON.parse(fs.readFileSync(path.join(dir, "skit.json"), "utf8"));
-  const voicePath = path.join(dir, "generated/voice.prepared.json");
-  const voice = fs.existsSync(voicePath) ? PreparedVoiceSchema.parse(JSON.parse(fs.readFileSync(voicePath, "utf8"))) : undefined;
-  const r = compileSkit({ skit, voice, lib: p.lib, sets: p.sets, sfx: p.sfx, reactions: p.reactions, safeArea: p.safeArea });
+  const raw = JSON.parse(fs.readFileSync(path.join(dir, "skit.json"), "utf8")) as Record<string, unknown>;
+  const skit = extra?.coldOpen ? { ...raw, coldOpen: extra.coldOpen === "pov" ? "pov" : extra.coldOpen } : raw;
+  const voicePath = path.join(dir, extra?.lang ? `generated/voice.${extra.lang}.prepared.json` : "generated/voice.prepared.json");
+  const voice = fs.existsSync(voicePath)
+    ? PreparedVoiceSchema.parse(JSON.parse(fs.readFileSync(voicePath, "utf8")))
+    : extra?.lang
+      ? placeholderVoice(skitLines(applyLanguage(parseSkit(skit), extra.lang)), extra.lang)
+      : undefined;
+  const r = compileSkit({ skit, voice, lib: p.lib, sets: p.sets, sfx: p.sfx, reactions: p.reactions, safeArea: p.safeArea, series: p.series, lang: extra?.lang });
   fs.mkdirSync(path.join(dir, "generated"), { recursive: true });
   fs.writeFileSync(path.join(dir, "generated/timeline.json"), JSON.stringify(r.program));
   return r;

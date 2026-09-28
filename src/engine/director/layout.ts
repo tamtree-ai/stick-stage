@@ -2,11 +2,12 @@ import type { PreparedLine } from "../voice/schema";
 import { resolveAnchor, type AnchorContext } from "./anchors";
 import type { Diagnostic } from "./diagnostics";
 import { isNarration, type Anchor, type Beat, type Skit } from "./schema";
+import { CLASSIC, type DirectingStyle } from "./style";
 import type { BeatKind } from "./timeline";
 
 export const DEFAULT_SILENT_MS = 900;
-/** Reaction close-up after the punchline: ~10 frames in the two-shot + ≥ 1 s on the face. */
-export const REACTION_MS = 1300;
+/** Reaction close-up after the punchline: ~10 frames in the two-shot + ≥ 1 s on the face. Classic's number. */
+export const REACTION_MS = CLASSIC.reactionMs;
 
 export type LaidBeat = {
   beat: Beat;
@@ -28,6 +29,8 @@ export type LaidBeat = {
   ctx: AnchorContext;
   /** Synthetic reaction beats: who reacts and with what. */
   reactor?: string;
+  /** Extra reactors (a chaotic style). The first is `reactor`. */
+  reactors?: string[];
   reactionExpression?: string;
 };
 
@@ -65,6 +68,7 @@ export const layoutBeats = (
   lines: ReadonlyMap<string, PreparedLine>,
   reactionFor: (beat: Beat, index: number) => { reactor: string; expression: string } | undefined,
   diags: Diagnostic[],
+  style: DirectingStyle = CLASSIC,
 ): Layout => {
   const punch = punchlineIndexes(skit);
   const out: LaidBeat[] = [];
@@ -74,7 +78,8 @@ export const layoutBeats = (
   const push = (beat: Beat, path: (string | number)[], kind: BeatKind, synthetic: boolean, isPunch: boolean, extra: Partial<LaidBeat> = {}) => {
     const a = beat.audio;
     const clipGap = a.source === "file" && lastClip?.src === a.src && a.startMs !== undefined ? Math.max(0, a.startMs - lastClip.endMs) : undefined;
-    const gap = beat.pauseBeforeMs ?? clipGap ?? (out.length === 0 || synthetic ? 0 : skit.timing.gapMs);
+    const gapDefault = skit.timing.gapMs === CLASSIC.gapMs ? style.gapMs : skit.timing.gapMs;
+    const gap = beat.pauseBeforeMs ?? clipGap ?? (out.length === 0 || synthetic ? 0 : gapDefault);
     lastClip = a.source === "file" && a.endMs !== undefined && kind === "line" ? { src: a.src, endMs: a.endMs } : undefined;
     const line = extra.line;
     const durMs = line ? line.durationMs : (beat.durationMs ?? DEFAULT_SILENT_MS);
@@ -135,8 +140,10 @@ export const layoutBeats = (
     if (next?.silent) return; // The skit already has its own reaction beat.
     const r = reactionFor(beat, i);
     if (!r) return;
-    const synthetic: Beat = { ...beat, id: `${beat.id}-reaction`, speaker: undefined, focus: undefined, line: undefined, silent: true, durationMs: REACTION_MS, pauseBeforeMs: 0, holdAfterMs: 0, shot: undefined, actions: [], sfx: [], text: [], punchline: false };
-    push(synthetic, path, "reaction", true, false, { reactor: r.reactor, reactionExpression: r.expression });
+    const others = skit.cast.map((c) => c.id).filter((id) => id !== beat.speaker && id !== r.reactor);
+    const reactors = [r.reactor, ...others.slice(0, Math.max(0, style.reactors - 1))];
+    const synthetic: Beat = { ...beat, id: `${beat.id}-reaction`, speaker: undefined, focus: undefined, line: undefined, silent: true, durationMs: style.reactionMs, pauseBeforeMs: 0, holdAfterMs: 0, shot: undefined, actions: [], sfx: [], text: [], punchline: false };
+    push(synthetic, path, "reaction", true, false, { reactor: r.reactor, reactors, reactionExpression: r.expression });
   });
   return { beats: out, totalMs: cursor + skit.timing.tailMs };
 };

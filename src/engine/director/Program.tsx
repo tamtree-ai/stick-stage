@@ -4,7 +4,7 @@ import { slide } from "@remotion/transitions/slide";
 import { wipe } from "@remotion/transitions/wipe";
 import { linearTiming, TransitionSeries, type TransitionPresentation } from "@remotion/transitions";
 import React from "react";
-import { AbsoluteFill, Html5Audio, staticFile } from "remotion";
+import { AbsoluteFill, Freeze, Html5Audio, staticFile } from "remotion";
 import { Skit, type SkitProps } from "./Skit";
 import type { Program, SceneTransition } from "./timeline";
 import type { SetDef } from "../set/schema";
@@ -40,9 +40,31 @@ const Bed: React.FC<{ program: Program; audio?: boolean }> = ({ program, audio =
   return <Html5Audio src={staticFile(bed.src)} loop volume={(f) => (punch(f) ? 0 : talking(f) ? bed.ducked : bed.gain)} />;
 };
 
-/** A compiled skit: its scenes in order, joined by their transitions. */
+/** A compiled skit: its scenes in order, joined by their transitions. A teaser or slam hook plays first. */
 export const SkitProgram: React.FC<SkitProgramProps> = ({ program, sets, ...rest }) => {
-  const picture =
+  const hook = program.hook;
+  const hookScene = hook ? program.scenes[hook.scene] : undefined;
+  const picture = hook && hookScene ? (
+    <TransitionSeries>
+      <TransitionSeries.Sequence durationInFrames={hook.prefixFrames}>
+        <Freeze frame={hook.frame}>
+          <Skit timeline={hookScene.timeline} set={sets[hookScene.timeline.set]!} {...rest} audio={false} />
+        </Freeze>
+        {rest.audio !== false ? <Html5Audio src={staticFile("sfx/whoosh.wav")} volume={0.8} /> : null}
+      </TransitionSeries.Sequence>
+      <TransitionSeries.Transition presentation={slide({ direction: "from-right" })} timing={linearTiming({ durationInFrames: hook.transitionFrames })} />
+      {program.scenes.map((sc) => (
+        <React.Fragment key={sc.id}>
+          {sc.transitionIn && sc.transitionIn.durationFrames > 0 ? (
+            <TransitionSeries.Transition presentation={presentation(sc.transitionIn, program.width, program.height)} timing={linearTiming({ durationInFrames: sc.transitionIn.durationFrames })} />
+          ) : null}
+          <TransitionSeries.Sequence durationInFrames={sc.timeline.durationInFrames}>
+            <Skit timeline={sc.timeline} set={sets[sc.timeline.set]!} {...rest} />
+          </TransitionSeries.Sequence>
+        </React.Fragment>
+      ))}
+    </TransitionSeries>
+  ) : (
     program.scenes.length === 1 ? (
       <Skit timeline={program.scenes[0]!.timeline} set={sets[program.scenes[0]!.timeline.set]!} {...rest} />
     ) : (
@@ -61,7 +83,8 @@ export const SkitProgram: React.FC<SkitProgramProps> = ({ program, sets, ...rest
         </React.Fragment>
       ))}
     </TransitionSeries>
-    );
+    )
+  );
   return (
     <AbsoluteFill>
       {picture}

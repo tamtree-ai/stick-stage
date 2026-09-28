@@ -1,0 +1,20 @@
+{
+  "id": "sitcom",
+  "reactionMs": 1500,
+  "gapMs": 280,
+  "fadeMs": 400,
+  "minPunchGapMs": 1500,
+  "closeupBudgetMs": 3000,
+  "minCloseupMs": 1000,
+  "oneThingFrames": 8,
+  "sfx": "all",
+  "punchIns": "default",
+  "emotion": "default",
+  "coverage": "wide",
+  "shakes": false,
+  "speedLines": false,
+  "reactors": 1,
+  "transition": "fade",
+  "punchSfx": "laugh",
+  "length": [18, 35]
+}

@@ -185,6 +185,22 @@ If the person names a series, read `src/data/series/<id>.json` before staging an
 
 A cast beat with `"voiceOver": true` is a thought: their own voice, mouth shut, italic caption. `"music": "room"` is the one original bed. It ducks under dialog and drops out on the punchline. Do not add another track.
 
+## Speech, gags, and style
+
+Speakers already nod and gesture while they talk (`speechMotion`, default on). Do not add a cycling pose on every line. An authored `pose` still wins. One optional gag per line, from `src/data/gags/`: `double-take`, `look-to-camera`, `spit-take` (needs the cup), `faint`, `slow-clap`, `walk-out`, `freeze-frame`. Write it as `{ "who", "do": "gag", "gag" }`.
+
+`style` is `classic` (the default), `deadpan`, `snappy`, `chaotic`, or `sitcom`. A skit inherits `series.style` when it omits its own. `coldOpen` may be `pov`, `none`, or `teaser` (a flash of the punchline reaction, then a rewind into beat one).
+
+`meta.language` is a BCP 47 tag. A dub lives in `i18n.<lang>` (`lines`, `slams`, `pov`, `cards`, `labels`) and is rendered with `pnpm render <id> --lang=<tag>`. Workspace characters go on `characters` and are never copied into `src/data/`.
+
+## Speech, gags, and style
+
+Speakers already nod and gesture while they talk (`speechMotion`, default on). Do not add a cycling pose on every line. An authored `pose` still wins. One optional gag per line, from `src/data/gags/`: `double-take`, `look-to-camera`, `spit-take` (needs the cup), `faint`, `slow-clap`, `walk-out`, `freeze-frame`. Write it as `{ "who", "do": "gag", "gag" }`.
+
+`style` is `classic` (the default), `deadpan`, `snappy`, `chaotic`, or `sitcom`. A skit inherits `series.style` when it omits its own. `coldOpen` may be `pov`, `none`, or `teaser` (a flash of the punchline reaction, then a rewind into beat one).
+
+`meta.language` is a BCP 47 tag. A dub lives in `i18n.<lang>` (`lines`, `slams`, `pov`, `cards`, `labels`) and is rendered with `pnpm render <id> --lang=<tag>`. Workspace characters go on `characters` and are never copied into `src/data/`.
+
 ## Reference
 
 - Authoring guide and every field: `docs/skits.md`. Voice contract: `docs/voice-contract.md`.

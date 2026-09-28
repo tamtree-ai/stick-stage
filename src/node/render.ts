@@ -33,8 +33,10 @@ export type SheetOptions = RenderControl & {
 
 export type RenderBackend = {
   serveUrl: () => Promise<string>;
-  renderSkit: (skitId: string, out: string, o?: RenderControl & { debug?: boolean; frames?: [number, number] }) => Promise<string>;
+  renderSkit: (skitId: string, out: string, o?: RenderControl & { debug?: boolean; frames?: [number, number]; scale?: number; x264Preset?: "ultrafast" | "superfast" | "veryfast" | "faster" | "fast" | "medium" | "slow" | "slower" | "veryslow" | "placebo"; omitHook?: boolean; lang?: string }) => Promise<string>;
   renderSheet: (o: SheetOptions) => Promise<string>;
+  /** One still of a registered composition (Cover, Thumbnail). */
+  renderComposition: (id: string, inputProps: Record<string, unknown>, out: string) => Promise<string>;
   /** One frame of a skit as a PNG (layout checks). */
   renderStill: (skitId: string, frame: number, out: string, o?: { debug?: boolean; timeoutInMilliseconds?: number }) => Promise<string>;
 };
@@ -57,7 +59,7 @@ export const remotionBackend = (opts: {
 
   const renderSkit: RenderBackend["renderSkit"] = async (skitId, out, o = {}) => {
     const url = await serveUrl();
-    const inputProps = { skit: skitId, showLabels: !!o.debug };
+    const inputProps = { skit: skitId, showLabels: !!o.debug, ...(o.omitHook ? { omitHook: true } : {}), ...(o.lang ? { lang: o.lang } : {}) };
     const composition = await selectComposition({ serveUrl: url, id: o.debug ? ids.debug : ids.skit, inputProps, browserExecutable });
     fs.mkdirSync(path.dirname(out), { recursive: true });
     await renderMedia({
@@ -68,6 +70,8 @@ export const remotionBackend = (opts: {
       codec: "h264",
       outputLocation: out,
       frameRange: o.frames ?? null,
+      scale: o.scale,
+      x264Preset: o.x264Preset,
       onProgress: ({ progress }) => o.onProgress?.(progress),
       cancelSignal: o.cancelSignal,
       timeoutInMilliseconds: o.timeoutInMilliseconds,
@@ -129,5 +133,13 @@ export const remotionBackend = (opts: {
     return out;
   };
 
-  return { serveUrl, renderSkit, renderSheet, renderStill: still };
+  const renderComposition: RenderBackend["renderComposition"] = async (id, inputProps, out) => {
+    const url = await serveUrl();
+    const composition = await selectComposition({ serveUrl: url, id, inputProps, browserExecutable });
+    fs.mkdirSync(path.dirname(out), { recursive: true });
+    await renderStill({ serveUrl: url, composition, inputProps, output: out, imageFormat: "png", browserExecutable });
+    return out;
+  };
+
+  return { serveUrl, renderSkit, renderSheet, renderStill: still, renderComposition };
 };

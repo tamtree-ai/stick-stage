@@ -8,8 +8,10 @@
  *   POST   /write/prompt            { mode: "draft", brief } | { mode: "revise", skit, note } → the model's prompt
  *   POST   /validate                 { premise } | { skit } | { reply, brief } | { reply, skit } → skit + lines + verdict
  *   POST   /render                   multipart skit + voice + audio files → 202 job
+ *   POST   /prepare                  same body; prep only, returns the prepared voice
  *   GET    /jobs/:id                 job status
- *   GET    /jobs/:id/files/:name     an output (mp4, srt, txt, manifest, sheet)
+ *   GET    /jobs/:id/events          server-sent events of the same payloads
+ *   GET    /jobs/:id/files/:name     an output (mp4, srt, txt, manifest, sheet, cover, thumbnail, voice)
  *   DELETE /jobs/:id                 cancel
  */
 import http from "node:http";
@@ -19,7 +21,7 @@ import { castNotes } from "../data";
 import type { Project } from "../node";
 import { requireBearer } from "./auth";
 import { HttpError, readForm, readJson, router, type Ctx } from "./http";
-import { JOB_ID, type Job, type JobQueue } from "./jobs";
+import { JOB_ID, jobPublic, type Job, type JobQueue } from "./jobs";
 import { parseSubmission, writeSubmission } from "./submit";
 import { projectCatalogVersion, validate } from "./validate";
 import { writePrompt } from "./write";
@@ -37,10 +39,13 @@ export type ServiceOptions = {
 const MB = 1024 * 1024;
 
 /** A job as the API shows it: output files become download URLs. */
-export const jobView = (job: Job) => ({
-  ...job,
-  outputs: job.outputs && Object.fromEntries(Object.entries(job.outputs).map(([k, o]) => [k, { url: `/jobs/${job.id}/files/${k}`, type: o.type, bytes: o.bytes, name: path.basename(o.file) }])),
-});
+export const jobView = (job: Job) => {
+  const pub = jobPublic(job);
+  return {
+    ...pub,
+    outputs: pub.outputs && Object.fromEntries(Object.entries(pub.outputs).map(([k, o]) => [k, { url: `/jobs/${job.id}/files/${k}`, type: o.type, bytes: o.bytes, name: path.basename(o.file) }])),
+  };
+};
 
 export const createService = (o: ServiceOptions) => {
   const auth = requireBearer(o.token);
@@ -66,8 +71,9 @@ export const createService = (o: ServiceOptions) => {
 
   r.post("/validate", async ({ req }) => ({ json: validate(o.project, await readJson(req, jsonLimit), castNotes) }));
 
-  r.post("/render", async ({ req }) => {
+  const accept = async (req: Ctx["req"], mode?: "prepare") => {
     const submission = await parseSubmission(await readForm(req, uploadLimit));
+    if (mode) submission.options.mode = mode;
     const { id, dir } = o.queue.reserve();
     try {
       writeSubmission(dir, submission);
@@ -75,11 +81,30 @@ export const createService = (o: ServiceOptions) => {
       o.queue.discard(id);
       throw e;
     }
-    const job = o.queue.enqueue(id, submission.options, submission.warnings);
-    return { status: 202, json: jobView(job) };
-  });
+    return { status: 202 as const, json: jobView(o.queue.enqueue(id, submission.options, submission.warnings)) };
+  };
+
+  r.post("/render", async ({ req }) => accept(req));
+  r.post("/prepare", async ({ req }) => accept(req, "prepare"));
 
   r.get("/jobs/:id", (ctx) => ({ json: jobView(jobOf(ctx)) }));
+
+  r.get("/jobs/:id/events", (ctx) => {
+    const job = jobOf(ctx);
+    return {
+      sse: async (res) => {
+        const write = (j: Job) => {
+          res.write(`data: ${JSON.stringify(jobView(j))}\n\n`);
+          if (j.status === "succeeded" || j.status === "failed" || j.status === "cancelled") res.end();
+        };
+        write(job);
+        if (res.writableEnded) return;
+        const unsub = o.queue.subscribe(job.id, write);
+        await new Promise<void>((resolve) => res.on("close", resolve));
+        unsub();
+      },
+    };
+  });
 
   r.get("/jobs/:id/files/:name", (ctx) => {
     const job = jobOf(ctx);

@@ -18,7 +18,7 @@ export class HttpError extends Error {
   }
 }
 
-export type Reply = { status?: number; json?: unknown; file?: { path: string; type: string; name?: string } };
+export type Reply = { status?: number; json?: unknown; file?: { path: string; type: string; name?: string }; sse?: (res: ServerResponse) => Promise<void> | void };
 export type Ctx = { req: IncomingMessage; url: URL; params: Record<string, string> };
 export type Handler = (ctx: Ctx) => Promise<Reply> | Reply;
 type Route = { method: string; parts: string[]; handler: Handler };
@@ -68,6 +68,11 @@ export const router = () => {
 };
 
 const send = async (res: ServerResponse, r: Reply) => {
+  if (r.sse) {
+    res.writeHead(r.status ?? 200, { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-cache", connection: "keep-alive" });
+    await r.sse(res);
+    return;
+  }
   if (r.file) {
     const { size } = fs.statSync(r.file.path);
     res.writeHead(r.status ?? 200, {

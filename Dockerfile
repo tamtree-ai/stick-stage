@@ -31,6 +31,8 @@ COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY --chown=node:node . .
 # Chrome Headless Shell into node_modules/.remotion, then prove it starts; prove the bundle builds.
+# Full ICU: Intl.Segmenter (Japanese, Chinese, Korean, Thai). The official Node image ships it; fail the build if a slim rebuild drops it.
+RUN node -e "if (typeof Intl.Segmenter !== 'function') process.exit(1); new Intl.Segmenter('ja', { granularity: 'word' })"
 RUN node_modules/.bin/remotion browser ensure \
  && mkdir -p public/skits/_jobs
 

@@ -37,6 +37,7 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
   const slamUp = tl.slams.some((s) => frame >= s.from - 4 && frame < s.to);
   // The POV card sits where a face close-up puts the head, so it steps aside on face shots.
   const faceShot = FACE_FRAMINGS.includes(shotAt(tl, frame).framing);
+  const direction = tl.direction ?? "ltr";
   return (
     <AbsoluteFill style={{ background: "#ffffff" }}>
       <Stage set={set} actors={actors} width={W} height={H} frame={frame} camera={camera} fontFamily={fontFamily} labels={tl.labels} />
@@ -59,14 +60,14 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
         minY={safeArea.top * H}
         fontFamily={fontFamily}
       />
-      {tl.pov && !faceShot ? <PovCard text={tl.pov.text} frame={frame} from={tl.pov.from} to={tl.pov.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} /> : null}
-      {tl.card ? <CardText card={tl.card} title={tl.card.lines.join("\n")} frame={frame} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} /> : null}
+      {tl.pov && !faceShot ? <PovCard text={tl.pov.text} frame={frame} from={tl.pov.from} to={tl.pov.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} direction={direction} /> : null}
+      {tl.card ? <CardText card={tl.card} title={tl.card.lines.join("\n")} frame={frame} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} direction={direction} /> : null}
       {tl.lists.map((l, i) => (
-        <ListText key={`list-${i}`} list={l} frame={frame} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} />
+        <ListText key={`list-${i}`} list={l} frame={frame} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} direction={direction} />
       ))}
-      <Subtitles hidden={slamUp} pages={tl.pages} frame={frame} fps={fps} width={W} height={H} safeArea={safeArea} style={{ fontFamily }} narratorStyle={tl.narratorCaption} />
+      <Subtitles hidden={slamUp} pages={tl.pages} frame={frame} fps={fps} width={W} height={H} safeArea={safeArea} style={{ fontFamily }} narratorStyle={tl.narratorCaption} direction={tl.direction} />
       {tl.slams.map((s, i) => (
-        <SlamText key={i} seed={`${tl.title}-${i}`} text={s.text} frame={frame} from={s.from} to={s.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} />
+        <SlamText key={i} seed={`${tl.title}-${i}`} text={s.text} frame={frame} from={s.from} to={s.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} direction={direction} />
       ))}
       {showLabels ? <QaOverlay tl={tl} lib={lib} set={set} safeArea={safeArea} camera={camera} frame={frame} /> : null}
       {showLabels ? <SkitLabel tl={tl} frame={frame} /> : null}

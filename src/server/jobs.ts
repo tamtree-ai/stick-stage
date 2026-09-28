@@ -10,8 +10,33 @@ import type { CheckReport, Diagnostic } from "../engine/core";
 
 export type JobStatus = "queued" | "running" | "succeeded" | "failed" | "cancelled";
 export type JobStage = "prep" | "compile" | "check" | "render" | "post";
-export type JobOptions = { skipCheck?: boolean; debug?: boolean; sheet?: boolean };
+export type JobQuality = "draft" | "final";
+export type HookVariant = "pov" | "teaser" | "slam";
+export type JobCallback = { url: string; secret: string };
+export type JobDelivery = { at: string; attempt: number; status: number | "error" };
+export type JobOptions = {
+  skipCheck?: boolean;
+  debug?: boolean;
+  sheet?: boolean;
+  /** `prepare` stops after the voice is ready. `render` is the default. */
+  mode?: "prepare" | "render";
+  quality?: JobQuality;
+  lang?: string;
+  variants?: HookVariant[];
+  /** HMAC-SHA256 webhook on each stage change and on finish. */
+  callback?: JobCallback;
+  /** Scene-level frame cache. On for multi-scene renders. */
+  sceneCache?: boolean;
+  covers?: boolean;
+};
 export type JobOutput = { file: string; type: string; bytes: number };
+
+/** Job JSON for clients and webhooks. The callback secret stays on disk. */
+export const jobPublic = (job: Job): Job => {
+  const callback = job.options.callback;
+  if (!callback) return job;
+  return { ...job, options: { ...job.options, callback: { url: callback.url, secret: "" } } };
+};
 
 export type Job = {
   id: string;
@@ -33,6 +58,8 @@ export type Job = {
   error?: { code: string; message: string };
   /** By name (`mp4`, `srt`, `txt`, `manifest`, `sheet`); files live in the job folder. */
   outputs?: Record<string, JobOutput>;
+  /** Webhook attempts. The job keeps going if delivery fails. */
+  deliveries?: JobDelivery[];
 };
 
 /** What a pipeline run reports back; thrown `JobFailure`s become `failed` with a code. */
@@ -58,6 +85,7 @@ export const jobQueue = (o: JobQueueOptions) => {
   const now = o.now ?? (() => new Date());
   const log = o.log ?? console.log;
   const jobs = new Map<string, Job>();
+  const listeners = new Map<string, Set<(job: Job) => void>>();
   const queue: string[] = [];
   let counter = 0;
   let running: { id: string; abort: AbortController; done: Promise<void> } | undefined;
@@ -65,11 +93,45 @@ export const jobQueue = (o: JobQueueOptions) => {
 
   const dirOf = (id: string) => path.join(o.jobsDir, id);
   const save = (job: Job) => fs.writeFileSync(path.join(dirOf(job.id), "job.json"), JSON.stringify(job, null, 1));
+  const emit = (job: Job) => {
+    for (const fn of listeners.get(job.id) ?? []) {
+      try {
+        fn(job);
+      } catch {
+        /* a closed stream */
+      }
+    }
+  };
+  const postCallback = (job: Job) => {
+    const cb = job.options.callback;
+    if (!cb?.url || !cb.secret) return;
+    const body = JSON.stringify(jobPublic(job));
+    const sig = crypto.createHmac("sha256", cb.secret).update(body).digest("hex");
+    const attempt = async (n: number) => {
+      let status: number | "error" = "error";
+      try {
+        const res = await fetch(cb.url, { method: "POST", headers: { "content-type": "application/json", "x-stickstage-signature": `sha256=${sig}` }, body });
+        status = res.status;
+      } catch {
+        status = "error";
+      }
+      const current = jobs.get(job.id);
+      if (!current) return;
+      current.deliveries = [...(current.deliveries ?? []), { at: now().toISOString(), attempt: n, status }];
+      save(current);
+      emit(current);
+      if (status !== "error" && status < 500) return;
+      if (n < 3) setTimeout(() => void attempt(n + 1), 200 * 4 ** (n - 1));
+    };
+    void attempt(1);
+  };
   const patch = (id: string, p: Partial<Job>) => {
     const job = jobs.get(id);
     if (!job) return;
     Object.assign(job, p);
     save(job);
+    emit(job);
+    postCallback(job);
   };
 
   /** A new job id and its empty folder; fill it, then `enqueue`. */
@@ -182,6 +244,13 @@ export const jobQueue = (o: JobQueueOptions) => {
     recover,
     sweep,
     get: (id: string) => jobs.get(id),
+    /** SSE subscribers. Returns an unsubscribe. */
+    subscribe: (id: string, fn: (job: Job) => void) => {
+      const set = listeners.get(id) ?? new Set();
+      set.add(fn);
+      listeners.set(id, set);
+      return () => set.delete(fn);
+    },
     dirOf,
     /** Discard a reserved folder that never became a job (bad upload). */
     discard: (id: string) => !jobs.has(id) && fs.rmSync(dirOf(id), { recursive: true, force: true }),

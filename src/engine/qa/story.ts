@@ -5,6 +5,8 @@ import { msToFrame } from "../director/layout";
 import { shotAt } from "../director/camera";
 import type { Skit } from "../director/schema";
 import type { BeatSpan, Program, Timeline } from "../director/timeline";
+import { contrastRatio } from "../lib/color";
+import { SLAM } from "../text/layout";
 import type { Finding } from "./types";
 
 /**
@@ -19,7 +21,12 @@ const secs = (tl: Timeline, f: number) => `${(f / tl.fps).toFixed(2)}s`;
 
 type Hint = (expression: string) => Expression["closeup"];
 
-export const STORY_CHECKS = ["punchline-camera", "punchline-reaction", "emotion-closeups", "closeup-budget", "closeup-hold", "punch-gap", "one-thing", "hook", "length", "narrator-dominant"];
+export const STORY_CHECKS = ["punchline-camera", "punchline-reaction", "emotion-closeups", "closeup-budget", "closeup-hold", "punch-gap", "one-thing", "hook", "length", "narrator-dominant", "cover-contrast"];
+
+const budgetOf = (tl: Timeline) => tl.directing?.closeupBudgetMs ?? CLOSEUP_BUDGET_MS;
+const punchGapOf = (tl: Timeline) => tl.directing?.minPunchGapMs ?? MIN_PUNCH_GAP_MS;
+const holdOf = (tl: Timeline) => tl.directing?.minCloseupMs ?? MIN_CLOSEUP_MS;
+const oneThingOf = (tl: Timeline) => tl.directing?.oneThingFrames ?? 8;
 
 /** Above this share of the spoken time, voice-over turns the skit into a slideshow. */
 export const NARRATOR_MAX_SHARE = 0.6;
@@ -75,7 +82,7 @@ const emotionMoments = (tl: Timeline, hint: Hint, b: BeatSpan) =>
 
 export const closeupChecks = (tl: Timeline, skit: Skit, hint: Hint): Finding[] => {
   const out: Finding[] = [];
-  const budget = msToFrame(CLOSEUP_BUDGET_MS, tl.fps);
+  const budget = msToFrame(budgetOf(tl), tl.fps);
   const faceCuts = tl.shots.filter((s) => isFace(s.framing));
   tl.beats.forEach((b, i) => {
     const sb = skitBeat(skit, b.id);
@@ -111,7 +118,7 @@ export const closeupChecks = (tl: Timeline, skit: Skit, hint: Hint): Finding[] =
     // Pushing in on the face already in shot (close → extreme) is one escalating close-up.
     const pushIn = prev && prev.on === s.on && tl.shots[tl.shots.indexOf(s) - 1] === prev;
     if (prev && !pushIn && s.frame - prev.frame < budget && !s.reason.startsWith("reaction close-up"))
-      out.push({ check: "closeup-budget", level: "warning", frame: s.frame, message: `two emotion close-ups ${secs(tl, s.frame - prev.frame)} apart (budget ${CLOSEUP_BUDGET_MS / 1000} s)` });
+      out.push({ check: "closeup-budget", level: "warning", frame: s.frame, message: `two emotion close-ups ${secs(tl, s.frame - prev.frame)} apart (budget ${budgetOf(tl) / 1000} s)` });
   });
   // Never on two consecutive plain lines.
   let plainRun = 0;
@@ -122,7 +129,7 @@ export const closeupChecks = (tl: Timeline, skit: Skit, hint: Hint): Finding[] =
     if (plainRun >= 2) out.push({ check: "closeup-budget", level: "warning", frame: b.from, message: `face close-ups on two plain lines in a row (at "${b.id}")` });
   }
   // A close-up holds ≥ 1 s before the next cut.
-  const minHold = msToFrame(MIN_CLOSEUP_MS, tl.fps) - 1;
+  const minHold = msToFrame(holdOf(tl), tl.fps) - 1;
   tl.shots.forEach((s, i) => {
     const end = tl.shots[i + 1]?.frame ?? tl.durationInFrames;
     if (isFace(s.framing) && end - s.frame < minHold)
@@ -133,7 +140,7 @@ export const closeupChecks = (tl: Timeline, skit: Skit, hint: Hint): Finding[] =
 
 export const pacingChecks = (tl: Timeline): Finding[] => {
   const out: Finding[] = [];
-  const gap = msToFrame(MIN_PUNCH_GAP_MS, tl.fps);
+  const gap = msToFrame(punchGapOf(tl), tl.fps);
   tl.punchIns.forEach((p, i) => {
     const prev = tl.punchIns[i - 1];
     if (prev && p.frame - prev.frame < gap) out.push({ check: "punch-gap", level: "warning", frame: p.frame, message: `punch-ins ${secs(tl, p.frame - prev.frame)} apart (min ${MIN_PUNCH_GAP_MS / 1000} s)` });
@@ -147,7 +154,7 @@ export const pacingChecks = (tl: Timeline): Finding[] => {
   ].sort((a, b) => a.frame - b.frame);
   events.forEach((e, i) => {
     const prev = events[i - 1];
-    if (prev && e.frame - prev.frame < 8 && e.frame !== prev.frame)
+    if (prev && e.frame - prev.frame < oneThingOf(tl) && e.frame !== prev.frame)
       out.push({ check: "one-thing", level: "warning", frame: e.frame, message: `${prev.what} and ${e.what} within ${e.frame - prev.frame} frames` });
   });
   for (let a = 0; a < tl.cast.length; a++)
@@ -165,17 +172,23 @@ export const programChecks = (p: Program): Finding[] => {
   const out: Finding[] = [];
   const tl = p.scenes[0]!.timeline;
   const first = tl.beats.find((b) => b.kind === "line");
-  if (first && first.from > tl.fps)
+  const hooked = p.hook?.kind === "teaser" || p.hook?.kind === "slam";
+  if (!hooked && first && first.from > tl.fps)
     out.push({ check: "hook", level: "warning", frame: first.from, message: `the first line starts at ${secs(tl, first.from)}; the hook should play within the first second` });
+  if (hooked && p.hook!.prefixFrames > p.fps * 2)
+    out.push({ check: "hook", level: "warning", message: "the cold open runs longer than two seconds" });
   const spoken = p.scenes.flatMap((sc) => sc.timeline.beats).filter((b) => b.kind === "line" && b.audioTo !== undefined);
   const time = (bs: BeatSpan[]) => bs.reduce((t, b) => t + b.audioTo! - b.audioFrom!, 0);
   const narrated = time(spoken.filter((b) => b.narrator));
   // A skit with a narrator is an explainer: it may run longer.
-  const [lo, hi, kind] = narrated > 0 ? [30, 60, "explainers"] : [15, 30, "two-person skits"];
+  const styled = tl.directing?.length;
+  const [lo, hi, kind] = narrated > 0 ? [30, 60, "explainers"] : [styled?.[0] ?? 15, styled?.[1] ?? 30, "two-person skits"];
   const len = p.durationInFrames / p.fps;
   if (len < lo || len > hi) out.push({ check: "length", level: "info", message: `${len.toFixed(1)} s long (${kind} target ${lo}–${hi} s)` });
   const share = narrated / (time(spoken) || 1);
   if (share > NARRATOR_MAX_SHARE)
     out.push({ check: "narrator-dominant", level: "warning", message: `${Math.round(share * 100)}% of the spoken time is voice-over (max ${NARRATOR_MAX_SHARE * 100}%); give the characters more of it or it plays like a slideshow` });
+  if (p.cover && contrastRatio(SLAM.fill, SLAM.outline) < 4.5)
+    out.push({ check: "cover-contrast", level: "error", message: "the cover title does not clear the contrast floor" });
   return out;
 };

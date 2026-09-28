@@ -1,0 +1,8 @@
+{
+  "id": "faint",
+  "steps": [
+    { "do": "expression", "expression": "shocked", "atMs": 0 },
+    { "do": "fall", "atMs": 140 },
+    { "do": "sfx", "id": "thud", "atMs": 380 }
+  ]
+}

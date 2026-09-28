@@ -37,8 +37,10 @@ export type ActorTracks = {
   gaze?: { x: number; y: number };
   /** Timed gaze overrides; `null` hands that axis back to the expression. Blends over 4 frames. */
   gazeKeys?: readonly GazeKey[];
-  /** Small head nods (listeners). */
+  /** Small head nods (listeners, and a speaker's stressed words). */
   nodKeys?: readonly NodKey[];
+  /** A brow lift added on top of the expression (a question). */
+  browKeys?: readonly BrowKey[];
   /** Where the root stands at a frame (stage px) and which way it faces. Keeps dropped props in place. */
   rootAt?: (frame: number) => { x: number; sign: 1 | -1 };
   idle?: number;
@@ -57,6 +59,7 @@ export type ActorTracks = {
 export type SymbolKey = { frame: number; symbol: SymbolId; durationFrames?: number };
 export type GazeKey = { frame: number; x: number | null; y?: number | null };
 export type NodKey = { frame: number; /** Degrees of forward head tilt at the bottom of the nod. */ amount?: number };
+export type BrowKey = { frame: number; raise: number };
 
 export const GAZE_BLEND_FRAMES = 4;
 export const NOD_FRAMES = 9;
@@ -75,6 +78,15 @@ export const evalGaze = (keys: readonly GazeKey[] | undefined, frame: number, ba
     seg = { start, target: { x: k.x ?? base.x, y: k.y ?? base.y }, frame: k.frame };
   }
   return seg ? blendAt(seg.start, seg.target, frame - seg.frame) : base;
+};
+
+const BROW_FRAMES = 8;
+
+/** Extra brow raise from lifts active at `frame` (a question's last word). */
+export const browLift = (keys: readonly BrowKey[] | undefined, frame: number): number => {
+  let raise = 0;
+  for (const k of keys ?? []) raise += k.raise * bump((frame - k.frame) / BROW_FRAMES);
+  return raise;
 };
 
 /** Forward head tilt from nods active at `frame`. */
@@ -167,6 +179,11 @@ export const evalActor = (
   const face = evalExpressionTrack(tracks.expressionKeys, frame, getter("expression", lib.expressions));
   if (tracks.gaze) face.gaze = tracks.gaze;
   if (tracks.gazeKeys?.length) face.gaze = evalGaze(tracks.gazeKeys, frame, face.gaze);
+  const lift = browLift(tracks.browKeys, frame);
+  if (lift) {
+    face.browL = { ...face.browL, raise: face.browL.raise + lift };
+    face.browR = { ...face.browR, raise: face.browR.raise + lift };
+  }
   applySpeech(face, tracks.speech, frame, fps);
   const symbolAges = applySymbols(face, tracks.symbolKeys, frame);
   const props = evalProps(

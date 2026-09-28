@@ -10,12 +10,34 @@ export const normWord = (s: string): string =>
     .replace(/[^\p{L}\p{N}']/gu, "")
     .replace(/^'+|'+$/g, "");
 
+const CJK_LOCALE = /^(ja|zh|ko|yue|th)\b/i;
+const CJK_CHAR = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}]/u;
+
+/** Languages with no spaces between words. `Intl.Segmenter` is pinned by the image's ICU. */
+export const segmented = (text: string, locale = "en"): boolean => CJK_LOCALE.test(locale) || (CJK_CHAR.test(text) && !/\s/.test(text.trim()));
+
+const segmentWords = (text: string, locale: string): Token[] => {
+  const seg = new Intl.Segmenter(locale === "en" ? "ja" : locale, { granularity: "word" });
+  const out: Token[] = [];
+  for (const part of seg.segment(text.trim())) {
+    if (!part.isWordLike) {
+      const prev = out[out.length - 1];
+      if (prev && part.segment.trim()) prev.text += part.segment;
+      continue;
+    }
+    const norm = normWord(part.segment);
+    if (norm) out.push({ text: part.segment, norm });
+  }
+  return out;
+};
+
 /**
  * Script text → display tokens. Splits on whitespace; a token with no letters or digits
  * ("—", "...") joins the previous token, so `tokens.map(t => t.text).join(" ")` gives back
- * the script with whitespace normalized.
+ * the script with whitespace normalized. Japanese, Chinese and Thai use word segmentation.
  */
-export const tokenize = (text: string): Token[] => {
+export const tokenize = (text: string, locale = "en"): Token[] => {
+  if (segmented(text, locale)) return segmentWords(text, locale);
   const out: Token[] = [];
   for (const raw of text.trim().split(/\s+/)) {
     if (!raw) continue;
@@ -30,6 +52,9 @@ export const tokenize = (text: string): Token[] => {
 const syllables = (norm: string): number =>
   Math.max(1, (norm.match(/[aeiouy]+/g) ?? []).length + (norm.match(/\p{N}/gu) ?? []).length);
 
+/** CJK timing is characters per second. Other languages stay on syllables. */
+const weightOf = (norm: string, locale: string): number => (CJK_LOCALE.test(locale) ? Math.max(1, [...norm].length) : syllables(norm));
+
 /** Pause after a token, in syllable units, from its trailing punctuation. */
 const pauseAfter = (text: string): number => {
   if (/[.!?]["')\]]*$/.test(text)) return 2;
@@ -38,9 +63,9 @@ const pauseAfter = (text: string): number => {
   return 0.25;
 };
 
-/** Spread tokens across [fromMs, toMs] in proportion to syllables, with punctuation pauses. */
-const spread = (tokens: readonly Token[], fromMs: number, toMs: number): WordTiming[] => {
-  const units = tokens.map((t, i) => ({ speak: syllables(t.norm), gap: i < tokens.length - 1 ? pauseAfter(t.text) : 0 }));
+/** Spread tokens across [fromMs, toMs] in proportion to syllables (or characters), with punctuation pauses. */
+const spread = (tokens: readonly Token[], fromMs: number, toMs: number, locale = "en"): WordTiming[] => {
+  const units = tokens.map((t, i) => ({ speak: weightOf(t.norm, locale), gap: i < tokens.length - 1 ? pauseAfter(t.text) : 0 }));
   const total = units.reduce((s, u) => s + u.speak + u.gap, 0) || 1;
   const per = Math.max(0, toMs - fromMs) / total;
   let at = fromMs;
@@ -57,9 +82,9 @@ const LEAD_MS = 60;
 const TAIL_MS = 120;
 
 /** Estimated word timings when the voice source gives none. */
-export const estimateWords = (text: string, durationMs: number): WordTiming[] => {
+export const estimateWords = (text: string, durationMs: number, locale = "en"): WordTiming[] => {
   const pad = durationMs > 600;
-  return spread(tokenize(text), pad ? LEAD_MS : 0, durationMs - (pad ? TAIL_MS : 0));
+  return spread(tokenize(text, locale), pad ? LEAD_MS : 0, durationMs - (pad ? TAIL_MS : 0), locale);
 };
 
 export type TimedWord = { text: string; startMs: number; endMs?: number };

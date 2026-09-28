@@ -38,7 +38,18 @@
       "type": "string",
       "enum": [
         "pov",
-        "none"
+        "none",
+        "teaser"
+      ]
+    },
+    "style": {
+      "type": "string",
+      "enum": [
+        "classic",
+        "deadpan",
+        "snappy",
+        "chaotic",
+        "sitcom"
       ]
     },
     "bible": {

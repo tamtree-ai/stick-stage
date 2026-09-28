@@ -25,6 +25,7 @@ import holdChest from "./poses/hold-chest.json";
 import holdUp from "./poses/hold-up.json";
 import highFive from "./poses/high-five.json";
 import shove from "./poses/shove.json";
+import faintPose from "./poses/faint.json";
 
 import phone from "./props/phone.json";
 import mic from "./props/mic.json";
@@ -74,13 +75,13 @@ import musicJson from "./music.json";
 /** Order matters: labs cycle through poses/expressions in this order. */
 export const POSE_IDS = ["idle", "point", "shrug", "facepalm", "arms-up", "arms-crossed", "think", "lean-in", "recoil", "slump", "hands-on-hips", "hold-phone"];
 /** Poses added after M1 (labs that cycle POSE_IDS skip these). */
-export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up", "high-five", "shove"];
+export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up", "high-five", "shove", "faint"];
 export const PROP_IDS = ["phone", "mic", "cup", "laptop", "sign"];
 export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed", "angry", "shocked", "sad", "crying", "cringe", "confused", "deadpan"];
 
 export const library: Library = createLibrary({
   characters: [milo, june, lila, theo, moss, dash],
-  poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove],
+  poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose],
   expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan],
   props: [phone, mic, cup, laptop, sign],
 });

@@ -16,13 +16,14 @@ export type PovCardProps = {
   /** Frame it leaves on (omit to hold to the end). */
   to?: number;
   fontSize?: number;
+  direction?: "ltr" | "rtl";
 };
 
 const IN_FRAMES = 5;
 const OUT_FRAMES = 3;
 
 /** Top "POV:" card: dark text on a white rounded card, just inside the top safe edge. */
-export const PovCard: React.FC<PovCardProps> = ({ text, frame, width, height, safeArea, fontFamily, from = 0, to, fontSize = POV.fontSize }) => {
+export const PovCard: React.FC<PovCardProps> = ({ text, frame, width, height, safeArea, fontFamily, from = 0, to, fontSize = POV.fontSize, direction = "ltr" }) => {
   if (frame < from || (to !== undefined && frame >= to)) return null;
   const safe = safeRect(safeArea, width, height);
   const inT = easeOutBack((frame - from + 1) / IN_FRAMES, 1.6);
@@ -56,6 +57,7 @@ export const PovCard: React.FC<PovCardProps> = ({ text, frame, width, height, sa
           fontSize,
           lineHeight: POV.lineHeight,
           textAlign: "center",
+          direction,
         }}
       >
         {rest.length ? (
