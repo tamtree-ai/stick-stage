@@ -1,4 +1,6 @@
-# Writing a skit
+# The skit file
+
+This page is the field list for `skit.json`. If you are making your first video, or you are writing lines, use [the manual](README.md) instead. Come here when you need the name of a field.
 
 A skit is one file: `public/skits/<skitId>/skit.json` (schema: `src/engine/director/schema.ts`).
 Humans write the premise and the lines. The director handles timing, listener reactions,

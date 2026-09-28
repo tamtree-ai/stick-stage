@@ -1,7 +1,10 @@
 # Getting started
 
-How to get StickStage running on a Mac, either as the Remotion Studio (to author and preview
-skits) or as the render service (for tamtree).
+The install steps, the service, and the failures you will actually see are in [Set up the machine](set-up.md).
+
+If the machine is already set up and you want to make a video, start at [the manual](README.md) and follow [Your first video](your-first-video.md).
+
+The rest of this page is the short form of that setup.
 
 ## 1. Install
 

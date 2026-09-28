@@ -7,6 +7,8 @@ characters, sets drawn entirely in code, TTS dialogue with lip-sync, and a direc
 You write the premise and the lines. StickStage handles timing, listener reactions, shots and
 cuts (two-shots, punch-ins, emotion close-ups), subtitles, SFX and rendering.
 
+The manual, written so a new person can follow it and so an engineer can trace one video from a topic to the posted files: [docs/README.md](docs/README.md).
+
 ## Requirements
 
 - Node 22+, pnpm

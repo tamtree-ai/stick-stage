@@ -1,4 +1,6 @@
-# Voice input contract (tamtree harness → StickStage)
+# Voices
+
+How draft voices and real voices fit into a video you would post is in [The files you hand over](files-you-hand-over.md). This page is the file contract the harness must match.
 
 StickStage does not call a TTS API. The tamtree agent harness synthesizes each line (for example
 with `shortvideo.google_tts` or `shortvideo.openrouter_tts`) and drops the result into the skit

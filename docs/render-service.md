@@ -1,6 +1,8 @@
 # Render service API
 
-StickStage as an HTTPS service, for the tamtree `stickstage` plugin nodes (`validate`,
+The walk-through of one video over these routes, with curl, is [One video, end to end](end-to-end.md). This page is the reference for every route.
+
+StickStage as an HTTP service, for the tamtree `stickstage` plugin nodes (`validate`,
 `render_submit`, `render_collect`). The service owns timing, lip-sync and rendering. Tamtree owns
 the script LLM, the TTS and the credentials. The service never calls a TTS or LLM API.
 
