@@ -55,8 +55,9 @@ export const parseBrief = (json: unknown, world: WriterWorld): Brief => {
   const d: Diagnostic[] = [];
   const known = new Set(world.sets);
   const allowed = brief.allowed_sets?.filter((id) => known.has(id));
+  const castIds = [...world.characters, ...(brief.characters?.map((c) => c.id) ?? [])];
   brief.cast.forEach((c, i) => {
-    if (!world.characters.includes(c.character)) d.push(unknownId("character", c.character, world.characters, ["cast", i, "character"]));
+    if (!castIds.includes(c.character)) d.push(unknownId("character", c.character, castIds, ["cast", i, "character"]));
   });
   if (brief.template) {
     const need = TEMPLATE_CAST[brief.template];

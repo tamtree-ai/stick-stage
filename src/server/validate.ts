@@ -74,7 +74,9 @@ export const validate = (p: Project, body: unknown, notes: Readonly<Record<strin
       const turned = premiseFromReply(reply, brief, world);
       premise = turned.premise;
       corrected = turned.warnings;
-      skit = fromPremise(premise, p.lib, p.sets);
+      const lib = brief.characters?.length ? { ...p.lib, characters: { ...p.lib.characters, ...Object.fromEntries(brief.characters.map((c) => [c.id, c])) } } : p.lib;
+      const staged = fromPremise(premise, lib, p.sets);
+      skit = brief.characters?.length ? { ...staged, characters: brief.characters } : staged;
     } else if (hasReply) {
       let doc;
       try {

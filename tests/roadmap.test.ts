@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { library, reactions, safeArea, series, sets, sfxLibrary } from "../src/data";
-import { applyLanguage, characterDistance, checkDraft, compileSkit, fontFor, framesTouched, parseSkit, placeholderVoice, planSegments, skitLines, speechMotion, tokenize, tooAlike, type SkitInput } from "../src/engine";
+import { applyLanguage, characterDistance, checkDraft, compileSkit, fontFor, framesTouched, parseBrief, parseSkit, placeholderVoice, planSegments, skitLines, speechMotion, tokenize, tooAlike, type SkitInput } from "../src/engine";
 import { compile, skitOf } from "./director-fixtures";
 
 const src = { lib: library, sets, sfx: sfxLibrary, reactions, safeArea };
@@ -107,6 +107,14 @@ describe("workspace characters", () => {
     expect(tooAlike(characterDistance(milo, june))).toBe(false);
     expect(tooAlike(characterDistance(milo, { ...milo, id: "milo-2" }))).toBe(true);
   });
+
+  it("lets a brief cast a character that is not in the catalog", () => {
+    const ada = { ...library.characters.milo!, id: "ada", displayName: "Ada" };
+    const world = { characters: Object.keys(library.characters), sets: Object.keys(sets), templates: [], expressions: ["neutral"], notes: {} };
+    const brief = parseBrief({ topic: "A meeting that runs long", cast: [{ id: "ada", character: "ada" }], characters: [ada] }, world);
+    expect(brief.cast[0]?.character).toBe("ada");
+    expect(() => parseBrief({ topic: "A meeting that runs long", cast: [{ id: "z", character: "nope" }] }, world)).toThrow(/nope/);
+  });
 });
 
 describe("camera cuts and scene cache", () => {
@@ -115,6 +123,15 @@ describe("camera cuts and scene cache", () => {
     const d = checkDraft(skit, src);
     expect(d.cuts[0]?.reason).toMatch(/two|wide/);
     expect(d.cuts.length).toBeGreaterThan(0);
+  });
+
+  it("uses a prepared voice for timing when one is passed", () => {
+    const { skit } = skitOf([line("a", "milo", "Setup line about the meeting."), line("b", "june", "The punchline lands here.", { punchline: true })]);
+    const estimated = checkDraft(skit, src);
+    const voice = placeholderVoice(estimated.lines);
+    voice.lines[0]!.durationMs = 8000;
+    const voiced = checkDraft(skit, src, { voice });
+    expect(voiced.estimatedDurationSec).toBeGreaterThan(estimated.estimatedDurationSec);
   });
 
   it("re-renders less than half the frames when the last scene of four changes", () => {
