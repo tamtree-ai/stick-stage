@@ -1,6 +1,6 @@
 import { easeOutBack } from "../lib/easing";
 import { lerp, type Vec2 } from "../lib/math";
-import { PROP_BOUNDS } from "./bounds";
+import { propBounds } from "./bounds";
 import type { PropDef, PropKey } from "./schema";
 
 export type Hand = "L" | "R";
@@ -46,7 +46,7 @@ export const fallPose = (def: PropDef, from: Vec2, angle0: number, t: number, fi
   const vy = DROP_VY * figurePx;
   const vx = DROP_VX * figurePx;
   // Rotated 90° clockwise, local x becomes y: the prop's far edge (x1) is its lowest point.
-  const restY = -PROP_BOUNDS[def.kind].x1 * u;
+  const restY = -propBounds(def).x1 * u;
   const disc = vy * vy + 2 * g * Math.max(0, restY - from.y);
   const land = (-vy + Math.sqrt(disc)) / g;
   if (t < land) {

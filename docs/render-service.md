@@ -36,7 +36,7 @@ A skit that fails `parseSkit` on a revise is `422 invalid-skit`.
 Body: `{ "mode": "draft", "brief": {…} }` or `{ "mode": "revise", "skit": {…}, "note": "…" }`.
 Optional `catalog_version` (409 on mismatch, before a prompt is built).
 
-`200`: `{ "system", "prompt", "writer": "w1", "catalogVersion" }`. The caller picks the model,
+`200`: `{ "system", "prompt", "writer": "w2", "catalogVersion" }`. The caller picks the model,
 sends `system` + `prompt`, and posts the text back to `/validate` as `reply`. `pnpm write` is
 the same contract from the repo.
 

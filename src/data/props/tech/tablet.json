@@ -1,0 +1,1 @@
+{"schemaVersion":1,"id":"tablet","kind":"drawn","name":"Tablet","category":"tech","rank": 31,"tags":["screen","device"],"aliases":["tablets"],"align":"upright","size":1.15,"colors":{"body":"#3a3d4d","accent":"#bfe3f5"},"parts":[{"shape":"rect","x":-0.04,"y":-0.12,"w":0.08,"h":0.1,"fill":"body","rx":0.008},{"shape":"rect","x":-0.032,"y":-0.11,"w":0.064,"h":0.08,"fill":"accent"}]}

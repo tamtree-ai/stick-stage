@@ -59,7 +59,7 @@ File you write: `public/skits/running-late/brief.json`.
 pnpm write prompt --brief=public/skits/running-late/brief.json
 ```
 
-Stdout is `{ "writer": "w1", "system": "…", "prompt": "…" }`. The caller chooses the model, sends `system` and `prompt`, and saves the model's JSON as `public/skits/running-late/reply.json`.
+Stdout is `{ "writer": "w2", "system": "…", "prompt": "…" }`. The caller chooses the model, sends `system` and `prompt`, and saves the model's JSON as `public/skits/running-late/reply.json`.
 
 ```sh
 pnpm write draft --brief=public/skits/running-late/brief.json --reply=public/skits/running-late/reply.json > /tmp/premise.json
@@ -191,7 +191,7 @@ curl -s -H "Authorization: Bearer dev-token" -H "Content-Type: application/json"
 EOF
 ```
 
-`200` returns `system`, `prompt`, `writer` (`w1`), and `catalogVersion`. Send `system` and `prompt` to the model. Post the model's text back:
+`200` returns `system`, `prompt`, `writer` (`w2`), and `catalogVersion`. Send `system` and `prompt` to the model. Post the model's text back:
 
 ```sh
 curl -s -H "Authorization: Bearer dev-token" -H "Content-Type: application/json" \

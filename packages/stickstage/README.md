@@ -49,6 +49,16 @@ Remotion is free for individuals and companies of up to 3 people; larger compani
 [company license](https://www.remotion.dev/license). Using `stickstage` means using Remotion under
 those terms.
 
+## Developer guide
+
+In this repo, the long form lives under `docs/`:
+
+- [For developers](../../docs/developers.md) — how a frame is drawn, and what is JSON versus code
+- [Creating characters](../../docs/creating-characters.md)
+- [Creating backgrounds](../../docs/creating-backgrounds.md)
+- [Creating props](../../docs/creating-props.md)
+- [Programmatic guide](../../docs/programmatic.md)
+
 ## Catalog version
 
 `catalog.version` (`c1-<16 hex>`) is a content hash of the registry a skit is checked and drawn

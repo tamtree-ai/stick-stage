@@ -1,0 +1,1 @@
+{"schemaVersion":1,"id":"spoon","kind":"drawn","name":"Spoon","category":"kitchen","rank": 37,"tags":["eat","kitchen"],"aliases":["spoons"],"align":"forearm","size":1.35,"colors":{"body":"#c5c8d0","accent":"#c5c8d0"},"parts":[{"shape":"ellipse","x":0,"y":-0.12,"rx":0.02,"ry":0.028,"fill":"body"},{"shape":"rect","x":-0.006,"y":-0.09,"w":0.012,"h":0.1,"fill":"body"}]}

@@ -54,11 +54,17 @@ const data = path.join(ROOT, "src/data");
 const kinds = ["characters", "poses", "expressions", "props", "sets"] as const;
 const imports: string[] = [];
 const lists: Record<string, string[]> = {};
+const jsonFiles = (dir: string, rel = ""): string[] =>
+  fs.readdirSync(dir, { withFileTypes: true }).flatMap((ent) => {
+    const next = rel ? `${rel}/${ent.name}` : ent.name;
+    if (ent.isDirectory()) return jsonFiles(path.join(dir, ent.name), next);
+    return ent.name.endsWith(".json") ? [next] : [];
+  });
 for (const k of kinds) {
   lists[k] = [];
-  for (const f of fs.readdirSync(path.join(data, k)).filter((x) => x.endsWith(".json"))) {
+  for (const f of jsonFiles(path.join(data, k))) {
     const name = `${k}_${f.replace(/\W/g, "_")}`;
-    fs.mkdirSync(path.join(fx, "src/data", k), { recursive: true });
+    fs.mkdirSync(path.dirname(path.join(fx, "src/data", k, f)), { recursive: true });
     fs.copyFileSync(path.join(data, k, f), path.join(fx, "src/data", k, f));
     imports.push(`import ${name} from "./data/${k}/${f}";`);
     lists[k].push(name);
@@ -136,7 +142,18 @@ for (const p of ["stickstage/dist/index.js", "stickstage/dist/types/engine/core.
   await assert.rejects(import(p), (e) => e.code === "ERR_PACKAGE_PATH_NOT_EXPORTED", p);
 }
 const read = (f) => JSON.parse(fs.readFileSync(f, "utf8"));
-const dir = (k) => fs.readdirSync("src/data/" + k).map((f) => read("src/data/" + k + "/" + f));
+const dir = (k) => {
+  const out = [];
+  const walk = (rel) => {
+    for (const ent of fs.readdirSync(rel, { withFileTypes: true })) {
+      const abs = rel + "/" + ent.name;
+      if (ent.isDirectory()) walk(abs);
+      else if (ent.name.endsWith(".json")) out.push(read(abs));
+    }
+  };
+  walk("src/data/" + k);
+  return out;
+};
 const lib = createLibrary({ characters: dir("characters"), poses: dir("poses"), expressions: dir("expressions"), props: dir("props") });
 const sets = createSets(dir("sets"));
 const skit = read("public/skits/demo/skit.json");

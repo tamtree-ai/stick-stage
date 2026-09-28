@@ -64,7 +64,11 @@ describe("registries and JSON Schema", () => {
     expect(() => createLibrary({ ...docs, props: [...docs.props, docs.props[0]] })).toThrow("Duplicate prop id");
   });
   it("every document kind has a JSON Schema", () => {
-    for (const k of DOC_KINDS) expect(jsonSchemaFor(k)).toHaveProperty("type", "object");
+    for (const k of DOC_KINDS) {
+      const schema = jsonSchemaFor(k) as { type?: string; anyOf?: { type?: string }[] };
+      if (k === "prop") expect(schema.anyOf?.every((branch) => branch.type === "object")).toBe(true);
+      else expect(schema).toHaveProperty("type", "object");
+    }
     expect(Object.keys((jsonSchemaFor("skit") as { properties: object }).properties)).toContain("scenes");
   });
 });

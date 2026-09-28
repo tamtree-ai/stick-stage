@@ -126,7 +126,7 @@ describe("POST /write/prompt", () => {
     const draft = await svc.call("/write/prompt", json({ mode: "draft", brief, catalog_version: catalog.version }));
     expect(draft.status).toBe(200);
     const body = (await draft.json()) as { writer: string; system: string; prompt: string; catalogVersion: string };
-    expect(body.writer).toBe("w1");
+    expect(body.writer).toBe("w2");
     expect(body.catalogVersion).toBe(catalog.version);
     expect(body.system).toContain("milo");
     expect(body.prompt).toContain("group chats");

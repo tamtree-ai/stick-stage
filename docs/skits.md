@@ -67,7 +67,7 @@ Default: the beat start.
 | `turn` | `facing?` (default: flip) |
 | `hop`, `nod` | |
 | `slideTo` | `mark`, `durationFrames?` (default 8) |
-| `hold` / `putAway` / `drop` | `prop` (phone, mic, cup, laptop, sign), `hand?` (`R` default). A sign `hold` may set `text` (one line, ≤ 24 characters). A laptop `hold` may set `screen` (≤ 3 lines, `\n` breaks, ≤ 24 characters each) |
+| `hold` / `putAway` / `drop` | `prop` (an id from the catalog below), `hand?` (`R` default). A sign `hold` may set `text` (one line, ≤ 24 characters). A laptop `hold` may set `screen` (≤ 3 lines, `\n` breaks, ≤ 24 characters each) |
 | `symbol` | `symbol` (tears, sweat, blush, anger, exclaim, question, speed-lines, spray), `durationMs?` |
 | `sit` / `stand` | Needs a seat at the character's mark |
 
@@ -92,6 +92,118 @@ Default: the beat start.
 **Workspace characters:** `characters` is a list of character documents. They resolve before the catalog and are not copied into `src/data/`. The house cast stays the six shipped faces.
 
 **Templates** a premise can name, besides the two-handers: `explainer`, `family`, `fable`, `trio`. `pnpm new` stages them.
+
+**A premise line may name one prop.** `"prop": "fries"` is held for that line. `"prop": "none"` puts that hand's prop away. The hand is chosen at staging: the free hand, or the left hand when the right is already holding a mic or a starting prop. A narrator line and a text-slam line do not hold anything. Phone, mic, cup, laptop, and sign are drawn in code. Every other prop is drawn from its JSON parts. `pnpm props:doc` rewrites the table.
+
+<!-- props:doc start -->
+| id | name | category | aliases |
+|---|---|---|---|
+| water-bottle | Water bottle | drinks | bottle, water |
+| water-glass | Water glass | drinks | glass, water |
+| stapler | Stapler | office | staplers |
+| pizza-slice | Pizza slice | food | pizza, slice |
+| camera | Camera | tech | photos |
+| fries | Fries | food | chips, hot chips, french fries, fry |
+| cookie | Cookie | food | biscuit, cookies |
+| sign | Sign | party | placard, poster |
+| book | Book | office | books |
+| credit-card | Credit card | money | card, debit card |
+| alarm-clock | Alarm clock | home | alarm, clock |
+| laptop | Laptop | tech | computer |
+| phone | Phone | tech | mobile, cell, cellphone, smartphone |
+| receipt | Receipt | money | receipts |
+| cash | Cash | money | money, bills, notes |
+| keys | Keys | home | key |
+| mic | Mic | office | microphone |
+| pill-bottle | Pill bottle | office | pills, medicine |
+| clipboard | Clipboard | office | clip board |
+| apple | Apple | food | apples |
+| umbrella | Umbrella | home | brolly |
+| potted-plant | Plant | home | plant, pot plant |
+| paper-map | Map | travel | map |
+| cup | Cup | drinks | mug, coffee, tea |
+| soda-can | Soda can | drinks | can, soda, soft drink |
+| folder | Folder | office | file, folders |
+| takeaway-coffee | Takeaway coffee | drinks | latte, takeaway, coffee cup |
+| burger | Burger | food | hamburger, cheeseburger |
+| pen | Pen | office | pens, biro |
+| notebook | Notebook | office | notepad, journal |
+| tablet | Tablet | tech | tablets |
+| sandwich | Sandwich | food | sarnie, sub |
+| headphones | Headphones | tech | headset, earphones |
+| pencil | Pencil | office | pencils |
+| fork | Fork | kitchen | forks |
+| hot-dog | Hot dog | food | hotdog, sausage |
+| spoon | Spoon | kitchen | spoons |
+| taco | Taco | food | taco shell |
+| tv-remote | TV remote | tech | remote, clicker |
+| donut | Donut | food | doughnut, donuts |
+| game-controller | Controller | tech | controller, gamepad, joystick |
+| ice-cream-cone | Ice cream | food | ice cream, icecream, cone |
+| computer-mouse | Mouse | tech | mouse |
+| banana | Banana | food | bananas |
+| cupcake | Cupcake | food | cake, cupcakes |
+| popcorn | Popcorn | food | pop corn |
+| shopping-bag | Shopping bag | money | bag, shopping |
+| noodle-bowl | Noodle bowl | food | noodles, ramen, soup |
+| chicken-drumstick | Drumstick | food | chicken, drumstick |
+| carrot | Carrot | food | carrots |
+| wallet | Wallet | money | billfold |
+| croissant | Croissant | food | croissants |
+| chocolate-bar | Chocolate | food | chocolate, candy bar |
+| gift-box | Gift | money | present, gift |
+| juice-box | Juice box | drinks | juice, juicebox |
+| basketball | Basketball | sport | hoops |
+| milkshake | Milkshake | drinks | shake, milk shake |
+| soccer-ball | Soccer ball | sport | football, soccer |
+| bubble-tea | Bubble tea | drinks | boba, bubbletea |
+| trophy | Trophy | sport | cup trophy |
+| energy-drink | Energy drink | drinks | energy |
+| balloon | Balloon | party | balloons |
+| baby-bottle | Baby bottle | drinks | bottle baby |
+| flower-bouquet | Bouquet | party | flowers, bouquet |
+| thermos | Thermos | drinks | flask |
+| megaphone | Megaphone | party | loudspeaker, bullhorn |
+| frying-pan | Frying pan | kitchen | pan, skillet |
+| suitcase | Suitcase | travel | luggage, bag |
+| spatula | Spatula | kitchen | turner |
+| passport | Passport | travel | passports |
+| whisk | Whisk | kitchen | whisks |
+| ticket | Ticket | travel | tickets |
+| rolling-pin | Rolling pin | kitchen | roller |
+| plate | Plate | kitchen | dish, plates |
+| oven-mitt | Oven mitt | kitchen | mitt, oven glove |
+| calculator | Calculator | office | calc |
+| ruler | Ruler | office | rulers |
+| envelope | Envelope | office | letter, mail |
+| id-badge | ID badge | office | badge, name tag, id |
+| selfie-stick | Selfie stick | tech | selfie |
+| charger | Charger | tech | charger cable, plug |
+| power-bank | Power bank | tech | battery, powerbank |
+| thermometer | Thermometer | tech | thermo |
+| broom | Broom | home | brooms |
+| mop | Mop | home | mops |
+| toothbrush | Toothbrush | home | tooth brush |
+| hairdryer | Hairdryer | home | dryer, hair dryer |
+| hand-mirror | Hand mirror | home | mirror |
+| pillow | Pillow | home | cushion |
+| toilet-roll | Toilet roll | home | toilet paper, loo roll |
+| spray-bottle | Spray bottle | home | spray |
+| piggy-bank | Piggy bank | money | piggy, piggybank |
+| shopping-basket | Basket | money | basket |
+| dumbbell | Dumbbell | sport | weight, weights |
+| tennis-racket | Tennis racket | sport | racket, racquet |
+| yoga-mat | Yoga mat | sport | mat |
+| stopwatch | Stopwatch | sport | timer |
+| whistle | Whistle | sport | whistles |
+| party-popper | Party popper | party | popper, cracker |
+| rose | Rose | party | roses |
+| small-flag | Flag | party | flag |
+| sparkler | Sparkler | party | sparkler stick |
+| binoculars | Binoculars | travel | binocular |
+| flashlight | Flashlight | travel | torch |
+| fishing-rod | Fishing rod | travel | rod, fishing |
+<!-- props:doc end -->
 
 **List reveal:** `{ "type": "list", "items": ["Our project.", "Our process."], "at": [{ "word": "Our" }, { "word": "Our", "occurrence": 2 }] }`: one anchor per item (≤ 5 items, ≤ 40 characters each). Items stack from the top of the safe area, each pops in on its anchor, and the list leaves at the next cut. The director goes `wide` for the beat so faces sit under the list.
 

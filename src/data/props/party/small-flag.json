@@ -1,0 +1,1 @@
+{"schemaVersion":1,"id":"small-flag","kind":"drawn","name":"Flag","category":"party","rank": 101,"tags":["flag"],"aliases":["flag"],"align":"upright","size":1.15,"colors":{"body":"#3a6ea5","accent":"#f7f4ee"},"parts":[{"shape":"rect","x":-0.004,"y":-0.16,"w":0.01,"h":0.18,"fill":"accent"},{"shape":"rect","x":0.006,"y":-0.16,"w":0.05,"h":0.032,"fill":"body"}]}

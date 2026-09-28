@@ -1,6 +1,6 @@
 /** The writer: StickStage builds the prompt and turns the model's words into a premise or a skit. */
 
-export const WRITER = "w1";
+export const WRITER = "w2";
 
 export { BriefSchema, parseBrief, scenePlan, type Brief, type ScenePlan } from "./brief";
 export { ReplyError, premiseFromReply } from "./draft";

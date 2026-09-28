@@ -45,6 +45,7 @@ A line looks like this:
 - `slam` is optional, mostly on the punchline. One or two words from that line. At most 40 characters.
 - `delivery` is optional, a hint for the real voice later, such as `flat` or `whispered`. The Mac preview ignores the subtlety. The harness can use it.
 - `gag` is optional. One named bit of physical comedy on that line. Names are in the shapes page.
+- `prop` is optional. One catalog id, such as `fries` or `water-bottle`. Staging puts it in a hand. `"none"` puts the previous one away. The list is on the skit-file page.
 - `voiceOver` set to `true` means the person is thinking. You hear them. The mouth stays shut. The caption is italic.
 
 `who` must be an `id` from `cast`, or `narrator` in an explainer.
@@ -146,6 +147,7 @@ mkdir -p public/skits/my-skit
 | `scenes` | No | A number from 2 to 4. Leave it out for one room. |
 | `sets` | No | One room id per scene. Only when `scenes` is set. Each scene gets its own room. |
 | `allowed_sets` | No | Rooms the writer may choose from. Anything else is rejected. |
+| `props` | No | Up to twelve catalog ids the writer should put on screen, such as `["fries", "water-bottle"]`. |
 
 `set` and `scenes` together are rejected. Pick one room, or a count of scenes.
 

@@ -28,6 +28,16 @@ After that, the field lists:
 - [Voices](voice-contract.md). The audio files and `voice.json` a voice service must write.
 - [The render service](render-service.md). Every HTTP endpoint.
 
+## If you are writing code
+
+Start here when you are changing Stick Stage, or calling it from another program.
+
+1. [For developers](developers.md). How a frame is drawn, what is a JSON file, and what is code.
+2. [Creating characters](creating-characters.md). The character document, the rig, poses, faces, and accessories.
+3. [Creating backgrounds](creating-backgrounds.md). Sets, parts, palettes, seats, and a new drawing.
+4. [Creating props](creating-props.md). Hand props, the five coded drawings, and a prop drawn from JSON.
+5. [Programmatic guide](programmatic.md). The package entry points, compile, check, Remotion, and Node.
+
 ## Words used in every page
 
 | Word | Meaning |

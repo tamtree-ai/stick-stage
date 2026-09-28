@@ -1,5 +1,5 @@
 import { GAG_IDS } from "../director/gags";
-import type { SkitDoc } from "../director/schema";
+import type { Action, SkitDoc } from "../director/schema";
 import { docBeats } from "../director/schema";
 import type { Brief, ScenePlan } from "./brief";
 import { briefFrame, scenePlan } from "./brief";
@@ -35,13 +35,35 @@ const openSets = (brief: Brief, world: WriterWorld): string[] => {
   return ids.filter((id) => (world.setAspect?.[id] ?? "9:16") === briefFrame(brief));
 };
 
+/** Ids grouped by category, common props first. Categories follow the first prop's rank. */
+export const propCatalogText = (world: WriterWorld): string => {
+  const sorted = [...world.props].sort((a, b) => a.rank - b.rank || a.id.localeCompare(b.id));
+  const groups: { cat: string; ids: string[] }[] = [];
+  for (const p of sorted) {
+    const found = groups.find((g) => g.cat === p.category);
+    if (found) found.ids.push(p.id);
+    else groups.push({ cat: p.category, ids: [p.id] });
+  }
+  return groups.map((g) => `  ${g.cat}: ${g.ids.join(", ")}`).join("\n");
+};
+
+const propRule = (world: WriterWorld): string =>
+  `prop: optional, the one object this line is about, in the speaker's hand. One of:
+${propCatalogText(world)}
+"none" puts it away. Use a prop only when the line is about something a person holds.
+The stage can show only these objects. Do not make the joke depend on anything else.`;
+
+const sampleProp = (world: WriterWorld): string => world.props.find((p) => p.id === "cup")?.id ?? [...world.props].sort((a, b) => a.rank - b.rank)[0]?.id ?? "cup";
+
 /** One example scene per planned scene. A fixed set is left out, so the model does not write it. */
-const exampleScenes = (plan: ScenePlan, speaker: string, closer: string): string =>
+const exampleScenes = (plan: ScenePlan, speaker: string, closer: string, propId: string): string =>
   Array.from({ length: plan.count }, (_, i) => {
     const last = i === plan.count - 1 && plan.count > 1;
+    const mid = Math.floor((plan.count - 1) / 2);
+    const prop = !last && i === mid ? `, "prop": "${propId}"` : "";
     const line = last
       ? `{"who": "${closer}", "text": "...", "expression": "smug", "slam": "WORD"}`
-      : `{"who": "${speaker}", "text": "...", "expression": "neutral"}`;
+      : `{"who": "${speaker}", "text": "...", "expression": "neutral"${prop}}`;
     const set = plan.sets[i] === null ? `"set": "<set id>", ` : "";
     const pov = i === 0 ? `"pov": "POV: ...", ` : "";
     return `{ ${set}${pov}"lines": [${line}] }`;
@@ -83,7 +105,7 @@ Write exactly this shape:
   "title": "Short title",${templateKey}
   "description": "One line for the post; do not spoil the punchline.",
   "hashtags": ["stickfigure", "relatable"],
-  "scenes": [ ${exampleScenes(plan, speaker, closer)} ]
+  "scenes": [ ${exampleScenes(plan, speaker, closer, sampleProp(world))} ]
 }
 
 ${templateRule}
@@ -94,25 +116,38 @@ expression: ${world.expressions.join(", ")}. No other word.
 pov: optional, at most 80 characters, starts with "POV: ".
 slam: optional, one or two words, only on the last line.
 gag: optional, at most one per line, one of: ${GAG_IDS.join(", ")}.
+${propRule(world)}
 delivery: optional ("flat", "whispered").
-Do not write schemaVersion, cast, role, or anything about shots, actions or timing.`;
+Do not write schemaVersion, cast, role, actions, or anything about shots, camera, poses or timing.`;
 
   const parts = [`Topic: ${brief.topic}`];
   if (brief.description) parts.push(`What the client wants: ${brief.description}`);
   if (brief.tone) parts.push(`Tone: ${brief.tone}`);
+  if (brief.props?.length) parts.push(`The client wants these on screen: ${brief.props.join(", ")}.`);
   return { system, prompt: parts.join("\n") };
 };
 
-export type WriterLine = { id: string; who: string; text: string; expression?: string };
+export type WriterLine = { id: string; who: string; text: string; expression?: string; prop?: string };
 
-/** The lines a change request shows the model: id, who, words, mood. Staging stays here. */
+const atZero = (a: Action): boolean => !("at" in a) || !a.at || ("ms" in a.at && a.at.ms === 0);
+
+/** The hold (or `"none"`) on this beat for its speaker, at the start of the line. */
+const beatProp = (actions: readonly Action[], who: string): string | undefined => {
+  const hold = actions.find((a) => a.do === "hold" && a.who === who && atZero(a));
+  if (hold && hold.do === "hold") return hold.prop;
+  if (actions.some((a) => a.do === "putAway" && a.who === who && atZero(a))) return "none";
+  return undefined;
+};
+
+/** The lines a change request shows the model: id, who, words, mood, and the object in the hand. */
 export const skitWriterLines = (doc: SkitDoc): WriterLine[] =>
   docBeats(doc).flatMap((b) => {
-    if (b.speaker && b.line && !b.silent) return [{ id: b.id, who: b.speaker, text: b.line, ...(b.expression ? { expression: b.expression } : {}) }];
+    const prop = b.speaker ? beatProp(b.actions, b.speaker) : undefined;
+    if (b.speaker && b.line && !b.silent) return [{ id: b.id, who: b.speaker, text: b.line, ...(b.expression ? { expression: b.expression } : {}), ...(prop ? { prop } : {}) }];
     const slam = b.text.find((t) => t.type === "slam");
     if (b.silent && b.speaker && slam) {
       const mood = b.actions.find((a) => a.do === "expression");
-      return [{ id: b.id, who: b.speaker, text: slam.value, ...(mood && mood.do === "expression" ? { expression: mood.expression } : {}) }];
+      return [{ id: b.id, who: b.speaker, text: slam.value, ...(mood && mood.do === "expression" ? { expression: mood.expression } : {}), ...(prop ? { prop } : {}) }];
     }
     return [];
   });
@@ -131,6 +166,7 @@ Change only what the note asks. Return every line you keep, in play order. Leave
 who: ${who.join(" or ") || "a cast id"}.
 expression: ${world.expressions.join(", ")}.
 The last line is the punchline. slam (one or two words) is optional, and only on that line.
-gag is optional, at most one per line: ${GAG_IDS.join(", ")}.`;
+gag is optional, at most one per line: ${GAG_IDS.join(", ")}.
+${propRule(world)}`;
   return { system, prompt: `Note: ${note}\n\nLines:\n${JSON.stringify(lines)}` };
 };

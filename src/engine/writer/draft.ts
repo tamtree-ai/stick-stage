@@ -7,6 +7,7 @@ import type { Brief, ScenePlan } from "./brief";
 import { briefFrame, scenePlan } from "./brief";
 import { parseLoose } from "./parse";
 import { repairPrompt } from "./repair";
+import { propMiss, resolveProp } from "../templates/lineProp";
 import type { WriterWorld } from "./world";
 
 /** A reply that cannot be staged. `prompt` is what to send the model once more. */
@@ -24,7 +25,7 @@ const LINE_MIN = 11;
 const LINE_MAX = 13;
 const HASHTAG = /^#?[\p{L}\p{N}_]+$/u;
 
-type RawLine = { who?: string; text: string; expression?: string; slam?: string; delivery?: string; gag?: string };
+type RawLine = { who?: string; text: string; expression?: string; slam?: string; delivery?: string; gag?: string; prop?: string };
 type RawGroup = { set?: string; pov?: string; lines: RawLine[] };
 
 const asString = (v: unknown): string | undefined => (typeof v === "string" && v.trim() ? v.trim() : undefined);
@@ -32,7 +33,7 @@ const asString = (v: unknown): string | undefined => (typeof v === "string" && v
 const asLine = (raw: unknown): RawLine | undefined => {
   if (!raw || typeof raw !== "object") return undefined;
   const o = raw as Record<string, unknown>;
-  return { who: asString(o.who), text: typeof o.text === "string" ? o.text.trim() : "", expression: asString(o.expression), slam: asString(o.slam), delivery: asString(o.delivery), gag: asString(o.gag) };
+  return { who: asString(o.who), text: typeof o.text === "string" ? o.text.trim() : "", expression: asString(o.expression), slam: asString(o.slam), delivery: asString(o.delivery), gag: asString(o.gag), prop: asString(o.prop) };
 };
 
 const asGroup = (raw: unknown): RawGroup => {
@@ -130,9 +131,10 @@ export const premiseFromReply = (reply: string, brief: Brief, world: WriterWorld
         warnings.push({ level: "warning", code: "gag", path: linePath(plan.count, s, i, "gag"), message: `gag "${gag}" is not one StickStage has; it was dropped` });
         gag = undefined;
       }
+      const prop = propOf(l.prop, linePath(plan.count, s, i, "prop"), who, template, world, warnings);
       global++;
       const role = global - 1 === 0 ? "setup" : last ? "punchline" : "escalation";
-      return { ...(who ? { who } : {}), text: l.text || "…", ...(expression ? { expression } : {}), role: role as "setup" | "escalation" | "punchline", ...(slam ? { slam } : {}), ...(gag ? { gag } : {}), ...(l.delivery ? { delivery: l.delivery } : {}) };
+      return { ...(who ? { who } : {}), text: l.text || "…", ...(expression ? { expression } : {}), role: role as "setup" | "escalation" | "punchline", ...(slam ? { slam } : {}), ...(gag ? { gag } : {}), ...(prop ? { prop } : {}), ...(l.delivery ? { delivery: l.delivery } : {}) };
     });
     return { set, ...(pov ? { pov } : {}), lines };
   });
@@ -193,6 +195,20 @@ const povFor = (pov: string | undefined, scene: number, count: number, warnings:
   if (pov.length <= 80) return pov;
   warnings.push({ level: "warning", code: "pov-length", path: count === 1 ? "pov" : `scenes[${scene}].pov`, message: "the POV caption was cut to 80 characters" });
   return pov.slice(0, 80);
+};
+
+const propOf = (raw: string | undefined, path: string, who: string | undefined, template: TemplateId, world: WriterWorld, warnings: Diagnostic[]): string | undefined => {
+  if (!raw) return undefined;
+  const resolved = resolveProp(raw, world.props);
+  if ("drop" in resolved) {
+    warnings.push({ level: "warning", code: "prop", path, message: propMiss(resolved.drop, world.props) });
+    return undefined;
+  }
+  if (who === "narrator" || template === "text-slam") {
+    warnings.push({ level: "warning", code: "prop", path, message: template === "text-slam" ? `a text slam has no hands; "${resolved.id}" was dropped` : `a narrator line can't hold a prop; "${resolved.id}" was dropped` });
+    return undefined;
+  }
+  return resolved.id;
 };
 
 const moodOf = (mood: string | undefined, path: string, world: WriterWorld, warnings: Diagnostic[]): string | undefined => {

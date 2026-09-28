@@ -1,0 +1,1 @@
+{"schemaVersion":1,"id":"wallet","kind":"drawn","name":"Wallet","category":"money","rank": 51,"tags":["money"],"aliases":["billfold"],"align":"upright","size":1.15,"colors":{"body":"#8a4b24","accent":"#f4c542"},"parts":[{"shape":"rect","x":-0.05,"y":-0.06,"w":0.1,"h":0.05,"fill":"body","rx":0.006},{"shape":"rect","x":-0.02,"y":-0.07,"w":0.04,"h":0.016,"fill":"accent"}]}

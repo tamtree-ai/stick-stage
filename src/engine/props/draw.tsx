@@ -1,7 +1,9 @@
 import React from "react";
 import { darken, lighten } from "../lib/color";
 import { FittedLines } from "../text/FittedLines";
-import type { PropDef, PropKind } from "./schema";
+import { pathPoints } from "./path";
+import type { CodedKind, DrawnPart, PropDef } from "./schema";
+import { isDrawn } from "./schema";
 
 export { PROP_BOUNDS } from "./bounds";
 
@@ -109,7 +111,67 @@ const Sign: React.FC<PropDrawProps> = ({ def, u, stroke, sw, mirrored, fontFamil
   );
 };
 
-export const PROP_DRAW: Record<PropKind, React.FC<PropDrawProps>> = {
+const slotHex = (token: string, colors: PropDef["colors"]): string => {
+  if (token.startsWith("#")) return token;
+  const m = /^(body|accent|screen)(?:-(dark|light))?$/.exec(token);
+  const key = (m?.[1] ?? "body") as "body" | "accent" | "screen";
+  const base = colors[key] ?? (key === "accent" ? darken(colors.body, 0.2) : key === "screen" ? lighten(colors.body, 0.6) : colors.body);
+  if (m?.[2] === "dark") return darken(base, 0.28);
+  if (m?.[2] === "light") return lighten(base, 0.4);
+  return base;
+};
+
+/** Fill for one part. `none` draws no fill. */
+export const partFill = (token: string, colors: PropDef["colors"]): string => (token === "none" ? "none" : slotHex(token, colors));
+
+const partCenter = (part: DrawnPart): [number, number] => {
+  if (part.shape === "rect") return [part.x + part.w / 2, part.y + part.h / 2];
+  if (part.shape === "circle" || part.shape === "ellipse") return [part.x, part.y];
+  if (part.shape === "poly") {
+    const n = part.points.length;
+    return [part.points.reduce((s, p) => s + p[0], 0) / n, part.points.reduce((s, p) => s + p[1], 0) / n];
+  }
+  if (part.shape === "line") return [(part.x1 + part.x2) / 2, (part.y1 + part.y2) / 2];
+  const pts = pathPoints(part.d);
+  if (!pts.length) return [0, 0];
+  return [pts.reduce((s, p) => s + p.x, 0) / pts.length, pts.reduce((s, p) => s + p.y, 0) / pts.length];
+};
+
+/** One data-drawn prop. Parts are in prop units (grip at the origin, up is −y). */
+export const Drawn: React.FC<PropDrawProps> = ({ def, u, stroke, sw }) => {
+  if (!isDrawn(def)) return null;
+  return (
+    <g>
+      {def.parts.map((part, i) => {
+        const [cx, cy] = partCenter(part);
+        const spin = part.angle ? `rotate(${part.angle} ${cx * u} ${cy * u})` : undefined;
+        const fill = partFill(part.fill, def.colors);
+        const ink = part.stroke === false ? "none" : stroke;
+        const weight = part.stroke === false ? 0 : sw;
+        const opacity = part.opacity;
+        if (part.shape === "path") {
+          return (
+            <g key={i} transform={`scale(${u})`} opacity={opacity}>
+              <path d={part.d} transform={part.angle ? `rotate(${part.angle} ${cx} ${cy})` : undefined} fill={fill} stroke={ink} strokeWidth={weight / u} strokeLinejoin="round" strokeLinecap="round" />
+            </g>
+          );
+        }
+        const common = { fill, stroke: ink, strokeWidth: weight, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
+        return (
+          <g key={i} transform={spin} opacity={opacity}>
+            {part.shape === "rect" ? <rect x={part.x * u} y={part.y * u} width={part.w * u} height={part.h * u} rx={(part.rx ?? 0) * u} {...common} /> : null}
+            {part.shape === "circle" ? <circle cx={part.x * u} cy={part.y * u} r={part.r * u} {...common} /> : null}
+            {part.shape === "ellipse" ? <ellipse cx={part.x * u} cy={part.y * u} rx={part.rx * u} ry={part.ry * u} {...common} /> : null}
+            {part.shape === "poly" ? <polygon points={part.points.map(([x, y]) => `${x * u},${y * u}`).join(" ")} {...common} /> : null}
+            {part.shape === "line" ? <line x1={part.x1 * u} y1={part.y1 * u} x2={part.x2 * u} y2={part.y2 * u} stroke={fill === "none" ? ink : fill} strokeWidth={weight} strokeLinecap="round" /> : null}
+          </g>
+        );
+      })}
+    </g>
+  );
+};
+
+export const PROP_DRAW: Record<CodedKind, React.FC<PropDrawProps>> = {
   phone: Phone,
   mic: Mic,
   cup: Cup,

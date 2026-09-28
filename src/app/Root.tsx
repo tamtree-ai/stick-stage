@@ -15,6 +15,7 @@ import { TalkLab } from "./labs/TalkLab";
 import { calculateTalkLabMetadata, talkLabSchema } from "./talk/talkData";
 import { SetLab, setLabSchema, setLabSize } from "./labs/SetLab";
 import { PROP_LAB_FRAMES, PropLab, propLabSchema } from "./labs/PropLab";
+import { PropSheet, propSheetRow, propSheetSchema } from "./labs/PropSheet";
 import { STAGING_LAB_FRAMES, StagingLab, stagingLabSchema } from "./labs/StagingLab";
 import { calculateContactSheetMetadata, ContactSheet, contactSheetSchema } from "../engine";
 import { CoverStill, ThumbnailStill } from "./skit/Cover";
@@ -215,6 +216,19 @@ export const RemotionRoot: React.FC = () => (
       calculateMetadata={async (args) => ({ ...(await calculateSkitMetadata(args)), durationInFrames: 1, width: 1280, height: 720 })}
       width={1280}
       height={720}
+    />
+    <Still
+      id="PropSheet"
+      component={PropSheet}
+      schema={propSheetSchema}
+      defaultProps={{ ids: ["phone", "cup", "fries"], panel: 540 }}
+      calculateMetadata={({ props }) => {
+        const panel = props.panel ?? 540;
+        const row = propSheetRow(panel);
+        return { width: panel * 3, height: Math.max(row, (props.ids?.length ?? 1) * row), durationInFrames: 1 };
+      }}
+      width={1620}
+      height={540}
     />
     <Composition id="SfxLab" component={SfxLab} durationInFrames={SFX_LAB_FRAMES} fps={FPS} width={W} height={H} />
     <Composition id="SafeAreaLab" component={SafeAreaLab} schema={safeAreaLabSchema} defaultProps={{}} durationInFrames={1} fps={FPS} width={W} height={H} />

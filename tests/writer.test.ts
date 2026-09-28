@@ -35,9 +35,9 @@ const reply = (n = 1) =>
 describe("writer prompt", () => {
   it("names set ids and not their descriptions, and records w1", () => {
     const { system, prompt } = draftPrompt(brief(), world);
-    expect(WRITER).toBe("w1");
+    expect(WRITER).toBe("w2");
     expect(system).toContain("cafe-1");
-    expect(system).not.toContain("coffee");
+    expect(system).not.toContain("espresso");
     expect(system).toContain("sincere straight man");
     expect(system).not.toContain('"schemaVersion"');
     expect(prompt).toBe("Topic: returning a gift\nTone: dry");

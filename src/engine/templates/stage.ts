@@ -5,6 +5,7 @@ import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
 import { seatHeightAt } from "../set/seating";
 import { normWord, tokenize } from "../voice/words";
+import { gestureWhileHolding, linePropActions, stillHolding, type HoldBook } from "./lineProp";
 import { PremiseSchema, type Premise, type PremiseLine, type TemplateId } from "./premise";
 import { fromZodIssues } from "../director/diagnostics";
 import { migrate } from "../migrate";
@@ -116,6 +117,7 @@ const check = (p: Premise, lib: Library, sets: Readonly<Record<string, SetDef>>)
     if (l.who === "narrator" && p.template !== "explainer") d.push({ level: "error", code: "line-speaker", path, message: `only an explainer has a narrator`, expected: `one of ${ids.join(", ")}` });
     if (l.who === undefined && p.template !== "text-slam" && p.cast.length > 1) d.push({ level: "error", code: "line-speaker", path, message: "who says this line?", expected: `one of ${ids.join(", ")}` });
     if (l.expression && !lib.expressions[l.expression]) d.push(unknownId("expression", l.expression, Object.keys(lib.expressions), path.replace(/who$/, "expression").split(".")));
+    if (l.prop && l.prop !== "none" && !lib.props[l.prop]) d.push(unknownId("prop", l.prop, Object.keys(lib.props), path.replace(/who$/, "prop").split(".")));
     if (p.template === "text-slam" && l.text.length > 40) d.push({ level: "error", code: "slam-length", path: path.replace(/who$/, "text"), message: "slam text is at most 40 characters", expected: "a word or a short phrase" });
   });
   return d;
@@ -132,7 +134,7 @@ const sceneLinePath = (groups: readonly Group[], i: number, key: string): string
   return `lines[${i}].${key}`;
 };
 
-const spokenBeat = (p: Premise, line: PremiseLine, role: Role, id: string, n: { gesture: number }): Beat => {
+const spokenBeat = (p: Premise, line: PremiseLine, role: Role, id: string, n: { gesture: number }, book: HoldBook): Beat => {
   const l = line;
   const who = l.who ?? p.cast[0]!.id;
   const thought = who === "narrator";
@@ -140,8 +142,11 @@ const spokenBeat = (p: Premise, line: PremiseLine, role: Role, id: string, n: { 
   const beat: Beat = { id, speaker: who, line: l.text, actions, ...(thought ? {} : { expression: l.expression ?? ROLE_EXPRESSION[role] }) };
   if (l.delivery) beat.delivery = l.delivery;
   if (l.voiceOver && !thought) beat.voiceOver = true;
+  // A narrator or a thought has no hand. A text-slam never reaches here.
+  if (!thought && !l.voiceOver) for (const a of linePropActions(who, l.prop, book)) actions.push(a);
+  const holding = stillHolding(who, book);
   if (!thought && l.gag) actions.push({ who, do: "gag", gag: l.gag, at: { fraction: 0.2 } });
-  else if (!thought && role === "escalation") actions.push({ who, do: "pose", pose: GESTURES[n.gesture++ % GESTURES.length]!, at: { fraction: 0.15 } });
+  else if (!thought && role === "escalation") actions.push({ who, do: "pose", pose: gestureWhileHolding(GESTURES[n.gesture++ % GESTURES.length]!, holding), at: { fraction: 0.15 } });
   if (role === "punchline") Object.assign(beat, { punchline: true, pauseBeforeMs: PUNCH_PAUSE_MS, holdAfterMs: PUNCH_HOLD_MS });
   if (l.slam) beat.text = [{ type: "slam", value: l.slam, at: lastWordAnchor(l.text) }];
   return beat;
@@ -191,7 +196,29 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
   const groups = groupsOf(p);
   const flat = groups.flatMap((g) => g.lines);
   const n = { gesture: 0 };
-  const staged = p.template === "text-slam" ? slamBeats(p, flat) : dress(p, flat.map((line, i) => spokenBeat(p, line, roleOf(flat, i), `l${i + 1}`, n)));
+  const rightTaken = new Set<string>();
+  const sceneLong = new Map<string, string>();
+  if (p.template === "interview") {
+    rightTaken.add(p.cast[0]!.id);
+    sceneLong.set(p.cast[0]!.id, "mic");
+  }
+  for (const c of p.cast) {
+    if (!c.holding) continue;
+    rightTaken.add(c.id);
+    sceneLong.set(c.id, c.holding);
+  }
+  const held = new Map<string, string>();
+  const spoken: Beat[] = [];
+  if (p.template !== "text-slam") {
+    for (const g of groups) {
+      held.clear();
+      for (const line of g.lines) {
+        const i = spoken.length;
+        spoken.push(spokenBeat(p, line, roleOf(flat, i), `l${i + 1}`, n, { held, rightTaken, sceneLong }));
+      }
+    }
+  }
+  const staged = p.template === "text-slam" ? slamBeats(p, flat) : dress(p, spoken);
   const setOf = (g: Group) => g.set ?? defaultSet(p.template, p.aspect);
   const narrated = flat.some((l) => l.who === "narrator");
   const sit = (set: string, mark: string) => p.template !== "fable" && seatHeightAt(sets[set]!, mark) !== undefined;

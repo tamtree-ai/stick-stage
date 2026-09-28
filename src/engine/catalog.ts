@@ -1,4 +1,5 @@
 import { ASPECTS, ASPECT_LABEL, FRAME, type Aspect } from "./format/aspect";
+import type { PropDef } from "./props/schema";
 import { GAGS } from "./director/gags";
 import type { ReactionTable, SfxManifest } from "./director/schema";
 import { STYLES } from "./director/style";
@@ -45,9 +46,36 @@ export type Catalog = {
   templates: CatalogTemplate[];
   expressions: string[];
   props: string[];
+  /** Names, categories and aliases. `props` stays the id list. Sorted by `rank`, then id. */
+  propInfo: CatalogProp[];
   gags: string[];
   styles: string[];
 };
+
+export type CatalogProp = {
+  id: string;
+  name: string;
+  category: string;
+  tags: string[];
+  aliases: string[];
+  rank: number;
+};
+
+const propLabel = (id: string): string =>
+  id
+    .split("-")
+    .map((w) => (w ? w[0]!.toUpperCase() + w.slice(1) : w))
+    .join(" ");
+
+/** Picker and writer view of one prop. Missing metadata falls back so an old JSON file still catalogs. */
+export const propMeta = (def: PropDef): CatalogProp => ({
+  id: def.id,
+  name: def.name ?? propLabel(def.id),
+  category: def.category ?? "other",
+  tags: [...def.tags],
+  aliases: [...def.aliases],
+  rank: def.rank,
+});
 
 const TEMPLATE_DESCRIPTION: Record<TemplateId, string> = {
   exchange: "Two characters trade lines; the last one lands the joke.",
@@ -107,6 +135,9 @@ export const buildCatalog = (src: CatalogSource): Catalog => ({
   })),
   expressions: Object.keys(src.lib.expressions),
   props: Object.keys(src.lib.props),
+  propInfo: Object.values(src.lib.props)
+    .map(propMeta)
+    .sort((a, b) => a.rank - b.rank || a.id.localeCompare(b.id)),
   gags: (src.gags ?? GAGS).map((g) => g.id),
   styles: Object.keys(src.styles ?? STYLES),
 });

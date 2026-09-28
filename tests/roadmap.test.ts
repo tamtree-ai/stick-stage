@@ -110,7 +110,7 @@ describe("workspace characters", () => {
 
   it("lets a brief cast a character that is not in the catalog", () => {
     const ada = { ...library.characters.milo!, id: "ada", displayName: "Ada" };
-    const world = { characters: Object.keys(library.characters), sets: Object.keys(sets), templates: [], expressions: ["neutral"], notes: {} };
+    const world = { characters: Object.keys(library.characters), sets: Object.keys(sets), templates: [], expressions: ["neutral"], props: [], notes: {} };
     const brief = parseBrief({ topic: "A meeting that runs long", cast: [{ id: "ada", character: "ada" }], characters: [ada] }, world);
     expect(brief.cast[0]?.character).toBe("ada");
     expect(() => parseBrief({ topic: "A meeting that runs long", cast: [{ id: "z", character: "nope" }] }, world)).toThrow(/nope/);

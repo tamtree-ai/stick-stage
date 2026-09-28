@@ -5,6 +5,7 @@ import {
   evalSeat,
   fallPose,
   PROP_BOUNDS,
+  propBounds,
   propUnit,
   rigMetrics,
   SEAT_HEIGHT,
@@ -158,6 +159,22 @@ describe("props", () => {
     expect(at(79).dropped).toHaveLength(1);
     expect(at(80).dropped).toHaveLength(0);
     expect(at(80).held.L?.def.id).toBe("phone");
+  });
+  it("a dropped drawn prop rests on the floor", () => {
+    const fries = library.props.fries!;
+    const tracks: ActorTracks = {
+      character: "milo",
+      poseKeys: [{ frame: 0, pose: "idle" }],
+      expressionKeys: [{ frame: 0, expression: "neutral" }],
+      propKeys: [
+        { frame: 0, hand: "R", prop: "fries" },
+        { frame: 10, hand: "R", prop: null, drop: true },
+      ],
+    };
+    const at = (f: number) => evalActor(library, tracks, f, FPS, FIG).props;
+    const rest = -propBounds(fries).x1 * propUnit(fries, FIG);
+    expect(at(60).dropped[0]!.y).toBeCloseTo(rest);
+    expect(at(60).dropped[0]!.angle).toBe(90);
   });
   it("fall is frame-pure and never sinks below its rest height", () => {
     const phone = library.props.phone!;

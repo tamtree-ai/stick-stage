@@ -30,11 +30,7 @@ import highFive from "./poses/high-five.json";
 import shove from "./poses/shove.json";
 import faintPose from "./poses/faint.json";
 
-import phone from "./props/phone.json";
-import mic from "./props/mic.json";
-import cup from "./props/cup.json";
-import laptop from "./props/laptop.json";
-import sign from "./props/sign.json";
+import { PROP_DOCS, PROP_IDS } from "./props";
 import miloJune from "./series/milo-june.json";
 import parkFables from "./series/park-fables.json";
 
@@ -87,14 +83,14 @@ import musicJson from "./music.json";
 export const POSE_IDS = ["idle", "point", "shrug", "facepalm", "arms-up", "arms-crossed", "think", "lean-in", "recoil", "slump", "hands-on-hips", "hold-phone"];
 /** Poses added after M1 (labs that cycle POSE_IDS skip these). */
 export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up", "high-five", "shove", "faint"];
-export const PROP_IDS = ["phone", "mic", "cup", "laptop", "sign"];
+export { PROP_IDS };
 export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed", "angry", "shocked", "sad", "crying", "cringe", "confused", "deadpan"];
 
 export const library: Library = createLibrary({
   characters: [milo, june, lila, theo, moss, dash, reed, nell, pip],
   poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose],
   expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan],
-  props: [phone, mic, cup, laptop, sign],
+  props: PROP_DOCS,
 });
 
 export const sets: Record<string, SetDef> = createSets([

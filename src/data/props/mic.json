@@ -1,1 +1,14 @@
-{"schemaVersion": 1, "id": "mic", "kind": "mic", "colors": {"body": "#3a3d4d", "accent": "#c9ccd6"}, "align": "forearm", "angle": -40, "size": 1.1}
+{
+  "schemaVersion": 1,
+  "id": "mic",
+  "kind": "mic",
+  "name": "Mic",
+  "category": "office",
+  "rank": 17,
+  "tags": ["interview", "audio", "talk"],
+  "aliases": ["microphone"],
+  "colors": { "body": "#3a3d4d", "accent": "#c9ccd6" },
+  "align": "forearm",
+  "angle": -40,
+  "size": 1.1
+}

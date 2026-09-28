@@ -1,1 +1,14 @@
-{"schemaVersion": 1, "id": "phone", "kind": "phone", "colors": {"body": "#3a3d4d", "screen": "#bfe3f5"}, "align": "forearm", "angle": 0, "size": 1.2}
+{
+  "schemaVersion": 1,
+  "id": "phone",
+  "kind": "phone",
+  "name": "Phone",
+  "category": "tech",
+  "rank": 13,
+  "tags": ["call", "text", "mobile", "screen"],
+  "aliases": ["mobile", "cell", "cellphone", "smartphone"],
+  "colors": { "body": "#3a3d4d", "screen": "#bfe3f5" },
+  "align": "forearm",
+  "angle": 0,
+  "size": 1.2
+}

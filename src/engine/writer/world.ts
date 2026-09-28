@@ -1,4 +1,4 @@
-import type { Catalog } from "../catalog";
+import type { Catalog, CatalogProp } from "../catalog";
 import type { Aspect } from "../format/aspect";
 import type { TemplateId } from "../templates/premise";
 
@@ -12,6 +12,8 @@ export type WriterWorld = {
   setAspect?: Readonly<Record<string, Aspect>>;
   templates: readonly { id: TemplateId; cast: 1 | 2 | 3; castMax: 1 | 2 | 3; description: string }[];
   expressions: readonly string[];
+  /** Props the stage can show, lowest rank first. */
+  props: readonly CatalogProp[];
   /** Character id → how they are played. Missing: played straight. */
   notes: Readonly<Record<string, string>>;
 };
@@ -23,5 +25,6 @@ export const writerWorld = (catalog: Catalog, notes: Readonly<Record<string, str
   setAspect: Object.fromEntries(catalog.sets.map((s) => [s.id, s.aspect])),
   templates: catalog.templates,
   expressions: catalog.expressions,
+  props: catalog.propInfo,
   notes,
 });

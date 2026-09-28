@@ -58,6 +58,8 @@ pnpm direct <id> --say --json          # validate → dev voices → prep → co
      (`"at": { "word": "fine", "occurrence": 2 }`). Big gestures (`arms-up`, `recoil`) are for peaks.
    - Physical comedy: `walkTo` (entrances/exits via `off-left`/`off-right`, `speed: "run"`),
      `highFive`, `shove`, `hop`, `slideTo`, `sit`/`stand`, props (`hold`/`putAway`/`drop`), symbols
+     A premise line may already name one `prop`. Staging holds it. Do not add a second hold for that object.
+     A premise line may already name one `prop`. Staging holds it. Do not add a second hold for that object.
      (`sweat`, `anger`, `blush`, `tears`, `exclaim`, `question`, `speed-lines`).
    - SFX sparingly: 1–3 per skit, on a physical hit or the punchline turn (`pnpm render SfxLab`,
      `src/data/sfx.json`). Slam text: one or two words from the punchline, anchored on that word.

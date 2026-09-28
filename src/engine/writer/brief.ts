@@ -29,6 +29,8 @@ export const BriefSchema = z
     allowed_sets: z.array(z.string().min(1)).optional(),
     /** Workspace characters. Their one-line `personality` is a cast note. They are not the house cast. */
     characters: z.array(CharacterSchema).max(4).optional(),
+    /** Prop ids the client wants on screen. The prompt names them; the model still picks the line. */
+    props: z.array(z.string().min(1)).max(12).optional(),
   })
   .superRefine((d, ctx) => {
     if (d.scenes && d.set) ctx.addIssue({ code: "custom", path: ["set"], message: "pick one set, or a set per scene, not both" });
@@ -88,6 +90,10 @@ export const parseBrief = (json: unknown, world: WriterWorld): Brief => {
   if (brief.set) setOk(brief.set, ["set"]);
   brief.sets?.forEach((id, i) => setOk(id, ["sets", i]));
   if (brief.allowed_sets && allowed && allowed.length === 0) d.push({ level: "error", code: "allowed-sets", path: "allowed_sets", message: "none of the allowed sets are in this catalog", expected: `one of ${world.sets.join(", ")}` });
+  const propIds = world.props.map((p) => p.id);
+  brief.props?.forEach((id, i) => {
+    if (!propIds.includes(id)) d.push(unknownId("prop", id, propIds, ["props", i]));
+  });
   if (d.length) throw new SkitError(d);
   return allowed ? { ...brief, allowed_sets: allowed } : brief;
 };

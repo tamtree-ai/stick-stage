@@ -1,0 +1,1 @@
+{"schemaVersion":1,"id":"passport","kind":"drawn","name":"Passport","category":"travel","rank": 70,"tags":["travel"],"aliases":["passports"],"align":"upright","size":1.15,"colors":{"body":"#1f4e3d","accent":"#f4c542"},"parts":[{"shape":"rect","x":-0.035,"y":-0.1,"w":0.07,"h":0.09,"fill":"body","rx":0.004},{"shape":"circle","x":0,"y":-0.06,"r":0.016,"fill":"accent"}]}

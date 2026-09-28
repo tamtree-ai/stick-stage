@@ -1,1 +1,13 @@
-{ "schemaVersion": 1, "id": "sign", "kind": "sign", "colors": { "body": "#fff7e0", "accent": "#c79a6b" }, "align": "upright", "text": "HELP" }
+{
+  "schemaVersion": 1,
+  "id": "sign",
+  "kind": "sign",
+  "name": "Sign",
+  "category": "party",
+  "rank": 8,
+  "tags": ["message", "picket", "poster"],
+  "aliases": ["placard", "poster"],
+  "colors": { "body": "#fff7e0", "accent": "#c79a6b" },
+  "align": "upright",
+  "text": "HELP"
+}

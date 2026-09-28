@@ -1,1 +1,13 @@
-{"schemaVersion": 1, "id": "cup", "kind": "cup", "colors": {"body": "#ffffff", "accent": "#f2a7a0"}, "align": "upright", "size": 1.25}
+{
+  "schemaVersion": 1,
+  "id": "cup",
+  "kind": "cup",
+  "name": "Cup",
+  "category": "drinks",
+  "rank": 24,
+  "tags": ["drink", "hot", "mug"],
+  "aliases": ["mug", "coffee", "tea"],
+  "colors": { "body": "#ffffff", "accent": "#f2a7a0" },
+  "align": "upright",
+  "size": 1.25
+}

@@ -1,5 +1,6 @@
 import type { Diagnostic } from "../director/diagnostics";
-import type { Beat, SkitDoc, SkitInput } from "../director/schema";
+import type { Action, Beat, SkitDoc, SkitInput } from "../director/schema";
+import { lineHand, linePropActions, propMiss, resolveProp, type HoldBook } from "../templates/lineProp";
 import { lastWordAnchor } from "../templates/stage";
 import { parseLoose } from "./parse";
 import { repairPrompt } from "./repair";
@@ -9,7 +10,7 @@ import type { WriterWorld } from "./world";
 const PUNCH_PAUSE_MS = 450;
 const PUNCH_HOLD_MS = 300;
 
-type RawLine = { id?: string; who?: string; text: string; expression?: string; slam?: string; delivery?: string; gag?: string };
+type RawLine = { id?: string; who?: string; text: string; expression?: string; slam?: string; delivery?: string; gag?: string; prop?: string };
 type Unit = { beat: Beat; trail: Beat[] };
 
 const asString = (v: unknown): string | undefined => (typeof v === "string" && v.trim() ? v.trim() : undefined);
@@ -36,7 +37,7 @@ const linesOf = (data: unknown): RawLine[] => {
     if (!raw || typeof raw !== "object") return [];
     const o = raw as Record<string, unknown>;
     const text = typeof o.text === "string" ? o.text.trim() : typeof o.line === "string" ? o.line.trim() : "";
-    return [{ id: asString(o.id), who: asString(o.who) ?? asString(o.speaker), text, expression: asString(o.expression), slam: asString(o.slam), delivery: asString(o.delivery), gag: asString(o.gag) }];
+    return [{ id: asString(o.id), who: asString(o.who) ?? asString(o.speaker), text, expression: asString(o.expression), slam: asString(o.slam), delivery: asString(o.delivery), gag: asString(o.gag), prop: asString(o.prop) }];
   });
 };
 
@@ -61,6 +62,43 @@ const freshId = (wanted: string | undefined, used: Set<string>): string => {
   let n = used.size + 1;
   while (used.has(`n${n}`)) n++;
   return `n${n}`;
+};
+
+const atZero = (a: Action): boolean => !a.at || ("ms" in a.at && a.at.ms === 0);
+
+const propNow = (beat: Beat, who: string): string | undefined => {
+  const hold = beat.actions.find((a) => a.do === "hold" && a.who === who && atZero(a));
+  if (hold && hold.do === "hold") return hold.prop;
+  if (beat.actions.some((a) => a.do === "putAway" && a.who === who && atZero(a))) return "none";
+  return undefined;
+};
+
+const noteHeld = (beat: Beat, who: string, hand: "L" | "R", held: Map<string, string>) => {
+  for (const a of beat.actions) {
+    if (a.who !== who || !atZero(a)) continue;
+    if (a.do === "hold" && a.hand === hand) held.set(who, a.prop);
+    if ((a.do === "putAway" || a.do === "drop") && a.hand === hand) held.delete(who);
+  }
+};
+
+/** Keep every action except this speaker's hold or put-away at the start of the line. */
+const withoutProp = (actions: Action[], who: string): Action[] =>
+  actions.filter((a) => a.who !== who || !atZero(a) || (a.do !== "hold" && a.do !== "putAway"));
+
+/**
+ * A named prop updates the hold. An omitted prop leaves the beat's actions alone.
+ * `book.held` always ends as what this beat shows in the line's hand.
+ */
+const applyProp = (beat: Beat, who: string, prop: string | undefined, book: HoldBook): Beat => {
+  const hand = lineHand(who, book.rightTaken);
+  if (prop === undefined || prop === propNow(beat, who)) {
+    noteHeld(beat, who, hand, book.held);
+    return beat;
+  }
+  const added = linePropActions(who, prop, book);
+  const next = structuredClone(beat);
+  next.actions = [...added, ...withoutProp(next.actions, who)];
+  return next;
 };
 
 const moodOf = (mood: string | undefined, path: string, world: WriterWorld, warnings: Diagnostic[]): string | undefined => {
@@ -165,6 +203,35 @@ export const skitFromReply = (reply: string, doc: SkitDoc, world: WriterWorld): 
   for (const loc of located) for (const unit of loc.units) byId.set(unit.beat.id, { scene: loc.scene, unit });
   const slamMode = located.some((l) => l.units.some((u) => isSlamBeat(u.beat))) && located.every((l) => l.units.every((u) => isSlamBeat(u.beat)));
 
+  const rightTaken = new Set<string>();
+  const sceneLong = new Map<string, string>();
+  for (const c of skit.cast) {
+    if (!c.holding) continue;
+    sceneLong.set(c.id, c.holding.prop);
+    if (c.holding.hand !== "L") rightTaken.add(c.id);
+  }
+  const held = new Map<string, string>();
+  const book: HoldBook = { held, rightTaken, sceneLong };
+  let bookScene = -1;
+  const enter = (index: number) => {
+    if (bookScene === index) return;
+    bookScene = index;
+    held.clear();
+  };
+  const namedProp = (raw: string | undefined, who: string, path: string, thought: boolean): string | undefined => {
+    if (!raw) return undefined;
+    const resolved = resolveProp(raw, world.props);
+    if ("drop" in resolved) {
+      warnings.push({ level: "warning", code: "prop", path, message: propMiss(resolved.drop, world.props) });
+      return undefined;
+    }
+    if (thought || slamMode) {
+      warnings.push({ level: "warning", code: "prop", path, message: slamMode ? `a text slam has no hands; "${resolved.id}" was dropped` : `a narrator line can't hold a prop; "${resolved.id}" was dropped` });
+      return undefined;
+    }
+    return resolved.id;
+  };
+
   const used = new Set<string>();
   const buckets: Unit[][] = scenes.map(() => []);
   let scene = 0;
@@ -184,7 +251,10 @@ export const skitFromReply = (reply: string, doc: SkitDoc, world: WriterWorld): 
     if (existing && !used.has(existing.unit.beat.id)) {
       scene = existing.scene;
       used.add(existing.unit.beat.id);
-      const beat = patch(existing.unit.beat, line, who, expression, warnings);
+      enter(scene);
+      const thought = who === skit.narrator?.id || !!existing.unit.beat.voiceOver;
+      const prop = namedProp(line.prop, who, `lines[${i}].prop`, thought);
+      const beat = applyProp(patch(existing.unit.beat, line, who, expression, warnings), who, prop, book);
       if (line.slam && i !== incoming.length - 1) warnings.push({ level: "warning", code: "slam", path: `lines[${i}].slam`, message: "a slam belongs on the last line; this one was dropped" });
       buckets[scene]!.push({ beat, trail: existing.unit.trail });
       return;
@@ -192,7 +262,9 @@ export const skitFromReply = (reply: string, doc: SkitDoc, world: WriterWorld): 
     const id = freshId(line.id, new Set([...byId.keys(), ...used, ...buckets.flat().map((u) => u.beat.id)]));
     if (line.id && line.id !== id) warnings.push({ level: "warning", code: "line-id", path: `lines[${i}].id`, message: `id "${line.id}" is already used; the new line is "${id}"` });
     used.add(id);
-    const beat = slamMode ? freshSlam(id, who, line.text, expression) : freshSpoken(id, who, line.text, expression, line.gag);
+    enter(scene);
+    const prop = namedProp(line.prop, who, `lines[${i}].prop`, who === skit.narrator?.id);
+    const beat = applyProp(slamMode ? freshSlam(id, who, line.text, expression) : freshSpoken(id, who, line.text, expression, line.gag), who, prop, book);
     if (line.delivery && spoken(beat)) beat.delivery = line.delivery;
     if (line.slam && i !== incoming.length - 1) warnings.push({ level: "warning", code: "slam", path: `lines[${i}].slam`, message: "a slam belongs on the last line; this one was dropped" });
     buckets[scene]!.push({ beat, trail: [] });

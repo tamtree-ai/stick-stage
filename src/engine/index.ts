@@ -17,7 +17,7 @@ export { Rig } from "./rig/Rig";
 export { accessoryIds } from "./rig/accessories";
 export * from "./props/schema";
 export * from "./props/track";
-export { PROP_BOUNDS } from "./props/bounds";
+export { PROP_BOUNDS, propBounds, drawnBounds } from "./props/bounds";
 export { PropView } from "./props/PropView";
 export * from "./face/schema";
 export * from "./face/mouths";

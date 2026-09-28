@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "template": "exchange",
+  "title": "Fries and water",
+  "logline": "Milo holds fries. June holds a water bottle.",
+  "pov": "POV: lunch is a prop",
+  "hashtags": ["stickfigure"],
+  "set": "cafe-1",
+  "cast": [
+    { "id": "milo", "character": "milo" },
+    { "id": "june", "character": "june" }
+  ],
+  "lines": [
+    { "who": "milo", "text": "These are my fries.", "role": "setup", "prop": "fries" },
+    { "who": "june", "text": "This is my water.", "role": "setup", "prop": "water-bottle" },
+    { "who": "milo", "text": "You can look.", "role": "escalation" },
+    { "who": "june", "text": "I am looking.", "role": "punchline" }
+  ]
+}

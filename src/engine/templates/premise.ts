@@ -27,6 +27,8 @@ export const PremiseLineSchema = z.strictObject({
   voiceOver: z.boolean().optional(),
   /** One named gag on the line. The compiler expands it. */
   gag: z.string().min(1).optional(),
+  /** The one object this line is about. `"none"` puts it away. The director chooses the hand. */
+  prop: z.string().min(1).optional(),
 });
 export type PremiseLine = z.infer<typeof PremiseLineSchema>;
 

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Fries and water",
+    "aspect": "9:16",
+    "hashtags": [
+      "stickfigure"
+    ]
+  },
+  "set": "cafe-1",
+  "cast": [
+    {
+      "id": "milo",
+      "character": "milo",
+      "mark": "left"
+    },
+    {
+      "id": "june",
+      "character": "june",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "pov": "POV: lunch is a prop",
+    "subtitles": true
+  },
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "milo",
+      "line": "These are my fries.",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "hold",
+          "prop": "fries",
+          "hand": "R",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "expression": "neutral"
+    },
+    {
+      "id": "l2",
+      "speaker": "june",
+      "line": "This is my water.",
+      "actions": [
+        {
+          "who": "june",
+          "do": "hold",
+          "prop": "water-bottle",
+          "hand": "R",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "expression": "neutral"
+    },
+    {
+      "id": "l3",
+      "speaker": "milo",
+      "line": "You can look.",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ],
+      "expression": "annoyed"
+    },
+    {
+      "id": "l4",
+      "speaker": "june",
+      "line": "I am looking.",
+      "actions": [],
+      "expression": "deadpan",
+      "punchline": true,
+      "pauseBeforeMs": 450,
+      "holdAfterMs": 300
+    }
+  ]
+}

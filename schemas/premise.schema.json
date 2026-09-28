@@ -126,6 +126,10 @@
           "gag": {
             "type": "string",
             "minLength": 1
+          },
+          "prop": {
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
@@ -190,6 +194,10 @@
                   "type": "boolean"
                 },
                 "gag": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "prop": {
                   "type": "string",
                   "minLength": 1
                 }

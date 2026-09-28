@@ -1,1 +1,12 @@
-{ "schemaVersion": 1, "id": "laptop", "kind": "laptop", "colors": { "body": "#c9ccd6", "screen": "#bfe3f5" }, "align": "upright" }
+{
+  "schemaVersion": 1,
+  "id": "laptop",
+  "kind": "laptop",
+  "name": "Laptop",
+  "category": "tech",
+  "rank": 12,
+  "tags": ["computer", "work", "screen"],
+  "aliases": ["computer"],
+  "colors": { "body": "#c9ccd6", "screen": "#bfe3f5" },
+  "align": "upright"
+}
