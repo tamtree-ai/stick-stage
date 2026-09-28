@@ -37,6 +37,8 @@ export type ServiceOptions = {
 };
 
 const MB = 1024 * 1024;
+/** Keep-alive comment on an idle event stream, well inside common 30–60 s read timeouts. */
+const SSE_PING_MS = 15_000;
 
 /** A job as the API shows it: output files become download URLs. */
 export const jobView = (job: Job) => {
@@ -100,7 +102,11 @@ export const createService = (o: ServiceOptions) => {
         write(job);
         if (res.writableEnded) return;
         const unsub = o.queue.subscribe(job.id, write);
+        // Events only fire when the job moves, and a final render sits in one stage for
+        // minutes; a comment line keeps clients' read timeouts from calling that a dead link.
+        const ping = setInterval(() => res.writableEnded || res.write(": ping\n\n"), SSE_PING_MS);
         await new Promise<void>((resolve) => res.on("close", resolve));
+        clearInterval(ping);
         unsub();
       },
     };

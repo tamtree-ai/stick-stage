@@ -105,7 +105,7 @@ Same multipart body as `POST /render`. Runs prep only and returns when `voice.pr
 
 ## `GET /jobs/:id/events`
 
-Server-sent events. Each `data:` line is the same JSON as `GET /jobs/:id`. The stream ends when the job succeeds, fails, or is cancelled. The callback secret is not included.
+Server-sent events. Each `data:` line is the same JSON as `GET /jobs/:id`. The stream ends when the job succeeds, fails, or is cancelled. The callback secret is not included. While the job is idle between events the service sends a `: ping` comment every 15 s, so a client read timeout does not mistake a long render stage for a dead connection; clients ignore comment lines.
 
 ## `GET /jobs/:id`: status
 
