@@ -38,7 +38,7 @@ export const rigMetrics = (c: Character, figureHeightPx: number): RigMetrics => 
     heightPx,
     headR: c.proportions.headRadius * heightPx,
     strokeWidth: sw,
-    footRx: 0.055 * heightPx,
+    footRx: 0.055 * heightPx * c.style.footLength,
     footRy: 0.026 * heightPx,
     handR: sw * 0.95,
   };
@@ -76,7 +76,8 @@ export const solveSkeleton = (
   const kneeR0 = add(hip0, scale(dirFromAngle(thighR), P.thigh * H));
   const ankleL0 = add(kneeL0, scale(dirFromAngle(thighL - legs.kneeL), P.shin * H));
   const ankleR0 = add(kneeR0, scale(dirFromAngle(thighR - legs.kneeR), P.shin * H));
-  const footOffset: Vec2 = { x: m.footRx * 0.45, y: m.footRy * 0.35 };
+  // The heel stays the same distance behind the ankle; longer feet reach further forward.
+  const footOffset: Vec2 = { x: m.footRx - (0.55 * m.footRx) / c.style.footLength, y: m.footRy * 0.35 };
   const footL0 = add(ankleL0, footOffset);
   const footR0 = add(ankleR0, footOffset);
 

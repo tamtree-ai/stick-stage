@@ -25,7 +25,7 @@ export const TorsoStyleSchema = z.discriminatedUnion("style", [
 ]);
 
 export const AccessorySchema = z.object({
-  slot: z.enum(["hair", "eyewear", "headwear", "neck", "body"]),
+  slot: z.enum(["hair", "eyewear", "headwear", "neck", "body", "face"]),
   id: z.string(),
   color: hex.optional(),
 });
@@ -45,6 +45,18 @@ export const CharacterSchema = z.object({
     hands: z.enum(["nub"]),
     feet: z.enum(["oval"]),
     footFill: hex,
+    /** Foot length multiplier (a hare's long feet are ~1.8). */
+    footLength: frac(0.6, 2.5).default(1),
+    /**
+     * Fleshy limbs: arms, legs and neck drawn as outlined tubes in `fill` instead of bare
+     * stroke lines, `width` × strokeWidth thick. Animals use it; people keep stick limbs.
+     */
+    limbs: z.object({ fill: hex, width: frac(1.5, 4) }).optional(),
+    /**
+     * Stretch the head outline into an ellipse (sx, sy × head radius), shifted `dx` × radius
+     * toward facing. A turtle's snout. Only the outline changes; the face keeps its layout.
+     */
+    headShape: z.object({ sx: frac(0.8, 1.4), sy: frac(0.8, 1.4), dx: frac(-0.3, 0.3).default(0) }).optional(),
     cheek: hex.optional(),
   }),
   face: z.object({

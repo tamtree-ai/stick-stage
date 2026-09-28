@@ -35,18 +35,23 @@ type LimbProps = {
   side: 1 | -1;
   stroke: string;
   sw: number;
+  /** Fleshy limb: an outlined tube in this fill instead of a bare line. */
+  tube?: { fill: string; width: number };
 };
 
-const Limb: React.FC<LimbProps> = ({ root, joint, tip, curve, side, stroke, sw }) => (
-  <path
-    d={limbPath(root, limbControl(root, joint, tip, curve, side), tip)}
-    fill="none"
-    stroke={stroke}
-    strokeWidth={sw}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
-);
+const Limb: React.FC<LimbProps> = ({ root, joint, tip, curve, side, stroke, sw, tube }) => {
+  const d = limbPath(root, limbControl(root, joint, tip, curve, side), tip);
+  const line = (color: string, width: number) => (
+    <path d={d} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" />
+  );
+  if (!tube) return line(stroke, sw);
+  return (
+    <g>
+      {line(stroke, tube.width)}
+      {line(tube.fill, tube.width - sw * 1.3)}
+    </g>
+  );
+};
 
 /** Renders one figure in figure space (root on the ground at 0,0, facing right). */
 export const Rig: React.FC<RigProps> = ({
@@ -63,7 +68,8 @@ export const Rig: React.FC<RigProps> = ({
   mirrored = false,
   fontFamily = "sans-serif",
 }) => {
-  const { stroke, strokeWidth: sw, headFill, torso, limbCurve, footFill } = character.style;
+  const { stroke, strokeWidth: sw, headFill, torso, limbCurve, footFill, limbs, headShape } = character.style;
+  const tube = limbs ? { fill: limbs.fill, width: limbs.width * sw } : undefined;
   const R = m.headR;
   const curve = (k: keyof PoseAngles["bend"]) => bend[k] ?? limbCurve;
   const figurePx = m.heightPx / character.proportions.height;
@@ -88,9 +94,14 @@ export const Rig: React.FC<RigProps> = ({
         side={-1}
         stroke={stroke}
         sw={sw}
+        tube={tube}
       />
       {held(s)}
-      <circle cx={s === "L" ? j.handL.x : j.handR.x} cy={s === "L" ? j.handL.y : j.handR.y} r={m.handR} fill={stroke} />
+      {tube ? (
+        <circle cx={s === "L" ? j.handL.x : j.handR.x} cy={s === "L" ? j.handL.y : j.handR.y} r={tube.width * 0.58} fill={tube.fill} stroke={stroke} strokeWidth={sw * 0.65} />
+      ) : (
+        <circle cx={s === "L" ? j.handL.x : j.handR.x} cy={s === "L" ? j.handL.y : j.handR.y} r={m.handR} fill={stroke} />
+      )}
     </g>
   );
 
@@ -106,6 +117,7 @@ export const Rig: React.FC<RigProps> = ({
           side={1}
           stroke={stroke}
           sw={sw}
+          tube={tube}
         />
         <ellipse cx={foot.x} cy={foot.y} rx={m.footRx} ry={m.footRy} fill={footFill} stroke={stroke} strokeWidth={sw * 0.8} />
       </g>
@@ -139,10 +151,16 @@ export const Rig: React.FC<RigProps> = ({
       {leg("L")}
       {arm("L")}
       {body}
+      {renderAccessories(character, "belly", R, { hip: j.hip, neck: j.neck, heightPx: m.heightPx })}
+      {tube ? <Limb root={j.shoulder} joint={j.neck} tip={j.head} curve={0} side={1} stroke={stroke} sw={sw} tube={{ ...tube, width: tube.width * 1.25 }} /> : null}
       {leg("R")}
       <g transform={`translate(${f2(j.head.x)} ${f2(j.head.y)}) rotate(${f2(j.headTilt)})`}>
         {renderAccessories(character, "back", R)}
-        <circle r={R} fill={headFill} stroke={stroke} strokeWidth={sw} />
+        {headShape ? (
+          <ellipse cx={headShape.dx * R} rx={headShape.sx * R} ry={headShape.sy * R} fill={headFill} stroke={stroke} strokeWidth={sw} />
+        ) : (
+          <circle r={R} fill={headFill} stroke={stroke} strokeWidth={sw} />
+        )}
         {renderAccessories(character, "front", R)}
         <Face character={character} face={face} R={R} blink={blink} frame={frame} symbolsSince={symbolsSince} symbolAges={symbolAges} mirrored={mirrored} />
         {renderAccessories(character, "eyewear", R)}
