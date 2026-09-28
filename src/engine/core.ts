@@ -3,6 +3,7 @@
  * templates, math and registries. No React, no Node APIs, no side effects on import.
  * React components are in `stickstage/remotion`, Node adapters in `stickstage/node`.
  */
+export * from "./format/aspect";
 export * from "./lib/math";
 export * from "./lib/easing";
 export * from "./lib/color";

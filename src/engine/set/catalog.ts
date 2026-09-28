@@ -3,6 +3,7 @@ import type { SetDef } from "./schema";
 
 export type SetCatalogEntry = {
   id: string;
+  aspect: SetDef["aspect"];
   kit: SetDef["kit"];
   description: string;
   tags: string[];
@@ -14,6 +15,7 @@ export type SetCatalogEntry = {
 export const setCatalog = (sets: Readonly<Record<string, SetDef>>): SetCatalogEntry[] =>
   Object.values(sets).map((s) => ({
     id: s.id,
+    aspect: s.aspect,
     kit: s.kit,
     description: s.description ?? `${s.kit} set`,
     tags: s.tags,

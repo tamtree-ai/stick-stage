@@ -26,12 +26,12 @@ describe("templates", () => {
       expect(report.findings.filter((f) => f.level === "error")).toEqual([]);
     });
 
-  for (const set of Object.keys(sets))
-    it(`exchange in ${set}: stages, compiles and passes the self-check`, () => {
-      const skit = fromPremise({ ...premise("exchange"), set }, library, sets);
+  for (const set of Object.values(sets).filter((s) => s.aspect === "9:16"))
+    it(`exchange in ${set.id}: stages, compiles and passes the self-check`, () => {
+      const skit = fromPremise({ ...premise("exchange"), set: set.id }, library, sets);
       const lines = skitLines(parseSkit(skit)).map((l) => ({ id: l.id, text: l.text, durationMs: 400 + l.text.split(/\s+/).length * 330 }));
       const result = compileSkit({ skit, voice: fakeVoice(lines), lib: library, sets, sfx: sfxLibrary, reactions });
-      expect(skit.set).toBe(set);
+      expect(skit.set).toBe(set.id);
       expect(checkSkit({ result, lib: library, sets, safeArea }).findings.filter((f) => f.level === "error")).toEqual([]);
     });
 

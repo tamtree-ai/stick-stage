@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "nell",
+  "displayName": "Nell",
+  "aspect": "16:9",
+  "proportions": {
+    "height": 0.92,
+    "headRadius": 0.16,
+    "neck": 0.015,
+    "torso": 0.26,
+    "upperArm": 0.14,
+    "forearm": 0.13,
+    "thigh": 0.16,
+    "shin": 0.16
+  },
+  "style": {
+    "stroke": "#1b1b1f",
+    "strokeWidth": 12,
+    "headFill": "#fff6ee",
+    "torso": { "style": "bean", "fill": "#d4566a", "width": 0.14 },
+    "limbCurve": 0.28,
+    "hands": "nub",
+    "feet": "oval",
+    "footFill": "#2a2a30"
+  },
+  "face": {
+    "eyes": "big-pupil",
+    "brows": true,
+    "mouthSet": "default",
+    "offsetX": 0.14,
+    "eyeSpacing": 0.46,
+    "eyeY": 0,
+    "mouthY": 0.44
+  },
+  "accessories": [{ "slot": "hair", "id": "bun-01", "color": "#2c2438" }],
+  "energy": 0.5,
+  "voice": { "say": "Moira" }
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "wide-office",
+  "aspect": "16:9",
+  "kit": "office",
+  "palette": "mint",
+  "description": "A wide office. The left cast member sits at a desk on the left third; the right one stands across the room.",
+  "tags": ["widescreen", "work", "office", "boss", "coworker", "deadline", "job"],
+  "groundY": 900,
+  "figureHeightPx": 620,
+  "layers": [
+    { "part": "wall", "pattern": "stripes" },
+    { "part": "floor" },
+    { "part": "whiteboard", "x": 0.55, "y": 0.12, "size": 0.9 },
+    { "part": "window", "x": 0.88, "y": 0.14, "size": 0.8, "variant": "blinds" },
+    { "part": "cabinet", "x": 0.96 },
+    { "part": "chair", "mark": "left", "seatFor": ["left"] }
+  ],
+  "foreground": [{ "part": "desk", "mark": "left", "dx": 0.1 }],
+  "marks": { "left": 0.22, "center": 0.5, "right": 0.74 }
+}

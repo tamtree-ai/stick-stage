@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "wide-street",
+  "aspect": "16:9",
+  "kit": "street",
+  "palette": "city",
+  "description": "A wide daytime street. Shopfront in the middle, lamp and hydrant at the edges. Standing. The 16:9 interview default.",
+  "tags": ["widescreen", "city", "street", "interview", "stranger", "public"],
+  "groundY": 900,
+  "figureHeightPx": 620,
+  "layers": [
+    { "part": "sky" },
+    { "part": "buildings" },
+    { "part": "sidewalk" },
+    { "part": "shopfront", "x": 0.5, "size": 1.05 },
+    { "part": "lamp", "x": 0.06 },
+    { "part": "hydrant", "x": 0.94 }
+  ],
+  "marks": { "left": 0.3, "center": 0.5, "right": 0.7 }
+}

@@ -1,5 +1,6 @@
 import type { MusicBed } from "../audio/music";
 import { applyLanguage } from "../i18n/apply";
+import { frameOfMeta } from "../format/aspect";
 import { migrate } from "../migrate";
 import { CharacterSchema } from "../rig/schema";
 import { coverOf } from "./cover";
@@ -34,7 +35,9 @@ export type CompileResult = {
 export const parseSkit = (json: unknown): SkitDoc => {
   const r = SkitSchema.safeParse(migrate("skit", json).doc);
   if (!r.success) throw new SkitError(fromZodIssues(r.error.issues));
-  return r.data;
+  const frame = frameOfMeta(r.data.meta);
+  if (!frame.ok) throw new SkitError([{ level: "error", code: "aspect", path: `meta.${frame.path}`, message: frame.message }]);
+  return { ...r.data, meta: { ...r.data.meta, aspect: frame.aspect, width: frame.width, height: frame.height } };
 };
 
 type Resolved = { id: string; skit: Skit; enter?: SceneTransition; remap: (path: string) => string };

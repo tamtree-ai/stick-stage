@@ -28,7 +28,12 @@ export type LibraryDocs = { characters: readonly unknown[]; poses: readonly unkn
 
 /** The consumer's registries: characters, poses, expressions and props, validated. */
 export const createLibrary = (docs: LibraryDocs): Library => ({
-  characters: docTable("character", CharacterSchema, docs.characters),
+  characters: Object.fromEntries(
+    Object.entries(docTable("character", CharacterSchema, docs.characters)).map(([id, c]) => [
+      id,
+      { ...c, aspect: c.aspect ?? "9:16" },
+    ]),
+  ),
   poses: docTable("pose", PoseSchema, docs.poses),
   expressions: docTable("expression", ExpressionSchema, docs.expressions),
   props: docTable("prop", PropSchema, docs.props),

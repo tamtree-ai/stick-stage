@@ -2,7 +2,7 @@ import { GAG_IDS } from "../director/gags";
 import type { SkitDoc } from "../director/schema";
 import { docBeats } from "../director/schema";
 import type { Brief, ScenePlan } from "./brief";
-import { scenePlan } from "./brief";
+import { briefFrame, scenePlan } from "./brief";
 import type { WriterWorld } from "./world";
 
 /** A ~30s skit, however many scenes it is split into. */
@@ -28,10 +28,11 @@ const fittingTemplates = (brief: Brief, world: WriterWorld) =>
     return true;
   });
 
-/** Sets the model is allowed to name. */
+/** Sets the model is allowed to name: the brief's list, and only rooms for this frame. */
 const openSets = (brief: Brief, world: WriterWorld): string[] => {
   const allowed = brief.allowed_sets;
-  return allowed?.length ? world.sets.filter((id) => allowed.includes(id)) : [...world.sets];
+  const ids = allowed?.length ? world.sets.filter((id) => allowed.includes(id)) : [...world.sets];
+  return ids.filter((id) => (world.setAspect?.[id] ?? "9:16") === briefFrame(brief));
 };
 
 /** One example scene per planned scene. A fixed set is left out, so the model does not write it. */
@@ -67,7 +68,10 @@ export const draftPrompt = (brief: Brief, world: WriterWorld): { system: string;
     .filter(Boolean)
     .join("\n");
   const templateKey = plan.template ? "" : `\n  "template": "<template id>",`;
+  const frame = briefFrame(brief) === "16:9" ? "FRAME: 16:9 widescreen, 1920 by 1080. People stand across a wide room." : "FRAME: 9:16 short, 1080 by 1920.";
   const system = `You write a ~30 second comedy skit. Reply with ONE JSON object only.
+
+${frame}
 
 CAST:
 ${castBlock(brief, world.notes)}

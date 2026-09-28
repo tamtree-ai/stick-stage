@@ -2,6 +2,7 @@ import { z } from "zod";
 import { CharacterSchema } from "../rig/schema";
 import type { Diagnostic } from "../director/diagnostics";
 import { SkitError, fromZodIssues, pathString, unknownId } from "../director/diagnostics";
+import { ASPECTS, type Aspect } from "../format/aspect";
 import { TEMPLATES, type TemplateId } from "../templates/premise";
 import { TEMPLATE_CAST, TEMPLATE_CAST_MAX } from "../templates/stage";
 import type { WriterWorld } from "./world";
@@ -20,6 +21,8 @@ export const BriefSchema = z
     tone: z.string().optional(),
     template: z.enum(TEMPLATES).optional(),
     cast: z.array(BriefCastSchema).min(1).max(3),
+    /** `9:16` short or `16:9` widescreen. Cast and sets must be drawn for that frame. Default short. */
+    aspect: z.enum(ASPECTS).default("9:16"),
     set: z.string().min(1).optional(),
     scenes: z.number().int().min(2).max(4).optional(),
     sets: z.array(z.string().min(1)).min(1).max(4).optional(),
@@ -34,6 +37,9 @@ export const BriefSchema = z
     if (d.sets && new Set(d.sets).size !== d.sets.length) ctx.addIssue({ code: "custom", path: ["sets"], message: "give each scene its own set" });
   });
 export type Brief = z.infer<typeof BriefSchema>;
+
+/** A brief that skipped the parser still means a short. */
+export const briefFrame = (brief: { aspect?: Aspect }): Aspect => brief.aspect ?? "9:16";
 
 /** How many scenes, and which sets the brief already chose (`null`: the model may pick). */
 export type ScenePlan = { count: number; sets: (string | null)[]; template: TemplateId | null };
@@ -58,6 +64,12 @@ export const parseBrief = (json: unknown, world: WriterWorld): Brief => {
   const castIds = [...world.characters, ...(brief.characters?.map((c) => c.id) ?? [])];
   brief.cast.forEach((c, i) => {
     if (!castIds.includes(c.character)) d.push(unknownId("character", c.character, castIds, ["cast", i, "character"]));
+    else {
+      const custom = brief.characters?.find((x) => x.id === c.character);
+      const aspect = custom ? custom.aspect : world.characterAspect?.[c.character];
+      if (aspect && aspect !== brief.aspect)
+        d.push({ level: "error", code: "aspect-character", path: `cast[${i}].character`, message: `"${c.character}" is drawn for ${aspect}; this brief is ${brief.aspect}`, expected: `a ${brief.aspect} character` });
+    }
   });
   if (brief.template) {
     const need = TEMPLATE_CAST[brief.template];
@@ -70,6 +82,8 @@ export const parseBrief = (json: unknown, world: WriterWorld): Brief => {
   const setOk = (id: string, path: (string | number)[]) => {
     if (!known.has(id)) d.push(unknownId("set", id, world.sets, path));
     else if (allowed && !allowed.includes(id)) d.push({ level: "error", code: "set-not-allowed", path: pathString(path), message: `"${id}" is not one of the allowed sets`, expected: allowed.join(", ") });
+    else if ((world.setAspect?.[id] ?? "9:16") !== brief.aspect)
+      d.push({ level: "error", code: "aspect-set", path: pathString(path), message: `"${id}" is a ${world.setAspect?.[id] ?? "9:16"} background; this brief is ${brief.aspect}`, expected: `a ${brief.aspect} set` });
   };
   if (brief.set) setOk(brief.set, ["set"]);
   brief.sets?.forEach((id, i) => setOk(id, ["sets", i]));

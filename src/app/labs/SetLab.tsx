@@ -72,6 +72,7 @@ const tileSet = (row: Row, palette: string, seed: number): SetDef => {
   return {
     schemaVersion: 1,
     id: `lab-${row.part}-${palette}-${seed}`,
+    aspect: "9:16",
     kit: row.kit,
     tags: [],
     palette,

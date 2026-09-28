@@ -6,6 +6,9 @@ import lila from "./characters/lila.json";
 import theo from "./characters/theo.json";
 import moss from "./characters/moss.json";
 import dash from "./characters/dash.json";
+import reed from "./characters/reed.json";
+import nell from "./characters/nell.json";
+import pip from "./characters/pip.json";
 
 import idle from "./poses/idle.json";
 import point from "./poses/point.json";
@@ -64,6 +67,14 @@ import park2 from "./sets/park-2.json";
 import streetNight1 from "./sets/street-night-1.json";
 import beach1 from "./sets/beach-1.json";
 import stage1 from "./sets/stage-1.json";
+import widePlain from "./sets/wide-plain.json";
+import wideLiving from "./sets/wide-living.json";
+import wideLounge from "./sets/wide-lounge.json";
+import wideOffice from "./sets/wide-office.json";
+import widePark from "./sets/wide-park.json";
+import wideStreet from "./sets/wide-street.json";
+import wideCafe from "./sets/wide-cafe.json";
+import wideClassroom from "./sets/wide-classroom.json";
 
 import castNotesJson from "./cast-notes.json";
 import safeAreaJson from "./safe-area.json";
@@ -80,13 +91,16 @@ export const PROP_IDS = ["phone", "mic", "cup", "laptop", "sign"];
 export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed", "angry", "shocked", "sad", "crying", "cringe", "confused", "deadpan"];
 
 export const library: Library = createLibrary({
-  characters: [milo, june, lila, theo, moss, dash],
+  characters: [milo, june, lila, theo, moss, dash, reed, nell, pip],
   poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose],
   expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan],
   props: [phone, mic, cup, laptop, sign],
 });
 
-export const sets: Record<string, SetDef> = createSets([plain1, living1, lounge1, office1, park1, street1, kitchen1, bedroom1, cafe1, classroom1, meeting1, living2, park2, streetNight1, beach1, stage1]);
+export const sets: Record<string, SetDef> = createSets([
+  plain1, living1, lounge1, office1, park1, street1, kitchen1, bedroom1, cafe1, classroom1, meeting1, living2, park2, streetNight1, beach1, stage1,
+  widePlain, wideLiving, wideLounge, wideOffice, widePark, wideStreet, wideCafe, wideClassroom,
+]);
 
 /** One conservative profile for TikTok / Reels / Shorts overlays (verify against real screenshots in M4). */
 export const safeArea: SafeArea = SafeAreaSchema.parse(migrate("safeArea", safeAreaJson).doc);

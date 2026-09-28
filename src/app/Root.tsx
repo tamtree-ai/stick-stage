@@ -203,7 +203,7 @@ export const RemotionRoot: React.FC = () => (
       component={CoverStill}
       schema={skitCompositionSchema}
       defaultProps={{ skit: "fine", showLabels: false }}
-      calculateMetadata={async (args) => ({ ...(await calculateSkitMetadata(args)), durationInFrames: 1, width: 1080, height: 1920 })}
+      calculateMetadata={async (args) => ({ ...(await calculateSkitMetadata(args)), durationInFrames: 1 })}
       width={1080}
       height={1920}
     />

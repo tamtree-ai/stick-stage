@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ASPECTS } from "../format/aspect";
 
 const hex = z.string().regex(/^#[0-9a-fA-F]{3,8}$/, "expected a hex color like #1b1b1f");
 const frac = (lo: number, hi: number) => z.number().min(lo).max(hi);
@@ -34,6 +35,11 @@ export const CharacterSchema = z.object({
   schemaVersion: z.literal(1),
   id: z.string(),
   displayName: z.string().optional(),
+  /**
+   * Which frame this face is drawn for. Catalog characters set it (missing means a short,
+   * stamped when the library loads). A workspace character may omit it and follow the skit.
+   */
+  aspect: z.enum(ASPECTS).optional(),
   proportions: ProportionsSchema,
   style: z.object({
     stroke: hex,

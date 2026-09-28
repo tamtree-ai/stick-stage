@@ -9,6 +9,14 @@
     "id": {
       "type": "string"
     },
+    "aspect": {
+      "default": "9:16",
+      "type": "string",
+      "enum": [
+        "9:16",
+        "16:9"
+      ]
+    },
     "kit": {
       "type": "string",
       "enum": [

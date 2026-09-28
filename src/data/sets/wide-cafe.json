@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "wide-cafe",
+  "aspect": "16:9",
+  "kit": "interior",
+  "palette": "peach",
+  "description": "A wide coffee shop. The counter runs across the middle; the menu board sits above it. Standing.",
+  "tags": ["widescreen", "cafe", "coffee", "barista", "ordering", "friends"],
+  "groundY": 900,
+  "figureHeightPx": 620,
+  "layers": [
+    { "part": "wall", "pattern": "stripes" },
+    { "part": "floor" },
+    { "part": "board", "x": 0.5, "y": 0.06, "size": 0.85, "variant": "menu" },
+    { "part": "window", "x": 0.12, "y": 0.14, "size": 0.75 },
+    { "part": "counter", "x": 0.5, "variant": "cafe", "size": 1.35 },
+    { "part": "plant", "x": 0.94 }
+  ],
+  "marks": { "left": 0.28, "center": 0.5, "right": 0.72 }
+}

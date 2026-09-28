@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Freeze } from "remotion";
 import { library, safeArea, sets } from "../../data";
-import { Skit } from "../../engine";
+import { Skit, WIDE_SAFE_AREA } from "../../engine";
 import { fontFor } from "../../engine/text/fonts";
 import { SLAM } from "../../engine/text/layout";
 import { TEXT_FONT } from "../fonts";
@@ -19,9 +19,10 @@ export const CoverStill: React.FC<SkitCompositionProps & { thumb?: boolean }> = 
   const scene = program.scenes[cover.scene] ?? program.scenes[0];
   if (!scene) throw new Error("Cover: the program has no scenes");
   const fontFamily = familyOf(scene.timeline.language);
+  const area = program.width > program.height ? WIDE_SAFE_AREA : safeArea;
   const picture = (
     <Freeze frame={cover.frame}>
-      <Skit timeline={scene.timeline} set={sets[scene.timeline.set]!} lib={library} safeArea={safeArea} fontFamily={fontFamily} showLabels={showLabels} audio={false} />
+      <Skit timeline={scene.timeline} set={sets[scene.timeline.set]!} lib={library} safeArea={area} fontFamily={fontFamily} showLabels={showLabels} audio={false} />
     </Freeze>
   );
   const title = (
@@ -52,10 +53,15 @@ export const CoverStill: React.FC<SkitCompositionProps & { thumb?: boolean }> = 
     </AbsoluteFill>
   );
   if (!thumb) return frame;
+  const thumbW = 1280;
+  const thumbH = 720;
+  const scale = Math.min(thumbW / program.width, thumbH / program.height);
+  const dw = program.width * scale;
+  const dh = program.height * scale;
   return (
     <AbsoluteFill style={{ background: "#111114" }}>
-      <div style={{ position: "absolute", left: "50%", top: 0, width: 405, height: 720, transform: "translateX(-50%)", overflow: "hidden" }}>
-        <div style={{ width: 1080, height: 1920, transform: "scale(0.375)", transformOrigin: "top left" }}>{frame}</div>
+      <div style={{ position: "absolute", left: (thumbW - dw) / 2, top: (thumbH - dh) / 2, width: program.width, height: program.height, transform: `scale(${scale})`, transformOrigin: "top left" }}>
+        {frame}
       </div>
     </AbsoluteFill>
   );

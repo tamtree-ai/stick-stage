@@ -15,6 +15,20 @@ export const FACE_FRAMING = {
   extreme: { headWidth: 0.84, eyeLine: 0.42 },
 } as const;
 
+/**
+ * Face framings for 16:9. Head width is a fraction of the wide frame, so the same
+ * 9:16 fractions would fill the short height with a head. These keep a medium shot
+ * at about a head and shoulders.
+ */
+export const WIDE_FACE_FRAMING = {
+  medium: { headWidth: 0.16, eyeLine: 0.38 },
+  close: { headWidth: 0.24, eyeLine: 0.42 },
+  extreme: { headWidth: 0.32, eyeLine: 0.45 },
+} as const;
+
+/** `9:16` uses `FACE_FRAMING`. A landscape frame uses `WIDE_FACE_FRAMING`. */
+export const faceFraming = (width: number, height: number) => (width > height ? WIDE_FACE_FRAMING : FACE_FRAMING);
+
 /** Lead room: the subject sits this fraction of frame width *behind* center, looking into space. */
 export const LEAD_ROOM = 0.03;
 
@@ -58,7 +72,7 @@ const faceShot = (
   groundY: number,
 ): Camera => {
   const { head, eyes, R } = headInStage(a, width, groundY);
-  const spec = FACE_FRAMING[kind];
+  const spec = faceFraming(width, height)[kind];
   const scale = (spec.headWidth * width) / (2 * R);
   const lead = (a.facing === "right" ? 1 : -1) * LEAD_ROOM * (width / scale);
   // Solve cy so the eyes land on the eye line: H/2 + scale·(eyes.y − cy) = eyeLine·H.

@@ -2,9 +2,9 @@ import type { Diagnostic } from "../director/diagnostics";
 import { GAG_IDS } from "../director/gags";
 import type { PremiseInput } from "../templates/premise";
 import type { TemplateId } from "../templates/premise";
-import { TEMPLATE_DEFAULT_SET } from "../templates/stage";
+import { defaultSet } from "../templates/stage";
 import type { Brief, ScenePlan } from "./brief";
-import { scenePlan } from "./brief";
+import { briefFrame, scenePlan } from "./brief";
 import { parseLoose } from "./parse";
 import { repairPrompt } from "./repair";
 import type { WriterWorld } from "./world";
@@ -150,10 +150,11 @@ export const premiseFromReply = (reply: string, brief: Brief, world: WriterWorld
     : [];
 
   const cast = brief.cast.map((c) => ({ id: c.id, character: c.character, ...(c.label ? { label: c.label } : {}) }));
+  const shared = { schemaVersion: 1 as const, template, aspect: briefFrame(brief), title, ...(description ? { description } : {}), hashtags };
   const premise: PremiseInput =
     plan.count === 1
-      ? { schemaVersion: 1, template, title, ...(description ? { description } : {}), hashtags, ...(scenes[0]!.pov ? { pov: scenes[0]!.pov } : {}), set: scenes[0]!.set, cast, lines: scenes[0]!.lines }
-      : { schemaVersion: 1, template, title, ...(description ? { description } : {}), hashtags, cast, scenes: scenes.map((s) => ({ set: s.set, ...(s.pov ? { pov: s.pov } : {}), lines: s.lines })) };
+      ? { ...shared, ...(scenes[0]!.pov ? { pov: scenes[0]!.pov } : {}), set: scenes[0]!.set, cast, lines: scenes[0]!.lines }
+      : { ...shared, cast, scenes: scenes.map((s) => ({ set: s.set, ...(s.pov ? { pov: s.pov } : {}), lines: s.lines })) };
   return { premise, warnings };
 };
 
@@ -178,9 +179,11 @@ const setFor = (i: number, group: RawGroup, plan: ScenePlan, template: TemplateI
     if (group.set && group.set !== fixed) warnings.push({ level: "warning", code: "set-fixed", path: where, message: `the brief fixed this set as "${fixed}"; ignored "${group.set}"` });
     return fixed;
   }
-  if (group.set && known.has(group.set) && (!allowed || allowed.has(group.set))) return group.set;
-  const preferred = TEMPLATE_DEFAULT_SET[template];
-  const usable = known.has(preferred) && (!allowed || allowed.has(preferred)) ? preferred : (world.sets.find((id) => !allowed || allowed.has(id)) ?? preferred);
+  const fits = (id: string) => known.has(id) && (world.setAspect?.[id] ?? "9:16") === briefFrame(brief) && (!allowed || allowed.has(id));
+  if (group.set && fits(group.set)) return group.set;
+  const preferred = defaultSet(template, briefFrame(brief));
+  const pool = world.sets.filter((id) => (world.setAspect?.[id] ?? "9:16") === briefFrame(brief));
+  const usable = pool.includes(preferred) && (!allowed || allowed.has(preferred)) ? preferred : (pool.find((id) => !allowed || allowed.has(id)) ?? preferred);
   warnings.push({ level: "warning", code: "set-fallback", path: where, message: group.set ? `set "${group.set}" is not one the brief allows; using "${usable}"` : `no set in the reply; using "${usable}"` });
   return usable;
 };

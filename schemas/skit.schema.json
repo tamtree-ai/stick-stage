@@ -22,14 +22,19 @@
           "minimum": 12,
           "maximum": 60
         },
+        "aspect": {
+          "type": "string",
+          "enum": [
+            "9:16",
+            "16:9"
+          ]
+        },
         "width": {
-          "default": 1080,
           "type": "integer",
           "minimum": 360,
           "maximum": 9007199254740991
         },
         "height": {
-          "default": 1920,
           "type": "integer",
           "minimum": 360,
           "maximum": 9007199254740991
@@ -333,6 +338,13 @@
           },
           "displayName": {
             "type": "string"
+          },
+          "aspect": {
+            "type": "string",
+            "enum": [
+              "9:16",
+              "16:9"
+            ]
           },
           "proportions": {
             "type": "object",

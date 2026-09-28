@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "reed",
+  "displayName": "Reed",
+  "aspect": "16:9",
+  "proportions": {
+    "height": 1.08,
+    "headRadius": 0.135,
+    "neck": 0.02,
+    "torso": 0.3,
+    "upperArm": 0.16,
+    "forearm": 0.15,
+    "thigh": 0.19,
+    "shin": 0.18
+  },
+  "style": {
+    "stroke": "#1b1b1f",
+    "strokeWidth": 12,
+    "headFill": "#fff8f2",
+    "torso": { "style": "bean", "fill": "#2f4a6e", "width": 0.11 },
+    "limbCurve": 0.22,
+    "hands": "nub",
+    "feet": "oval",
+    "footFill": "#1b1b1f"
+  },
+  "face": {
+    "eyes": "dot",
+    "brows": true,
+    "mouthSet": "default",
+    "offsetX": 0.12,
+    "eyeSpacing": 0.4,
+    "eyeY": -0.02,
+    "mouthY": 0.4
+  },
+  "accessories": [{ "slot": "hair", "id": "spikes-01", "color": "#1c1c22" }],
+  "energy": 0.4,
+  "voice": { "say": "Alex" }
+}

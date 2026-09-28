@@ -2,7 +2,8 @@ import type { CompileResult } from "../director/compile";
 import type { Expression } from "../face/schema";
 import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
-import type { SafeArea } from "../text/safeArea";
+import { aspectOfFrame } from "../format/aspect";
+import { WIDE_SAFE_AREA, type SafeArea } from "../text/safeArea";
 import { characterDistance, tooAlike } from "./distinct";
 import { closeupChecks, pacingChecks, programChecks, punchlineChecks, STORY_CHECKS } from "./story";
 import { report, type CheckReport, type Finding } from "./types";
@@ -29,7 +30,7 @@ export const checkSkit = ({ result, lib, sets, safeArea }: CheckInput): CheckRep
       ...punchlineChecks(tl, skit),
       ...closeupChecks(tl, skit, hint),
       ...pacingChecks(tl),
-      ...visualChecks({ tl, lib, set: sets[tl.set]!, safeArea }),
+      ...visualChecks({ tl, lib, set: sets[tl.set]!, safeArea: aspectOfFrame(tl.width, tl.height) === "16:9" ? WIDE_SAFE_AREA : safeArea }),
     ];
     // Report skit-absolute frames.
     findings.push(...scene.map((f) => ({ ...f, frame: f.frame === undefined ? undefined : f.frame + ps.from, scene: multi ? ps.id : undefined })));

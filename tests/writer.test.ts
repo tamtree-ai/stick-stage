@@ -5,6 +5,7 @@ import { fromPremise, parseSkit, ReplyError, WRITER, draftPrompt, premiseFromRep
 const world = writerWorld(catalog, castNotes);
 const brief = (extra: Partial<Brief> = {}): Brief => ({
   topic: "returning a gift",
+  aspect: "9:16",
   tone: "dry",
   cast: [
     { id: "milo", character: "milo" },

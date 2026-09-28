@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { SYMBOLS } from "../face/schema";
+import type { Aspect } from "../format/aspect";
 import { ScreenTextSchema, SignTextSchema } from "../lib/screenText";
 import { CharacterSchema } from "../rig/schema";
-import { SeriesRefSchema } from "../series/schema";
 import { PartLabelSchema } from "../set/schema";
 import { FRAMINGS } from "../shots/framing";
 import { I18nSchema } from "../i18n/pack";
+import { MetaSchema } from "./meta";
 import { STYLE_IDS } from "./style";
 
 /**
@@ -240,21 +241,8 @@ const TimingSchema = z
   })
   .default({ leadInMs: 300, gapMs: 250, tailMs: 700 });
 
-export const MetaSchema = z.strictObject({
-  title: z.string().min(1),
-  fps: z.number().int().min(12).max(60).default(30),
-  width: z.number().int().min(360).default(1080),
-  height: z.number().int().min(360).default(1920),
-  /** Post caption (batch render writes it to `<name>.txt`). Default: the title. */
-  description: z.string().max(2000).optional(),
-  hashtags: z.array(z.string().regex(/^#?[\p{L}\p{N}_]+$/u, "one word, no spaces")).default([]),
-  /** Synthetic (TTS) voices: add the AI-voice disclosure line to the post text. */
-  syntheticVoices: z.boolean().default(true),
-  /** Season and episode for the post manifest. Does not post. */
-  series: SeriesRefSchema.optional(),
-  /** BCP 47. Tokenizing, timing and the font follow it. Default English. */
-  language: z.string().min(2).max(16).optional(),
-});
+/** Title, frame and post text. Defined in `meta.ts` so this file stays under the line cap. */
+export { MetaSchema } from "./meta";
 
 /** The skit document (`skit.json`): one scene (`set` + `beats`) or several (`scenes`). */
 export const SkitSchema = z
@@ -302,7 +290,11 @@ export const SkitSchema = z
     if (d.narrator && d.cast.some((c) => c.id === d.narrator!.id))
       ctx.addIssue({ code: "custom", path: ["narrator", "id"], message: `the narrator's id "${d.narrator.id}" is also a cast id; rename one` });
   });
-export type SkitDoc = z.infer<typeof SkitSchema>;
+type SkitParsed = z.infer<typeof SkitSchema>;
+/** A parsed skit. `meta.aspect`, `width` and `height` are filled in by `parseSkit`. */
+export type SkitDoc = Omit<SkitParsed, "meta"> & {
+  meta: Omit<SkitParsed["meta"], "aspect" | "width" | "height"> & { aspect: Aspect; width: number; height: number };
+};
 export type SkitInput = z.input<typeof SkitSchema>;
 
 /** One resolved scene, as the director compiles it (a single-scene skit is exactly this). */

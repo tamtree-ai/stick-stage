@@ -10,6 +10,12 @@ export const SafeAreaSchema = z.object({
 });
 export type SafeArea = z.infer<typeof SafeAreaSchema>;
 
+/**
+ * Margins for a 16:9 frame. The shorts profile reserves a TikTok rail and a tall
+ * bottom drawer; a widescreen video does not, and still leaves a caption band.
+ */
+export const WIDE_SAFE_AREA: SafeArea = { schemaVersion: 1, top: 0.08, bottom: 0.16, left: 0.05, right: 0.05 };
+
 export type Rect = { x: number; y: number; w: number; h: number };
 
 export const safeRect = (sa: SafeArea, width: number, height: number): Rect => ({

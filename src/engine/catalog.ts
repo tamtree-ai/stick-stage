@@ -1,3 +1,4 @@
+import { ASPECTS, ASPECT_LABEL, FRAME, type Aspect } from "./format/aspect";
 import { GAGS } from "./director/gags";
 import type { ReactionTable, SfxManifest } from "./director/schema";
 import { STYLES } from "./director/style";
@@ -5,8 +6,8 @@ import type { Library } from "./rig/actorState";
 import { setCatalog, type SetCatalogEntry } from "./set/catalog";
 import type { SetDef } from "./set/schema";
 import { TEMPLATES, type TemplateId } from "./templates/premise";
-import { TEMPLATE_CAST, TEMPLATE_CAST_MAX, TEMPLATE_DEFAULT_SET } from "./templates/stage";
-import type { SafeArea } from "./text/safeArea";
+import { TEMPLATE_CAST, TEMPLATE_CAST_MAX, defaultSet } from "./templates/stage";
+import { WIDE_SAFE_AREA, type SafeArea } from "./text/safeArea";
 
 /** Everything a skit is validated and rendered against. Two registries with equal content have equal versions. */
 export type CatalogSource = {
@@ -21,12 +22,24 @@ export type CatalogSource = {
   gags?: typeof GAGS;
 };
 
-export type CatalogCharacter = { id: string; name: string };
-export type CatalogTemplate = { id: TemplateId; cast: 1 | 2 | 3; castMax: 1 | 2 | 3; defaultSet: string; description: string };
+export type CatalogCharacter = { id: string; name: string; aspect: Aspect };
+export type CatalogAspect = { id: Aspect; width: number; height: number; label: string };
+export type CatalogTemplate = {
+  id: TemplateId;
+  cast: 1 | 2 | 3;
+  castMax: 1 | 2 | 3;
+  /** Default set for a 9:16 short. */
+  defaultSet: string;
+  /** Default set for each frame. */
+  defaultSets: Record<Aspect, string>;
+  description: string;
+};
 
 /** What a brief can pick from: the picker's view of a registry, pinned by `version`. */
 export type Catalog = {
   version: string;
+  /** The two frames a user can pick. */
+  aspects: CatalogAspect[];
   characters: CatalogCharacter[];
   sets: SetCatalogEntry[];
   templates: CatalogTemplate[];
@@ -77,13 +90,21 @@ const fnv64 = (s: string): string => {
  * it; a mismatch means the skit would be checked or drawn against different characters or sets.
  */
 export const catalogVersion = (src: CatalogSource): string =>
-  `c1-${fnv64(stable({ lib: src.lib, sets: src.sets, sfx: src.sfx, reactions: src.reactions, safeArea: src.safeArea, styles: src.styles ?? STYLES, gags: src.gags ?? GAGS }))}`;
+  `c1-${fnv64(stable({ lib: src.lib, sets: src.sets, sfx: src.sfx, reactions: src.reactions, safeArea: src.safeArea, wideSafeArea: WIDE_SAFE_AREA, styles: src.styles ?? STYLES, gags: src.gags ?? GAGS }))}`;
 
 export const buildCatalog = (src: CatalogSource): Catalog => ({
   version: catalogVersion(src),
-  characters: Object.values(src.lib.characters).map((c) => ({ id: c.id, name: c.displayName ?? c.id })),
+  aspects: ASPECTS.map((id) => ({ id, width: FRAME[id].width, height: FRAME[id].height, label: ASPECT_LABEL[id] })),
+  characters: Object.values(src.lib.characters).map((c) => ({ id: c.id, name: c.displayName ?? c.id, aspect: c.aspect ?? "9:16" })),
   sets: setCatalog(src.sets),
-  templates: TEMPLATES.map((id) => ({ id, cast: TEMPLATE_CAST[id], castMax: TEMPLATE_CAST_MAX[id], defaultSet: TEMPLATE_DEFAULT_SET[id], description: TEMPLATE_DESCRIPTION[id] })),
+  templates: TEMPLATES.map((id) => ({
+    id,
+    cast: TEMPLATE_CAST[id],
+    castMax: TEMPLATE_CAST_MAX[id],
+    defaultSet: defaultSet(id, "9:16"),
+    defaultSets: { "9:16": defaultSet(id, "9:16"), "16:9": defaultSet(id, "16:9") },
+    description: TEMPLATE_DESCRIPTION[id],
+  })),
   expressions: Object.keys(src.lib.expressions),
   props: Object.keys(src.lib.props),
   gags: (src.gags ?? GAGS).map((g) => g.id),

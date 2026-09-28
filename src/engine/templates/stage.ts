@@ -1,5 +1,6 @@
 import { SkitError, unknownId, type Diagnostic } from "../director/diagnostics";
 import type { SkitInput } from "../director/schema";
+import type { Aspect } from "../format/aspect";
 import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
 import { seatHeightAt } from "../set/seating";
@@ -12,7 +13,7 @@ type Beat = NonNullable<SkitInput["beats"]>[number];
 type Action = NonNullable<Beat["actions"]>[number];
 type Role = NonNullable<PremiseLine["role"]>;
 
-/** Per-template staging defaults. The director adds listener reactions, shots and the reaction beat. */
+/** Per-template staging defaults for a 9:16 short. The director adds listener reactions, shots and the reaction beat. */
 export const TEMPLATE_DEFAULT_SET: Record<TemplateId, string> = {
   exchange: "living-1",
   interview: "street-1",
@@ -24,6 +25,22 @@ export const TEMPLATE_DEFAULT_SET: Record<TemplateId, string> = {
   fable: "park-1",
   trio: "living-1",
 };
+/** The same templates, on rooms laid out for 16:9. */
+export const WIDE_TEMPLATE_SET: Record<TemplateId, string> = {
+  exchange: "wide-living",
+  interview: "wide-street",
+  "me-vs-me": "wide-living",
+  "pov-monologue": "wide-plain",
+  "text-slam": "wide-plain",
+  explainer: "wide-living",
+  family: "wide-classroom",
+  fable: "wide-park",
+  trio: "wide-living",
+};
+
+/** The room a template opens on for this frame. */
+export const defaultSet = (template: TemplateId, aspect: Aspect = "9:16"): string =>
+  (aspect === "16:9" ? WIDE_TEMPLATE_SET : TEMPLATE_DEFAULT_SET)[template];
 /** Fewest cast members each template stages. `family` may add a second kid. */
 export const TEMPLATE_CAST: Record<TemplateId, 1 | 2 | 3> = {
   exchange: 2, interview: 2, "me-vs-me": 2, "pov-monologue": 1, "text-slam": 1, explainer: 2, family: 2, fable: 2, trio: 3,
@@ -64,9 +81,15 @@ const check = (p: Premise, lib: Library, sets: Readonly<Record<string, SetDef>>)
   const flat = groups.flatMap((g) => g.lines);
   p.cast.forEach((c, i) => {
     if (!lib.characters[c.character]) d.push(unknownId("character", c.character, Object.keys(lib.characters), ["cast", i, "character"]));
+    else if (lib.characters[c.character]!.aspect && lib.characters[c.character]!.aspect !== p.aspect)
+      d.push({ level: "error", code: "aspect-character", path: `cast[${i}].character`, message: `"${c.character}" is a ${lib.characters[c.character]!.aspect} character; this premise is ${p.aspect}`, expected: `a ${p.aspect} character` });
     if (c.holding && !lib.props[c.holding]) d.push(unknownId("prop", c.holding, Object.keys(lib.props), ["cast", i, "holding"]));
   });
-  if (p.set && !sets[p.set]) d.push(unknownId("set", p.set, Object.keys(sets), ["set"]));
+  groups.forEach((g, i) => {
+    const id = g.set;
+    if (id && sets[id] && sets[id]!.aspect !== p.aspect)
+      d.push({ level: "error", code: "aspect-set", path: p.scenes ? `scenes[${i}].set` : "set", message: `"${id}" is a ${sets[id]!.aspect} background; this premise is ${p.aspect}`, expected: `a ${p.aspect} set` });
+  });
   const need = TEMPLATE_CAST[p.template];
   const most = TEMPLATE_CAST_MAX[p.template];
   if (p.cast.length < need || p.cast.length > most)
@@ -82,7 +105,7 @@ const check = (p: Premise, lib: Library, sets: Readonly<Record<string, SetDef>>)
   if (p.template === "me-vs-me" && p.cast.some((c) => !c.label))
     d.push({ level: "error", code: "template-labels", path: "cast", message: `me-vs-me: give both a "label" so viewers can tell them apart`, example: `{ "id": "me", "character": "milo", "label": "me" }, { "id": "brain", "character": "milo", "label": "my brain" }` });
   groups.forEach((g, s) => {
-    const set = g.set ?? TEMPLATE_DEFAULT_SET[p.template];
+    const set = g.set ?? defaultSet(p.template, p.aspect);
     const where = p.scenes ? `scenes[${s}].set` : "set";
     if (!sets[set]) d.push(unknownId("set", set, Object.keys(sets), where.split(".")));
   });
@@ -169,7 +192,7 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
   const flat = groups.flatMap((g) => g.lines);
   const n = { gesture: 0 };
   const staged = p.template === "text-slam" ? slamBeats(p, flat) : dress(p, flat.map((line, i) => spokenBeat(p, line, roleOf(flat, i), `l${i + 1}`, n)));
-  const setOf = (g: Group) => g.set ?? TEMPLATE_DEFAULT_SET[p.template];
+  const setOf = (g: Group) => g.set ?? defaultSet(p.template, p.aspect);
   const narrated = flat.some((l) => l.who === "narrator");
   const sit = (set: string, mark: string) => p.template !== "fable" && seatHeightAt(sets[set]!, mark) !== undefined;
   const cast = p.cast.map((c, i) => ({
@@ -180,7 +203,7 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
     ...(c.holding ? { holding: { prop: c.holding, hand: "R" as const } } : p.template === "interview" && i === 0 ? { holding: { prop: "mic", hand: "R" as const } } : {}),
     ...(p.template === "interview" && i === 0 ? { pose: "hold-chest" } : {}),
   }));
-  const meta = { title: p.title, ...(p.description ? { description: p.description } : {}), hashtags: p.hashtags };
+  const meta = { title: p.title, aspect: p.aspect, ...(p.description ? { description: p.description } : {}), hashtags: p.hashtags };
   // One scene stays `beats`, so a premise written the old way stages the way it always has.
   if (!p.scenes) {
     const set = setOf(groups[0]!);

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "wide-park",
+  "aspect": "16:9",
+  "kit": "park",
+  "palette": "meadow",
+  "description": "A wide park. Trees at both edges, a bench in the middle. Both cast members sit.",
+  "tags": ["widescreen", "outdoors", "park", "sunny", "friends", "advice"],
+  "groundY": 900,
+  "figureHeightPx": 620,
+  "layers": [
+    { "part": "sky", "variant": "sun" },
+    { "part": "hills" },
+    { "part": "grass", "variant": "path" },
+    { "part": "tree", "x": 0.08, "y": 0.78, "size": 1.15 },
+    { "part": "tree", "x": 0.93, "y": 0.8, "size": 0.85, "seed": 3 },
+    { "part": "bush", "x": 0.18, "y": 0.78, "size": 0.7 },
+    { "part": "lamp", "x": 0.84 },
+    { "part": "bench", "x": 0.5, "size": 1.2, "seatFor": ["left", "right"] }
+  ],
+  "marks": { "left": 0.4, "center": 0.5, "right": 0.6 }
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "wide-lounge",
+  "aspect": "16:9",
+  "kit": "interior",
+  "palette": "peach",
+  "description": "A wide lounge. The couch sits in the middle of the frame; both ends are seated.",
+  "tags": ["widescreen", "home", "couch", "couple", "friends", "talk"],
+  "groundY": 900,
+  "figureHeightPx": 620,
+  "layers": [
+    { "part": "wall", "pattern": "dots" },
+    { "part": "floor" },
+    { "part": "window", "x": 0.1, "y": 0.12, "size": 0.85 },
+    { "part": "clock", "x": 0.9, "y": 0.14 },
+    { "part": "plant", "x": 0.95 },
+    { "part": "couch", "x": 0.5, "size": 1.15, "seatFor": ["left", "right"] }
+  ],
+  "marks": { "left": 0.4, "center": 0.5, "right": 0.6 }
+}

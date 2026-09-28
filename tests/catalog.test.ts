@@ -8,7 +8,8 @@ const src = { lib: library, sets, sfx: sfxLibrary, reactions, safeArea };
 
 describe("catalog", () => {
   it("lists what a brief can pick from", () => {
-    expect(catalog.characters).toEqual(expect.arrayContaining([{ id: "milo", name: "Milo" }]));
+    expect(catalog.characters).toEqual(expect.arrayContaining([{ id: "milo", name: "Milo", aspect: "9:16" }]));
+    expect(catalog.aspects.map((a) => a.id)).toEqual(["9:16", "16:9"]);
     expect(catalog.templates.map((t) => t.id)).toEqual([...TEMPLATES]);
     expect(catalog.sets.every((s) => s.description && s.tags.length)).toBe(true);
     expect(catalog.expressions).toContain("deadpan");

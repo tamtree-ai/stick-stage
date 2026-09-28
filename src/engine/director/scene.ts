@@ -2,7 +2,7 @@
 import type { MusicManifest } from "../audio/music";
 import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
-import type { SafeArea } from "../text/safeArea";
+import { WIDE_SAFE_AREA, type SafeArea } from "../text/safeArea";
 import { buildCaptionPages } from "../text/captions";
 import { cardLayout } from "../text/layout";
 import type { PreparedLine, PreparedVoice } from "../voice/schema";
@@ -54,12 +54,30 @@ const checkIds = (skit: Skit, input: CompileInput, diags: Diagnostic[]) => {
     if (got !== undefined && !known.includes(got)) diags.push(unknownId(kind, got, known, path));
   };
   need("set", skit.set, ids(sets), ["set"]);
+  const setDef = sets[skit.set];
+  if (setDef && setDef.aspect !== skit.meta.aspect)
+    diags.push({
+      level: "error",
+      code: "aspect-set",
+      path: "set",
+      message: `"${setDef.id}" is a ${setDef.aspect} background; this skit is ${skit.meta.aspect}`,
+      expected: `a ${skit.meta.aspect} set`,
+    });
   const dup = (xs: string[], path: string, what: string) =>
     xs.forEach((x, i) => xs.indexOf(x) !== i && diags.push({ level: "error", code: "duplicate-id", path: `${path}[${i}].id`, message: `duplicate ${what} id "${x}"` }));
   dup(castIds, "cast", "cast");
   dup(skit.beats.map((b) => b.id), "beats", "beat");
   skit.cast.forEach((c, i) => {
     need("character", c.character, ids(lib.characters), ["cast", i, "character"]);
+    const drawn = lib.characters[c.character];
+    if (drawn?.aspect && drawn.aspect !== skit.meta.aspect)
+      diags.push({
+        level: "error",
+        code: "aspect-character",
+        path: `cast[${i}].character`,
+        message: `"${drawn.id}" is a ${drawn.aspect} character; this skit is ${skit.meta.aspect}`,
+        expected: `a ${skit.meta.aspect} character`,
+      });
     need("pose", c.pose, ids(lib.poses), ["cast", i, "pose"]);
     need("expression", c.expression, ids(lib.expressions), ["cast", i, "expression"]);
     need("prop", c.holding?.prop, ids(lib.props), ["cast", i, "holding", "prop"]);
@@ -145,6 +163,7 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
   if (fail()) throw new SkitError(diags);
 
   const { fps, width, height } = skit.meta;
+  const safeArea = skit.meta.aspect === "16:9" ? WIDE_SAFE_AREA : (input.safeArea ?? DEFAULT_SAFE_AREA);
   const set = input.sets[skit.set]!;
   const partNames = new Set([...set.layers, ...set.foreground].map((p) => p.part));
   skit.labels?.forEach((label, i) => {
@@ -178,7 +197,7 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
   };
   const plan = planShots(layout, moments, hint, fps, diags, settleAt, style);
   if (fail()) throw new SkitError(diags);
-  const { shots, punchIns, shakes } = solveShots(plan, cast, input.lib, set, fps, width, height, input.safeArea, msToFrame(layout.totalMs, fps));
+  const { shots, punchIns, shakes } = solveShots(plan, cast, input.lib, set, fps, width, height, safeArea, msToFrame(layout.totalMs, fps));
 
   const audio: AudioClip[] = [];
   const sfx: SfxEvent[] = [];
@@ -221,7 +240,7 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
   if (order(0) !== order(durationInFrames))
     diags.push({ level: "warning", code: "screen-direction", path: "beats", message: "a slideTo swaps the characters' sides; screen direction breaks across cuts" });
 
-  const card = cardEvent(skit, layout.beats, input.safeArea, durationInFrames, diags);
+  const card = cardEvent(skit, layout.beats, safeArea, durationInFrames, diags);
   if (fail()) throw new SkitError(diags);
   const nextCut = (f: number) => shots.find((c) => c.frame > f)?.frame ?? durationInFrames;
   const spoken = layout.beats.filter((b) => b.kind === "line" && b.line);

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "wide-plain",
+  "aspect": "16:9",
+  "kit": "plain",
+  "palette": "mint",
+  "description": "A wide empty stage with a soft spotlight. For a 16:9 video with no real place.",
+  "tags": ["widescreen", "abstract", "meme", "any", "thoughts", "pov"],
+  "groundY": 900,
+  "figureHeightPx": 620,
+  "layers": [{ "part": "plain-wall", "pattern": "halftone" }, { "part": "floor" }],
+  "marks": { "left": 0.28, "center": 0.5, "right": 0.72 }
+}

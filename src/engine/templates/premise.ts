@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ASPECTS } from "../format/aspect";
 
 /**
  * A premise: what a human writes (plan M6). The jokes, who says them and which line is the
@@ -53,6 +54,8 @@ export const PremiseSchema = z
     $schema: z.string().optional(),
     schemaVersion: z.literal(1),
     template: z.enum(TEMPLATES),
+    /** `9:16` short or `16:9` widescreen. Default short. Cast and sets must match. */
+    aspect: z.enum(ASPECTS).default("9:16"),
     title: z.string().min(1),
     /** The premise in a sentence, for the record (not shown). */
     logline: z.string().optional(),

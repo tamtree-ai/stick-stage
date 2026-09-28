@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "wide-classroom",
+  "aspect": "16:9",
+  "kit": "office",
+  "palette": "mint",
+  "description": "A wide classroom. The board is high on the wall so standing heads stay under it. Door and cabinet at the edges.",
+  "tags": ["widescreen", "school", "class", "teacher", "student", "homework"],
+  "groundY": 900,
+  "figureHeightPx": 620,
+  "layers": [
+    { "part": "wall", "pattern": "none" },
+    { "part": "floor" },
+    { "part": "board", "x": 0.46, "y": 0.04, "size": 0.72 },
+    { "part": "clock", "x": 0.78, "y": 0.1 },
+    { "part": "cabinet", "x": 0.06 },
+    { "part": "door", "x": 0.94, "size": 0.9 }
+  ],
+  "marks": { "left": 0.28, "center": 0.5, "right": 0.72 }
+}

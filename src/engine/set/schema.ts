@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ASPECTS } from "../format/aspect";
 import { ScreenTextSchema } from "../lib/screenText";
 
 export const PATTERNS = ["none", "halftone", "stripes", "dots"] as const;
@@ -42,6 +43,8 @@ export type SetPart = z.infer<typeof SetPartSchema>;
 export const SetSchema = z.object({
   schemaVersion: z.literal(1),
   id: z.string(),
+  /** `9:16` rooms are shorts. `16:9` rooms are laid out for a wide frame. Default short. */
+  aspect: z.enum(ASPECTS).default("9:16"),
   kit: z.enum(["plain", "interior", "office", "park", "street", "beach"]),
   /** Catalog text for whoever picks the set (an LLM or a person): what the place is and what it suits. */
   description: z.string().optional(),
