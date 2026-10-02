@@ -11,6 +11,8 @@ Stick-figure comedy-skit engine on Remotion, for our own channel. Plan: `../plan
 6. **Original characters only.** Match the genre, not someone's cast.
 
 ## Commands
+- `pnpm bootstrap` / `pnpm diagnose` / `pnpm demo`: first run (Rhubarb + Chrome into place; what's missing; render `fine` without TTS). Not `pnpm setup`/`pnpm doctor`: those are pnpm built-ins
+- `pnpm try "<topic>"`: premise (yours, or `LOCAL_LLM_*`'s) → Kokoro voices → `out/<id>.mp4`
 - `pnpm dev`: Remotion Studio
 - `pnpm test` / `pnpm typecheck` / `pnpm lint`: run all three before every commit
 - `pnpm still <Comp> out/x.png --frame=N`: single still (layout checks only)
@@ -21,6 +23,7 @@ Stick-figure comedy-skit engine on Remotion, for our own channel. Plan: `../plan
 - `pnpm sfx`: regenerate the synthesized SFX library (`public/sfx/`, `src/data/sfx.json`); `pnpm render SfxLab out/SfxLab.mp4` plays them all
 - `pnpm still SetLab out/SetLab.png [--props='{"kits":["park"],"tileWidth":200}']`: every set part × 3 palettes × 3 seeds
 - `pnpm voice:say <skitId>`: dev stand-in for the tamtree harness TTS; macOS `say` → `public/skits/<id>/voice/` + `voice.json`
+- `pnpm voice:tts <skitId>`: the same with Kokoro in-process (or `LOCAL_TTS_BASE_URL`); voice map in `scripts/lib/kokoro-voices.ts`
 - `pnpm prep <skitId> [--require-rhubarb]`: voice.json → Rhubarb mouths + script-aligned word timings → `generated/voice.prepared.json` (hash-cached, no network). Rhubarb: `RHUBARB_PATH`, `tools/Rhubarb-Lip-Sync-*/rhubarb` (gitignored), or PATH
 
 ## Skills
@@ -28,7 +31,7 @@ Stick-figure comedy-skit engine on Remotion, for our own channel. Plan: `../plan
 - `skit-director` (`skills/skit-director/SKILL.md`): stages a human-written premise; never writes or changes a line.
 
 ## Voice
-TTS is **not** called from this repo. The tamtree agent harness generates audio (+ optional word timings) and writes `voice.json`; see `docs/voice-contract.md`. Never add TTS provider keys here.
+The **engine and the render service never call a TTS or an LLM.** In production the tamtree agent harness generates audio (+ optional word timings) and writes `voice.json`; see `docs/voice-contract.md`. Dev scripts in `scripts/` may (standalone mode, D1): `voice:tts` (Kokoro), `voice:say`, `write --model` / `try` (the user's own `LOCAL_LLM_*`). Never put provider keys in the repo.
 
 ## Layout
 - `src/engine/lib`: math (angle convention in `math.ts`), easing, seeds, colors

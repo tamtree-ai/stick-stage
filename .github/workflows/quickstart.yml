@@ -1,0 +1,113 @@
+# The README's quickstart, from a fresh clone, on amd64 and arm64 (standalone plan §7).
+# A red run blocks the release: the image job only publishes when the quickstart passed.
+name: quickstart
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    paths: [README.md, package.json, pnpm-lock.yaml, Dockerfile, "scripts/**", "src/node/**", ".github/**"]
+  schedule:
+    - cron: "0 6 * * 1" # Mondays: catches a moved download or a broken upstream release
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  demo:
+    name: pnpm demo (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 11.17.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      # Headless Chrome's shared libraries. A desktop Linux has them; a minimal runner image may not.
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libpango-1.0-0 libcairo2
+      - name: README quickstart, verbatim
+        run: bash .github/scripts/quickstart.sh README.md
+      - run: npx tsx .github/scripts/check-mp4.ts fine
+      - if: failure()
+        run: pnpm diagnose
+
+  try:
+    name: pnpm try (Kokoro, no model)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 11.17.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libnss3 libgbm1 libxkbcommon0 libxcomposite1 libxdamage1 libxrandr2 libpango-1.0-0 libcairo2
+      - run: pnpm install && pnpm bootstrap
+      - run: pnpm try --id=ci-try --premise=tests/fixtures/try-premise.json
+      - run: npx tsx .github/scripts/check-mp4.ts ci-try
+
+  image:
+    name: render image (${{ matrix.arch }})
+    needs: demo
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: amd64, runner: ubuntu-latest }
+          - { arch: arm64, runner: ubuntu-24.04-arm }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 11.17.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: docker build -t stickstage-render:ci .
+      - name: Render through the image (serve:smoke)
+        run: |
+          docker run -d --name ss -p 127.0.0.1:8787:8787 -e STICKSTAGE_API_TOKEN=ci stickstage-render:ci
+          for i in $(seq 90); do curl -fsS 127.0.0.1:8787/healthz | grep -q '"ready"' && break; sleep 2; done
+          curl -fsS 127.0.0.1:8787/healthz
+          pnpm install --frozen-lockfile
+          STICKSTAGE_API_TOKEN=ci npx tsx scripts/serve-smoke.ts http://127.0.0.1:8787
+      - run: docker images stickstage-render:ci --format 'pulled size {{.Size}}'
+      - name: Push (release tags only), tagged by catalog version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          version=$(npx tsx -e "import('./src/data/index.ts').then((m) => console.log(m.catalog.version))")
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          image=ghcr.io/${{ github.repository_owner }}/stickstage-render
+          docker tag stickstage-render:ci "$image:$version-${{ matrix.arch }}"
+          docker push "$image:$version-${{ matrix.arch }}"
+
+  manifest:
+    name: multi-arch manifest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [image, try]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 11.17.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: pnpm install --frozen-lockfile
+      - run: |
+          version=$(npx tsx -e "import('./src/data/index.ts').then((m) => console.log(m.catalog.version))")
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          image=ghcr.io/${{ github.repository_owner }}/stickstage-render
+          docker buildx imagetools create -t "$image:$version" "$image:$version-amd64" "$image:$version-arm64"

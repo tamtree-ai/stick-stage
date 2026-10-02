@@ -80,7 +80,7 @@ export const findRhubarb = (ws: Workspace, env: NodeJS.ProcessEnv = process.env)
   if (env.RHUBARB_PATH) return env.RHUBARB_PATH;
   if (fs.existsSync(ws.toolsDir))
     for (const d of fs.readdirSync(ws.toolsDir).sort().reverse()) {
-      const bin = path.join(ws.toolsDir, d, "rhubarb");
+      const bin = path.join(ws.toolsDir, d, process.platform === "win32" ? "rhubarb.exe" : "rhubarb");
       if (d.startsWith("Rhubarb-Lip-Sync") && fs.existsSync(bin)) return bin;
     }
   return which("rhubarb");

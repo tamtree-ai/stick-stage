@@ -13,6 +13,7 @@ import { SetSchema } from "./set/schema";
 import { PremiseSchema } from "./templates/premise";
 import { SafeAreaSchema } from "./text/safeArea";
 import { PreparedVoiceSchema, VoiceManifestSchema } from "./voice/schema";
+import { WriterReplySchema } from "./writer/reply";
 import type { DocKind } from "./migrate";
 
 export * from "./director/schema";
@@ -27,6 +28,7 @@ export { PremiseSchema, PremiseLineSchema, PremiseCastSchema, PremiseSceneSchema
 export { SafeAreaSchema } from "./text/safeArea";
 export * from "./voice/schema";
 export * from "./migrate";
+export { DraftReplySchema, ReviseReplySchema, WriterReplySchema, type DraftReply, type ReviseReply, type WriterReply } from "./writer/reply";
 
 /** The schema for each persisted document kind. */
 export const DOC_SCHEMAS: Record<DocKind, z.ZodType> = {
@@ -49,3 +51,6 @@ export const DOC_SCHEMAS: Record<DocKind, z.ZodType> = {
 /** JSON Schema (draft 2020-12) of a document kind, for editors and other languages. */
 export const jsonSchemaFor = (kind: DocKind): Record<string, unknown> =>
   z.toJSONSchema(DOC_SCHEMAS[kind], { io: "input", unrepresentable: "any" }) as Record<string, unknown>;
+
+/** JSON Schema of a model's reply to the writer prompts (draft or revise). Not a stored document. */
+export const writerReplyJsonSchema = (): Record<string, unknown> => z.toJSONSchema(WriterReplySchema, { io: "input" }) as Record<string, unknown>;

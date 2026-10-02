@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "template": "exchange",
+  "title": "The plant",
+  "pov": "POV: you said you'd water it",
+  "hashtags": ["stickfigure"],
+  "cast": [ { "id": "milo", "character": "milo" }, { "id": "june", "character": "june" } ],
+  "lines": [
+    { "who": "june", "text": "Did you water the plant?", "role": "setup" },
+    { "who": "milo", "text": "Define water.", "role": "setup" },
+    { "who": "june", "text": "It's brown, Milo.", "role": "escalation" },
+    { "who": "milo", "text": "It's autumn. It's thematic.", "role": "escalation" },
+    { "who": "june", "text": "It's plastic.", "role": "punchline", "slam": "PLASTIC" }
+  ]
+}

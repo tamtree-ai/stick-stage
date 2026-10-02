@@ -5,12 +5,17 @@
   "type": "module",
   "description": "Stick-figure comedy skit engine on Remotion",
   "scripts": {
+    "bootstrap": "tsx scripts/bootstrap.ts",
+    "diagnose": "tsx scripts/diagnose.ts",
+    "demo": "tsx scripts/demo.ts",
+    "try": "tsx scripts/try.ts",
     "dev": "remotion studio src/app/index.ts",
     "still": "remotion still src/app/index.ts",
     "render": "tsx scripts/render.ts",
     "render:comp": "remotion render src/app/index.ts",
     "sheet": "tsx scripts/sheet.ts",
     "voice:say": "tsx scripts/voice-say.ts",
+    "voice:tts": "tsx scripts/voice-tts.ts",
     "prep": "tsx scripts/prep.ts",
     "compile": "tsx scripts/compile.ts",
     "check": "tsx scripts/check.ts",
@@ -56,15 +61,22 @@
     "zod": "4.5.4"
   },
   "devDependencies": {
+    "@ai-sdk/anthropic": "^4.0.69",
+    "@ai-sdk/openai-compatible": "^3.0.60",
     "@remotion/eslint-config-flat": "4.0.529",
     "@types/node": "22.20.4",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "ai": "^7.0.123",
     "esbuild": "0.28.1",
     "eslint": "9.39.5",
     "prettier": "3.9.9",
     "tsx": "4.23.15",
     "typescript": "5.7.3",
     "vitest": "5.0.2"
+  },
+  "optionalDependencies": {
+    "@huggingface/transformers": "3.8.1",
+    "kokoro-js": "^1.2.1"
   }
 }
