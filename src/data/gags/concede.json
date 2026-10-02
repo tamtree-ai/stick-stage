@@ -1,0 +1,12 @@
+{
+  "id": "concede",
+  "steps": [
+    { "do": "pose", "pose": "idle", "atMs": 0 },
+    { "do": "look", "to": "speaker", "atMs": 0 },
+    { "do": "expression", "expression": "confused", "atMs": 0 },
+    { "do": "holdMs", "ms": 700 },
+    { "do": "expression", "expression": "neutral", "atMs": 450 },
+    { "do": "nod", "atMs": 500 },
+    { "do": "sfx", "id": "ding-idea", "atMs": 450 }
+  ]
+}

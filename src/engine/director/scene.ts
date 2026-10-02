@@ -17,6 +17,8 @@ import { isNarration, type Beat, type ReactionTable, type SfxManifest, type Skit
 import { planShots } from "./shots";
 import { CLASSIC, type DirectingStyle } from "./style";
 import { buildTracks } from "./tracks";
+import { sceneFigures, withDriverGestures } from "./sceneFigures";
+import type { FigureLib } from "../viz/compile";
 import type { AudioClip, CardEvent, ListEvent, SfxEvent, SlamEvent, Timeline } from "./timeline";
 
 export type CompileInput = {
@@ -40,6 +42,8 @@ export type CompileInput = {
   lang?: string;
   /** Series documents, so a skit can inherit `style` and `coldOpen`. */
   series?: Readonly<Record<string, { style?: string; coldOpen?: string }>>;
+  /** Typeset equations and the image manifest, for figures. */
+  figures?: FigureLib;
 };
 
 
@@ -155,7 +159,7 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
   const beats = skitIn.beats.map((b) => {
     const exp = expandBeatGags(b, gags, (who) => skitIn.beats.find((x) => x.speaker && x.speaker !== who)?.speaker ?? skitIn.cast.find((c) => c.id !== who)?.id);
     for (const name of exp.unknown) diags.push({ level: "error", code: "unknown-gag", path: "actions", message: `unknown gag "${name}"`, expected: gags.map((g) => g.id).join(", ") });
-    return exp.beat;
+    return withDriverGestures(exp.beat);
   });
   const skit: Skit = { ...skitIn, beats };
   checkIds(skit, input, diags);
@@ -188,7 +192,9 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
   const layout = layoutBeats(skit, lines, reactionFor, diags, style);
   if (fail()) throw new SkitError(diags);
 
-  const { cast, moments } = buildTracks(skit, layout, set, input.lib, input.reactions, fps, diags, style);
+  const figs = sceneFigures(skit, layout, input.figures ?? {}, diags);
+  if (fail()) throw new SkitError(diags);
+  const { cast, moments } = buildTracks(skit, layout, set, input.lib, input.reactions, fps, diags, style, figs.figureAt);
   const hint = (e: string) => input.lib.expressions[e]?.closeup;
   const settleAt = (who: string, f: number) => {
     let at = f;
@@ -197,7 +203,7 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
   };
   const plan = planShots(layout, moments, hint, fps, diags, settleAt, style);
   if (fail()) throw new SkitError(diags);
-  const { shots, punchIns, shakes } = solveShots(plan, cast, input.lib, set, fps, width, height, safeArea, msToFrame(layout.totalMs, fps));
+  const { shots, punchIns, shakes } = solveShots(plan, cast, input.lib, set, fps, width, height, safeArea, msToFrame(layout.totalMs, fps), figs.keepInFrame);
 
   const audio: AudioClip[] = [];
   const sfx: SfxEvent[] = [];
@@ -283,6 +289,8 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
       ? buildCaptionPages(spoken.map((b) => ({ startMs: (msToFrame(b.zeroMs, fps) / fps) * 1000, words: b.line!.words, narrator: b.narrator || b.thought })))
       : [],
     ...(skit.narrator ? { narratorCaption: skit.narrator.captionStyle } : {}),
+    ...(figs.tracks.length ? { figures: figs.tracks } : {}),
+    ...(figs.credits.length ? { credits: figs.credits.map((c) => ({ ...c, to: Math.min(c.to, durationInFrames) })) } : {}),
     directing: { id: style.id, closeupBudgetMs: style.closeupBudgetMs, minPunchGapMs: style.minPunchGapMs, minCloseupMs: style.minCloseupMs, oneThingFrames: style.oneThingFrames, length: style.length },
     ...(skit.meta.language ? { language: skit.meta.language, direction: fontFor(skit.meta.language).direction } : {}),
   };

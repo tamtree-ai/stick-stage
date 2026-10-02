@@ -49,6 +49,7 @@ const TYPES: Record<string, string> = {
   cover: "image/png",
   thumbnail: "image/png",
   voice: "application/json",
+  sources: "text/plain; charset=utf-8",
 };
 
 export const renderPipeline =
@@ -126,7 +127,9 @@ export const renderPipeline =
     }
 
     update({ stage: "post" });
-    const post = writePostFiles(base, { skit: job.id, doc, program: result.program, report: check, lib: o.project.lib });
+    const raw = JSON.parse(fs.readFileSync(path.join(dir, "skit.json"), "utf8"));
+    const post = writePostFiles(base, { skit: job.id, doc, program: result.program, report: check, lib: o.project.lib, images: o.project.images, raw });
+    if (post.sources) files.sources = post.sources;
     files.srt = post.srt;
     files.txt = post.txt;
     files.manifest = post.json;

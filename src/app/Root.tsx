@@ -23,6 +23,7 @@ import { SkitComposition } from "./skit/SkitComposition";
 import { calculateSkitMetadata, skitCompositionSchema } from "./skit/skitData";
 import { SFX_LAB_FRAMES, SfxLab } from "./labs/SfxLab";
 import { SafeAreaLab, safeAreaLabSchema } from "./labs/SafeAreaLab";
+import { calculateVizLabMetadata, VIZ_LAB_FRAMES, VizLab, vizLabSchema } from "./labs/VizLab";
 
 const FPS = 30;
 const W = 1080;
@@ -238,6 +239,17 @@ export const RemotionRoot: React.FC = () => (
       schema={contactSheetSchema}
       defaultProps={{ title: "", tiles: [], cols: 6, tileWidth: 270, tileHeight: 480 }}
       calculateMetadata={calculateContactSheetMetadata}
+      width={W}
+      height={H}
+    />
+    <Composition
+      id="VizLab"
+      component={VizLab}
+      schema={vizLabSchema}
+      defaultProps={{ showLabels: true, cast: ["milo", "june"] }}
+      calculateMetadata={calculateVizLabMetadata}
+      durationInFrames={VIZ_LAB_FRAMES}
+      fps={FPS}
       width={W}
       height={H}
     />

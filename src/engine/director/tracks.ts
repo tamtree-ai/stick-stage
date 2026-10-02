@@ -10,6 +10,7 @@ import { stageSpeech } from "./speech";
 import type { Action, ReactionTable, Skit } from "./schema";
 import { CLASSIC, type DirectingStyle } from "./style";
 import type { CastTrack, Facing } from "./timeline";
+import { checkOverlaps, sortTracks } from "./trackOrder";
 
 /** Poses start this many frames before their anchor, so the 4-frame move lands on it. */
 export const POSE_LEAD = 2;
@@ -35,6 +36,8 @@ type Ctx = {
   diags: Diagnostic[];
   byId: Map<string, CastTrack>;
   mark: Map<string, string>;
+  /** `"figure:orbit.perihelion"` → frame fractions (scene figures). */
+  figureAt?: (ref: string) => { x: number; y: number } | undefined;
 };
 
 const moveCtx = (ctx: Ctx): MoveCtx => ({ set: ctx.set, lib: ctx.lib, width: ctx.skit.meta.width, fps: ctx.fps, cast: ctx.byId.values() });
@@ -110,6 +113,15 @@ const applyAction = (ctx: Ctx, b: LaidBeat, a: Action, path: string, moments: Mo
       moments.push({ who: a.who, expression: a.expression, frame: f });
       return;
     case "look": {
+      if (typeof a.to === "string" && a.to.startsWith("figure:")) {
+        const pt = ctx.figureAt?.(a.to);
+        if (!pt) {
+          ctx.diags.push({ level: "error", code: "figure-anchor", path: `${path}.to`, message: `no figure point "${a.to}"`, expected: `"figure:<id>" or "figure:<id>.<anchor>" for a figure in this scene` });
+          return;
+        }
+        c.gazeKeys.push({ frame: f, ...gazeToward({ x: xAt(c, f), facing: facingAt(c, f) }, pt, 0.42) });
+        return;
+      }
       if (typeof a.to === "string" && a.to !== "camera" && !ctx.byId.has(a.to)) {
         ctx.diags.push(unknownId("look target", a.to, ["camera", ...ctx.byId.keys()], [...path.split("."), "to"]));
         return;
@@ -230,8 +242,8 @@ const autoListen = (ctx: Ctx, b: LaidBeat, reactions: ReactionTable, from: numbe
 };
 
 /** Beats + actions → per-cast tracks, and the expression moments the shot policy reads. */
-export const buildTracks = (skit: Skit, layout: Layout, set: SetDef, lib: Library, reactions: ReactionTable, fps: number, diags: Diagnostic[], style: DirectingStyle = CLASSIC): TrackResult => {
-  const ctx: Ctx = { skit, set, lib, fps, diags, byId: new Map(), mark: new Map() };
+export const buildTracks = (skit: Skit, layout: Layout, set: SetDef, lib: Library, reactions: ReactionTable, fps: number, diags: Diagnostic[], style: DirectingStyle = CLASSIC, figureAt?: Ctx["figureAt"]): TrackResult => {
+  const ctx: Ctx = { skit, set, lib, fps, diags, byId: new Map(), mark: new Map(), figureAt };
   for (const c of initCast(ctx)) ctx.byId.set(c.id, c);
   const moments = new Map<LaidBeat, Moment[]>();
   for (const b of layout.beats) {
@@ -291,28 +303,4 @@ export const buildTracks = (skit: Skit, layout: Layout, set: SetDef, lib: Librar
   for (const c of cast) sortTracks(c);
   checkOverlaps(cast, diags);
   return { cast, moments };
-};
-
-const byFrame = <T extends { frame: number }>(xs: T[]) => xs.sort((a, b) => a.frame - b.frame);
-
-const sortTracks = (c: CastTrack) => {
-  for (const k of ["poseKeys", "expressionKeys", "gazeKeys", "nodKeys", "seatKeys", "propKeys", "symbolKeys", "moveKeys", "facingKeys", "hopKeys", "gaitKeys", "browKeys", "fallKeys"] as const)
-    byFrame(c[k] as { frame: number }[]);
-  c.speech.sort((a, b) => a.startFrame - b.startFrame);
-};
-
-/** Two pose (or expression) changes on one character within 2 frames: the later one wins. */
-const checkOverlaps = (cast: CastTrack[], diags: Diagnostic[]) => {
-  for (const c of cast) {
-    for (const [name, keys] of [["pose", c.poseKeys], ["expression", c.expressionKeys]] as const) {
-      for (let i = 1; i < keys.length; i++) {
-        const a = keys[i - 1]!;
-        const b = keys[i]!;
-        const ida = "pose" in a ? a.pose : a.expression;
-        const idb = "pose" in b ? b.pose : b.expression;
-        if (b.frame - a.frame <= 1 && ida !== idb && a.frame > 0)
-          diags.push({ level: "warning", code: "overlap", path: `cast "${c.id}"`, message: `${name} "${ida}" and "${idb}" land together at frame ${b.frame}; "${idb}" wins` });
-      }
-    }
-  }
 };

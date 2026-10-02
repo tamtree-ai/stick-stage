@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "blueprint-1",
+  "kit": "abstract",
+  "palette": "blueprint",
+  "description": "Blueprint paper: a blue ground with a fine grid and drafting marks. For maths, geometry, electromagnetism and anything engineered.",
+  "tags": ["maths", "geometry", "electromagnetism", "engineering", "design", "science"],
+  "groundY": 1480,
+  "figureHeightPx": 640,
+  "layers": [{ "part": "blueprint" }, { "part": "grid-floor" }],
+  "marks": { "left": 0.25, "center": 0.5, "right": 0.75 }
+}

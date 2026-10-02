@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Are you seeing the Pillars as they are now?",
+    "aspect": "9:16",
+    "description": "The light in Webb's Pillars of Creation image left the nebula about 6,500 years ago. Image: NASA, ESA, CSA, STScI (CC BY 4.0). Sources and simplifications in the pinned comment.",
+    "hashtags": [
+      "astronomy",
+      "space",
+      "jwst",
+      "mythbusting"
+    ]
+  },
+  "set": "space-1",
+  "cast": [
+    {
+      "id": "gus",
+      "character": "gus",
+      "mark": "left",
+      "pose": "arms-crossed"
+    },
+    {
+      "id": "vera",
+      "character": "vera",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "subtitles": true
+  },
+  "figures": [
+    {
+      "id": "pillars",
+      "kind": "image",
+      "at": {
+        "x": 0.5,
+        "y": 0.27,
+        "w": 0.5,
+        "h": 0.28
+      },
+      "layer": "back",
+      "params": {
+        "image": "pillars-webb",
+        "frame": "eyepiece",
+        "to": {
+          "x": 0.45,
+          "y": 0.4,
+          "zoom": 1.4
+        }
+      },
+      "hidden": false,
+      "reveal": "fade",
+      "label": "Pillars of Creation (Webb)",
+      "panel": false
+    },
+    {
+      "id": "trip",
+      "kind": "scale",
+      "at": {
+        "x": 0.5,
+        "y": 0.29,
+        "w": 0.9,
+        "h": 0.14
+      },
+      "layer": "back",
+      "params": {
+        "log": true,
+        "min": -1,
+        "max": 12,
+        "step": 2,
+        "marks": [
+          {
+            "value": 0.11,
+            "label": "Moon 1.3 s"
+          }
+        ]
+      },
+      "hidden": true,
+      "reveal": "draw",
+      "label": "How long the light took (seconds)",
+      "panel": false
+    },
+    {
+      "id": "why",
+      "kind": "equation",
+      "at": {
+        "x": 0.5,
+        "y": 0.27,
+        "w": 0.88,
+        "h": 0.14
+      },
+      "layer": "front",
+      "params": {
+        "tex": "t = \\frac{\\class{t-d}{6{,}500\\ \\text{ly}}}{\\class{t-c}{1\\ \\text{ly per year}}} = \\class{t-t}{6{,}500\\ \\text{years}}"
+      },
+      "hidden": true,
+      "reveal": "draw",
+      "panel": false
+    }
+  ],
+  "template": "myth-flip",
+  "claims": [
+    {
+      "text": "The Pillars of Creation, in the Eagle Nebula, are about 6,500 light-years from Earth.",
+      "source": "ESA/Webb release weic2216, 'Webb takes a stunning, star-filled portrait of the Pillars of Creation' (esawebb.org/news/weic2216)",
+      "checkedBy": null,
+      "beats": [
+        "l6"
+      ]
+    },
+    {
+      "text": "A light-year is the distance light travels in one year, so light from 6,500 light-years away has been travelling for about 6,500 years.",
+      "source": "OpenStax, Astronomy 2e, §1.7 The Universe on the Large Scale (light-year; looking out is looking back in time)",
+      "checkedBy": null,
+      "beats": [
+        "l6",
+        "l8"
+      ]
+    },
+    {
+      "text": "Light takes about 1.3 seconds to reach us from the Moon and about 8.3 minutes from the Sun.",
+      "source": "NASA Science, 'Light-year' / Solar System facts (science.nasa.gov)",
+      "checkedBy": null,
+      "beats": [
+        "l4",
+        "l7"
+      ]
+    }
+  ],
+  "simplifications": [
+    "6,500 light-years is a rounded distance estimate; published values for the Eagle Nebula vary by several hundred light-years.",
+    "Webb photographs in near-infrared. The colours are assigned to infrared wavelengths (shorter is bluer), so this is not what the eye would see.",
+    "The scale shows light travel time in seconds on a powers-of-ten axis."
+  ],
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "gus",
+      "line": "That's what the Pillars of Creation look like right now.",
+      "actions": [],
+      "expression": "smug",
+      "role": "myth"
+    },
+    {
+      "id": "l2",
+      "speaker": "vera",
+      "line": "Right now? That light is ancient.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "hold",
+          "prop": "telescope",
+          "hand": "R",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "expression": "happy",
+      "role": "pushback"
+    },
+    {
+      "id": "l3",
+      "speaker": "gus",
+      "line": "Light is instant. I see it, it's there.",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "pose",
+          "pose": "arms-crossed",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "smug",
+      "role": "prediction"
+    },
+    {
+      "id": "l4",
+      "speaker": "vera",
+      "line": "Moon: about a second. Sun: eight minutes. The Pillars?",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        },
+        {
+          "who": "vera",
+          "do": "look",
+          "to": "figure:pillars",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "happy",
+      "figures": [
+        {
+          "do": "hide",
+          "id": "pillars",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "show",
+          "id": "trip",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "set",
+          "id": "trip",
+          "at": {
+            "word": "Sun",
+            "occurrence": 1
+          },
+          "params": {
+            "marks": [
+              {
+                "value": 0.11,
+                "label": "Moon 1.3 s"
+              },
+              {
+                "value": 2.7,
+                "label": "Sun 8 min"
+              }
+            ]
+          }
+        },
+        {
+          "do": "set",
+          "id": "trip",
+          "at": {
+            "word": "Pillars",
+            "occurrence": 1
+          },
+          "params": {
+            "marks": [
+              {
+                "value": 0.11,
+                "label": "Moon 1.3 s"
+              },
+              {
+                "value": 2.7,
+                "label": "Sun 8 min"
+              },
+              {
+                "value": 11.31,
+                "label": "Pillars 6,500 yr",
+                "color": "highlight"
+              }
+            ]
+          }
+        }
+      ],
+      "role": "demo"
+    },
+    {
+      "id": "l5",
+      "speaker": "gus",
+      "line": "Wait. Years?",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "gag",
+          "gag": "concede",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "expression": "shocked",
+      "role": "reaction"
+    },
+    {
+      "id": "l6",
+      "speaker": "vera",
+      "line": "They're 6,500 light-years away. That's 6,500 years of travel.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        },
+        {
+          "who": "vera",
+          "do": "look",
+          "to": "figure:pillars",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "neutral",
+      "spoken": "They're six and a half thousand light-years away. That's six and a half thousand years of travel.",
+      "figures": [
+        {
+          "do": "hide",
+          "id": "trip",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "show",
+          "id": "why",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "set",
+          "id": "why",
+          "at": {
+            "word": "away",
+            "occurrence": 1
+          },
+          "params": {
+            "highlight": [
+              "t-d"
+            ]
+          }
+        },
+        {
+          "do": "set",
+          "id": "why",
+          "at": {
+            "word": "travel",
+            "occurrence": 1
+          },
+          "params": {
+            "highlight": [
+              "t-t"
+            ]
+          }
+        }
+      ],
+      "role": "why"
+    },
+    {
+      "id": "l7",
+      "speaker": "vera",
+      "line": "Everything near you is a split second away, so light feels instant.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "shrug",
+          "at": {
+            "fraction": 0.2
+          }
+        }
+      ],
+      "expression": "neutral",
+      "figures": [
+        {
+          "do": "hide",
+          "id": "why",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "show",
+          "id": "pillars",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "role": "why-it-felt-true"
+    },
+    {
+      "id": "l8",
+      "speaker": "vera",
+      "line": "Look far away, and you're looking back in time.",
+      "actions": [],
+      "expression": "happy",
+      "role": "takeaway",
+      "text": [
+        {
+          "type": "slam",
+          "value": "BACK IN TIME",
+          "at": {
+            "word": "time",
+            "occurrence": 1
+          }
+        }
+      ],
+      "punchline": true,
+      "pauseBeforeMs": 350,
+      "holdAfterMs": 400,
+      "reaction": "happy"
+    }
+  ]
+}

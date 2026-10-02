@@ -48,6 +48,9 @@ Example: `public/skits/fine/skit.json`.
 | `punchline: true` | Marks the punchline. Default: the last spoken beat |
 | `reaction` | Listener's expression on the last word (or in the reaction close-up after the punchline). `false` = none |
 | `delivery` | Hint for the TTS in the harness ("flat", "whispered") |
+| `spoken` | What the voice says when it differs from the caption (`line` "E = mc²", `spoken` "E equals m c squared") |
+| `role` | The line's job: `setup`, `escalation`, `punchline`, or a `myth-flip` role (`myth` … `takeaway`, see [science-channel.md](science-channel.md)) |
+| `figures` | Diagram cues: show, hide, switch state, tween ([figures.md](figures.md)) |
 | `shot` | Overrides the default camera for this beat (below) |
 | `actions`, `sfx`, `text` | Below |
 

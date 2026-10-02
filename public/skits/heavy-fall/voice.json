@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "gus",
+      "text": "Heavy things fall faster. Obviously.",
+      "audio": "voice/l1.wav",
+      "durationMs": 3002
+    },
+    {
+      "id": "l2",
+      "speaker": "vera",
+      "text": "Want to bet? Same height, let go together.",
+      "audio": "voice/l2.wav",
+      "durationMs": 2956
+    },
+    {
+      "id": "l3",
+      "speaker": "gus",
+      "text": "The heavy one lands first. Every time.",
+      "audio": "voice/l3.wav",
+      "durationMs": 3199
+    },
+    {
+      "id": "l4",
+      "speaker": "vera",
+      "text": "Watch the drop.",
+      "audio": "voice/l4.wav",
+      "durationMs": 878
+    },
+    {
+      "id": "l5",
+      "speaker": "gus",
+      "text": "…huh.",
+      "audio": "voice/l5.wav",
+      "durationMs": 390
+    },
+    {
+      "id": "l6",
+      "speaker": "vera",
+      "text": "Twice the mass gets twice the pull, but it is twice as hard to speed up.",
+      "audio": "voice/l6.wav",
+      "durationMs": 4018
+    },
+    {
+      "id": "l7",
+      "speaker": "vera",
+      "text": "A feather is slow because of air, not because it is light.",
+      "audio": "voice/l7.wav",
+      "durationMs": 3177
+    },
+    {
+      "id": "l8",
+      "speaker": "vera",
+      "text": "Without air, everything falls together.",
+      "audio": "voice/l8.wav",
+      "durationMs": 2259
+    }
+  ]
+}

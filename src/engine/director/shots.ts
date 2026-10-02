@@ -4,6 +4,7 @@ import type { Diagnostic } from "./diagnostics";
 import { anchorFrame, msToFrame, type LaidBeat, type Layout } from "./layout";
 import { CLASSIC, type DirectingStyle } from "./style";
 import type { Moment } from "./tracks";
+import { figureBeat } from "./sceneFigures";
 
 /** Show the emotion in the two-shot this long before cutting to the face. */
 export const LAND_FRAMES = 10;
@@ -109,6 +110,11 @@ export const planShots = (
       return at;
     };
 
+    // A figure changing (shown, flipped from myth to truth, a demo) gets the whole frame.
+    if (b.kind === "line" && !b.punchline && figureBeat(b.beat)) {
+      if (cam.framing !== "wide" || cam.punched) cut(from, "wide", undefined, "wide for the figure");
+      return;
+    }
     if (b.kind === "line" && !b.punchline && !b.narrator) {
       // Plain back-and-forth stays on (or returns to) the two-shot.
       backToTwo("back to two for the next line");

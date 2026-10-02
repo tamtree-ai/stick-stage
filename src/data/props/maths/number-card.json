@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "number-card",
+  "kind": "sign",
+  "name": "Number card",
+  "category": "maths",
+  "rank": 17,
+  "tags": ["number", "pick", "maths", "demo"],
+  "aliases": ["card", "flash card"],
+  "colors": { "body": "#ffffff", "accent": "#2b6cb0" },
+  "align": "upright",
+  "size": 0.75,
+  "text": "7"
+}

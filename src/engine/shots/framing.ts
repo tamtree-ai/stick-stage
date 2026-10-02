@@ -87,15 +87,18 @@ const groupShot = (
   width: number,
   height: number,
   groundY: number,
+  extra: readonly Rect[] = [],
 ): Camera => {
   // Characters waiting off stage (entrances, exits) don't widen the shot.
   const onStage = actors.filter((a) => a.x >= 0 && a.x <= 1);
   if (onStage.length === 0) return { scale: 1, cx: width / 2, cy: height / 2 };
   const heads = onStage.map((a) => headInStage(a, width, groundY));
   const R = Math.max(...heads.map((h) => h.R));
-  const x0 = Math.min(...heads.map((h) => h.head.x)) - 2.2 * R;
-  const x1 = Math.max(...heads.map((h) => h.head.x)) + 2.2 * R;
-  const y0 = Math.min(...heads.map((h) => h.head.y)) - 1.6 * R;
+  // Figures on screen stay in the shot too, with a margin.
+  const m = 0.04 * width;
+  const x0 = Math.min(...heads.map((h) => h.head.x - 2.2 * R), ...extra.map((r) => r.x - m));
+  const x1 = Math.max(...heads.map((h) => h.head.x + 2.2 * R), ...extra.map((r) => r.x + r.w + m));
+  const y0 = Math.min(...heads.map((h) => h.head.y - 1.6 * R), ...extra.map((r) => r.y - m));
   const y1 = groundY + 0.6 * R;
   const scale = clamp(Math.min(width / (x1 - x0), height / (y1 - y0)), 1, 1.6);
   return clampCamera({ scale, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 }, width, height);
@@ -111,9 +114,11 @@ export const frameShot = (
   width: number,
   height: number,
   groundY: number,
+  /** Stage rectangles a group shot must keep in frame (figures on screen). */
+  extra: readonly Rect[] = [],
 ): Camera => {
   if (shot.framing === "wide") return { scale: 1, cx: width / 2, cy: height / 2 };
-  if (shot.framing === "two") return groupShot(actors, width, height, groundY);
+  if (shot.framing === "two") return groupShot(actors, width, height, groundY, extra);
   const subject = actors.find((a) => a.id === shot.on);
   if (!subject)
     throw new Error(

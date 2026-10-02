@@ -146,7 +146,7 @@ export const TECH: Art[] = [
     P([[-0.025, -0.02], [0.025, -0.02], [0.02, -0.08], [0, -0.1], [-0.02, -0.08]], "body"),
     R(-0.002, -0.09, 0.004, 0.04, "accent", { stroke: false }),
   ], 1.3),
-  prop("power-bank", "tech", "Power bank", 96, ["battery", "phone"], ["battery", "powerbank"], "upright", dark, "#7ed957", [
+  prop("power-bank", "tech", "Power bank", 96, ["battery", "phone"], ["portable charger", "powerbank"], "upright", dark, "#7ed957", [
     R(-0.02, -0.1, 0.05, 0.08, "body", { rx: 0.008 }),
     R(0.02, -0.06, 0.012, 0.02, "accent"),
     C(-0.006, -0.04, 0.004, "accent", { stroke: false }),

@@ -8,6 +8,7 @@ import { normWord, tokenize } from "../voice/words";
 import { gestureWhileHolding, linePropActions, stillHolding, type HoldBook } from "./lineProp";
 import { PremiseSchema, type Premise, type PremiseLine, type TemplateId } from "./premise";
 import { fromZodIssues } from "../director/diagnostics";
+import { checkMythFlip, dressMythFlip, MYTH_FLIP_EXPRESSION, mythFlipRole } from "./mythFlip";
 import { migrate } from "../migrate";
 
 type Beat = NonNullable<SkitInput["beats"]>[number];
@@ -25,6 +26,7 @@ export const TEMPLATE_DEFAULT_SET: Record<TemplateId, string> = {
   family: "classroom-1",
   fable: "park-1",
   trio: "living-1",
+  "myth-flip": "void-1",
 };
 /** The same templates, on rooms laid out for 16:9. */
 export const WIDE_TEMPLATE_SET: Record<TemplateId, string> = {
@@ -37,6 +39,7 @@ export const WIDE_TEMPLATE_SET: Record<TemplateId, string> = {
   family: "wide-classroom",
   fable: "wide-park",
   trio: "wide-living",
+  "myth-flip": "wide-plain",
 };
 
 /** The room a template opens on for this frame. */
@@ -44,29 +47,29 @@ export const defaultSet = (template: TemplateId, aspect: Aspect = "9:16"): strin
   (aspect === "16:9" ? WIDE_TEMPLATE_SET : TEMPLATE_DEFAULT_SET)[template];
 /** Fewest cast members each template stages. `family` may add a second kid. */
 export const TEMPLATE_CAST: Record<TemplateId, 1 | 2 | 3> = {
-  exchange: 2, interview: 2, "me-vs-me": 2, "pov-monologue": 1, "text-slam": 1, explainer: 2, family: 2, fable: 2, trio: 3,
+  exchange: 2, interview: 2, "me-vs-me": 2, "pov-monologue": 1, "text-slam": 1, explainer: 2, family: 2, fable: 2, trio: 3, "myth-flip": 2,
 };
-export const TEMPLATE_CAST_MAX: Record<TemplateId, 1 | 2 | 3> = { ...TEMPLATE_CAST, family: 3 };
-const ROLE_EXPRESSION: Record<Role, string> = { setup: "neutral", escalation: "annoyed", punchline: "deadpan" };
+export const TEMPLATE_CAST_MAX: Record<TemplateId, 1 | 2 | 3> = { ...TEMPLATE_CAST, family: 3, "myth-flip": 3 };
+const ROLE_EXPRESSION: Partial<Record<Role, string>> = { setup: "neutral", escalation: "annoyed", punchline: "deadpan", ...MYTH_FLIP_EXPRESSION };
 /** Escalation gestures, one per escalation line, in turn. */
 const GESTURES = ["point", "hands-on-hips", "shrug", "arms-crossed"];
 /** Dead air before the punchline: the comedic beat. */
 const PUNCH_PAUSE_MS = 450;
 const PUNCH_HOLD_MS = 300;
 
-type Group = { set?: string; pov?: string; card?: string; lines: PremiseLine[] };
+type Group = { set?: string; pov?: string; card?: string; figures?: Premise["figures"]; lines: PremiseLine[] };
 
 /** `lines` is one scene. `scenes` is 1–4, and the first scene's POV falls back to the premise `pov`. */
 const groupsOf = (p: Premise): Group[] =>
   p.scenes
-    ? p.scenes.map((s, i) => ({ set: s.set ?? p.set, pov: s.pov ?? (i === 0 ? p.pov : undefined), card: s.card, lines: s.lines }))
-    : [{ set: p.set, pov: p.pov, lines: p.lines ?? [] }];
+    ? p.scenes.map((s, i) => ({ set: s.set ?? p.set, pov: s.pov ?? (i === 0 ? p.pov : undefined), card: s.card, figures: s.figures, lines: s.lines }))
+    : [{ set: p.set, pov: p.pov, figures: p.figures, lines: p.lines ?? [] }];
 
 const marksFor = (n: number): string[] => (n <= 1 ? ["center"] : n === 2 ? ["left", "right"] : ["left", "center", "right"]);
 
 /** Roles run over the whole skit: first line setup, last line of the last scene punchline, unless a line names its own. */
-const roleOf = (flat: readonly PremiseLine[], i: number): Role =>
-  flat[i]!.role ?? (i === flat.length - 1 && flat.length > 1 ? "punchline" : i === 0 ? "setup" : "escalation");
+const roleOf = (p: Premise, flat: readonly PremiseLine[], i: number): Role =>
+  p.template === "myth-flip" ? mythFlipRole(flat, i) : flat[i]!.role ?? (i === flat.length - 1 && flat.length > 1 ? "punchline" : i === 0 ? "setup" : "escalation");
 
 /** Anchor on the last word of a line (by normalized word and occurrence, so punctuation never breaks it). */
 export const lastWordAnchor = (text: string) => {
@@ -99,6 +102,7 @@ const check = (p: Premise, lib: Library, sets: Readonly<Record<string, SetDef>>)
     d.push({ level: "error", code: "template-family", path: "cast", message: `family needs a kid (lila or theo)`, expected: `one adult and one or two kids` });
   if (p.template === "fable" && (p.cast[0]?.character !== "dash" || p.cast[1]?.character !== "moss"))
     d.push({ level: "error", code: "template-fable", path: "cast", message: `fable is Dash, then Moss`, example: `[{ "id": "dash", "character": "dash" }, { "id": "moss", "character": "moss" }]` });
+  if (p.template === "myth-flip") d.push(...checkMythFlip(p, flat));
   if (p.template === "explainer" && !flat.some((l) => l.who === "narrator"))
     d.push({ level: "error", code: "template-narrator", path: "lines", message: `an explainer needs a narrator line`, example: `{ "who": "narrator", "text": "The concept, in one sentence." }` });
   if (p.template === "explainer" && !flat.some((l) => l.who && l.who !== "narrator"))
@@ -139,8 +143,11 @@ const spokenBeat = (p: Premise, line: PremiseLine, role: Role, id: string, n: { 
   const who = l.who ?? p.cast[0]!.id;
   const thought = who === "narrator";
   const actions: Action[] = [];
-  const beat: Beat = { id, speaker: who, line: l.text, actions, ...(thought ? {} : { expression: l.expression ?? ROLE_EXPRESSION[role] }) };
+  const beat: Beat = { id, speaker: who, line: l.text, actions, ...(thought ? {} : { expression: l.expression ?? ROLE_EXPRESSION[role] ?? "neutral" }) };
   if (l.delivery) beat.delivery = l.delivery;
+  if (l.spoken) beat.spoken = l.spoken;
+  if (l.figures?.length) beat.figures = l.figures;
+  if (l.role || p.template === "myth-flip") beat.role = role;
   if (l.voiceOver && !thought) beat.voiceOver = true;
   // A narrator or a thought has no hand. A text-slam never reaches here.
   if (!thought && !l.voiceOver) for (const a of linePropActions(who, l.prop, book)) actions.push(a);
@@ -172,7 +179,7 @@ const dress = (p: Premise, beats: Beat[]): Beat[] => {
 const slamBeats = (p: Premise, flat: readonly PremiseLine[]): Beat[] =>
   flat.map((l, i) => {
     const who = l.who ?? p.cast[0]!.id;
-    const last = roleOf(flat, i) === "punchline";
+    const last = roleOf(p, flat, i) === "punchline";
     const beat: Beat = {
       id: `s${i + 1}`,
       silent: true,
@@ -214,11 +221,19 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
       held.clear();
       for (const line of g.lines) {
         const i = spoken.length;
-        spoken.push(spokenBeat(p, line, roleOf(flat, i), `l${i + 1}`, n, { held, rightTaken, sceneLong }));
+        spoken.push(spokenBeat(p, line, roleOf(p, flat, i), `l${i + 1}`, n, { held, rightTaken, sceneLong }));
       }
     }
   }
-  const staged = p.template === "text-slam" ? slamBeats(p, flat) : dress(p, spoken);
+  const firstFigure = (i: number) => {
+    let at = i;
+    for (const g of groups) {
+      if (at < g.lines.length) return g.figures?.[0]?.id;
+      at -= g.lines.length;
+    }
+    return undefined;
+  };
+  const staged = p.template === "text-slam" ? slamBeats(p, flat) : p.template === "myth-flip" ? dressMythFlip(p, spoken, flat, firstFigure) : dress(p, spoken);
   const setOf = (g: Group) => g.set ?? defaultSet(p.template, p.aspect);
   const narrated = flat.some((l) => l.who === "narrator");
   const sit = (set: string, mark: string) => p.template !== "fable" && seatHeightAt(sets[set]!, mark) !== undefined;
@@ -228,8 +243,13 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
     mark: marks[i]!,
     ...(c.label ? { label: c.label } : {}),
     ...(c.holding ? { holding: { prop: c.holding, hand: "R" as const } } : p.template === "interview" && i === 0 ? { holding: { prop: "mic", hand: "R" as const } } : {}),
-    ...(p.template === "interview" && i === 0 ? { pose: "hold-chest" } : {}),
+    ...(p.template === "interview" && i === 0 ? { pose: "hold-chest" } : p.template === "myth-flip" && i === 0 ? { pose: "arms-crossed" } : {}),
   }));
+  const science = {
+    ...(p.template === "myth-flip" ? { template: p.template } : {}),
+    ...(p.claims?.length ? { claims: p.claims } : {}),
+    ...(p.simplifications?.length ? { simplifications: p.simplifications } : {}),
+  };
   const meta = { title: p.title, aspect: p.aspect, ...(p.description ? { description: p.description } : {}), hashtags: p.hashtags };
   // One scene stays `beats`, so a premise written the old way stages the way it always has.
   if (!p.scenes) {
@@ -241,6 +261,8 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
       cast: cast.map((c, i) => ({ ...c, ...(sit(set, marks[i]!) ? { seated: true } : {}) })),
       ...(narrated ? { narrator: { id: "narrator" } } : {}),
       overlay: { ...(groups[0]!.pov ? { pov: groups[0]!.pov } : {}), subtitles: p.template !== "text-slam" },
+      ...(groups[0]!.figures?.length ? { figures: groups[0]!.figures } : {}),
+      ...science,
       beats: staged,
     };
   }
@@ -251,6 +273,7 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
     cast,
     ...(narrated ? { narrator: { id: "narrator" } } : {}),
     overlay: { subtitles: p.template !== "text-slam" },
+    ...science,
     scenes: groups.map((g, s) => {
       const set = setOf(g);
       const beats = staged.slice(at, at + g.lines.length);
@@ -258,7 +281,7 @@ export const fromPremise = (json: unknown, lib: Library, sets: Readonly<Record<s
       // A scene `cast` replaces the whole cast, so name everyone. Seating depends on this set.
       const sitting = p.cast.some((_, i) => sit(set, marks[i]!));
       const cast = sitting ? p.cast.map((c, i) => ({ id: c.id, ...(sit(set, marks[i]!) ? { seated: true as const } : {}) })) : undefined;
-      return { id: `s${s + 1}`, set, ...(g.pov ? { pov: g.pov } : {}), ...(g.card ? { card: { title: g.card } } : {}), ...(cast ? { cast } : {}), beats };
+      return { id: `s${s + 1}`, set, ...(g.pov ? { pov: g.pov } : {}), ...(g.card ? { card: { title: g.card } } : {}), ...(cast ? { cast } : {}), ...(g.figures?.length ? { figures: g.figures } : {}), beats };
     }),
   };
 };

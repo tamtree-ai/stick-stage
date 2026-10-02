@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "template": "myth-flip",
+  "title": "Do heavy things fall faster?",
+  "logline": "Gus is sure the heavy ball wins. Vera drops both.",
+  "description": "Heavy and light fall together when air doesn't get in the way. Sources and simplifications in the pinned comment.",
+  "hashtags": ["physics", "science", "mythbusting"],
+  "set": "void-1",
+  "cast": [
+    { "id": "gus", "character": "gus" },
+    { "id": "vera", "character": "vera" }
+  ],
+  "claims": [
+    {
+      "text": "Without air resistance, all objects near Earth's surface fall with the same acceleration, g ≈ 9.8 m/s².",
+      "source": "OpenStax, University Physics Volume 1, §3.5 Free Fall (openstax.org)",
+      "checkedBy": null,
+      "beats": ["l4", "l6", "l8"]
+    },
+    {
+      "text": "Gravity's pull is proportional to mass (F = mg), and so is the resistance to speeding up (a = F/m), so the mass cancels.",
+      "source": "OpenStax, University Physics Volume 1, §5.4 Mass and Weight",
+      "checkedBy": null,
+      "beats": ["l6"]
+    }
+  ],
+  "simplifications": [
+    "The graph ignores air resistance; in air, shape and size matter, which is the point of line 7.",
+    "g varies slightly with latitude and height; 9.8 m/s² is a rounded value."
+  ],
+  "figures": [
+    {
+      "id": "drop",
+      "kind": "plot",
+      "at": { "x": 0.5, "y": 0.27, "w": 0.88, "h": 0.22 },
+      "params": { "x": [0, 2], "y": [0, 20], "xLabel": "t (s)", "yLabel": "fallen (m)" },
+      "state": "myth",
+      "states": {
+        "myth": { "label": "Heavy falls faster", "series": [{ "fn": "0.5*14*x^2", "color": "myth", "label": "heavy" }, { "fn": "0.5*5*x^2", "color": "a1", "label": "light", "labelAt": 0.95 }] },
+        "truth": { "label": "Same rate", "series": [{ "fn": "0.5*9.8*x^2", "color": "truth", "label": "both" }] }
+      }
+    },
+    {
+      "id": "why",
+      "kind": "equation",
+      "hidden": true,
+      "layer": "front",
+      "at": { "x": 0.5, "y": 0.27, "w": 0.84, "h": 0.13 },
+      "params": { "tex": "a = \\frac{F}{m} = \\frac{\\class{t-m1}{m}\\,g}{\\class{t-m2}{m}} = \\class{t-g}{g}" }
+    }
+  ],
+  "lines": [
+    { "who": "gus", "role": "myth", "text": "Heavy things fall faster. Obviously." },
+    { "who": "vera", "role": "pushback", "text": "Want to bet? Same height, let go together.", "prop": "heavy-ball" },
+    { "who": "gus", "role": "prediction", "text": "The heavy one lands first. Every time." },
+    { "who": "vera", "role": "demo", "text": "Watch the drop.", "figures": [{ "do": "state", "id": "drop", "state": "truth", "style": "strike", "at": { "word": "drop" } }] },
+    { "who": "gus", "role": "reaction", "text": "…huh." },
+    {
+      "who": "vera",
+      "role": "why",
+      "text": "Twice the mass gets twice the pull, but it is twice as hard to speed up.",
+      "figures": [
+        { "do": "hide", "id": "drop", "at": { "ms": 0 } },
+        { "do": "show", "id": "why", "at": { "ms": 0 } },
+        { "do": "set", "id": "why", "params": { "highlight": ["t-m1"] }, "at": { "word": "pull" } },
+        { "do": "set", "id": "why", "params": { "highlight": ["t-m1", "t-m2"] }, "at": { "word": "hard" } },
+        { "do": "set", "id": "why", "params": { "highlight": ["t-g"], "strike": ["t-m1", "t-m2"] }, "at": { "word": "up" } }
+      ]
+    },
+    { "who": "vera", "role": "why-it-felt-true", "text": "A feather is slow because of air, not because it is light." },
+    { "who": "vera", "role": "takeaway", "text": "Without air, everything falls together.", "slam": "TOGETHER" }
+  ]
+}

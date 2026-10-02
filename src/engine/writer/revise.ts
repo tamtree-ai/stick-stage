@@ -118,6 +118,7 @@ const freshSpoken = (id: string, who: string, text: string, expression: string |
   actions: gag ? [{ who, do: "gag", gag, at: { fraction: 0.2 } }] : [],
   sfx: [],
   text: [],
+  figures: [],
 });
 
 const freshSlam = (id: string, who: string, text: string, expression: string | undefined): Beat => ({
@@ -129,6 +130,7 @@ const freshSlam = (id: string, who: string, text: string, expression: string | u
   actions: [{ who, do: "expression", expression: expression ?? "deadpan", at: { ms: 0 } }],
   text: [{ type: "slam", value: text.slice(0, 40), at: { ms: 120 }, durationMs: 1100 }],
   sfx: [{ id: "pop", at: { ms: 120 }, volume: 1 }],
+  figures: [],
 });
 
 const patch = (beat: Beat, line: RawLine, who: string, expression: string | undefined, warnings: Diagnostic[]): Beat => {

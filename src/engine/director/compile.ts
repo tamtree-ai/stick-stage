@@ -10,6 +10,8 @@ import { msToFrame } from "./layout";
 import { docBeats, isNarration, SkitSchema, type Beat, type CastMember, type Skit, type SkitDoc } from "./schema";
 import { compileScene, type CompileInput } from "./scene";
 import { styleById, type StyleId } from "./style";
+import { scienceChecks } from "./scienceChecks";
+import { pronunciationsFor, type Pronunciation } from "../voice/pronounce";
 import type { Program, SceneTransition, Timeline } from "./timeline";
 
 export type { CompileInput } from "./scene";
@@ -90,6 +92,7 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[], style = styleBy
       beats,
       card: sc.card,
       labels: sc.labels,
+      figures: sc.figures,
       overlay: { ...doc.overlay, pov: sc.pov ?? (s === 0 ? doc.overlay.pov : undefined) },
       timing: {
         gapMs: gap,
@@ -100,7 +103,7 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[], style = styleBy
     const remap = (p: string) => {
       const m = p.match(/^cast\[(\d+)\](.*)$/);
       if (m) return `${castPath.get(Number(m[1])) ?? `scenes[${s}].cast`}${m[2]}`;
-      return /^(beats|set|card)\b/.test(p) ? `scenes[${s}].${p}` : p;
+      return /^(beats|set|card|figures)\b/.test(p) ? `scenes[${s}].${p}` : p;
     };
     return { id: sc.id, skit, enter: trans[s], remap };
   });
@@ -143,6 +146,7 @@ export const compileSkit = (input: CompileInput): CompileResult => {
   if (doc.music && !bed)
     diags.push({ level: "error", code: "unknown-music", path: "music", message: `unknown music bed "${doc.music}"`, expected: input.music?.beds.map((b) => b.id).join(", ") || "pass a music manifest" });
   if (diags.some((d) => d.level === "error")) throw new SkitError(diags);
+  diags.push(...scienceChecks(doc, input.skit));
   const music: MusicBed | undefined = bed ? { src: bed.file, gain: bed.gain, ducked: bed.ducked } : undefined;
 
   let from = 0;
@@ -173,16 +177,23 @@ export type SkitLine = {
   /** Character id, or the narrator's id for voice-over lines. */
   character: string;
   text: string;
+  /** Say this instead of `text` (the caption keeps `text`). */
+  spoken?: string;
+  /** Words in the line with a pronunciation hint (`pronunciations.json`), for the TTS. */
+  pronounce?: Pronunciation[];
   delivery?: string;
   /** A voice-over line: voice it with `doc.narrator.voice`, not a character's voice. */
   narrator?: true;
 };
 
 /** The lines a voice source must synthesize: one per spoken TTS beat (id = beat id = voice file name). */
-export const skitLines = (doc: SkitDoc): SkitLine[] =>
+export const skitLines = (doc: SkitDoc, lexicon: readonly Pronunciation[] = []): SkitLine[] =>
   docBeats(doc).flatMap((b) => {
     if (b.silent || !b.speaker || !b.line || b.audio.source !== "tts") return [];
-    if (isNarration(doc, b)) return [{ id: b.id, speaker: b.speaker, character: b.speaker, text: b.line, delivery: b.delivery, narrator: true as const }];
+    const said = b.spoken ?? b.line;
+    const pronounce = pronunciationsFor(said, lexicon);
+    const extra = { ...(b.spoken ? { spoken: b.spoken } : {}), ...(pronounce.length ? { pronounce } : {}) };
+    if (isNarration(doc, b)) return [{ id: b.id, speaker: b.speaker, character: b.speaker, text: b.line, ...extra, delivery: b.delivery, narrator: true as const }];
     const character = doc.cast.find((c) => c.id === b.speaker)?.character ?? b.speaker;
-    return [{ id: b.id, speaker: b.speaker, character, text: b.line, delivery: b.delivery }];
+    return [{ id: b.id, speaker: b.speaker, character, text: b.line, ...extra, delivery: b.delivery }];
   });

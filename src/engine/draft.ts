@@ -1,4 +1,5 @@
 import type { CatalogSource } from "./catalog";
+import type { FigureLib } from "./viz/compile";
 import { compileSkit, parseSkit, skitLines, type CompileResult, type SeriesStyle } from "./director/compile";
 import { applyLanguage } from "./i18n/apply";
 import { docBeats, type SkitDoc } from "./director/schema";
@@ -43,14 +44,14 @@ export type DraftCheck = {
  * placeholder timings, self-check. Pure, so a client holding the same registry (`stickstage/data`)
  * gets the same verdict locally, without a round trip. Throws `SkitError` with diagnostics when the skit is invalid.
  */
-export const checkDraft = (skit: unknown, src: CatalogSource, opts?: { lang?: string; series?: Readonly<Record<string, SeriesStyle>>; voice?: PreparedVoice }): DraftCheck => {
+export const checkDraft = (skit: unknown, src: CatalogSource, opts?: { lang?: string; series?: Readonly<Record<string, SeriesStyle>>; voice?: PreparedVoice; figures?: FigureLib }): DraftCheck => {
   const doc = parseSkit(skit);
   const unsupported = unsupportedBeats(doc);
   if (unsupported.length) throw new SkitError(unsupported);
   const dubbed = opts?.lang ? applyLanguage(doc, opts.lang) : doc;
   const lines = skitLines(dubbed);
   const voice = opts?.voice ?? placeholderVoice(lines, dubbed.meta.language ?? "en");
-  const result = compileSkit({ skit, voice, lib: src.lib, sets: src.sets, sfx: src.sfx, reactions: src.reactions, safeArea: src.safeArea, lang: opts?.lang, series: opts?.series });
+  const result = compileSkit({ skit, voice, lib: src.lib, sets: src.sets, sfx: src.sfx, reactions: src.reactions, safeArea: src.safeArea, lang: opts?.lang, series: opts?.series, figures: opts?.figures });
   const check = checkSkit({ result, lib: src.lib, sets: src.sets, safeArea: src.safeArea });
   const cuts: DraftCut[] = result.program.scenes.flatMap((sc) => [
     ...sc.timeline.shots.map((s) => ({ frame: s.frame + sc.from, kind: "cut" as const, framing: s.framing, ...(s.on ? { on: s.on } : {}), reason: s.reason, scene: sc.id })),

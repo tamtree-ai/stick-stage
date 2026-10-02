@@ -1,0 +1,401 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "95% of the universe is fine print",
+    "aspect": "9:16",
+    "description": "Atoms are only about 5% of the universe; the rest is dark matter and dark energy. Sources and simplifications in the pinned comment. What else would you put in the fine print?",
+    "hashtags": [
+      "shorts",
+      "space",
+      "cosmology",
+      "darkmatter",
+      "science"
+    ]
+  },
+  "set": "space-1",
+  "cast": [
+    {
+      "id": "gus",
+      "character": "gus",
+      "mark": "left",
+      "pose": "arms-crossed"
+    },
+    {
+      "id": "vera",
+      "character": "vera",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "subtitles": true
+  },
+  "figures": [
+    {
+      "id": "parts",
+      "kind": "histogram",
+      "at": {
+        "x": 0.5,
+        "y": 0.27,
+        "w": 0.8,
+        "h": 0.22
+      },
+      "layer": "back",
+      "params": {
+        "source": "values",
+        "values": [
+          0,
+          0,
+          0
+        ],
+        "labels": [
+          "atoms",
+          "dark M",
+          "dark E"
+        ],
+        "share": false,
+        "yMax": 70,
+        "expected": false,
+        "count": false
+      },
+      "hidden": true,
+      "reveal": "draw",
+      "label": "What the universe is made of (%)",
+      "panel": false
+    },
+    {
+      "id": "here",
+      "kind": "callout",
+      "at": {
+        "x": 0.36,
+        "y": 0.2,
+        "w": 0.3,
+        "h": 0.05
+      },
+      "layer": "front",
+      "params": {
+        "text": "you are here",
+        "target": [
+          0.26,
+          0.36
+        ]
+      },
+      "hidden": true,
+      "reveal": "draw",
+      "panel": false
+    }
+  ],
+  "template": "myth-flip",
+  "claims": [
+    {
+      "text": "Today's mass-energy budget of the universe is about 5% ordinary matter, 27% dark matter and 68% dark energy.",
+      "source": "Planck Collaboration, Planck 2018 results VI: Cosmological parameters, A&A 641, A6 (2020); NASA Science, 'Dark Energy, Dark Matter'",
+      "checkedBy": null,
+      "beats": [
+        "l2",
+        "l3",
+        "l4",
+        "l6",
+        "l9",
+        "l10"
+      ]
+    },
+    {
+      "text": "Stars in the outer parts of galaxies orbit faster than the visible mass can explain (flat rotation curves), a key line of evidence for dark matter.",
+      "source": "Rubin & Ford 1970; Rubin, Ford & Thonnard 1980; OpenStax, Astronomy 2e, dark matter section (check section number)",
+      "checkedBy": null,
+      "beats": [
+        "l4"
+      ]
+    },
+    {
+      "text": "Distant Type Ia supernovae are dimmer than expected, showing that the expansion of the universe is accelerating.",
+      "source": "Riess et al. 1998; Perlmutter et al. 1999; The Nobel Prize in Physics 2011 (nobelprize.org)",
+      "checkedBy": null,
+      "beats": [
+        "l6"
+      ]
+    },
+    {
+      "text": "Dark energy is the name for whatever drives the acceleration; neither dark energy nor dark matter has been identified.",
+      "source": "OpenStax, Astronomy 2e, ch. 29 (check section)",
+      "checkedBy": null,
+      "beats": [
+        "l6",
+        "l8"
+      ]
+    }
+  ],
+  "simplifications": [
+    "The shares are of the universe's total mass-energy today, not of its volume. They change over cosmic time.",
+    "'Atoms' means ordinary (baryonic) matter: it also counts the gas between galaxies, which we mostly don't see. Neutrinos and light are a tiny extra slice, left out.",
+    "Rotation curves are one line of evidence for dark matter; gravitational lensing and the cosmic microwave background are others.",
+    "The numbers are rounded; 4.9 + 26.8 + 68.3 is the usual Planck split."
+  ],
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "gus",
+      "line": "Done. I've read the whole universe: stars, planets, gas.",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "hold",
+          "prop": "book",
+          "hand": "R",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "expression": "smug",
+      "role": "myth"
+    },
+    {
+      "id": "l2",
+      "speaker": "vera",
+      "line": "All the atoms? About 5% of it.",
+      "actions": [],
+      "expression": "happy",
+      "spoken": "All the atoms? About five percent of it.",
+      "figures": [
+        {
+          "do": "show",
+          "id": "parts",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "set",
+          "id": "parts",
+          "at": {
+            "word": "5",
+            "occurrence": 1
+          },
+          "params": {
+            "values": [
+              5,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "role": "pushback"
+    },
+    {
+      "id": "l3",
+      "speaker": "gus",
+      "line": "So the other 95% is… more planets?",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "pose",
+          "pose": "arms-crossed",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "smug",
+      "spoken": "So the other ninety-five percent is… more planets?",
+      "role": "prediction"
+    },
+    {
+      "id": "l4",
+      "speaker": "vera",
+      "line": "27% is dark matter. Galaxies spin too fast without it.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        },
+        {
+          "who": "vera",
+          "do": "look",
+          "to": "figure:parts",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "happy",
+      "spoken": "Twenty-seven percent is dark matter. Galaxies spin too fast without it.",
+      "figures": [
+        {
+          "do": "set",
+          "id": "parts",
+          "at": {
+            "word": "matter",
+            "occurrence": 1
+          },
+          "params": {
+            "values": [
+              5,
+              27,
+              0
+            ]
+          }
+        }
+      ],
+      "role": "demo"
+    },
+    {
+      "id": "l5",
+      "speaker": "gus",
+      "line": "So the galaxies are cheating.",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "gag",
+          "gag": "double-take",
+          "at": {
+            "fraction": 0.2
+          }
+        }
+      ],
+      "expression": "shocked",
+      "role": "reaction"
+    },
+    {
+      "id": "l6",
+      "speaker": "vera",
+      "line": "68% is dark energy. Far-off supernovae show the expansion speeding up.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        },
+        {
+          "who": "vera",
+          "do": "look",
+          "to": "figure:parts",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "neutral",
+      "spoken": "Sixty-eight percent is dark energy. Far-off supernovae show the expansion speeding up.",
+      "figures": [
+        {
+          "do": "set",
+          "id": "parts",
+          "at": {
+            "word": "energy",
+            "occurrence": 1
+          },
+          "params": {
+            "values": [
+              5,
+              27,
+              68
+            ]
+          }
+        }
+      ],
+      "role": "why"
+    },
+    {
+      "id": "l7",
+      "speaker": "gus",
+      "line": "And what are they, actually?",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "gag",
+          "gag": "double-take",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "expression": "shocked",
+      "role": "reaction"
+    },
+    {
+      "id": "l8",
+      "speaker": "vera",
+      "line": "Nobody knows yet.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        },
+        {
+          "who": "vera",
+          "do": "look",
+          "to": "figure:parts",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "neutral",
+      "role": "why"
+    },
+    {
+      "id": "l9",
+      "speaker": "vera",
+      "line": "Everything you've ever touched is in that 5%.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "shrug",
+          "at": {
+            "fraction": 0.2
+          }
+        }
+      ],
+      "expression": "neutral",
+      "spoken": "Everything you've ever touched is in that five percent.",
+      "figures": [
+        {
+          "do": "show",
+          "id": "here",
+          "at": {
+            "word": "touched",
+            "occurrence": 1
+          }
+        }
+      ],
+      "role": "why-it-felt-true"
+    },
+    {
+      "id": "l10",
+      "speaker": "vera",
+      "line": "You read the 5%. The rest is fine print.",
+      "actions": [],
+      "expression": "happy",
+      "spoken": "You read the five percent. The rest is fine print.",
+      "role": "takeaway",
+      "text": [
+        {
+          "type": "slam",
+          "value": "FINE PRINT",
+          "at": {
+            "word": "print",
+            "occurrence": 1
+          }
+        }
+      ],
+      "punchline": true,
+      "pauseBeforeMs": 350,
+      "holdAfterMs": 400,
+      "reaction": "happy"
+    }
+  ]
+}

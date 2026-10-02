@@ -87,6 +87,7 @@ const TEMPLATE_DESCRIPTION: Record<TemplateId, string> = {
   family: "A kid asks. An adult answers badly. One or two kids.",
   fable: "Dash is sure and leaves. Moss has the last true line.",
   trio: "Three people in one room. One of them lands it.",
+  "myth-flip": "Science: the skeptic states a common myth, the host shows the truth with a prop or a diagram, then why it felt true and a takeaway.",
 };
 
 /** JSON with object keys sorted, so the hash does not depend on key order. */

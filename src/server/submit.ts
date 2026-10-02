@@ -6,7 +6,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { parseSkit, skitLines, SkitError, VoiceManifestSchema, type Diagnostic, type VoiceManifest } from "../engine/core";
+import { approvalStatus, isScienceSkit, parseSkit, skitLines, SkitError, VoiceManifestSchema, type Diagnostic, type VoiceManifest } from "../engine/core";
 import { HttpError } from "./http";
 import type { HookVariant, JobOptions } from "./jobs";
 import { unsupportedBeats } from "./validate";
@@ -78,6 +78,13 @@ export const parseSubmission = async (form: FormData): Promise<Submission> => {
   }
   const unsupported = unsupportedBeats(doc);
   if (unsupported.length) throw invalid(unsupported);
+  // A final render of a science skit is a posting render: the owner's approval must match the content.
+  const rawOpts = ((await jsonField(form, "options", false)) ?? {}) as Record<string, unknown>;
+  if (isScienceSkit(doc) && parseOptions(rawOpts).quality === "final" && parseOptions(rawOpts).mode === "render") {
+    const status = approvalStatus(skit);
+    if (!status.ok)
+      throw invalid([{ level: "error", code: `approval-${status.reason}`, path: "skit.approval", message: status.message, expected: `a draft render ("quality": "draft"), or approve the skit first` }]);
+  }
 
   const voiceParse = VoiceManifestSchema.safeParse(await jsonField(form, "voice", true));
   if (!voiceParse.success) throw invalid(voiceParse.error.issues.map((i) => err("voice-invalid", `voice.${i.path.join(".")}`, i.message)));
@@ -97,6 +104,7 @@ export const parseSubmission = async (form: FormData): Promise<Submission> => {
     const v = byId.get(l.id);
     if (!v) diags.push(err("voice-missing", `voice.lines`, `no voice line for beat "${l.id}"`, `{ "id": "${l.id}", "text": ${JSON.stringify(l.text)}, "audio": "voice/${l.id}.wav" }`));
     else if (v.text !== l.text) diags.push(err("voice-stale", `voice.lines[id=${l.id}].text`, `voice text ${JSON.stringify(v.text)} differs from the skit line`, JSON.stringify(l.text)));
+    else if ((v.spoken ?? undefined) !== (l.spoken ?? undefined)) diags.push(err("voice-stale", `voice.lines[id=${l.id}].spoken`, `the voice says ${JSON.stringify(v.spoken ?? v.text)}, the skit's spoken form is ${JSON.stringify(l.spoken ?? l.text)}`, l.spoken ? JSON.stringify(l.spoken) : `no "spoken" field`));
   }
   const neededIds = new Set(needed.map((l) => l.id));
   for (const v of voice.lines) if (!neededIds.has(v.id)) warnings.push(`voice line "${v.id}" isn't a spoken beat of the skit; ignored`);

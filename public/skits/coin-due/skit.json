@@ -1,0 +1,388 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Is tails due after five heads?",
+    "aspect": "9:16",
+    "description": "A coin has no memory: after any streak, the next flip is still 50/50. Sources and simplifications in the pinned comment.",
+    "hashtags": [
+      "maths",
+      "probability",
+      "mythbusting"
+    ]
+  },
+  "set": "blueprint-1",
+  "cast": [
+    {
+      "id": "gus",
+      "character": "gus",
+      "mark": "left",
+      "pose": "arms-crossed"
+    },
+    {
+      "id": "vera",
+      "character": "vera",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "subtitles": true
+  },
+  "figures": [
+    {
+      "id": "next",
+      "kind": "histogram",
+      "at": {
+        "x": 0.5,
+        "y": 0.27,
+        "w": 0.7,
+        "h": 0.22
+      },
+      "layer": "back",
+      "params": {
+        "source": "values",
+        "labels": [
+          "heads",
+          "tails"
+        ],
+        "expected": false,
+        "count": false,
+        "yMax": 1
+      },
+      "states": {
+        "myth": {
+          "label": "Tails is due",
+          "values": [
+            0.15,
+            0.85
+          ],
+          "color": "myth"
+        },
+        "truth": {
+          "label": "Still 50/50",
+          "values": [
+            0.5,
+            0.5
+          ],
+          "color": "truth"
+        }
+      },
+      "state": "myth",
+      "hidden": false,
+      "reveal": "draw",
+      "panel": false
+    },
+    {
+      "id": "why",
+      "kind": "equation",
+      "at": {
+        "x": 0.5,
+        "y": 0.27,
+        "w": 0.88,
+        "h": 0.14
+      },
+      "layer": "front",
+      "params": {
+        "tex": "P(\\text{T} \\mid \\class{t-past}{\\text{HHHHH}}) = P(\\text{T}) = \\class{t-half}{\\tfrac{1}{2}}"
+      },
+      "hidden": true,
+      "reveal": "draw",
+      "panel": false
+    },
+    {
+      "id": "many",
+      "kind": "histogram",
+      "at": {
+        "x": 0.5,
+        "y": 0.27,
+        "w": 0.7,
+        "h": 0.22
+      },
+      "layer": "back",
+      "params": {
+        "source": "coin",
+        "n": 0,
+        "seed": "coin-due",
+        "labels": [
+          "heads",
+          "tails"
+        ]
+      },
+      "hidden": true,
+      "reveal": "draw",
+      "label": "Share of heads and tails",
+      "panel": false
+    }
+  ],
+  "template": "myth-flip",
+  "claims": [
+    {
+      "text": "Flips of a fair coin are independent: whatever came before, the chance of tails on the next flip is 1/2.",
+      "source": "OpenStax, Introductory Statistics 2e, §3.2 Independent and Mutually Exclusive Events (openstax.org)",
+      "checkedBy": null,
+      "beats": [
+        "l2",
+        "l4",
+        "l6",
+        "l8"
+      ]
+    },
+    {
+      "text": "Over many flips the share of tails gets close to 1/2 (the law of large numbers), because the streak becomes a smaller part of the total, not because later flips make up for it.",
+      "source": "OpenStax, Introductory Statistics 2e, §3.1 Terminology (law of large numbers)",
+      "checkedBy": null,
+      "beats": [
+        "l7"
+      ]
+    }
+  ],
+  "simplifications": [
+    "Assumes a fair coin and a fair toss. Real tossed coins land on the side they started on slightly more often than half (about 51% in a 350,757-flip study, Bartoš et al. 2023). That comes from the toss, not from memory of earlier flips.",
+    "The histogram is a simulation of a fair coin, not a recording of real flips."
+  ],
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "gus",
+      "line": "Five heads in a row. Tails is due.",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "hold",
+          "prop": "coin",
+          "hand": "R",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "expression": "smug",
+      "role": "myth"
+    },
+    {
+      "id": "l2",
+      "speaker": "vera",
+      "line": "Due? The coin doesn't remember.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "hold",
+          "prop": "coin",
+          "hand": "R",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "expression": "happy",
+      "role": "pushback"
+    },
+    {
+      "id": "l3",
+      "speaker": "gus",
+      "line": "It has to even out. Tails, for sure.",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "pose",
+          "pose": "arms-crossed",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "smug",
+      "role": "prediction"
+    },
+    {
+      "id": "l4",
+      "speaker": "vera",
+      "line": "Next flip? Still a coin toss.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        },
+        {
+          "who": "vera",
+          "do": "look",
+          "to": "figure:next",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "happy",
+      "figures": [
+        {
+          "do": "state",
+          "id": "next",
+          "at": {
+            "word": "toss",
+            "occurrence": 1
+          },
+          "state": "truth",
+          "style": "strike"
+        }
+      ],
+      "role": "demo"
+    },
+    {
+      "id": "l5",
+      "speaker": "gus",
+      "line": "…huh.",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "gag",
+          "gag": "concede",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "expression": "shocked",
+      "role": "reaction"
+    },
+    {
+      "id": "l6",
+      "speaker": "vera",
+      "line": "Each flip starts fresh. The last five heads change nothing.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        },
+        {
+          "who": "vera",
+          "do": "look",
+          "to": "figure:next",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "neutral",
+      "figures": [
+        {
+          "do": "hide",
+          "id": "next",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "show",
+          "id": "why",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "set",
+          "id": "why",
+          "at": {
+            "word": "heads",
+            "occurrence": 1
+          },
+          "params": {
+            "highlight": [
+              "t-past"
+            ]
+          }
+        },
+        {
+          "do": "set",
+          "id": "why",
+          "at": {
+            "word": "nothing",
+            "occurrence": 1
+          },
+          "params": {
+            "highlight": [
+              "t-half"
+            ],
+            "strike": [
+              "t-past"
+            ]
+          }
+        }
+      ],
+      "role": "why"
+    },
+    {
+      "id": "l7",
+      "speaker": "vera",
+      "line": "Over thousands of flips it does even out. The streak gets buried, not fixed.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "shrug",
+          "at": {
+            "fraction": 0.2
+          }
+        }
+      ],
+      "expression": "neutral",
+      "figures": [
+        {
+          "do": "hide",
+          "id": "why",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "show",
+          "id": "many",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "set",
+          "id": "many",
+          "at": {
+            "word": "thousands",
+            "occurrence": 1
+          },
+          "params": {
+            "n": 2000
+          },
+          "durationMs": 3500
+        }
+      ],
+      "role": "why-it-felt-true"
+    },
+    {
+      "id": "l8",
+      "speaker": "vera",
+      "line": "Coins don't remember. Streaks just happen.",
+      "actions": [],
+      "expression": "happy",
+      "role": "takeaway",
+      "text": [
+        {
+          "type": "slam",
+          "value": "NO MEMORY",
+          "at": {
+            "word": "happen",
+            "occurrence": 1
+          }
+        }
+      ],
+      "punchline": true,
+      "pauseBeforeMs": 350,
+      "holdAfterMs": 400,
+      "reaction": "happy"
+    }
+  ]
+}

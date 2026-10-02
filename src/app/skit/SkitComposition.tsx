@@ -1,13 +1,13 @@
 import React from "react";
 import { SkitProgram } from "../../engine";
 import { library, safeArea, sets } from "../../data";
-import { fontFor } from "../../engine/text/fonts";
+import { fontFor, withSymbolFallbacks } from "../../engine/text/fonts";
 import { TEXT_FONT } from "../fonts";
 import type { SkitCompositionProps } from "./skitData";
 
 const familyOf = (language: string | undefined): string => {
   const choice = fontFor(language);
-  return choice.family === "Montserrat" ? TEXT_FONT : choice.family;
+  return choice.family === "Montserrat" ? TEXT_FONT : withSymbolFallbacks(choice.family);
 };
 
 /** A skit from `public/skits/<id>/skit.json`, compiled in `calculateSkitMetadata`. */

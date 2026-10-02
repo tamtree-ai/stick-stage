@@ -25,7 +25,10 @@
         "office",
         "park",
         "street",
-        "beach"
+        "beach",
+        "abstract",
+        "space",
+        "lab"
       ]
     },
     "description": {

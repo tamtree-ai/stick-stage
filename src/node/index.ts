@@ -10,3 +10,5 @@ export * from "./prep";
 export * from "./project";
 export * from "./render";
 export * from "./post";
+export * from "./figures";
+export * from "./equations";

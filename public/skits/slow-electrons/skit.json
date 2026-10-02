@@ -1,0 +1,381 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Do electrons race through the wire?",
+    "aspect": "9:16",
+    "description": "Electrons in a wire drift at well under a millimetre per second. The push travels fast; the electrons don't. Sources and simplifications in the pinned comment.",
+    "hashtags": [
+      "physics",
+      "electricity",
+      "science",
+      "mythbusting"
+    ]
+  },
+  "set": "lab-1",
+  "cast": [
+    {
+      "id": "gus",
+      "character": "gus",
+      "mark": "left",
+      "pose": "arms-crossed"
+    },
+    {
+      "id": "vera",
+      "character": "vera",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "subtitles": true
+  },
+  "figures": [
+    {
+      "id": "speed",
+      "kind": "scale",
+      "at": {
+        "x": 0.5,
+        "y": 0.29,
+        "w": 0.9,
+        "h": 0.14
+      },
+      "layer": "back",
+      "params": {
+        "log": true,
+        "min": -5,
+        "max": 9,
+        "step": 2
+      },
+      "states": {
+        "myth": {
+          "label": "Electrons: light speed",
+          "marks": [
+            {
+              "value": 8.48,
+              "label": "light 3×10⁸ m/s",
+              "color": "myth"
+            }
+          ]
+        },
+        "truth": {
+          "label": "Electrons: a crawl",
+          "marks": [
+            {
+              "value": 0,
+              "label": "1 m/s",
+              "color": "muted"
+            },
+            {
+              "value": -3.34,
+              "label": "drift ≈ 0.5 mm/s",
+              "color": "truth"
+            }
+          ]
+        }
+      },
+      "state": "myth",
+      "hidden": false,
+      "reveal": "draw",
+      "panel": false
+    },
+    {
+      "id": "why",
+      "kind": "equation",
+      "at": {
+        "x": 0.5,
+        "y": 0.27,
+        "w": 0.7,
+        "h": 0.15
+      },
+      "layer": "front",
+      "params": {
+        "tex": "\\class{t-v}{v_d} = \\frac{I}{\\class{t-n}{n}\\,q\\,A}"
+      },
+      "hidden": true,
+      "reveal": "draw",
+      "panel": false
+    },
+    {
+      "id": "push",
+      "kind": "wave",
+      "at": {
+        "x": 0.5,
+        "y": 0.27,
+        "w": 0.88,
+        "h": 0.2
+      },
+      "layer": "back",
+      "params": {
+        "mode": "packet",
+        "components": [
+          {
+            "amp": 1.2,
+            "wavelength": 0.5,
+            "period": 0.6
+          }
+        ],
+        "packetWidth": 0.5
+      },
+      "hidden": true,
+      "reveal": "draw",
+      "label": "The push: near light speed",
+      "panel": false,
+      "tag": "cartoon model"
+    }
+  ],
+  "template": "myth-flip",
+  "claims": [
+    {
+      "text": "The drift velocity of electrons in a typical copper wire is small: about 0.45 mm/s for 20 A in a 12-gauge (2.05 mm) copper wire.",
+      "source": "OpenStax, University Physics Volume 2, §9.2 Model of Conduction in Metals, worked example on drift velocity (openstax.org)",
+      "checkedBy": null,
+      "beats": [
+        "l4",
+        "l8"
+      ]
+    },
+    {
+      "text": "Drift velocity is v_d = I / (n q A); copper has about 8.5 × 10²⁸ free electrons per cubic metre, so each one moves slowly for an ordinary current.",
+      "source": "OpenStax, University Physics Volume 2, §9.2 Model of Conduction in Metals",
+      "checkedBy": null,
+      "beats": [
+        "l6"
+      ]
+    },
+    {
+      "text": "The light comes on almost at once because the electric field that pushes the electrons is set up along the circuit at close to the speed of light, so electrons everywhere in the wire start moving together.",
+      "source": "OpenStax, University Physics Volume 2, §9.2 Model of Conduction in Metals",
+      "checkedBy": null,
+      "beats": [
+        "l7",
+        "l8"
+      ]
+    }
+  ],
+  "simplifications": [
+    "The numbers are for steady (DC) current. With household AC, electrons mostly jiggle back and forth in place rather than drifting along.",
+    "Electrons also move fast at random (around 10⁶ m/s) in every direction; drift is the slow average motion along the wire.",
+    "The signal speed in a real cable is a large fraction of the speed of light, depending on the cable; the scale rounds it to light speed.",
+    "The scale is in metres per second on a powers-of-ten axis."
+  ],
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "gus",
+      "line": "Flip the switch and electrons zoom down the wire at light speed.",
+      "actions": [],
+      "expression": "smug",
+      "role": "myth"
+    },
+    {
+      "id": "l2",
+      "speaker": "vera",
+      "line": "Zoom? They barely shuffle.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "hold",
+          "prop": "light-bulb",
+          "hand": "R",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "expression": "happy",
+      "role": "pushback"
+    },
+    {
+      "id": "l3",
+      "speaker": "gus",
+      "line": "They must. The light comes on instantly.",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "pose",
+          "pose": "arms-crossed",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "smug",
+      "role": "prediction"
+    },
+    {
+      "id": "l4",
+      "speaker": "vera",
+      "line": "Here's how fast they really go.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        },
+        {
+          "who": "vera",
+          "do": "look",
+          "to": "figure:speed",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "happy",
+      "figures": [
+        {
+          "do": "state",
+          "id": "speed",
+          "at": {
+            "word": "go",
+            "occurrence": 1
+          },
+          "state": "truth",
+          "style": "strike"
+        }
+      ],
+      "role": "demo"
+    },
+    {
+      "id": "l5",
+      "speaker": "gus",
+      "line": "…huh.",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "gag",
+          "gag": "concede",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "expression": "shocked",
+      "role": "reaction"
+    },
+    {
+      "id": "l6",
+      "speaker": "vera",
+      "line": "A wire is packed with so many electrons that each one only has to creep.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        },
+        {
+          "who": "vera",
+          "do": "look",
+          "to": "figure:speed",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "neutral",
+      "figures": [
+        {
+          "do": "hide",
+          "id": "speed",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "show",
+          "id": "why",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "set",
+          "id": "why",
+          "at": {
+            "word": "many",
+            "occurrence": 1
+          },
+          "params": {
+            "highlight": [
+              "t-n"
+            ]
+          }
+        },
+        {
+          "do": "set",
+          "id": "why",
+          "at": {
+            "word": "creep",
+            "occurrence": 1
+          },
+          "params": {
+            "highlight": [
+              "t-v"
+            ]
+          }
+        }
+      ],
+      "role": "why"
+    },
+    {
+      "id": "l7",
+      "speaker": "vera",
+      "line": "The light is instant because the push travels fast. Every electron starts moving at once.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "shrug",
+          "at": {
+            "fraction": 0.2
+          }
+        }
+      ],
+      "expression": "neutral",
+      "figures": [
+        {
+          "do": "hide",
+          "id": "why",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "show",
+          "id": "push",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "role": "why-it-felt-true"
+    },
+    {
+      "id": "l8",
+      "speaker": "vera",
+      "line": "The signal is fast. The electrons are slow.",
+      "actions": [],
+      "expression": "happy",
+      "role": "takeaway",
+      "text": [
+        {
+          "type": "slam",
+          "value": "SLOW",
+          "at": {
+            "word": "slow",
+            "occurrence": 1
+          }
+        }
+      ],
+      "punchline": true,
+      "pauseBeforeMs": 350,
+      "holdAfterMs": 400,
+      "reaction": "happy"
+    }
+  ]
+}

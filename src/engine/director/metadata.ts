@@ -8,6 +8,8 @@ import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
 import type { SafeArea } from "../text/safeArea";
 import { PreparedVoiceSchema } from "../voice/schema";
+import { EquationCacheSchema } from "../viz/typeset";
+import type { ImageDef } from "../viz/images";
 
 /** Props of the skit composition the consumer registers (`skit` = folder under their skits dir). */
 export const skitCompositionSchema = z.object({
@@ -34,6 +36,8 @@ export type StickStageContext = {
   skitsPath?: string;
   /** Series documents, so a skit can inherit style and cold open. */
   series?: Readonly<Record<string, SeriesStyle>>;
+  /** Credited images figures may show (`images.json`). */
+  images?: Readonly<Record<string, ImageDef>>;
 };
 
 /**
@@ -48,7 +52,9 @@ export const calculateStickStageMetadata =
     if (skit === undefined) throw new Error(`Missing ${base}/skit.json`);
     const voiceJson = await ctx.load(`${base}/generated/voice.prepared.json`);
     const voice = voiceJson === undefined ? undefined : PreparedVoiceSchema.parse(voiceJson);
-    const compiled = compileSkit({ skit, voice, lib: ctx.lib, sets: ctx.sets, sfx: ctx.sfx, reactions: ctx.reactions, safeArea: ctx.safeArea, series: ctx.series, lang: props.lang });
+    const eqJson = await ctx.load(`${base}/generated/equations.json`);
+    const equations = eqJson === undefined ? {} : EquationCacheSchema.parse(eqJson).equations;
+    const compiled = compileSkit({ skit, voice, lib: ctx.lib, sets: ctx.sets, sfx: ctx.sfx, reactions: ctx.reactions, safeArea: ctx.safeArea, series: ctx.series, lang: props.lang, figures: { equations, images: ctx.images } });
     if (compiled.warnings.length) console.warn(formatDiagnostics(compiled.warnings));
     const hook = compiled.program.hook;
     const program = props.omitHook && hook ? { ...compiled.program, hook: undefined, durationInFrames: compiled.program.durationInFrames - hook.prefixFrames + hook.transitionFrames } : compiled.program;

@@ -1,5 +1,5 @@
 /**
- * Writes the 100 drawn props from scripts/prop-art into src/data/props/<category>/.
+ * Writes the 118 drawn props from scripts/prop-art into src/data/props/<category>/.
  * The JSON files are what the engine loads. Re-running this overwrites them.
  */
 import fs from "node:fs";
@@ -9,14 +9,15 @@ import { DRINKS } from "./prop-art/drinks";
 import { FOOD } from "./prop-art/food";
 import { HOME, MONEY, PARTY, SPORT, TRAVEL } from "./prop-art/life";
 import { KITCHEN, OFFICE, TECH } from "./prop-art/work";
+import { MATHS, SCIENCE } from "./prop-art/science";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 
-const arts = [...FOOD, ...DRINKS, ...KITCHEN, ...OFFICE, ...TECH, ...HOME, ...MONEY, ...SPORT, ...PARTY, ...TRAVEL];
+const arts = [...FOOD, ...DRINKS, ...KITCHEN, ...OFFICE, ...TECH, ...HOME, ...MONEY, ...SPORT, ...PARTY, ...TRAVEL, ...MATHS, ...SCIENCE];
 const dir = path.join(ROOT, "src/data/props");
 
-if (arts.length !== 100) {
-  console.error(`expected 100 drawn props, got ${arts.length}`);
+if (arts.length !== 118) {
+  console.error(`expected 118 drawn props, got ${arts.length}`);
   process.exit(1);
 }
 

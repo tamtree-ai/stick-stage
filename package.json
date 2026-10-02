@@ -35,7 +35,9 @@
     "test": "vitest run && tsx scripts/props-lint.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "viz:lab": "tsx scripts/viz-lab.ts",
+    "approve": "tsx scripts/approve.ts"
   },
   "engines": {
     "node": ">=22"
@@ -49,6 +51,7 @@
     "@remotion/renderer": "4.0.529",
     "@remotion/shapes": "4.0.529",
     "@remotion/transitions": "4.0.529",
+    "mathjax-full": "3.2.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "remotion": "4.0.529",

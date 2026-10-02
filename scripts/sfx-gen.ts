@@ -11,6 +11,7 @@ import path from "node:path";
 import { SfxManifestSchema, type SfxManifest } from "../src/engine";
 import { buf, env, filter, mix, noise, osc, perc, saturate, SR, time, writeWav, type Sig } from "./lib/synth";
 import { ROOT } from "./lib/tools";
+import { SCIENCE_SOUNDS } from "./lib/sfx-science";
 
 const SOURCE = "synthesized in code by scripts/sfx-gen.ts (StickStage, original)";
 const LICENSE = "CC0-1.0";
@@ -200,6 +201,7 @@ const SOUNDS: Sound[] = [
       return mix(T, ...[1568, 1976, 2349, 3136].map((hz, i) => [bell(hz), 1, i * 0.07] as [Sig, number, number]));
     },
   },
+  ...SCIENCE_SOUNDS,
 ];
 
 const outDir = path.join(ROOT, "public/sfx");

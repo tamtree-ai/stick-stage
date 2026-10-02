@@ -6,6 +6,7 @@ import lookToCamera from "../../data/gags/look-to-camera.json";
 import slowClap from "../../data/gags/slow-clap.json";
 import spitTake from "../../data/gags/spit-take.json";
 import walkOut from "../../data/gags/walk-out.json";
+import concede from "../../data/gags/concede.json";
 import { SYMBOLS } from "../face/schema";
 import type { Action, Beat, SfxCue } from "./schema";
 
@@ -18,6 +19,7 @@ const StepSchema = z.discriminatedUnion("do", [
   z.strictObject({ do: z.literal("holdProp"), prop: z.string().min(1), atMs: z.number() }),
   z.strictObject({ do: z.literal("fall"), atMs: z.number() }),
   z.strictObject({ do: z.literal("turn"), atMs: z.number() }),
+  z.strictObject({ do: z.literal("nod"), atMs: z.number() }),
   z.strictObject({ do: z.literal("walkOut"), atMs: z.number() }),
   z.strictObject({ do: z.literal("punchIn"), atMs: z.number() }),
   z.strictObject({ do: z.literal("holdMs"), ms: z.number().min(0) }),
@@ -33,7 +35,7 @@ export const GagSchema = z.strictObject({
 export type GagDef = z.infer<typeof GagSchema>;
 
 /** The shipped gag library. A new gag is a JSON file plus a line here. */
-export const GAGS: GagDef[] = [doubleTake, lookToCamera, spitTake, faint, slowClap, walkOut, freezeFrame].map((g) => GagSchema.parse(g));
+export const GAGS: GagDef[] = [doubleTake, lookToCamera, spitTake, faint, slowClap, walkOut, freezeFrame, concede].map((g) => GagSchema.parse(g));
 
 export const GAG_IDS = GAGS.map((g) => g.id);
 
@@ -82,6 +84,9 @@ export const expandGag = (gag: GagDef, who: string, speaker: string | undefined,
         break;
       case "turn":
         actions.push({ do: "turn", who, at: atMs(step.atMs) });
+        break;
+      case "nod":
+        actions.push({ do: "nod", who, at: atMs(step.atMs) });
         break;
       case "walkOut":
         actions.push({ do: "walkTo", who, mark: side === "left" ? "off-left" : "off-right", at: atMs(step.atMs), speed: "walk" });

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "a",
+      "speaker": "vera",
+      "text": "ħ = h / 2π, and Δx·Δp ≥ ħ/2.",
+      "spoken": "h-bar equals h over two pi, and delta x delta p is at least h-bar over two.",
+      "audio": "voice/a.wav",
+      "durationMs": 5520
+    },
+    {
+      "id": "b",
+      "speaker": "gus",
+      "text": "Schrödinger would say ≈ 10⁻³⁴.",
+      "spoken": "Schrödinger would say about ten to the minus thirty four.",
+      "audio": "voice/b.wav",
+      "durationMs": 3304
+    }
+  ]
+}

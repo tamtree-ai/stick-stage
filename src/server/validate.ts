@@ -5,6 +5,13 @@
  */
 import { buildCatalog, catalogVersion, checkDraft, fromPremise, parseBrief, parseSkit, premiseFromReply, repairPrompt, ReplyError, skitFromReply, SkitError, writerWorld, type CheckReport, type Diagnostic, type skitLines } from "../engine/core";
 import type { Project } from "../node";
+import { typesetForCheck } from "./typesetCheck";
+import { pronunciationsFor, type Pronunciation } from "../engine/core";
+
+const pronounceOf = (text: string, lexicon: readonly Pronunciation[] = []) => {
+  const hits = pronunciationsFor(text, lexicon);
+  return hits.length ? { pronounce: hits } : {};
+};
 import { HttpError } from "./http";
 
 export { placeholderVoice, unsupportedBeats } from "../engine/core";
@@ -89,14 +96,14 @@ export const validate = (p: Project, body: unknown, notes: Readonly<Record<strin
       skit = turned.skit;
       corrected = turned.warnings;
     } else if (hasPremise) skit = fromPremise(input.premise, p.lib, p.sets);
-    const d = checkDraft(skit, p);
+    const d = checkDraft(skit, p, { figures: { equations: typesetForCheck(skit), images: p.images } });
     return {
       ok: d.ok,
       catalogVersion: version,
       skit,
       ...(premise !== undefined ? { premise } : {}),
       // Voice-over lines take the skit's narrator voice; the rest their character's.
-      lines: d.lines.map((l) => ({ ...l, voice: l.narrator ? hint(d.result.doc.narrator?.voice) : voiceHint(p, l.character) })),
+      lines: d.lines.map((l) => ({ ...l, ...pronounceOf(l.spoken ?? l.text, p.pronunciations), voice: l.narrator ? hint(d.result.doc.narrator?.voice) : voiceHint(p, l.character) })),
       estimatedDurationSec: d.estimatedDurationSec,
       warnings: [...corrected, ...d.warnings],
       check: d.check,
