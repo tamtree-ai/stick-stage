@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "milo",
+      "text": "Party tonight! Everyone's coming!",
+      "audio": "voice/l1.wav",
+      "durationMs": 2206
+    },
+    {
+      "id": "l2",
+      "speaker": "june",
+      "text": "Everyone? That's so many people.",
+      "audio": "voice/l2.wav",
+      "durationMs": 2075
+    },
+    {
+      "id": "l3",
+      "speaker": "milo",
+      "text": "You promised you'd come!",
+      "audio": "voice/l3.wav",
+      "durationMs": 1221
+    },
+    {
+      "id": "l4",
+      "speaker": "june",
+      "text": "I promised in July. I was a different person.",
+      "audio": "voice/l4.wav",
+      "durationMs": 2817
+    },
+    {
+      "id": "l5",
+      "speaker": "milo",
+      "text": "Just stay one hour.",
+      "audio": "voice/l5.wav",
+      "durationMs": 1222
+    },
+    {
+      "id": "l6",
+      "speaker": "june",
+      "text": "Fine. I'll arrive late and leave early.",
+      "audio": "voice/l6.wav",
+      "durationMs": 2219
+    },
+    {
+      "id": "l7",
+      "speaker": "milo",
+      "text": "That's the same as not coming.",
+      "audio": "voice/l7.wav",
+      "durationMs": 1635
+    },
+    {
+      "id": "l8",
+      "speaker": "june",
+      "text": "Exactly. Efficient.",
+      "audio": "voice/l8.wav",
+      "durationMs": 1506
+    },
+    {
+      "id": "l9",
+      "speaker": "milo",
+      "text": "Why are you like this?",
+      "audio": "voice/l9.wav",
+      "durationMs": 1279
+    },
+    {
+      "id": "l10",
+      "speaker": "june",
+      "text": "Science. Introverts' brains react more to everything. Even lemon juice.",
+      "audio": "voice/l10.wav",
+      "durationMs": 4496
+    },
+    {
+      "id": "l11",
+      "speaker": "milo",
+      "text": "Okay... why does that matter?",
+      "audio": "voice/l11.wav",
+      "durationMs": 1947
+    },
+    {
+      "id": "l12",
+      "speaker": "june",
+      "text": "A lemon is too much for me. Your party has karaoke.",
+      "audio": "voice/l12.wav",
+      "durationMs": 3166
+    }
+  ]
+}

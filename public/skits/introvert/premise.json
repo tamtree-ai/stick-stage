@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "template": "exchange",
+  "title": "Introvert vs. the party",
+  "logline": "Milo wants June at a party; June has science on her side.",
+  "pov": "POV: you invite your introvert friend out",
+  "description": "Every introvert has a reason. This one is backed by science.",
+  "hashtags": ["stickfigure", "relatable", "introvert", "funfact"],
+  "set": "bedroom-1",
+  "cast": [ { "id": "milo", "character": "milo" }, { "id": "june", "character": "june" } ],
+  "lines": [
+    { "who": "milo", "text": "Party tonight! Everyone's coming!", "role": "setup", "expression": "happy" },
+    { "who": "june", "text": "Everyone? That's so many people.", "role": "setup", "expression": "deadpan", "delivery": "flat" },
+    { "who": "milo", "text": "You promised you'd come!", "role": "escalation", "expression": "neutral" },
+    { "who": "june", "text": "I promised in July. I was a different person.", "role": "escalation", "expression": "deadpan", "delivery": "flat" },
+    { "who": "milo", "text": "Just stay one hour.", "role": "escalation", "expression": "neutral" },
+    { "who": "june", "text": "Fine. I'll arrive late and leave early.", "role": "escalation", "expression": "smug" },
+    { "who": "milo", "text": "That's the same as not coming.", "role": "escalation", "expression": "annoyed" },
+    { "who": "june", "text": "Exactly. Efficient.", "role": "escalation", "expression": "smug", "delivery": "flat" },
+    { "who": "milo", "text": "Why are you like this?", "role": "escalation", "expression": "confused" },
+    { "who": "june", "text": "Science. Introverts' brains react more to everything. Even lemon juice.", "role": "escalation", "expression": "deadpan", "delivery": "matter-of-fact" },
+    { "who": "milo", "text": "Okay... why does that matter?", "role": "escalation", "expression": "confused" },
+    { "who": "june", "text": "A lemon is too much for me. Your party has karaoke.", "role": "punchline", "expression": "deadpan", "delivery": "flat, slow on the last word", "slam": "KARAOKE" }
+  ]
+}

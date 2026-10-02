@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Introvert vs. the party",
+    "description": "Every introvert has a reason. This one is backed by science.",
+    "hashtags": [
+      "stickfigure",
+      "relatable",
+      "introvert",
+      "funfact"
+    ]
+  },
+  "set": "bedroom-1",
+  "cast": [
+    {
+      "id": "milo",
+      "character": "milo",
+      "mark": "left",
+      "seated": true
+    },
+    {
+      "id": "june",
+      "character": "june",
+      "mark": "right",
+      "seated": true
+    }
+  ],
+  "overlay": {
+    "pov": "POV: you invite your introvert friend out",
+    "subtitles": true
+  },
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "milo",
+      "line": "Party tonight! Everyone's coming!",
+      "expression": "happy",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "arms-up",
+          "at": {
+            "word": "Everyone's"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "speaker": "june",
+      "line": "Everyone? That's so many people.",
+      "expression": "deadpan",
+      "actions": [
+        {
+          "who": "june",
+          "do": "symbol",
+          "symbol": "sweat",
+          "at": {
+            "word": "many"
+          },
+          "durationMs": 1200
+        }
+      ],
+      "delivery": "flat",
+      "pauseBeforeMs": 250
+    },
+    {
+      "id": "l3",
+      "speaker": "milo",
+      "line": "You promised you'd come!",
+      "expression": "neutral",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "word": "promised"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l4",
+      "speaker": "june",
+      "line": "I promised in July. I was a different person.",
+      "expression": "deadpan",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "think",
+          "at": {
+            "word": "July"
+          }
+        }
+      ],
+      "delivery": "flat"
+    },
+    {
+      "id": "l5",
+      "speaker": "milo",
+      "line": "Just stay one hour.",
+      "expression": "neutral",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "hold-up",
+          "at": {
+            "word": "one"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l6",
+      "speaker": "june",
+      "line": "Fine. I'll arrive late and leave early.",
+      "expression": "smug",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "arms-crossed",
+          "at": {
+            "word": "late"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l7",
+      "speaker": "milo",
+      "line": "That's the same as not coming.",
+      "expression": "annoyed",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "word": "same"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l8",
+      "speaker": "june",
+      "line": "Exactly. Efficient.",
+      "expression": "smug",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "hands-on-hips",
+          "at": {
+            "word": "Efficient"
+          }
+        }
+      ],
+      "delivery": "flat",
+      "pauseBeforeMs": 400,
+      "sfx": [
+        {
+          "id": "ding",
+          "at": {
+            "word": "Efficient"
+          }
+        }
+      ]
+    },
+    {
+      "id": "s1",
+      "silent": true,
+      "durationMs": 800,
+      "actions": [
+        {
+          "who": "milo",
+          "do": "expression",
+          "expression": "annoyed",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "facepalm",
+          "at": {
+            "ms": 150
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "id": "crickets",
+          "at": {
+            "ms": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "l9",
+      "speaker": "milo",
+      "line": "Why are you like this?",
+      "expression": "confused",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "shrug",
+          "at": {
+            "word": "like"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l10",
+      "speaker": "june",
+      "line": "Science. Introverts' brains react more to everything. Even lemon juice.",
+      "expression": "deadpan",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "hold-up",
+          "at": {
+            "word": "Science"
+          }
+        }
+      ],
+      "delivery": "matter-of-fact",
+      "holdAfterMs": 100
+    },
+    {
+      "id": "l11",
+      "speaker": "milo",
+      "line": "Okay... why does that matter?",
+      "expression": "confused",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "symbol",
+          "symbol": "question",
+          "at": {
+            "word": "matter"
+          },
+          "durationMs": 1200
+        }
+      ],
+      "pauseBeforeMs": 300
+    },
+    {
+      "id": "l12",
+      "speaker": "june",
+      "line": "A lemon is too much for me. Your party has karaoke.",
+      "expression": "deadpan",
+      "actions": [],
+      "delivery": "flat, slow on the last word",
+      "punchline": true,
+      "pauseBeforeMs": 600,
+      "holdAfterMs": 300,
+      "text": [
+        {
+          "type": "slam",
+          "value": "KARAOKE",
+          "at": {
+            "word": "karaoke",
+            "occurrence": 1
+          }
+        }
+      ]
+    }
+  ]
+}
