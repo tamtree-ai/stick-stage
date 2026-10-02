@@ -6,7 +6,9 @@ import { renderAccessories } from "./accessories";
 import type { SymbolId } from "../face/schema";
 import { PropView } from "../props/PropView";
 import { propAngle, type PropState } from "../props/track";
+import { proportionsOf, toonOf } from "./build";
 import { limbControl, limbPath } from "./limbs";
+import { ToonRig } from "./toon/ToonRig";
 import type { Character, PoseAngles } from "./schema";
 import type { Joints, RigMetrics } from "./skeleton";
 
@@ -54,7 +56,12 @@ const Limb: React.FC<LimbProps> = ({ root, joint, tip, curve, side, stroke, sw, 
 };
 
 /** Renders one figure in figure space (root on the ground at 0,0, facing right). */
-export const Rig: React.FC<RigProps> = ({
+export const Rig: React.FC<RigProps> = (p) => {
+  const toon = toonOf(p.character);
+  return toon ? <ToonRig {...p} toon={toon} /> : <StickRig {...p} />;
+};
+
+const StickRig: React.FC<RigProps> = ({
   character,
   joints: j,
   metrics: m,
@@ -72,7 +79,7 @@ export const Rig: React.FC<RigProps> = ({
   const tube = limbs ? { fill: limbs.fill, width: limbs.width * sw } : undefined;
   const R = m.headR;
   const curve = (k: keyof PoseAngles["bend"]) => bend[k] ?? limbCurve;
-  const figurePx = m.heightPx / character.proportions.height;
+  const figurePx = m.heightPx / proportionsOf(character).height;
   const propCommon = { figurePx, stroke, sw, mirrored, fontFamily };
 
   // A held prop sits between the arm and the hand nub, so the nub reads as the grip.

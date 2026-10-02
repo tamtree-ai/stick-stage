@@ -150,6 +150,38 @@ Hair and ears draw in a head space where `0°` is the top of the circle and posi
 
 `headwear` and `neck` are legal slots. No shipped drawing uses them yet. A new drawing declares the slot it belongs to.
 
+## The toon tier
+
+A character can also be drawn as a **toon**: skin-coloured arms and legs, clothes, hands with
+fingers, ears, a nose, and eyes with whites, a coloured iris and lids. It uses the same skeleton,
+poses, expressions, mouths and blinks as the stick figure; only the drawing changes. Vera and Gus
+carry a toon block (`src/data/characters/vera.json`); the schema is `src/engine/rig/toon/schema.ts`.
+
+```jsonc
+"style": { "build": "toon", ... },   // default "stick"; "toon" needs the block below
+"toon": {
+  "proportions": { ... },            // the toon body (the stick body keeps "proportions")
+  "skin": "#f3c9a6",
+  "body": { "shoulders": 84, "waist": 58, "hips": 74 },   // toon units: px on a 610 px figure
+  "eyes": { "iris": "#2f7d6d", "lashes": true },
+  "brows": { "color": "#5e231b", "gap": 0.5 },            // gap clears a fringe
+  "lip": "#b23c55",
+  "hair": { "kind": "long-streak", "fill": "#a2412f", "streak": "#f6ece0" },  // or curly-mop
+  "glasses": { "kind": "cat-eye", "fill": "#178f8a" },
+  "top": { "kind": "turtleneck", "fill": "#ef6b57", "belt": "#f6c445" },     // or tee (+ print)
+  "outer": { "kind": "labcoat", "fill": "#fbfaf7", "cuffAt": 0.62 },         // or varsity
+  "bottom": { "kind": "skirt", "fill": "#24566e", "legs": "#3a2e4d" },       // or jeans
+  "shoes": { "kind": "boot", "fill": "#7a4130" },                           // or sneaker
+  "details": [{ "id": "planet-pin" }]
+}
+```
+
+Every garment takes an optional `shade`, the cel-shade tone on its back side; without one it is a
+darker `fill`. Accessories are stick-only: a toon draws its own hair and glasses. The labs force a
+tier with `build` (`CharacterLabToon`, `FaceLabToon`, `PoseLabVera`, `PoseLabGus`, `TalkLabToon`),
+so the same character can be compared stick vs toon. Hair, clothes and details are drawn in code,
+so a new kind (a hoodie, a bob) is a few lines in `src/engine/rig/toon/`, then owner review.
+
 ## Voice, personality, energy
 
 ```json

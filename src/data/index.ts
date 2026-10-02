@@ -48,6 +48,11 @@ import crying from "./expressions/crying.json";
 import cringe from "./expressions/cringe.json";
 import confused from "./expressions/confused.json";
 import deadpan from "./expressions/deadpan.json";
+import skeptical from "./expressions/skeptical.json";
+import worried from "./expressions/worried.json";
+import embarrassed from "./expressions/embarrassed.json";
+import thinking from "./expressions/thinking.json";
+import laughing from "./expressions/laughing.json";
 
 import plain1 from "./sets/plain-1.json";
 import living1 from "./sets/living-1.json";
@@ -93,11 +98,13 @@ export const POSE_IDS = ["idle", "point", "shrug", "facepalm", "arms-up", "arms-
 export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up", "high-five", "shove", "faint"];
 export { PROP_IDS };
 export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed", "angry", "shocked", "sad", "crying", "cringe", "confused", "deadpan"];
+/** Expressions added with the toon tier (labs that cycle EXPRESSION_IDS skip these; FaceLab can include them). */
+export const EXTRA_EXPRESSION_IDS = ["skeptical", "worried", "embarrassed", "thinking", "laughing"];
 
 export const library: Library = createLibrary({
   characters: [milo, june, lila, theo, moss, dash, reed, nell, pip, vera, gus],
   poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose],
-  expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan],
+  expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan, skeptical, worried, embarrassed, thinking, laughing],
   props: PROP_DOCS,
 });
 

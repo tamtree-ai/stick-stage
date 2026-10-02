@@ -2,11 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { z } from "zod";
 import { Actor, evalActor, SetLayers } from "../../engine";
-import { EXTRA_POSE_IDS, library, POSE_IDS, sets } from "../../data";
+import { EXTRA_POSE_IDS, POSE_IDS, sets } from "../../data";
+import { buildProp, labLibrary } from "./build";
 
 export const poseLabSchema = z.object({
   character: z.string(),
   expression: z.string(),
+  build: buildProp,
 });
 
 const ALL_POSES = [...POSE_IDS, ...EXTRA_POSE_IDS];
@@ -14,7 +16,7 @@ const COLS = 4;
 const ROWS = Math.ceil(ALL_POSES.length / COLS);
 
 /** Static grid of every pose for one character — the quickest way to tune pose numbers. */
-export const PoseLab: React.FC<z.infer<typeof poseLabSchema>> = ({ character, expression }) => {
+export const PoseLab: React.FC<z.infer<typeof poseLabSchema>> = ({ character, expression, build }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const W = 1080;
@@ -23,7 +25,8 @@ export const PoseLab: React.FC<z.infer<typeof poseLabSchema>> = ({ character, ex
   const cellH = H / ROWS;
   const set = sets["plain-1"]!;
   const fig = 760;
-  const s = 0.46;
+  // Toon figures carry hair and shoes beyond the stick outline: a little smaller to fit the cells.
+  const s = build === "toon" ? 0.4 : 0.46;
   return (
     <AbsoluteFill style={{ background: "#fff" }}>
       <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H}>
@@ -34,7 +37,7 @@ export const PoseLab: React.FC<z.infer<typeof poseLabSchema>> = ({ character, ex
           const col = i % COLS;
           const row = Math.floor(i / COLS);
           const state = evalActor(
-            library,
+            labLibrary(build),
             { character, poseKeys: [{ frame: 0, pose }], expressionKeys: [{ frame: 0, expression }], idle: 0 },
             frame,
             fps,

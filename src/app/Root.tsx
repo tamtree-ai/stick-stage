@@ -31,6 +31,58 @@ const H = 1920;
 
 export const RemotionRoot: React.FC = () => (
   <>
+    {/* Toon tier (science cast): the same labs with style.build forced to "toon". */}
+    <Composition
+      id="CharacterLabToon"
+      component={CharacterLab}
+      schema={characterLabSchema}
+      defaultProps={{ set: "lab-1", left: "vera", right: "gus", showLabels: true, build: "toon" as const }}
+      durationInFrames={CHARACTER_LAB_FRAMES}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
+    <Composition
+      id="FaceLabToon"
+      component={FaceLab}
+      schema={faceLabSchema}
+      defaultProps={{ set: "lab-1", left: "vera", right: "gus", showLabels: true, build: "toon" as const }}
+      durationInFrames={FACE_LAB_FRAMES}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
+    <Composition
+      id="PoseLabVera"
+      component={PoseLab}
+      schema={poseLabSchema}
+      defaultProps={{ character: "vera", expression: "neutral", build: "toon" as const }}
+      durationInFrames={FPS}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
+    <Composition
+      id="PoseLabGus"
+      component={PoseLab}
+      schema={poseLabSchema}
+      defaultProps={{ character: "gus", expression: "neutral", build: "toon" as const }}
+      durationInFrames={FPS}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
+    <Composition
+      id="TalkLabToon"
+      component={TalkLab}
+      schema={talkLabSchema}
+      defaultProps={{ skit: "talklab", character: "vera", showLabels: true, build: "toon" as const }}
+      calculateMetadata={calculateTalkLabMetadata}
+      durationInFrames={FPS}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
     <Composition
       id="CharacterLab"
       component={CharacterLab}

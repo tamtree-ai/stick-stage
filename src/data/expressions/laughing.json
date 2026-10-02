@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "laughing", "eyes": { "shape": "closed-happy" }, "brows": { "raise": 0.6, "tilt": 4 }, "mouth": { "preset": "grin", "w": 0.62, "open": 0.5 }, "closeup": "close" }

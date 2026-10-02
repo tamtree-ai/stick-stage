@@ -1,3 +1,4 @@
+import { proportionsOf } from "./build";
 import { easeOutCubic } from "../lib/easing";
 import { clamp, DEG, dirFromAngle, lerp } from "../lib/math";
 import type { Character } from "./schema";
@@ -63,8 +64,8 @@ export const solveLeg = (a: number, b: number, tx: number, ty: number): { hip: n
  */
 export const seatedLegs = (c: Character, m: RigMetrics, seatPx: number): LegAngles => {
   const H = m.heightPx;
-  const a = c.proportions.thigh * H;
-  const b = c.proportions.shin * H;
+  const a = proportionsOf(c).thigh * H;
+  const b = proportionsOf(c).shin * H;
   const hipH = seatPx + seatContact(c, m);
   // Ankle height above the ground when the foot oval rests on it.
   const ty = hipH - m.footRy * 1.35;

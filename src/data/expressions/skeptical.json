@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "skeptical", "eyes": { "lid": 0.42, "gaze": { "x": 0.5, "y": 0 } }, "brows": { "left": { "raise": -0.3, "tilt": -6 }, "right": { "raise": 1, "tilt": -4 } }, "mouth": { "preset": "flat", "skew": 0.35 } }

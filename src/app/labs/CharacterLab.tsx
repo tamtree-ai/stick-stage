@@ -2,7 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { z } from "zod";
 import { evalActor, Stage } from "../../engine";
-import { EXPRESSION_IDS, library, POSE_IDS, sets } from "../../data";
+import { EXPRESSION_IDS, POSE_IDS, sets } from "../../data";
+import { buildProp, labLibrary } from "./build";
 import { activeIndex, cycleKeys } from "./cycle";
 import { Label } from "./Label";
 
@@ -11,6 +12,7 @@ export const characterLabSchema = z.object({
   left: z.string(),
   right: z.string(),
   showLabels: z.boolean(),
+  build: buildProp,
 });
 
 export const SEGMENT = 36;
@@ -20,7 +22,7 @@ export const CHARACTER_LAB_FRAMES = SEGMENT * POSE_IDS.length + SEGMENT;
  * Two characters face each other and alternate through every pose and expression, like
  * an exchange: the right character changes half a segment after the left one.
  */
-export const CharacterLab: React.FC<z.infer<typeof characterLabSchema>> = ({ set: setId, left, right, showLabels }) => {
+export const CharacterLab: React.FC<z.infer<typeof characterLabSchema>> = ({ set: setId, left, right, showLabels, build }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const W = 1080;
@@ -36,7 +38,7 @@ export const CharacterLab: React.FC<z.infer<typeof characterLabSchema>> = ({ set
     x: c.x,
     facing: c.facing,
     state: evalActor(
-      library,
+      labLibrary(build),
       {
         character: c.id,
         poseKeys: cycleKeys("pose", POSE_IDS, SEGMENT, c.offset, c.start),

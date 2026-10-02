@@ -1,3 +1,4 @@
+import { proportionsOf, toonOf } from "../rig/build";
 import type { Character } from "../rig/schema";
 
 /** How unlike two characters are. Small numbers are twins. */
@@ -15,18 +16,32 @@ const colorDist = (a: string, b: string): number => {
   return Math.hypot(ar - br, ag - bg, ab - bb);
 };
 
-const fill = (c: Character): string => (c.style.torso.style === "bean" ? c.style.torso.fill : c.style.headFill);
+/** The colour that reads first: the outer layer or top of a toon, the bean of a stick figure. */
+const fill = (c: Character): string => {
+  const t = toonOf(c);
+  if (t) return (t.outer ?? t.top).fill;
+  return c.style.torso.style === "bean" ? c.style.torso.fill : c.style.headFill;
+};
+const skin = (c: Character): string => toonOf(c)?.skin ?? c.style.headFill;
 
-/** Silhouette (proportions and torso style) plus colour. The house cast clears both floors. */
+/** Toon shape cues a silhouette shows: the hair mass, the outer layer, skirt vs trousers. */
+const toonShape = (a: Character, b: Character): number => {
+  const s = toonOf(a);
+  const t = toonOf(b);
+  if (!s || !t) return s || t ? 0.35 : 0;
+  return (s.hair.kind === t.hair.kind ? 0 : 0.2) + (s.outer?.kind === t.outer?.kind ? 0 : 0.1) + (s.bottom.kind === t.bottom.kind ? 0 : 0.2);
+};
+
+/** Silhouette (proportions, torso style, toon shape cues) plus colour. The house cast clears both floors. */
 export const characterDistance = (a: Character, b: Character): Distance => {
-  const p = a.proportions;
-  const q = b.proportions;
+  const p = proportionsOf(a);
+  const q = proportionsOf(b);
   const silhouette =
     Math.abs(p.height - q.height) +
     Math.abs(p.headRadius - q.headRadius) * 4 +
     Math.abs(p.torso - q.torso) +
-    (a.style.torso.style === b.style.torso.style ? 0 : 0.35);
-  const color = colorDist(a.style.headFill, b.style.headFill) + colorDist(fill(a), fill(b)) * 0.5;
+    (toonOf(a) || toonOf(b) ? toonShape(a, b) : a.style.torso.style === b.style.torso.style ? 0 : 0.35);
+  const color = colorDist(skin(a), skin(b)) + colorDist(fill(a), fill(b)) * 0.5;
   return { silhouette: +silhouette.toFixed(3), color: +color.toFixed(1) };
 };
 

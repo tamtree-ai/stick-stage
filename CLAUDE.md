@@ -39,6 +39,7 @@ The **engine and the render service never call a TTS or an LLM.** In production 
 - `src/engine/lib`: math (angle convention in `math.ts`), easing, seeds, colors
 - `src/engine/rig`: schema, FK skeleton (`solveSkeleton`), pose tracks, idle/blinks, Bézier limbs (or `style.limbs` tubes for animals), accessories (animal parts in `animalParts.tsx` / `animalHeads.tsx`), `evalActor` (`actorState.ts`: pose, expression, speech, seat, prop and symbol tracks), `<Actor>`
 - `src/engine/rig/seat.ts`: seat track + seated-leg IK (hip on the seat, feet planted)
+- `src/engine/rig/toon/`: the toon drawing tier (`style.build: "toon"` + a `toon` block): `ToonRig` on the same joints, clothes, limbs, hands, shoes, head and face. `rig/build.ts`: `toonOf`, `proportionsOf` (read body proportions through it), `withBuild`. Guide: `docs/creating-characters.md`
 - `src/engine/props`: prop schema, per-kind drawings (`draw.tsx`), hold/drop track + fall (`track.ts`), `<PropView>`
 - `src/engine/face`: expression schema, parametric mouths (`mouths.ts`), eyes/brows/mouth/symbols (`Emanata.tsx`: !, ?, speed lines)
 - `src/engine/face/visemes.ts`: Rhubarb A–H/X → mouth params, `speechMouth` layers speech on the expression mouth
@@ -54,7 +55,7 @@ The **engine and the render service never call a TTS or an LLM.** In production 
 - `src/data`: JSON library + `index.ts` loader (validates on import), `safe-area.json`, `reactions.json` (listener reaction defaults), `sfx.json` (SFX manifest with licenses)
 - `scripts/`: `sheet.ts`, `voice-say.ts`, `prep.ts`, `compile.ts`, `render.ts`, `sfx-gen.ts`, `lib/` (prep, skit loading, Rhubarb + bundled ffmpeg, WAV reading, `synth.ts` DSP)
 - `public/skits/<id>/`: `skit.json` (labs: `script.json`), `voice.json`, `voice/*.wav` (committed); `generated/` (gitignored)
-- `src/app`: Remotion root and lab compositions (`CharacterLab`, `FaceLab`, `CloseupLab`, `CloseupSheet`, `PoseLab`, `TalkLab`, `SetLab`, `PropLab`, `StagingLab`, `SfxLab`, `ContactSheet`), `skit/` (the `Skit` / `SkitDebug` compositions); `fonts.ts` loads the local text font
+- `src/app`: Remotion root and lab compositions (`CharacterLab`, `FaceLab` (labs take `build: stick | toon` to compare tiers; `*Toon` compositions), `CloseupLab`, `CloseupSheet`, `PoseLab`, `TalkLab`, `SetLab`, `PropLab`, `StagingLab`, `SfxLab`, `ContactSheet`), `skit/` (the `Skit` / `SkitDebug` compositions); `fonts.ts` loads the local text font
 
 ## Rig conventions
 Canonical view faces right; `facing: "left"` mirrors. `L` = back limb, `R` = front limb. Arms: 0° hangs along the torso, +90° forward, 180° up; elbow + flexes forward. Legs are world-relative (0° down, + forward); knee + bends back. The rig lifts the figure so the lowest foot touches `groundY`.

@@ -5,6 +5,8 @@ export * from "./lib/seed";
 export * from "./lib/screenText";
 export * from "./audio/music";
 export * from "./rig/schema";
+export * from "./rig/build";
+export { ToonSchema, TOON_DETAILS, HAND_SHAPES, type Toon, type HandShape } from "./rig/toon/schema";
 export * from "./rig/skeleton";
 export * from "./rig/pose";
 export * from "./rig/idle";
