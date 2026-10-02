@@ -23,6 +23,10 @@
             "type": "string",
             "minLength": 1
           },
+          "spoken": {
+            "type": "string",
+            "minLength": 1
+          },
           "audio": {
             "type": "string",
             "minLength": 1

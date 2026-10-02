@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "vera",
+  "displayName": "Vera",
+  "proportions": { "height": 1.06, "headRadius": 0.165, "neck": 0.025, "torso": 0.28, "upperArm": 0.15, "forearm": 0.14, "thigh": 0.18, "shin": 0.18 },
+  "style": {
+    "stroke": "#1b1b1f",
+    "strokeWidth": 12,
+    "headFill": "#ffffff",
+    "torso": { "style": "bean", "fill": "#3fb6a8", "width": 0.12 },
+    "limbCurve": 0.3,
+    "hands": "nub",
+    "feet": "oval",
+    "footFill": "#1b1b1f"
+  },
+  "face": { "eyes": "dot", "brows": true, "mouthSet": "default", "offsetX": 0.14, "eyeSpacing": 0.44, "eyeY": -0.02, "mouthY": 0.44 },
+  "accessories": [
+    { "slot": "hair", "id": "wild-01", "color": "#c9c3bb" },
+    { "slot": "eyewear", "id": "glasses-rect" },
+    { "slot": "body", "id": "labcoat-01", "color": "#fbfbf8" }
+  ],
+  "energy": 0.6,
+  "personality": "the host: warm, quick and sure without being smug. Says the true thing in one clear line, then shows it.",
+  "voice": { "say": "Karen" }
+}

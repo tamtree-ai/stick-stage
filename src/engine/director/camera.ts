@@ -4,7 +4,7 @@ import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
 import { clampCamera, faceRect, frameShot, headInStage, type Framing } from "../shots/framing";
 import { inside } from "../text/layout";
-import { safeRect, type SafeArea } from "../text/safeArea";
+import { safeRect, type Rect, type SafeArea } from "../text/safeArea";
 import type { Camera } from "../shots/Stage";
 import { stageActorsAt } from "./placement";
 import { PUNCH_FACTOR, PUNCH_FRAMES, type ShotPlan } from "./shots";
@@ -25,6 +25,8 @@ export const solveShots = (
   safeArea: SafeArea = DEFAULT_SAFE_AREA,
   /** Scene length: the last cut holds until here. */
   durationInFrames?: number,
+  /** Stage rectangles a two-shot keeps in frame over [from, to) (figures on screen). */
+  keepInFrame: (from: number, to: number) => Rect[] = () => [],
 ): { shots: ShotKey[]; punchIns: PunchIn[]; shakes: Shake[] } => {
   const actorsAt = (f: number) => stageActorsAt(lib, cast, set, f, fps, width);
   // A face shot on someone mid-move frames them where they come to rest (the shot is locked off).
@@ -73,7 +75,7 @@ export const solveShots = (
       const f = faceCamera(c, end);
       return { frame: c.frame, framing: f.framing, on: c.on, reason: c.reason + f.note, camera: f.camera };
     }
-    const camera = frameShot({ framing: c.framing, on: c.on }, c.framing === "two" ? groupActors(c.frame, end) : actorsAt(c.frame), width, height, set.groundY);
+    const camera = frameShot({ framing: c.framing, on: c.on }, c.framing === "two" ? groupActors(c.frame, end) : actorsAt(c.frame), width, height, set.groundY, c.framing === "two" ? keepInFrame(c.frame, end) : []);
     return { frame: c.frame, framing: c.framing, on: c.on, reason: c.reason, camera };
   });
   const punchIns = plan.punchIns.map((p): PunchIn => {

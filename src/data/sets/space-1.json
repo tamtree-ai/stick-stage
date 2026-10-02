@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "space-1",
+  "kit": "space",
+  "palette": "deep-space",
+  "description": "Out in space: a seeded starfield, a faint nebula and a distant banded planet. For astronomy and cosmology.",
+  "tags": ["space", "astronomy", "cosmology", "stars", "planets", "orbit", "science"],
+  "groundY": 1480,
+  "figureHeightPx": 640,
+  "layers": [{ "part": "starfield" }, { "part": "nebula", "x": 0.25, "y": 0.28 }, { "part": "planet", "x": 0.86, "y": 0.13, "size": 0.7 }, { "part": "grid-floor" }],
+  "marks": { "left": 0.25, "center": 0.5, "right": 0.75 }
+}

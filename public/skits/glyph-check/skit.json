@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "meta": { "title": "Glyph check" },
+  "set": "blueprint-1",
+  "claims": [],
+  "cast": [
+    { "id": "vera", "character": "vera", "mark": "left" },
+    { "id": "gus", "character": "gus", "mark": "right" }
+  ],
+  "beats": [
+    { "id": "a", "speaker": "vera", "line": "ħ = h / 2π, and Δx·Δp ≥ ħ/2.", "spoken": "h-bar equals h over two pi, and delta x delta p is at least h-bar over two." },
+    { "id": "b", "speaker": "gus", "line": "Schrödinger would say ≈ 10⁻³⁴.", "spoken": "Schrödinger would say about ten to the minus thirty four." }
+  ]
+}

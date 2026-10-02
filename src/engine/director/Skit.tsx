@@ -8,6 +8,7 @@ import { CardText, ListText } from "../text/ExplainerText";
 import { PovCard } from "../text/PovCard";
 import type { SafeArea } from "../text/safeArea";
 import { SlamText } from "../text/SlamText";
+import { CreditLine } from "../text/CreditLine";
 import { Subtitles } from "../text/Subtitles";
 import { cameraAt, shotAt } from "./camera";
 import { stageActorsAt } from "./placement";
@@ -40,7 +41,7 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
   const direction = tl.direction ?? "ltr";
   return (
     <AbsoluteFill style={{ background: "#ffffff" }}>
-      <Stage set={set} actors={actors} width={W} height={H} frame={frame} camera={camera} fontFamily={fontFamily} labels={tl.labels} />
+      <Stage set={set} actors={actors} width={W} height={H} frame={frame} camera={camera} fontFamily={fontFamily} labels={tl.labels} figures={tl.figures} fps={fps} />
       {audio && tl.audio.map((a) => (
         <Sequence key={`v-${a.beatId}`} from={a.frame} durationInFrames={a.durationFrames} layout="none">
           <Html5Audio src={staticFile(a.src)} />
@@ -69,6 +70,7 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
       {tl.slams.map((s, i) => (
         <SlamText key={i} seed={`${tl.title}-${i}`} text={s.text} frame={frame} from={s.from} to={s.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} direction={direction} />
       ))}
+      {tl.credits?.map((c, i) => (frame >= c.from && frame < c.to ? <CreditLine key={`credit-${i}`} text={c.text} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} /> : null))}
       {showLabels ? <QaOverlay tl={tl} lib={lib} set={set} safeArea={safeArea} camera={camera} frame={frame} /> : null}
       {showLabels ? <SkitLabel tl={tl} frame={frame} /> : null}
     </AbsoluteFill>

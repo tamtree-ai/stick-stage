@@ -29,6 +29,8 @@ export const applyLanguage = (doc: SkitDoc, lang: string | undefined): SkitDoc =
     list?.map((b) => ({
       ...b,
       ...(b.line ? { line: line(b.id, b.line) } : {}),
+      // A dubbed line is spoken as written: the English spoken form no longer applies.
+      ...(b.line && pack.lines[b.id] ? { spoken: undefined } : {}),
       text: b.text.map((t) => (t.type === "slam" && pack.slams?.[b.id] ? { ...t, value: pack.slams[b.id]!.slice(0, 40) } : t)),
     }));
   const labelPack = pack.labels;

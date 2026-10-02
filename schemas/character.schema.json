@@ -150,6 +150,55 @@
           "type": "string",
           "pattern": "^#[0-9a-fA-F]{3,8}$"
         },
+        "footLength": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0.6,
+          "maximum": 2.5
+        },
+        "limbs": {
+          "type": "object",
+          "properties": {
+            "fill": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{3,8}$"
+            },
+            "width": {
+              "type": "number",
+              "minimum": 1.5,
+              "maximum": 4
+            }
+          },
+          "required": [
+            "fill",
+            "width"
+          ]
+        },
+        "headShape": {
+          "type": "object",
+          "properties": {
+            "sx": {
+              "type": "number",
+              "minimum": 0.8,
+              "maximum": 1.4
+            },
+            "sy": {
+              "type": "number",
+              "minimum": 0.8,
+              "maximum": 1.4
+            },
+            "dx": {
+              "default": 0,
+              "type": "number",
+              "minimum": -0.3,
+              "maximum": 0.3
+            }
+          },
+          "required": [
+            "sx",
+            "sy"
+          ]
+        },
         "cheek": {
           "type": "string",
           "pattern": "^#[0-9a-fA-F]{3,8}$"
@@ -226,7 +275,8 @@
               "eyewear",
               "headwear",
               "neck",
-              "body"
+              "body",
+              "face"
             ]
           },
           "id": {

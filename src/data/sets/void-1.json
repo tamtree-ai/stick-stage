@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "void-1",
+  "kit": "abstract",
+  "palette": "void",
+  "description": "A neutral void: a soft gradient and a faint perspective grid floor, nothing else. The main stage for diagrams and equations; figures get the whole upper half.",
+  "tags": ["science", "maths", "physics", "explainer", "diagram", "abstract", "any"],
+  "groundY": 1480,
+  "figureHeightPx": 640,
+  "layers": [{ "part": "void" }, { "part": "grid-floor" }],
+  "marks": { "left": 0.25, "center": 0.5, "right": 0.75 }
+}

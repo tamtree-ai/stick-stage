@@ -130,7 +130,7 @@ export const layoutBeats = (
       diags.push({ level: "error", code: "voice-missing", path: `beats[${i}]`, message: `no voice for beat "${beat.id}"`, expected: `generated voice: run the tamtree harness or \`pnpm voice:say <skit>\`, then \`pnpm prep <skit>\`` });
       return;
     }
-    if (line.text !== beat.line) {
+    if (line.text !== beat.line || (line.spoken ?? undefined) !== (beat.spoken ?? undefined)) {
       diags.push({ level: "error", code: "voice-stale", path: `beats[${i}].line`, message: `line changed since the voice was generated ("${line.text}")`, expected: `re-generate the voice for "${beat.id}", then \`pnpm prep <skit>\`` });
       return;
     }
@@ -142,7 +142,7 @@ export const layoutBeats = (
     if (!r) return;
     const others = skit.cast.map((c) => c.id).filter((id) => id !== beat.speaker && id !== r.reactor);
     const reactors = [r.reactor, ...others.slice(0, Math.max(0, style.reactors - 1))];
-    const synthetic: Beat = { ...beat, id: `${beat.id}-reaction`, speaker: undefined, focus: undefined, line: undefined, silent: true, durationMs: style.reactionMs, pauseBeforeMs: 0, holdAfterMs: 0, shot: undefined, actions: [], sfx: [], text: [], punchline: false };
+    const synthetic: Beat = { ...beat, id: `${beat.id}-reaction`, speaker: undefined, focus: undefined, line: undefined, silent: true, durationMs: style.reactionMs, pauseBeforeMs: 0, holdAfterMs: 0, shot: undefined, actions: [], sfx: [], text: [], figures: [], punchline: false };
     push(synthetic, path, "reaction", true, false, { reactor: r.reactor, reactors, reactionExpression: r.expression });
   });
   return { beats: out, totalMs: cursor + skit.timing.tailMs };

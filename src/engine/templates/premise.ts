@@ -1,23 +1,29 @@
 import { z } from "zod";
 import { ASPECTS } from "../format/aspect";
+import { LINE_ROLES, scienceFields } from "../director/science";
+import { FigureCueSchema, FigureSchema } from "../viz/schema";
 
 /**
  * A premise: what a human writes (plan M6). The jokes, who says them and which line is the
  * punchline are human work; a template stages them into a draft `skit.json` that the
  * skit-director skill (or a person) then refines.
  */
-export const TEMPLATES = ["exchange", "interview", "me-vs-me", "pov-monologue", "text-slam", "explainer", "family", "fable", "trio"] as const;
+export const TEMPLATES = ["exchange", "interview", "me-vs-me", "pov-monologue", "text-slam", "explainer", "family", "fable", "trio", "myth-flip"] as const;
 export type TemplateId = (typeof TEMPLATES)[number];
 
-export const ROLES = ["setup", "escalation", "punchline"] as const;
+export const ROLES = LINE_ROLES;
 
 export const PremiseLineSchema = z.strictObject({
   /** Cast id. For text-slam: whose face reacts (default: the first cast member). */
   who: z.string().min(1).optional(),
   /** Exactly what is said (or, for text-slam, the slam text). */
   text: z.string().min(1),
-  /** Default: first line setup, last line punchline, the rest escalation. */
+  /** Default: first line setup, last line punchline, the rest escalation. `myth-flip` uses its own roles (myth … takeaway). */
   role: z.enum(ROLES).optional(),
+  /** What the voice says when it differs from the caption ("h-bar" for ħ). */
+  spoken: z.string().min(1).optional(),
+  /** Diagram cues on this line (show, switch to the truth state, roll the dice). */
+  figures: z.array(FigureCueSchema).max(6).optional(),
   expression: z.string().optional(),
   /** Slam this text on the line's last word (punchlines, mostly). */
   slam: z.string().min(1).max(40).optional(),
@@ -46,6 +52,8 @@ export const PremiseSceneSchema = z.strictObject({
   pov: z.string().max(80).optional(),
   /** Title card over this scene. */
   card: z.string().min(1).max(60).optional(),
+  /** Diagrams in this scene. */
+  figures: z.array(FigureSchema).max(8).optional(),
   lines: z.array(PremiseLineSchema).min(1),
 });
 export type PremiseScene = z.infer<typeof PremiseSceneSchema>;
@@ -67,6 +75,11 @@ export const PremiseSchema = z
     /** Default per template, and the fallback for a scene that names no set. */
     set: z.string().optional(),
     cast: z.array(PremiseCastSchema).min(1).max(3),
+    /** Diagrams for a one-scene premise (`lines`). */
+    figures: z.array(FigureSchema).max(8).optional(),
+    /** Facts with sources, the simplifications made: copied to the skit for the owner's check. */
+    claims: scienceFields.claims,
+    simplifications: scienceFields.simplifications,
     /** One scene. Mutually exclusive with `scenes`. */
     lines: z.array(PremiseLineSchema).min(1).optional(),
     /** 1–4 scenes, staged as `scenes[]`. Mutually exclusive with `lines`. */

@@ -8,8 +8,9 @@ import { Buildings, Hydrant, Shopfront, Sidewalk } from "./street";
 import { Bed, Counter, FloorLamp, Fridge, Tv } from "./home";
 import { Board, Curtain, Sand, Sea, Umbrella } from "./venue";
 import type { PartComponent } from "./types";
+import { Blueprint, FumeHood, GridFloor, LabBench, Nebula, Planet, Starfield, VoidBackdrop, WallChart } from "./science";
 
-export const KITS = ["plain", "interior", "office", "park", "street", "beach"] as const;
+export const KITS = ["plain", "interior", "office", "park", "street", "beach", "abstract", "space", "lab"] as const;
 export type Kit = (typeof KITS)[number];
 
 export type PartInfo = {
@@ -58,6 +59,15 @@ export const PART_INFO: Record<string, PartInfo> = {
   sea: { draw: Sea, kits: ["beach"], backdrop: true },
   sand: { draw: Sand, kits: ["beach"], backdrop: true },
   umbrella: { draw: Umbrella, kits: ["beach"] },
+  void: { draw: VoidBackdrop, kits: ["abstract", "space"], backdrop: true },
+  "grid-floor": { draw: GridFloor, kits: ["abstract", "space"], backdrop: true },
+  blueprint: { draw: Blueprint, kits: ["abstract"], backdrop: true },
+  starfield: { draw: Starfield, kits: ["space"], backdrop: true },
+  nebula: { draw: Nebula, kits: ["space"] },
+  planet: { draw: Planet, kits: ["space"] },
+  "lab-bench": { draw: LabBench, kits: ["lab"] },
+  "fume-hood": { draw: FumeHood, kits: ["lab"] },
+  "wall-chart": { draw: WallChart, kits: ["lab"] },
 };
 
 export const PARTS: Record<string, PartComponent> = Object.fromEntries(Object.entries(PART_INFO).map(([id, p]) => [id, p.draw]));
@@ -70,6 +80,9 @@ export const KIT_BACKDROP: Record<Kit, SetDef["layers"]> = {
   park: [part("sky"), part("hills"), part("grass")],
   street: [part("sky"), part("buildings"), part("sidewalk")],
   beach: [part("sky"), part("sea"), part("sand")],
+  abstract: [part("void"), part("grid-floor")],
+  space: [part("starfield"), part("grid-floor")],
+  lab: [part("wall", { pattern: "none" }), part("floor")],
 };
 
 function part(id: string, extra: Partial<SetDef["layers"][number]> = {}): SetDef["layers"][number] {

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "images": [
+    {
+      "id": "pillars-webb",
+      "file": "images/pillars-webb.jpg",
+      "width": 1280,
+      "height": 1280,
+      "credit": "NASA, ESA, CSA, STScI; J. DePasquale, A. Koekemoer, A. Pagan (STScI)",
+      "licence": "cc-by-4.0",
+      "source": "https://esawebb.org/images/weic2216a/",
+      "fetched": "2026-10-02",
+      "description": "The Pillars of Creation in the Eagle Nebula, Webb NIRCam (near-infrared). Columns of gas and dust where stars are forming; a photograph, not an impression."
+    }
+  ]
+}

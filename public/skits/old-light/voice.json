@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "gus",
+      "text": "That's what the Pillars of Creation look like right now.",
+      "audio": "voice/l1.wav",
+      "durationMs": 3269
+    },
+    {
+      "id": "l2",
+      "speaker": "vera",
+      "text": "Right now? That light is ancient.",
+      "audio": "voice/l2.wav",
+      "durationMs": 2092
+    },
+    {
+      "id": "l3",
+      "speaker": "gus",
+      "text": "Light is instant. I see it, it's there.",
+      "audio": "voice/l3.wav",
+      "durationMs": 3357
+    },
+    {
+      "id": "l4",
+      "speaker": "vera",
+      "text": "Moon: about a second. Sun: eight minutes. The Pillars?",
+      "audio": "voice/l4.wav",
+      "durationMs": 3984
+    },
+    {
+      "id": "l5",
+      "speaker": "gus",
+      "text": "Wait. Years?",
+      "audio": "voice/l5.wav",
+      "durationMs": 1685
+    },
+    {
+      "id": "l6",
+      "speaker": "vera",
+      "text": "They're 6,500 light-years away. That's 6,500 years of travel.",
+      "spoken": "They're six and a half thousand light-years away. That's six and a half thousand years of travel.",
+      "audio": "voice/l6.wav",
+      "durationMs": 5112
+    },
+    {
+      "id": "l7",
+      "speaker": "vera",
+      "text": "Everything near you is a split second away, so light feels instant.",
+      "audio": "voice/l7.wav",
+      "durationMs": 3931
+    },
+    {
+      "id": "l8",
+      "speaker": "vera",
+      "text": "Look far away, and you're looking back in time.",
+      "audio": "voice/l8.wav",
+      "durationMs": 2765
+    }
+  ]
+}

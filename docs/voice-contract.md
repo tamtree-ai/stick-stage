@@ -38,7 +38,8 @@ public/skits/<skitId>/
 | `text` | yes | **Exactly the script text.** Subtitles show this, never a transcript |
 | `audio` | yes | Relative to the skit folder. WAV, MP3 or OGG |
 | `durationMs` | no | The harness's measured `duration_seconds × 1000`. Prep measures it when missing |
-| `words` | no | Per-word start times, e.g. from Google TTS with one SSML `<mark>` before each word. `endMs` defaults to the next word's start |
+| `spoken` | when the beat has one | What the audio says, when the beat's `spoken` differs from its caption (`text`: "ħ = h / 2π", `spoken`: "h-bar equals h over two pi"). Synthesize `spoken`, copy it here unchanged |
+| `words` | no | Per-word start times, e.g. from Google TTS with one SSML `<mark>` before each word. `endMs` defaults to the next word's start. With `spoken`, these are timings of the spoken words |
 
 **Without `words`** (OpenRouter plain text, macOS `say`), prep estimates word timings. It finds the
 pauses in the audio by silence detection, matches them to the script's punctuation, and spreads
@@ -56,6 +57,13 @@ For a skit, the lines are the spoken beats of `skit.json`: `id` = beat id, `text
 `voice` (`provider`, `voiceId`, `settings` for the harness; `say` for local dev), and a beat's
 `delivery` is a free-form hint ("flat", "whispered"). `skitLines(skit)` in the engine returns
 exactly this list.
+
+**Spoken forms and pronunciations.** A line from `skitLines` (and from `POST /validate`) may carry
+`spoken`: speak that instead of `text`, and return it in the manifest. Prep maps the spoken word
+timings back onto the caption's tokens, so subtitles highlight "ħ" while the voice says "h-bar". A
+line may also carry `pronounce: [{ word, say, ipa? }]` from `src/data/pronunciations.json`
+(Schrödinger, muon, Planck…): pass them to the provider as SSML `<sub>`/`<phoneme>` or a lexicon.
+`POST /render` refuses a manifest whose `spoken` doesn't match the skit (`voice-stale`).
 
 **Voice-over lines** are beats whose `speaker` is the skit's `narrator.id` (default `"narrator"`).
 They come out of `skitLines` with `narrator: true` and take their hints from the skit's

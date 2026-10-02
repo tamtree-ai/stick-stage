@@ -1,4 +1,4 @@
-import { buildCatalog, createLibrary, createSets, migrate, MusicManifestSchema, SafeAreaProfilesSchema, SeriesSchema, type MusicManifest, type SafeAreaProfiles, type Series, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type Catalog, type SafeArea, type SetDef, type SfxManifest } from "../engine/core";
+import { ImageManifestSchema, PronunciationsSchema, type Pronunciation, type ImageDef, buildCatalog, createLibrary, createSets, migrate, MusicManifestSchema, SafeAreaProfilesSchema, SeriesSchema, type MusicManifest, type SafeAreaProfiles, type Series, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type Catalog, type SafeArea, type SetDef, type SfxManifest } from "../engine/core";
 
 import milo from "./characters/milo.json";
 import june from "./characters/june.json";
@@ -9,6 +9,8 @@ import dash from "./characters/dash.json";
 import reed from "./characters/reed.json";
 import nell from "./characters/nell.json";
 import pip from "./characters/pip.json";
+import vera from "./characters/vera.json";
+import gus from "./characters/gus.json";
 
 import idle from "./poses/idle.json";
 import point from "./poses/point.json";
@@ -71,6 +73,10 @@ import widePark from "./sets/wide-park.json";
 import wideStreet from "./sets/wide-street.json";
 import wideCafe from "./sets/wide-cafe.json";
 import wideClassroom from "./sets/wide-classroom.json";
+import void1 from "./sets/void-1.json";
+import blueprint1 from "./sets/blueprint-1.json";
+import space1 from "./sets/space-1.json";
+import lab1 from "./sets/lab-1.json";
 
 import castNotesJson from "./cast-notes.json";
 import safeAreaJson from "./safe-area.json";
@@ -78,6 +84,8 @@ import safeAreaProfilesJson from "./safe-area-profiles.json";
 import reactionsJson from "./reactions.json";
 import sfxJson from "./sfx.json";
 import musicJson from "./music.json";
+import imagesJson from "./images.json";
+import pronunciationsJson from "./pronunciations.json";
 
 /** Order matters: labs cycle through poses/expressions in this order. */
 export const POSE_IDS = ["idle", "point", "shrug", "facepalm", "arms-up", "arms-crossed", "think", "lean-in", "recoil", "slump", "hands-on-hips", "hold-phone"];
@@ -87,7 +95,7 @@ export { PROP_IDS };
 export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed", "angry", "shocked", "sad", "crying", "cringe", "confused", "deadpan"];
 
 export const library: Library = createLibrary({
-  characters: [milo, june, lila, theo, moss, dash, reed, nell, pip],
+  characters: [milo, june, lila, theo, moss, dash, reed, nell, pip, vera, gus],
   poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose],
   expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan],
   props: PROP_DOCS,
@@ -96,6 +104,7 @@ export const library: Library = createLibrary({
 export const sets: Record<string, SetDef> = createSets([
   plain1, living1, lounge1, office1, park1, street1, kitchen1, bedroom1, cafe1, classroom1, meeting1, living2, park2, streetNight1, beach1, stage1,
   widePlain, wideLiving, wideLounge, wideOffice, widePark, wideStreet, wideCafe, wideClassroom,
+  void1, blueprint1, space1, lab1,
 ]);
 
 /** One conservative profile for TikTok / Reels / Shorts overlays (verify against real screenshots in M4). */
@@ -124,3 +133,9 @@ export const series: Readonly<Record<string, Series>> = {
 
 /** How each shipped character is played. A character with no entry is played straight. */
 export const castNotes: Readonly<Record<string, string>> = castNotesJson;
+
+/** Credited NASA / ESA images (`public/images/`), by id. Only allow-listed licences load. */
+export const images: Readonly<Record<string, ImageDef>> = Object.fromEntries(ImageManifestSchema.parse(imagesJson).images.map((i) => [i.id, i]));
+
+/** How to say science words; `skitLines(doc, pronunciations)` attaches the ones a line uses for the harness TTS. */
+export const pronunciations: readonly Pronunciation[] = PronunciationsSchema.parse(pronunciationsJson).words;

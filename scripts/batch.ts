@@ -14,7 +14,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { formatDiagnostics, parseSkit, skitLines, slug, SkitError, VoiceManifestSchema } from "../src/engine";
 import { writePostFiles } from "../src/node";
-import { library } from "../src/data";
+import { images, library } from "../src/data";
 import { prepIfVoiced, renderSkitMp4 } from "./lib/render";
 import { checkSkitDir, compileSkitDir, isSkit, skitDir } from "./lib/skit";
 import { ROOT } from "./lib/tools";
@@ -63,7 +63,8 @@ for (const id of ids) {
     const hash = crypto.createHash("sha256").update(JSON.stringify(result.program)).update(CODE_HASH).digest("hex").slice(0, 8);
     const dir = path.join(ROOT, "out/posts", id);
     const base = path.join(dir, `${id}-${slug(doc.meta.title)}-${hash}`);
-    writePostFiles(base, { skit: id, doc, program: result.program, report, hash, lib: library });
+    const raw = JSON.parse(fs.readFileSync(path.join(ROOT, "public/skits", id, "skit.json"), "utf8"));
+    writePostFiles(base, { skit: id, doc, program: result.program, report, hash, lib: library, images, raw });
     if (fs.existsSync(`${base}.mp4`) && !has("force")) {
       rows.push({ id, status: "unchanged", out: path.relative(ROOT, `${base}.mp4`) });
       continue;

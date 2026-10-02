@@ -1,8 +1,9 @@
 /** A project: a workspace plus its registries. Loads, compiles, checks and summarizes skits. */
 import fs from "node:fs";
 import path from "node:path";
-import { applyLanguage, checkSkit, compileSkit, parseSkit, placeholderVoice, PreparedVoiceSchema, skitLines, type CheckReport, type CompileResult, type Library, type Program, type ReactionTable, type SafeArea, type SeriesStyle, type SetDef, type SfxManifest, type Timeline } from "../engine/core";
+import { applyLanguage, checkSkit, compileSkit, parseSkit, placeholderVoice, PreparedVoiceSchema, skitLines, type CheckReport, type CompileResult, type Library, type Program, type ReactionTable, type SafeArea, type SeriesStyle, type SetDef, type SfxManifest, type Timeline, type ImageDef, type Pronunciation } from "../engine/core";
 import type { Workspace } from "./workspace";
+import { prepEquations } from "./figures";
 
 export type Project = {
   ws: Workspace;
@@ -13,6 +14,10 @@ export type Project = {
   safeArea: SafeArea;
   /** Series documents, so a skit can inherit style and cold open. */
   series?: Readonly<Record<string, SeriesStyle>>;
+  /** Credited NASA / ESA images figures may show. */
+  images?: Readonly<Record<string, ImageDef>>;
+  /** How to say science words (`pronunciations.json`), listed per line for the harness TTS. */
+  pronunciations?: readonly Pronunciation[];
 };
 
 export const isSkit = (p: Project, id: string) => fs.existsSync(path.join(p.ws.skitDir(id), "skit.json"));
@@ -28,7 +33,9 @@ export const compileSkitIn = (p: Project, id: string, extra?: { lang?: string; c
     : extra?.lang
       ? placeholderVoice(skitLines(applyLanguage(parseSkit(skit), extra.lang)), extra.lang)
       : undefined;
-  const r = compileSkit({ skit, voice, lib: p.lib, sets: p.sets, sfx: p.sfx, reactions: p.reactions, safeArea: p.safeArea, series: p.series, lang: extra?.lang });
+  // Equations are typeset here too (hash-cached), so a compile never waits on a separate prep.
+  const { equations } = prepEquations(dir, skit);
+  const r = compileSkit({ skit, voice, lib: p.lib, sets: p.sets, sfx: p.sfx, reactions: p.reactions, safeArea: p.safeArea, series: p.series, lang: extra?.lang, figures: { equations, images: p.images } });
   fs.mkdirSync(path.join(dir, "generated"), { recursive: true });
   fs.writeFileSync(path.join(dir, "generated/timeline.json"), JSON.stringify(r.program));
   return r;

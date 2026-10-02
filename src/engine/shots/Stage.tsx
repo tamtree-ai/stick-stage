@@ -4,6 +4,10 @@ import type { ActorState } from "../rig/actorState";
 import { f2 } from "../lib/math";
 import { SetLayers } from "../set/Set";
 import type { PartLabel, SetDef } from "../set/schema";
+import { getPalette } from "../set/palettes";
+import { Figures } from "../viz/Figures";
+import { themeFor } from "../viz/theme";
+import type { FigureTrack } from "../viz/track";
 
 export type StageActor = {
   id: string;
@@ -38,19 +42,25 @@ export type StageProps = {
   fontFamily?: string;
   /** Scene words for boards, desks, and TVs. */
   labels?: readonly PartLabel[];
+  /** Diagrams: back-layer figures sit behind the cast, front-layer ones over it. */
+  figures?: readonly FigureTrack[];
+  fps?: number;
 };
 
 /** Set background → actors → set foreground, under one camera transform. */
-export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame, camera, fontFamily, labels }) => {
+export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame, camera, fontFamily, labels, figures, fps = 30 }) => {
   const cam = camera ?? FULL_FRAME(width, height);
+  const figs = figures?.length ? { figures, frame, fps, width, height, theme: themeFor(getPalette(set.palette)), fontFamily } : undefined;
   const t = `translate(${f2(width / 2)} ${f2(height / 2)}) scale(${f2(cam.scale)}) translate(${f2(-cam.cx)} ${f2(-cam.cy)})`;
   return (
     <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} style={{ display: "block" }}>
       <g transform={t}>
         <SetLayers set={set} width={width} height={height} layer="background" labels={labels} fontFamily={fontFamily} />
+        {figs ? <Figures {...figs} layer="back" /> : null}
         {actors.map((a) => (
           <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY + (a.dy ?? 0)} facing={a.facing} frame={frame} fontFamily={fontFamily} tilt={a.tilt} />
         ))}
+        {figs ? <Figures {...figs} layer="front" /> : null}
         <SetLayers set={set} width={width} height={height} layer="foreground" labels={labels} fontFamily={fontFamily} />
       </g>
     </svg>

@@ -8,19 +8,17 @@ import { FRAMINGS } from "../shots/framing";
 import { I18nSchema } from "../i18n/pack";
 import { MetaSchema } from "./meta";
 import { STYLE_IDS } from "./style";
+import { FigureCueSchema, FigureSchema } from "../viz/schema";
+import { LINE_ROLES, scienceFields } from "./science";
 
 /**
  * Skit document (`public/skits/<id>/skit.json`). Library ids (poses, expressions, props, sets,
  * characters, sfx) are checked by the compiler, which knows the library; this schema checks shape.
  */
 
-/** A moment inside a beat. Word anchors match the script text, tokenized like the TTS timings. */
-export const AnchorSchema = z.union([
-  z.strictObject({ word: z.string().min(1), occurrence: z.number().int().min(1).default(1) }),
-  z.strictObject({ ms: z.number() }),
-  z.strictObject({ fraction: z.number().min(0).max(1) }),
-]);
-export type Anchor = z.infer<typeof AnchorSchema>;
+export { AnchorSchema, type Anchor } from "./anchor";
+import { AnchorSchema } from "./anchor";
+import { AudioSourceSchema, TextCueSchema } from "./cues";
 
 const who = z.string().min(1);
 const at = AnchorSchema.optional();
@@ -72,46 +70,16 @@ export type Shot = z.infer<typeof ShotSchema>;
 
 export const SfxCueSchema = z.strictObject({ id: z.string().min(1), at, volume: z.number().min(0).max(2).default(1) });
 export type SfxCue = z.infer<typeof SfxCueSchema>;
-export const MAX_LIST_ITEMS = 5;
-export const TextCueSchema = z.discriminatedUnion("type", [
-  z.strictObject({
-    type: z.literal("slam"),
-    value: z.string().min(1).max(40),
-    at,
-    durationMs: z.number().min(200).max(5000).default(1100),
-  }),
-  /** Items stack in the upper-middle band; each pops in on its anchor and stays until the next cut. */
-  z
-    .strictObject({
-      type: z.literal("list"),
-      items: z.array(z.string().min(1).max(40)).min(1).max(MAX_LIST_ITEMS),
-      /** One anchor per item. */
-      at: z.array(AnchorSchema).min(1).max(MAX_LIST_ITEMS),
-    })
-    .refine((t) => t.items.length === t.at.length, { message: `"at" needs one anchor per item`, path: ["at"] }),
-]);
-export type TextCue = z.infer<typeof TextCueSchema>;
-
-export const AudioSourceSchema = z.discriminatedUnion("source", [
-  z.strictObject({ source: z.literal("tts") }),
-  /**
-   * Lip-sync to existing audio (e.g. a trending sound): `src` is relative to the skit folder,
-   * trimmed to `startMs`–`endMs`. Consecutive beats cut from one file keep the file's own timing.
-   * `words` are optional word start times in the source file's ms (else Whisper, else estimated).
-   */
-  z.strictObject({
-    source: z.literal("file"),
-    src: z.string().min(1),
-    startMs: z.number().min(0).optional(),
-    endMs: z.number().min(0).optional(),
-    words: z.array(z.strictObject({ text: z.string().min(1), startMs: z.number().min(0), endMs: z.number().min(0).optional() })).optional(),
-  }),
-]);
+export { MAX_LIST_ITEMS, TextCueSchema, AudioSourceSchema, type TextCue } from "./cues";
 
 export const BeatSchema = z.strictObject({
   id: z.string().regex(/^[A-Za-z0-9_-]+$/, "letters, digits, - and _ only (it names the voice file)"),
   speaker: z.string().optional(),
   line: z.string().min(1).optional(),
+  /** What the voice says when it differs from the caption (`line` shows "ħ = h/2π", the voice says "h-bar equals h over two pi"). */
+  spoken: z.string().min(1).optional(),
+  /** The line's job in its format (`myth`, `demo`, `why-it-felt-true`…). The director frames by it. */
+  role: z.enum(LINE_ROLES).optional(),
   /** A beat with no dialog: reactions, comedic pauses. Needs `durationMs` (default 900). */
   silent: z.boolean().default(false),
   durationMs: z.number().min(100).max(10000).optional(),
@@ -140,6 +108,8 @@ export const BeatSchema = z.strictObject({
   actions: z.array(ActionSchema).default([]),
   sfx: z.array(SfxCueSchema).default([]),
   text: z.array(TextCueSchema).default([]),
+  /** Diagram cues: show, hide, switch state, or tween a scene figure. */
+  figures: z.array(FigureCueSchema).default([]),
 });
 export type Beat = z.infer<typeof BeatSchema>;
 
@@ -226,6 +196,8 @@ export const SceneSchema = z.strictObject({
   card: CardSchema.optional(),
   /** Words on a set part for this scene only. The shared set is unchanged. */
   labels: z.array(PartLabelSchema).max(6).optional(),
+  /** Diagrams on the stage next to the cast (`docs/figures.md`). */
+  figures: z.array(FigureSchema).max(8).optional(),
   beats: z.array(BeatSchema).min(1),
 });
 export type Scene = z.infer<typeof SceneSchema>;
@@ -277,12 +249,16 @@ export const SkitSchema = z
     characters: z.array(CharacterSchema).max(4).optional(),
     /** Dubbed words, keyed by BCP 47. Staging stays; timing follows the new voice. */
     i18n: I18nSchema.optional(),
+    /** Figures for a single-scene skit (a multi-scene skit puts them on each scene). */
+    figures: z.array(FigureSchema).max(8).optional(),
+    ...scienceFields,
     beats: z.array(BeatSchema).min(1).optional(),
     scenes: z.array(SceneSchema).min(1).optional(),
   })
   .superRefine((d, ctx) => {
     if (d.beats && d.scenes) ctx.addIssue({ code: "custom", path: ["scenes"], message: `use either "beats" (one scene) or "scenes", not both` });
     if (!d.beats && !d.scenes) ctx.addIssue({ code: "custom", path: ["beats"], message: `a skit needs "beats" (or "scenes")` });
+    if (d.scenes && d.figures) ctx.addIssue({ code: "custom", path: ["figures"], message: `a multi-scene skit puts "figures" on each scene` });
     if (!d.set && !d.scenes) ctx.addIssue({ code: "custom", path: ["set"], message: `a skit needs a "set"` });
     d.scenes?.forEach((sc, i) => {
       if (!sc.set && !d.set) ctx.addIssue({ code: "custom", path: ["scenes", i, "set"], message: `scene "${sc.id}" needs a "set" (or give the skit one)` });

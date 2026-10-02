@@ -8,6 +8,8 @@ import type { Camera } from "../shots/Stage";
 import type { Framing } from "../shots/framing";
 import type { PartLabel } from "../set/schema";
 import type { CaptionPage } from "../text/captions";
+import type { CreditEvent } from "../viz/compile";
+import type { FigureTrack } from "../viz/track";
 
 /**
  * Compiled skit: frame-indexed tracks, fully resolved (no anchors, no defaults left to apply).
@@ -121,6 +123,10 @@ export type Timeline = {
   lists: ListEvent[];
   card?: CardEvent;
   pages: CaptionPage[];
+  /** Diagrams on the stage (absent when the scene has none). */
+  figures?: FigureTrack[];
+  /** Image credits burned in while a NASA / ESA image is up. */
+  credits?: CreditEvent[];
   /** How narrator caption pages are drawn (skits with a narrator). */
   narratorCaption?: "italic" | "boxed";
   /** The style's targets, so QA checks the cut it was directed with. */

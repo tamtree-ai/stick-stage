@@ -16,6 +16,8 @@ export const KOKORO_VOICES: Readonly<Record<string, string>> = {
   pip: "af_sarah",
   moss: "bm_george",
   theo: "am_liam",
+  vera: "af_nova",
+  gus: "am_eric",
 };
 export const KOKORO_NARRATOR = "am_michael";
 export const KOKORO_DEFAULT = "af_heart";

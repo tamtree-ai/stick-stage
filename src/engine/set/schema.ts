@@ -45,7 +45,7 @@ export const SetSchema = z.object({
   id: z.string(),
   /** `9:16` rooms are shorts. `16:9` rooms are laid out for a wide frame. Default short. */
   aspect: z.enum(ASPECTS).default("9:16"),
-  kit: z.enum(["plain", "interior", "office", "park", "street", "beach"]),
+  kit: z.enum(["plain", "interior", "office", "park", "street", "beach", "abstract", "space", "lab"]),
   /** Catalog text for whoever picks the set (an LLM or a person): what the place is and what it suits. */
   description: z.string().optional(),
   /** Topic keywords this set suits, e.g. "work", "date", "morning"; `GET /sets` lists them. */

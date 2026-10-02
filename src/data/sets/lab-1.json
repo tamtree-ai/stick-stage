@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "lab-1",
+  "kit": "lab",
+  "palette": "lab-white",
+  "description": "A clean science lab: a bench of glassware, a fume hood, a generic element-style wall chart. For general science and experiments.",
+  "tags": ["lab", "science", "experiment", "chemistry", "physics", "school"],
+  "groundY": 1480,
+  "figureHeightPx": 640,
+  "layers": [
+    { "part": "wall", "pattern": "none" },
+    { "part": "floor" },
+    { "part": "wall-chart", "x": 0.82, "y": 0.5, "size": 0.7 },
+    { "part": "fume-hood", "x": 0.1, "size": 0.9 },
+    { "part": "lab-bench", "x": 0.5, "size": 0.85, "dx": 0 }
+  ],
+  "marks": { "left": 0.25, "center": 0.5, "right": 0.75 }
+}

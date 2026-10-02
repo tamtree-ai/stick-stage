@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "gus",
+      "text": "Done. I've read the whole universe: stars, planets, gas.",
+      "audio": "voice/l1.wav",
+      "durationMs": 5153
+    },
+    {
+      "id": "l2",
+      "speaker": "vera",
+      "text": "All the atoms? About 5% of it.",
+      "spoken": "All the atoms? About five percent of it.",
+      "audio": "voice/l2.wav",
+      "durationMs": 2606
+    },
+    {
+      "id": "l3",
+      "speaker": "gus",
+      "text": "So the other 95% is… more planets?",
+      "spoken": "So the other ninety-five percent is… more planets?",
+      "audio": "voice/l3.wav",
+      "durationMs": 3733
+    },
+    {
+      "id": "l4",
+      "speaker": "vera",
+      "text": "27% is dark matter. Galaxies spin too fast without it.",
+      "spoken": "Twenty-seven percent is dark matter. Galaxies spin too fast without it.",
+      "audio": "voice/l4.wav",
+      "durationMs": 4529
+    },
+    {
+      "id": "l5",
+      "speaker": "gus",
+      "text": "So the galaxies are cheating.",
+      "audio": "voice/l5.wav",
+      "durationMs": 1957
+    },
+    {
+      "id": "l6",
+      "speaker": "vera",
+      "text": "68% is dark energy. Far-off supernovae show the expansion speeding up.",
+      "spoken": "Sixty-eight percent is dark energy. Far-off supernovae show the expansion speeding up.",
+      "audio": "voice/l6.wav",
+      "durationMs": 5332
+    },
+    {
+      "id": "l7",
+      "speaker": "gus",
+      "text": "And what are they, actually?",
+      "audio": "voice/l7.wav",
+      "durationMs": 1778
+    },
+    {
+      "id": "l8",
+      "speaker": "vera",
+      "text": "Nobody knows yet.",
+      "audio": "voice/l8.wav",
+      "durationMs": 1141
+    },
+    {
+      "id": "l9",
+      "speaker": "vera",
+      "text": "Everything you've ever touched is in that 5%.",
+      "spoken": "Everything you've ever touched is in that five percent.",
+      "audio": "voice/l9.wav",
+      "durationMs": 2643
+    },
+    {
+      "id": "l10",
+      "speaker": "vera",
+      "text": "You read the 5%. The rest is fine print.",
+      "spoken": "You read the five percent. The rest is fine print.",
+      "audio": "voice/l10.wav",
+      "durationMs": 2998
+    }
+  ]
+}

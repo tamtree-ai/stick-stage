@@ -19,3 +19,15 @@ export const fontFor = (language: string | undefined): FontChoice => {
   const hit = FONT_STACK.find((f) => f.test.test(lang));
   return hit ? { family: hit.family, file: hit.file, direction: hit.direction } : LATIN_FONT;
 };
+
+/**
+ * Fallbacks after the text font, for science captions: Greek letters and ħ from Noto Sans, maths
+ * symbols (∫ ∑ ≈ ∝ √ …) from Noto Sans Math. Both OFL, local files.
+ */
+export const SYMBOL_FALLBACKS: readonly { family: string; file: string; weight?: string }[] = [
+  { family: "StickStage Greek", file: "fonts/NotoSans-Variable.ttf", weight: "100 900" },
+  { family: "StickStage Math", file: "fonts/NotoSansMath-Regular.ttf" },
+];
+
+/** A CSS / SVG `font-family` value: the family, then the symbol fallbacks. */
+export const withSymbolFallbacks = (family: string): string => [family, ...SYMBOL_FALLBACKS.map((f) => f.family)].map((f) => `"${f}"`).join(", ");

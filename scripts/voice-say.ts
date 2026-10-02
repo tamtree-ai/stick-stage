@@ -24,7 +24,7 @@ const ScriptSchema = z.object({
   lines: z.array(z.object({ id: z.string(), speaker: z.string(), text: z.string() }).passthrough()),
 });
 
-type Line = { id: string; speaker: string; text: string; voice: string; rate?: number };
+type Line = { id: string; speaker: string; text: string; spoken?: string; voice: string; rate?: number };
 
 const skitId = process.argv[2];
 const narratorRate = Number(process.argv.find((a) => a.startsWith("--narrator-rate="))?.split("=")[1]) || undefined;
@@ -70,8 +70,8 @@ const manifest: VoiceManifest = {
     const wav = path.join(voiceDir, `${line.id}.wav`);
     const wpm = line.rate ?? rate;
     const r = wpm ? ["-r", String(wpm)] : [];
-    execFileSync("say", ["-v", line.voice, ...r, "--file-format=WAVE", "--data-format=LEI16@22050", "-o", wav, line.text]);
-    return { id: line.id, speaker: line.speaker, text: line.text, audio: `voice/${line.id}.wav`, durationMs: wavDurationMs(wav) };
+    execFileSync("say", ["-v", line.voice, ...r, "--file-format=WAVE", "--data-format=LEI16@22050", "-o", wav, line.spoken ?? line.text]);
+    return { id: line.id, speaker: line.speaker, text: line.text, ...(line.spoken ? { spoken: line.spoken } : {}), audio: `voice/${line.id}.wav`, durationMs: wavDurationMs(wav) };
   }),
 };
 fs.writeFileSync(path.join(skitDir, "voice.json"), JSON.stringify(manifest, null, 2) + "\n");

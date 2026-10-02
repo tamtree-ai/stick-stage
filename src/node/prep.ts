@@ -13,6 +13,7 @@ import {
   estimateWords,
   estimateWordsInSpans,
   isNarration,
+  mapSpokenToCaption,
   parseSkit,
   PreparedLineSchema,
   VoiceManifestSchema,
@@ -65,13 +66,17 @@ const prepTtsLine = (ctx: Ctx, line: VoiceLine, voiceOver: boolean) => {
     ctx.a.normalizer.toWav(audio, mono, { rate: 22050 });
     const durationMs = line.durationMs ?? ctx.a.probe.durationMs(mono);
     const spans = ctx.a.probe.speechSpans(mono);
-    const words = line.words?.length ? alignWords(line.text, durationMs, line.words) : spans.length ? estimateWordsInSpans(line.text, spans, durationMs) : estimateWords(line.text, durationMs);
-    const mouthCues = voiceOver ? [] : mouths(ctx, mono, line.text, words);
+    // Timings are of the words the audio says; a different caption gets them mapped onto its tokens.
+    const said = line.spoken ?? line.text;
+    const saidWords = line.words?.length ? alignWords(said, durationMs, line.words) : spans.length ? estimateWordsInSpans(said, spans, durationMs) : estimateWords(said, durationMs);
+    const words = line.spoken ? mapSpokenToCaption(line.text, saidWords, durationMs) : saidWords;
+    const mouthCues = voiceOver ? [] : line.spoken ? (ctx.a.lipSync ? ctx.a.lipSync.cues(mono, said, ctx.gen) : estimateMouthCues(saidWords)) : mouths(ctx, mono, line.text, words);
     fs.rmSync(mono);
     return {
       id: line.id,
       speaker: line.speaker,
       text: line.text,
+      ...(line.spoken ? { spoken: line.spoken } : {}),
       audio: ctx.ws.publicPath(audio),
       durationMs,
       words,

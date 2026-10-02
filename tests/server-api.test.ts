@@ -170,6 +170,13 @@ describe("POST /render", () => {
   it("audio paths outside voice/", async () => expect(await rejects((p) => (p.voice.lines[0]!.audio = "../../skit.json"))).toEqual(["audio-path"]));
   it("a missing upload", async () => expect(await rejects((p) => delete p.files["b2.wav"])).toEqual(["audio-missing"]));
   it("an upload that isn't audio", async () => expect(await rejects((p) => (p.files["b4.wav"] = new TextEncoder().encode('{"error":"quota"}')))).toEqual(["audio-format"]));
+  it("a final render of an unapproved science skit (claims) is refused; a draft is fine", async () => {
+    expect(await rejects((p) => (p.skit.claims = []))).toEqual(["approval-unapproved"]);
+    const p = fineParts();
+    p.skit.claims = [];
+    p.options = { quality: "draft" };
+    expect((await svc.call("/render", { method: "POST", body: formOf(p) })).status).toBe(202);
+  });
   it("an invalid skit, with paths under skit.", async () => {
     const p = fineParts();
     delete p.skit.cast;

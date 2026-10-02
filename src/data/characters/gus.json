@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "gus",
+  "displayName": "Gus",
+  "proportions": { "height": 0.98, "headRadius": 0.18, "neck": 0.02, "torso": 0.27, "upperArm": 0.15, "forearm": 0.14, "thigh": 0.16, "shin": 0.16 },
+  "style": {
+    "stroke": "#1b1b1f",
+    "strokeWidth": 12,
+    "headFill": "#ffffff",
+    "torso": { "style": "bean", "fill": "#8a9a4f", "width": 0.15 },
+    "limbCurve": 0.3,
+    "hands": "nub",
+    "feet": "oval",
+    "footFill": "#5a4636",
+    "headShape": { "sx": 1.06, "sy": 0.96, "dx": 0.04 }
+  },
+  "face": { "eyes": "big-pupil", "brows": true, "mouthSet": "default", "offsetX": 0.16, "eyeSpacing": 0.46, "eyeY": -0.02, "mouthY": 0.46 },
+  "accessories": [{ "slot": "headwear", "id": "flatcap-01", "color": "#6b5a48" }],
+  "energy": 0.45,
+  "personality": "the skeptic: confident, plausible and wrong, never stupid. Says what most people believe, then changes his mind on screen.",
+  "voice": { "say": "Fred" }
+}

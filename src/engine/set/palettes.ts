@@ -122,6 +122,48 @@ export const PALETTES: Record<string, Palette> = {
     sky: "#d6e6f3",
     detail: "#a9828a",
   },
+  /**
+   * Science grounds. Mid-tone on purpose: dark outlines keep ≥ 3:1 against every tone, and
+   * figures switch to chalk (light ink) over them.
+   */
+  "deep-space": {
+    wallA: "#5d6aa8",
+    wallB: "#5864a3",
+    floor: "#6470aa",
+    accent: "#f3d99a",
+    shade: "#5f6ba8",
+    sky: "#5d6aa8",
+    detail: "#8e9ad2",
+  },
+  /** The neutral void: slate teal, a faint grid floor. */
+  void: {
+    wallA: "#4f7a8a",
+    wallB: "#4b7484",
+    floor: "#55808f",
+    accent: "#f2cf8a",
+    shade: "#527c8c",
+    sky: "#4f7a8a",
+    detail: "#86aeba",
+  },
+  blueprint: {
+    wallA: "#3f6f9e",
+    wallB: "#3d6c9a",
+    floor: "#4878a8",
+    accent: "#f6d36b",
+    shade: "#4373a3",
+    sky: "#3f6f9e",
+    detail: "#a9c9ea",
+  },
+  /** A bright, clean lab. */
+  "lab-white": {
+    wallA: "#e6eef0",
+    wallB: "#d8e4e8",
+    floor: "#b9c9cf",
+    accent: "#f4b183",
+    shade: "#cfdde2",
+    sky: "#d6ecf5",
+    detail: "#7fa6b3",
+  },
 };
 
 /** Tones every part may use, derived from the seven tokens (still no raw hex in parts). */

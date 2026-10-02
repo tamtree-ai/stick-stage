@@ -204,6 +204,97 @@
         "idea",
         "magic"
       ]
+    },
+    {
+      "id": "ding-idea",
+      "file": "sfx/ding-idea.wav",
+      "durationMs": 1300,
+      "gain": 0.6,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "idea",
+        "realise",
+        "science"
+      ]
+    },
+    {
+      "id": "zap",
+      "file": "sfx/zap.wav",
+      "durationMs": 350,
+      "gain": 0.55,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "spark",
+        "electric",
+        "science"
+      ]
+    },
+    {
+      "id": "hum",
+      "file": "sfx/hum.wav",
+      "durationMs": 1500,
+      "gain": 0.4,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "electric",
+        "machine",
+        "science"
+      ]
+    },
+    {
+      "id": "whoosh-warp",
+      "file": "sfx/whoosh-warp.wav",
+      "durationMs": 1100,
+      "gain": 0.65,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "zoom",
+        "transition",
+        "science"
+      ]
+    },
+    {
+      "id": "chalk-tap",
+      "file": "sfx/chalk-tap.wav",
+      "durationMs": 300,
+      "gain": 0.6,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "board",
+        "write",
+        "science"
+      ]
+    },
+    {
+      "id": "blip",
+      "file": "sfx/blip.wav",
+      "durationMs": 120,
+      "gain": 0.55,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "appear",
+        "particle",
+        "science"
+      ]
+    },
+    {
+      "id": "pop-annihilate",
+      "file": "sfx/pop-annihilate.wav",
+      "durationMs": 900,
+      "gain": 0.65,
+      "license": "CC0-1.0",
+      "source": "synthesized in code by scripts/sfx-gen.ts (StickStage, original)",
+      "tags": [
+        "flash",
+        "particle",
+        "science"
+      ]
     }
   ]
 }

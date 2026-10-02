@@ -24,6 +24,8 @@ Stick-figure comedy-skit engine on Remotion, for our own channel. Plan: `../plan
 - `pnpm still SetLab out/SetLab.png [--props='{"kits":["park"],"tileWidth":200}']`: every set part × 3 palettes × 3 seeds
 - `pnpm voice:say <skitId>`: dev stand-in for the tamtree harness TTS; macOS `say` → `public/skits/<id>/voice/` + `voice.json`
 - `pnpm voice:tts <skitId>`: the same with Kokoro in-process (or `LOCAL_TTS_BASE_URL`); voice map in `scripts/lib/kokoro-voices.ts`
+- `pnpm approve <skitId> --by=<owner> [--check]`: science skits: list claims, then pin the owner's sign-off to the content hash; `pnpm render <skit> --post` and final service renders refuse an unapproved or changed skit
+- `pnpm viz:lab` then `pnpm render VizLab out/VizLab.mp4`: every figure kind with its cues (typesets the lab's equations first)
 - `pnpm prep <skitId> [--require-rhubarb]`: voice.json → Rhubarb mouths + script-aligned word timings → `generated/voice.prepared.json` (hash-cached, no network). Rhubarb: `RHUBARB_PATH`, `tools/Rhubarb-Lip-Sync-*/rhubarb` (gitignored), or PATH
 
 ## Skills
@@ -44,7 +46,9 @@ The **engine and the render service never call a TTS or an LLM.** In production 
 - `src/engine/text`: `buildCaptionPages` (script tokens + timings → `@remotion/captions` pages), `Subtitles` (narrator pages italic/boxed), `PovCard`, `SlamText`, `ExplainerText` (title cards, list reveals; geometry in `layout.ts`), safe area
 - `src/engine/set`: set schema (with `description` / `tags` for set pickers; `catalog.ts` → `GET /sets`), palettes (tokens + `derived()` tones; no raw hex in parts), patterns, `<SetLayers>`, `seatHeightAt`
 - `src/engine/set/parts`: part components by kit (`room`, `decor`, `office`, `furniture`, `outdoor`, `street`, `home`, `venue`) and `registry.ts` (`PART_INFO`, `KIT_BACKDROP`). New part → add to `PART_INFO`; it shows up in SetLab
-- `src/engine/shots/Stage.tsx`: set background, then actors, then set foreground, under one camera
+- `src/engine/viz`: figures (the science diagram layer): per-kind params (`params.ts`), figure + cue schema, `compileFigures` (states, cues, anchors, credits), frame evaluation (`track.ts`), real physics (`physics.ts`: Kepler, waves, seeded particles and dice), a safe expression language (`expr.ts`), drawers in `draw/`, `<Figures>`. Equations are typeset by MathJax in `src/node/equations.ts` (prep), never in the engine. Guide: `docs/figures.md`
+- `src/engine/director/science.ts` / `scienceChecks.ts`: claims, simplifications, approval hash, myth-flip roles and checks, `sources.txt`. Workflow: `docs/science-channel.md`
+- `src/engine/shots/Stage.tsx`: set background, back figures, actors, front figures, set foreground, under one camera
 - `src/engine/shots/framing.ts`: `frameShot({ framing, on })` → camera for `wide | two | medium | close | extreme`
 - `src/engine/director`: skit schema (`schema.ts`), diagnostics (path + expected + example), anchors, beat layout (`layout.ts`, inserts the punchline reaction beat), actions + listener auto-reactions → cast tracks (`tracks.ts`), default shot policy (`shots.ts`), cameras / punch-ins / shake (`camera.ts`), `compileSkit` → `Timeline`, `<Skit>`. Authoring guide: `docs/skits.md`
 - `src/data`: JSON library + `index.ts` loader (validates on import), `safe-area.json`, `reactions.json` (listener reaction defaults), `sfx.json` (SFX manifest with licenses)

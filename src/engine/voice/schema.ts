@@ -17,6 +17,8 @@ export const VoiceLineSchema = z.object({
   speaker: z.string().optional(),
   /** Exactly the script text. Subtitles show this, never the TTS transcript. */
   text: z.string().min(1),
+  /** What the audio says when it differs from `text` (the beat's `spoken`); word timings are of these words. */
+  spoken: z.string().min(1).optional(),
   /** Path relative to the skit folder (`public/skits/<id>/`). WAV, MP3 or OGG. */
   audio: z.string().min(1),
   /** Measured audio duration. Optional: prepare measures it when missing. */
@@ -56,6 +58,8 @@ export const PreparedLineSchema = z.object({
   id: z.string(),
   speaker: z.string().optional(),
   text: z.string(),
+  /** The spoken form, when it differs from the caption. */
+  spoken: z.string().optional(),
   /** Path relative to `public/` (ready for `staticFile`). */
   audio: z.string(),
   durationMs: z.number().positive(),

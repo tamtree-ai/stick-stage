@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "gus",
+      "text": "Flip the switch and electrons zoom down the wire at light speed.",
+      "audio": "voice/l1.wav",
+      "durationMs": 3849
+    },
+    {
+      "id": "l2",
+      "speaker": "vera",
+      "text": "Zoom? They barely shuffle.",
+      "audio": "voice/l2.wav",
+      "durationMs": 1704
+    },
+    {
+      "id": "l3",
+      "speaker": "gus",
+      "text": "They must. The light comes on instantly.",
+      "audio": "voice/l3.wav",
+      "durationMs": 3072
+    },
+    {
+      "id": "l4",
+      "speaker": "vera",
+      "text": "Here's how fast they really go.",
+      "audio": "voice/l4.wav",
+      "durationMs": 1792
+    },
+    {
+      "id": "l5",
+      "speaker": "gus",
+      "text": "…huh.",
+      "audio": "voice/l5.wav",
+      "durationMs": 390
+    },
+    {
+      "id": "l6",
+      "speaker": "vera",
+      "text": "A wire is packed with so many electrons that each one only has to creep.",
+      "audio": "voice/l6.wav",
+      "durationMs": 4061
+    },
+    {
+      "id": "l7",
+      "speaker": "vera",
+      "text": "The light is instant because the push travels fast. Every electron starts moving at once.",
+      "audio": "voice/l7.wav",
+      "durationMs": 5194
+    },
+    {
+      "id": "l8",
+      "speaker": "vera",
+      "text": "The signal is fast. The electrons are slow.",
+      "audio": "voice/l8.wav",
+      "durationMs": 2779
+    }
+  ]
+}

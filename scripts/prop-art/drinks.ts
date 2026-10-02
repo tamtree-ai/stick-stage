@@ -53,7 +53,7 @@ export const DRINKS: Art[] = [
     R(-0.02, -0.14, 0.04, 0.12, "body", { rx: 0.012 }),
     R(-0.012, -0.1, 0.024, 0.03, "accent", { stroke: false }),
   ], 1.15),
-  prop("thermos", "drinks", "Thermos", 60, ["drink", "hot"], ["flask"], "upright", "#c0392b", "#f4f1ea", [
+  prop("thermos", "drinks", "Thermos", 60, ["drink", "hot"], ["vacuum flask"], "upright", "#c0392b", "#f4f1ea", [
     R(-0.016, -0.2, 0.032, 0.03, "accent", { rx: 0.008 }),
     R(-0.024, -0.17, 0.048, 0.16, "body", { rx: 0.014 }),
     R(-0.024, -0.1, 0.048, 0.02, "accent"),
