@@ -7,5 +7,6 @@ export { ReplyError, premiseFromReply } from "./draft";
 export { parseLoose } from "./parse";
 export { draftPrompt, revisePrompt, skitWriterLines, type WriterLine } from "./prompt";
 export { repairPrompt } from "./repair";
+export { DraftReplySchema, ReplyLineSchema, ReplySceneSchema, ReviseReplySchema, WriterReplySchema, type DraftReply, type ReviseReply, type WriterReply } from "./reply";
 export { skitFromReply } from "./revise";
 export { writerWorld, type WriterWorld } from "./world";

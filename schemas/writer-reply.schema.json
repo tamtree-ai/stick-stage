@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "template": {
+          "description": "only when the prompt asks for one",
+          "type": "string"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "hashtags": {
+          "maxItems": 12,
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scenes": {
+          "minItems": 1,
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "set": {
+                "description": "only when the prompt leaves this scene's set open",
+                "type": "string"
+              },
+              "pov": {
+                "type": "string",
+                "maxLength": 80
+              },
+              "lines": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "who": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "a cast id from the prompt"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "the spoken words, at most 12"
+                    },
+                    "expression": {
+                      "description": "one of the expressions the prompt lists",
+                      "type": "string"
+                    },
+                    "slam": {
+                      "description": "one or two words, last line only",
+                      "type": "string",
+                      "maxLength": 40
+                    },
+                    "gag": {
+                      "type": "string"
+                    },
+                    "prop": {
+                      "description": "a prop id from the prompt, or \"none\"",
+                      "type": "string"
+                    },
+                    "delivery": {
+                      "description": "\"flat\", \"whispered\", …",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "who",
+                    "text"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "lines"
+            ]
+          }
+        }
+      },
+      "required": [
+        "title",
+        "scenes"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "lines": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "who": {
+                "type": "string",
+                "minLength": 1,
+                "description": "a cast id from the prompt"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "the spoken words, at most 12"
+              },
+              "expression": {
+                "description": "one of the expressions the prompt lists",
+                "type": "string"
+              },
+              "slam": {
+                "description": "one or two words, last line only",
+                "type": "string",
+                "maxLength": 40
+              },
+              "gag": {
+                "type": "string"
+              },
+              "prop": {
+                "description": "a prop id from the prompt, or \"none\"",
+                "type": "string"
+              },
+              "delivery": {
+                "description": "\"flat\", \"whispered\", …",
+                "type": "string"
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "who",
+              "text",
+              "id"
+            ]
+          }
+        }
+      },
+      "required": [
+        "lines"
+      ]
+    }
+  ],
+  "$id": "https://stickstage.dev/schemas/writer-reply.schema.json",
+  "title": "StickStage writer reply"
+}

@@ -1,5 +1,8 @@
 allowBuilds:
   esbuild: true
+  onnxruntime-node: false
+  protobufjs: false
+  sharp: false
 minimumReleaseAgeExclude:
   - '@remotion/bundler@4.0.529'
   - '@remotion/canvas@4.0.529'
