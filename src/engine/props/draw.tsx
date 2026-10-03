@@ -1,7 +1,7 @@
 import React from "react";
 import { darken, lighten } from "../lib/color";
 import { FittedLines } from "../text/FittedLines";
-import { pathPoints } from "./path";
+import { pathPoints } from "./svgPath";
 import type { CodedKind, DrawnPart, PropDef } from "./schema";
 import { isDrawn } from "./schema";
 

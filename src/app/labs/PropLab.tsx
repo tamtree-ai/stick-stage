@@ -2,12 +2,19 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { z } from "zod";
 import { evalActor, Stage, type ExpressionKey, type PoseKey, type PropKey } from "../../engine";
-import { library, sets } from "../../data";
+import { sets } from "../../data";
+import { buildProp, labLibrary } from "./build";
 import { TEXT_FONT } from "../fonts";
 import { Label } from "./Label";
 import { PROP_POSES } from "./propPoses";
 
-export const propLabSchema = z.object({ set: z.string(), showLabels: z.boolean() });
+export const propLabSchema = z.object({
+  set: z.string(),
+  showLabels: z.boolean(),
+  left: z.string().optional(),
+  right: z.string().optional(),
+  build: buildProp,
+});
 
 const SEG = 84;
 /** Poses the prop is carried through after its own pose, to prove it stays in the hand. */
@@ -38,19 +45,19 @@ const tracks = (offset: number) => {
 };
 
 /** Two characters hold every prop, carry it through pose changes, then the phone gets dropped. */
-export const PropLab: React.FC<z.infer<typeof propLabSchema>> = ({ set: setId, showLabels }) => {
+export const PropLab: React.FC<z.infer<typeof propLabSchema>> = ({ set: setId, showLabels, left = "milo", right = "june", build }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
   const set = sets[setId]!;
   const cast = [
-    { id: "milo", x: set.marks.left ?? 0.3, facing: "right" as const, offset: 0 },
-    { id: "june", x: set.marks.right ?? 0.7, facing: "left" as const, offset: 6 },
+    { id: left, x: set.marks.left ?? 0.3, facing: "right" as const, offset: 0 },
+    { id: right, x: set.marks.right ?? 0.7, facing: "left" as const, offset: 6 },
   ];
   const actors = cast.map((c) => ({
     id: c.id,
     x: c.x,
     facing: c.facing,
-    state: evalActor(library, { character: c.id, ...tracks(c.offset) }, frame, fps, set.figureHeightPx),
+    state: evalActor(labLibrary(build), { character: c.id, ...tracks(c.offset) }, frame, fps, set.figureHeightPx),
   }));
   const seg = Math.min(PROP_POSES.length - 1, Math.floor(frame / SEG));
   return (

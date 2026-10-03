@@ -8,6 +8,7 @@ import {
   charactersWithBuild,
   contrastRatio,
   evalActor,
+  evalHands,
   proportionsOf,
   rigMetrics,
   Rig,
@@ -19,6 +20,7 @@ import {
   type Library,
 } from "../src/engine";
 import { PALETTES } from "../src/engine/set/palettes";
+import { thumbFlip } from "../src/engine/rig/toon/limbs";
 
 const FIG = 720;
 const FPS = 30;
@@ -42,6 +44,7 @@ const markup = (lib: Library, character: string, pose: string, expression: strin
         symbolsSince: s.symbolsSince,
         symbolAges: s.symbolAges,
         props: s.props,
+        hands: s.hands,
       }),
     ),
   );
@@ -123,5 +126,41 @@ describe("toon checks", () => {
         expect(worst, `${id} on ${pid}`).toBeGreaterThanOrEqual(3);
       }
     }
+  });
+});
+
+describe("toon hands (T2)", () => {
+  const pose = (id: string) => library.poses[id]!;
+  it("hand shapes switch at the middle of a pose blend, not at its start", () => {
+    const keys = [{ frame: 0, pose: "idle" }, { frame: 10, pose: "point" }];
+    expect(evalHands(keys, 10, pose).R).toBeUndefined();
+    expect(evalHands(keys, 11, pose).R).toBeUndefined();
+    expect(evalHands(keys, 12, pose).R).toBe("point");
+  });
+
+  it("a held prop closes the hand; otherwise the pose's shape shows", () => {
+    const s = evalActor(toonLib, { character: "vera", poseKeys: [{ frame: 0, pose: "point" }], expressionKeys: [{ frame: 0, expression: "neutral" }], propKeys: [{ frame: 0, hand: "L", prop: "mic" }] }, 5, FPS, FIG);
+    expect(s.hands.R).toBe("point");
+    expect(s.props.held.L).toBeDefined();
+  });
+
+  it("the thumb is on top of a forearm pointing forward or back, and forward on a hanging arm", () => {
+    // Local −y of the hand is the thumb; rotate it by the forearm angle (and mirror on a flip).
+    const thumbDir = (fore: { x: number; y: number }) => {
+      const a = Math.atan2(fore.y, fore.x);
+      const s = thumbFlip(fore) ? -1 : 1;
+      return { x: s * Math.sin(a), y: -s * Math.cos(a) };
+    };
+    expect(thumbDir({ x: 1, y: 0 }).y).toBeLessThan(-0.9);
+    expect(thumbDir({ x: -1, y: 0 }).y).toBeLessThan(-0.9);
+    expect(thumbDir({ x: 0, y: 1 }).x).toBeGreaterThan(0.9);
+    // A hanging arm's idle sway never flips the hand.
+    expect(thumbFlip({ x: -0.2, y: 0.98 })).toBe(false);
+  });
+
+  it("every pose × hand shape draws with no NaN, and point draws a different hand than idle", () => {
+    for (const id of TOON_CAST)
+      for (const p of Object.keys(library.poses)) expect(markup(toonLib, id, p, "neutral"), `${id} ${p}`).not.toContain("NaN");
+    expect(markup(toonLib, "gus", "point", "neutral")).not.toBe(markup(toonLib, "gus", "idle", "neutral"));
   });
 });

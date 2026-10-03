@@ -27,6 +27,8 @@ export type TorsoProps = {
   /** Torso length and thigh length in toon units. */
   T: number;
   thigh: number;
+  /** Knees in figure px (back, front): a skirt's hem follows the thighs. */
+  knees: readonly [Vec2, Vec2];
   pen: Pen;
 };
 
@@ -34,7 +36,7 @@ export type TorsoProps = {
  * Everything worn on the torso, drawn in toon units in the torso frame (origin at the hip,
  * up = −y, facing +x): skirt or the jeans seat, the top, belt, the open outer layer, details.
  */
-export const Torso: React.FC<TorsoProps> = ({ hip, angle, T, thigh, pen }) => {
+export const Torso: React.FC<TorsoProps> = ({ hip, angle, T, thigh, knees, pen }) => {
   const { t } = pen;
   const o = t.outline;
   const ink = pen.ink;
@@ -46,10 +48,34 @@ export const Torso: React.FC<TorsoProps> = ({ hip, angle, T, thigh, pen }) => {
   const parts: React.ReactNode[] = [];
 
   if (b.kind === "skirt") {
-    const sk = `M${-Wa * 0.55},-30 L${Wa * 0.55},-30 Q${H * 0.75},40 ${H * 0.9},${thigh * 0.82} Q0,${thigh * 0.92} ${-H * 0.9},${thigh * 0.82} Q${-H * 0.75},40 ${-Wa * 0.55},-30 Z`;
+    // The hem follows the thighs: (a, b) is `a` along the mean thigh and `b` across it toward
+    // the front. Standing that is plain (b, a); seated the skirt lies over the lap, less flared.
+    const rad = (-angle * Math.PI) / 180;
+    const local = (p: Vec2) => {
+      const x = (p.x - hip.x) / pen.u;
+      const y = (p.y - hip.y) / pen.u;
+      return { x: x * Math.cos(rad) - y * Math.sin(rad), y: x * Math.sin(rad) + y * Math.cos(rad) };
+    };
+    const kl = local(knees[0]);
+    const kr = local(knees[1]);
+    const mx = (kl.x + kr.x) / 2;
+    const my = (kl.y + kr.y) / 2;
+    const dl = Math.hypot(mx, my) || 1;
+    const d = { x: mx / dl, y: my / dl };
+    const lap = Math.min(1, Math.max(0, Math.atan2(d.x, d.y) / (Math.PI / 2)));
+    const k = 1 - 0.45 * lap;
+    const at = (a: number, w: number) => `${f2(d.x * a + d.y * w * k)},${f2(d.y * a - d.x * w * k)}`;
+    const sk = `M${-Wa * 0.55},-30 L${Wa * 0.55},-30 Q${at(40, H * 0.75)} ${at(thigh * 0.82, H * 0.9)} Q${at(thigh * 0.92, 0)} ${at(thigh * 0.82, -H * 0.9)} Q${at(40, -H * 0.75)} ${-Wa * 0.55},-30 Z`;
     parts.push(<Shaded key="skirt" d={sk} fill={b.fill} shade={shadeOf(b)} cut={-H * 0.35} pen={pen} />);
     parts.push(
-      <path key="pleats" d={`M-6,0 Q-10,60 -16,${thigh * 0.84} M24,4 Q30,60 36,${thigh * 0.82}`} fill="none" stroke={shadeOf(b)} strokeWidth={5} strokeLinecap="round" />,
+      <path
+        key="pleats"
+        d={`M${at(0, -6)} Q${at(60, -10)} ${at(thigh * 0.84, -16)} M${at(4, 24)} Q${at(60, 30)} ${at(thigh * 0.82, 36)}`}
+        fill="none"
+        stroke={shadeOf(b)}
+        strokeWidth={5}
+        strokeLinecap="round"
+      />,
     );
   } else {
     // The seat of the jeans, so the tops of the legs join under the top.

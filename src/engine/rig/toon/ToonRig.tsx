@@ -28,6 +28,7 @@ export const ToonRig: React.FC<RigProps & { toon: Toon }> = ({
   symbolsSince,
   symbolAges,
   props,
+  hands = {},
   mirrored = false,
   fontFamily = "sans-serif",
 }) => {
@@ -60,7 +61,7 @@ export const ToonRig: React.FC<RigProps & { toon: Toon }> = ({
       elbow={s === "L" ? j.elbowL : j.elbowR}
       wrist={s === "L" ? j.handL : j.handR}
       back={s === "L"}
-      hand={props.held[s] ? "hold" : "open"}
+      hand={props.held[s] ? "hold" : (hands[s] ?? "open")}
       between={held(s)}
       pen={pen}
     />
@@ -87,7 +88,7 @@ export const ToonRig: React.FC<RigProps & { toon: Toon }> = ({
       {leg("L")}
       {leg("R")}
       <Tube d={polyline([add(j.neck, { x: 0, y: 6 * u }), neckTop])} w={toon.body.neck * u} fill={toon.skin} pen={pen} />
-      <Torso hip={j.hip} angle={angle} T={len / u} thigh={(P.thigh * m.heightPx) / u} pen={pen} />
+      <Torso hip={j.hip} angle={angle} T={len / u} thigh={(P.thigh * m.heightPx) / u} knees={[j.kneeL, j.kneeR]} pen={pen} />
       <g transform={headTransform}>
         <ToonHead
           R={R}

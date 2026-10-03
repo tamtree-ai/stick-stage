@@ -62,7 +62,7 @@ Default: the beat start.
 
 | `do` | Fields |
 |---|---|
-| `pose` | `pose` (idle, point, shrug, facepalm, arms-up, arms-crossed, think, lean-in, recoil, slump, hands-on-hips, hold-phone, sit, hold-out, hold-chest, hold-up, faint), `durationFrames?` |
+| `pose` | `pose` (idle, point, shrug, facepalm, arms-up, arms-crossed, think, lean-in, recoil, slump, hands-on-hips, hold-phone, sit, hold-out, hold-chest, hold-up, high-five, shove, faint, wave, thumbs-up), `durationFrames?` |
 | `gag` | `gag` (`double-take`, `look-to-camera`, `spit-take`, `faint`, `slow-clap`, `walk-out`, `freeze-frame`). The compiler expands it. `spit-take` holds the cup. |
 | `fall` | Stiff pose, then a tilt onto the ground. `faint` uses this. |
 | `expression` | `expression` (neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan, skeptical, worried, embarrassed, thinking, laughing) |

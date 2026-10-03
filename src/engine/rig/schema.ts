@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ASPECTS } from "../format/aspect";
-import { ToonSchema } from "./toon/schema";
+import { HAND_SHAPES, ToonSchema } from "./toon/schema";
 
 const hex = z.string().regex(/^#[0-9a-fA-F]{3,8}$/, "expected a hex color like #1b1b1f");
 const frac = (lo: number, hi: number) => z.number().min(lo).max(hi);
@@ -132,6 +132,12 @@ export const PoseSchema = z.object({
   hipR: z.number().default(5),
   kneeR: z.number().default(0),
   bend: limbBend.default({}),
+  /**
+   * Toon hand shapes (stick figures ignore them). Missing means "open", or "hold" while the
+   * hand holds a prop. Shapes switch at the middle of a pose blend; they don't tween.
+   */
+  handL: z.enum(HAND_SHAPES).optional(),
+  handR: z.enum(HAND_SHAPES).optional(),
   /** Big gestures get a short opposite dip before the move. */
   anticipation: z.boolean().default(false),
 });

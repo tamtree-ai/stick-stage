@@ -4,7 +4,7 @@ import { speechMouth } from "../face/visemes";
 import type { MouthCue } from "../voice/schema";
 import { applyGait, type GaitKey } from "./gait";
 import { blinkAmount, idleOffsets } from "./idle";
-import { evalPoseTrack, type PoseKey } from "./pose";
+import { evalHands, evalPoseTrack, type Hands, type PoseKey } from "./pose";
 import type { Character, Pose, PoseAngles } from "./schema";
 import { evalSeat, type SeatKey } from "./seat";
 import type { PropDef, PropKey } from "../props/schema";
@@ -134,6 +134,8 @@ export type ActorState = {
   /** Ages of event symbols (see `symbolKeys`). */
   symbolAges: Partial<Record<SymbolId, number>>;
   props: PropState;
+  /** Toon hand shapes from the pose track (a held prop overrides with "hold"). */
+  hands: Hands;
 };
 
 /** Figure space at `dropFrame` → stage → figure space now (x mirrors with facing). */
@@ -208,5 +210,6 @@ export const evalActor = (
     symbolsSince: lastKeyFrame(tracks.expressionKeys, frame),
     symbolAges,
     props,
+    hands: evalHands(tracks.poseKeys, frame, getPose),
   };
 };

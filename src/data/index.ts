@@ -31,6 +31,8 @@ import holdUp from "./poses/hold-up.json";
 import highFive from "./poses/high-five.json";
 import shove from "./poses/shove.json";
 import faintPose from "./poses/faint.json";
+import wavePose from "./poses/wave.json";
+import thumbsUp from "./poses/thumbs-up.json";
 
 import { PROP_DOCS, PROP_IDS } from "./props";
 import miloJune from "./series/milo-june.json";
@@ -95,7 +97,7 @@ import pronunciationsJson from "./pronunciations.json";
 /** Order matters: labs cycle through poses/expressions in this order. */
 export const POSE_IDS = ["idle", "point", "shrug", "facepalm", "arms-up", "arms-crossed", "think", "lean-in", "recoil", "slump", "hands-on-hips", "hold-phone"];
 /** Poses added after M1 (labs that cycle POSE_IDS skip these). */
-export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up", "high-five", "shove", "faint"];
+export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up", "high-five", "shove", "faint", "wave", "thumbs-up"];
 export { PROP_IDS };
 export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed", "angry", "shocked", "sad", "crying", "cringe", "confused", "deadpan"];
 /** Expressions added with the toon tier (labs that cycle EXPRESSION_IDS skip these; FaceLab can include them). */
@@ -103,7 +105,7 @@ export const EXTRA_EXPRESSION_IDS = ["skeptical", "worried", "embarrassed", "thi
 
 export const library: Library = createLibrary({
   characters: [milo, june, lila, theo, moss, dash, reed, nell, pip, vera, gus],
-  poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose],
+  poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose, wavePose, thumbsUp],
   expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan, skeptical, worried, embarrassed, thinking, laughing],
   props: PROP_DOCS,
 });

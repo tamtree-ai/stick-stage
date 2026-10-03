@@ -1,6 +1,7 @@
 import { easeOutBack, bump } from "../lib/easing";
 import { lerp, lerpAngle } from "../lib/math";
 import { POSE_ANGLES, type Pose, type PoseAngles } from "./schema";
+import type { HandShape } from "./toon/schema";
 
 export type PoseKey = {
   frame: number;
@@ -82,4 +83,21 @@ export const evalPoseTrack = (
     current = blendAngles(current, toAngles(target), t);
   }
   return current;
+};
+
+/** Toon hand shapes per hand; missing means the default ("open", or "hold" with a prop). */
+export type Hands = { L?: HandShape; R?: HandShape };
+
+/**
+ * Hand shapes at `frame`: each key's shapes take over at the middle of its blend (shapes
+ * don't tween). Keys must be sorted by frame.
+ */
+export const evalHands = (keys: readonly PoseKey[], frame: number, getPose: (id: string) => Pose): Hands => {
+  let hands: Hands = {};
+  keys.forEach((key, i) => {
+    const pose = getPose(key.pose);
+    const swap = i === 0 ? key.frame : key.frame + Math.floor(transitionLength(key, pose) / 2);
+    if (swap <= frame) hands = { L: pose.handL, R: pose.handR };
+  });
+  return hands;
 };

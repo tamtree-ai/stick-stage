@@ -178,7 +178,7 @@ carry a toon block (`src/data/characters/vera.json`); the schema is `src/engine/
 
 Every garment takes an optional `shade`, the cel-shade tone on its back side; without one it is a
 darker `fill`. Accessories are stick-only: a toon draws its own hair and glasses. The labs force a
-tier with `build` (`CharacterLabToon`, `FaceLabToon`, `PoseLabVera`, `PoseLabGus`, `TalkLabToon`),
+tier with `build` (`CharacterLabToon`, `FaceLabToon`, `PoseLabVera`, `PoseLabGus`, `PropLabToon`, `StagingLabToon`, `TalkLabToon`),
 so the same character can be compared stick vs toon. Hair, clothes and details are drawn in code,
 so a new kind (a hoodie, a bob) is a few lines in `src/engine/rig/toon/`, then owner review.
 
@@ -261,7 +261,9 @@ Angles are degrees. The canonical view faces right. `L` is the back limb (screen
 
 `bend` is optional extra bow per limb (`armL`, `armR`, `legL`, `legR`). `anticipation: true` dips the opposite way before a big gesture.
 
-Shipped poses: `idle`, `point`, `shrug`, `facepalm`, `arms-up`, `arms-crossed`, `think`, `lean-in`, `recoil`, `slump`, `hands-on-hips`, `hold-phone`, `sit`, `hold-out`, `hold-chest`, `hold-up`, `high-five`, `shove`, `faint`.
+`handL` / `handR` pick a toon hand shape: `open` (default), `fist`, `point`, `thumb`, `wave`, `palmup`, `hold`. Stick figures ignore them. A held prop always closes the hand (`hold`). Shapes switch at the middle of a pose blend, since they don't tween. The thumb turns with the forearm: forward on a hanging arm, on top of an arm pointing forward or back.
+
+Shipped poses: `idle`, `point`, `shrug`, `facepalm`, `arms-up`, `arms-crossed`, `think`, `lean-in`, `recoil`, `slump`, `hands-on-hips`, `hold-phone`, `sit`, `hold-out`, `hold-chest`, `hold-up`, `high-five`, `shove`, `faint`, `wave`, `thumbs-up`.
 
 A beat names one with `{ "who": "june", "do": "pose", "pose": "arms-crossed" }`. To add a pose: write the JSON, import it in `src/data/index.ts`, and look at it in `PoseLab`. You do not draw a new limb. The rig already interpolates these angles.
 

@@ -9,16 +9,18 @@ export const poseLabSchema = z.object({
   character: z.string(),
   expression: z.string(),
   build: buildProp,
+  /** Only these poses (default: all), in a grid of `cols` columns. */
+  poses: z.array(z.string()).optional(),
+  cols: z.number().int().min(1).max(6).optional(),
 });
 
 const ALL_POSES = [...POSE_IDS, ...EXTRA_POSE_IDS];
-const COLS = 4;
-const ROWS = Math.ceil(ALL_POSES.length / COLS);
 
 /** Static grid of every pose for one character — the quickest way to tune pose numbers. */
-export const PoseLab: React.FC<z.infer<typeof poseLabSchema>> = ({ character, expression, build }) => {
+export const PoseLab: React.FC<z.infer<typeof poseLabSchema>> = ({ character, expression, build, poses = ALL_POSES, cols: COLS = 4 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const ROWS = Math.ceil(poses.length / COLS);
   const W = 1080;
   const H = 1920;
   const cellW = W / COLS;
@@ -26,14 +28,14 @@ export const PoseLab: React.FC<z.infer<typeof poseLabSchema>> = ({ character, ex
   const set = sets["plain-1"]!;
   const fig = 760;
   // Toon figures carry hair and shoes beyond the stick outline: a little smaller to fit the cells.
-  const s = build === "toon" ? 0.4 : 0.46;
+  const s = (build === "toon" ? 0.4 : 0.46) * Math.min(cellW / 270, cellH / 384);
   return (
     <AbsoluteFill style={{ background: "#fff" }}>
       <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H}>
         <g opacity={0.6}>
           <SetLayers set={set} width={W} height={H} layer="background" />
         </g>
-        {ALL_POSES.map((pose, i) => {
+        {poses.map((pose, i) => {
           const col = i % COLS;
           const row = Math.floor(i / COLS);
           const state = evalActor(

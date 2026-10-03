@@ -14,6 +14,13 @@ const Band: React.FC<{ a: Vec2; b: Vec2; w: number; fill: string; pen: Pen }> = 
   <Tube d={polyline([a, b])} w={w} fill={fill} pen={pen} cap="butt" />
 );
 
+/**
+ * The thumb (local −y of a hand shape) turns with the forearm: forward when the arm hangs, on
+ * top when it points forward. Only a forearm pointing clearly backward mirrors the hand, so the
+ * thumb stays on top; the margin keeps a hanging arm's sway from flipping it back and forth.
+ */
+export const thumbFlip = (fore: Vec2): boolean => fore.x < -0.35;
+
 export type ArmProps = {
   shoulder: Vec2;
   elbow: Vec2;
@@ -64,8 +71,7 @@ export const Arm: React.FC<ArmProps> = ({ shoulder, elbow, wrist, back, hand, be
           shape={hand}
           at={add(wrist, scale(fore, -4 * u))}
           angle={angle}
-          // Rig angle of the forearm > 0 means it points forward: the thumb goes on top.
-          flip={fore.x > 0}
+          flip={thumbFlip(fore)}
           skin={skin}
           nails={t.nails}
           pen={pen}

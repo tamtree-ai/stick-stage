@@ -242,3 +242,11 @@ Plan: `../planning/2026-10-02-toon-characters/plan.md` (owner approved the v2 lo
 - **The catalog version changes** (character library + expressions are hashed), so t-shoot needs a re-vendor when this merges.
 - **Look-alike QA knows toons:** `characterDistance` uses toon proportions, adds hair / outer / bottom kind to the silhouette score and compares skin and the outer layer's colour. The plan's raster silhouette check (solid fill at 18 %, pixel overlap) is not built; this geometric score stands in for it.
 - **Dark garments on dark ink are accepted** (Vera's skirt and tights, Gus's jeans and hair are 1–2.7:1 against the ink). The outline separates the figure from the set, which the visual QA checks (toon ink ≥ 3:1 on every palette, and against skin).
+
+## 2026-10-03 (toon characters, T2)
+- **Hand shapes live on the pose** (`handL` / `handR`), not on a separate track. A held prop overrides with `hold`. Shapes switch at the middle of the blend (`evalHands`); they don't tween. Stick figures ignore the fields, so stick drawings are unchanged.
+- **Thumb rule:** the hand turns with the forearm (thumb forward on a hanging arm, on top when pointing forward); it mirrors only when the forearm points clearly backward (`fore.x < −0.35`), so idle sway never flips it. The T1 rule (mirror whenever the forearm pointed forward) put the thumb underneath on `point`.
+- **Two poses added:** `wave`, `thumbs-up` (`EXTRA_POSE_IDS`).
+- **The skirt follows the thighs:** its hem is laid out along the mean thigh direction, so a seated skirt lies over the lap.
+- **Known:** in `think` the back fist shows in front of the torso on toons. Fixing it means changing the pose angles, which would change the stick drawing too; left for an owner call.
+- `src/engine/props/path.ts` → `svgPath.ts`: the engine's no-filesystem lint rule matched the local `./path` import (the 3 lint errors on `main`).

@@ -28,6 +28,7 @@ export const Actor: React.FC<ActorProps> = ({ state, x, groundY, facing, frame, 
       symbolsSince={state.symbolsSince}
       symbolAges={state.symbolAges}
       props={state.props}
+      hands={state.hands}
       mirrored={facing === "left"}
       fontFamily={fontFamily}
     />

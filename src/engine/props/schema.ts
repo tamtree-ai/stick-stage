@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { pathError } from "./path";
+import { pathError } from "./svgPath";
 import { ScreenTextSchema } from "../lib/screenText";
 
 const hex = z.string().regex(/^#[0-9a-fA-F]{3,8}$/, "expected a hex color like #1b1b1f");

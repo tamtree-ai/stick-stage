@@ -11,6 +11,7 @@ import { limbControl, limbPath } from "./limbs";
 import { ToonRig } from "./toon/ToonRig";
 import type { Character, PoseAngles } from "./schema";
 import type { Joints, RigMetrics } from "./skeleton";
+import type { Hands } from "./pose";
 
 export type RigProps = {
   character: Character;
@@ -23,6 +24,8 @@ export type RigProps = {
   symbolsSince: number;
   symbolAges?: Partial<Record<SymbolId, number>>;
   props: PropState;
+  /** Toon hand shapes (stick figures ignore them). */
+  hands?: Hands;
   /** Drawn mirrored (facing left): text-bearing parts counter-flip. */
   mirrored?: boolean;
   /** Font for text on props (signs). */
