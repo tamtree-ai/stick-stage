@@ -4,6 +4,7 @@
   "displayName": "Vera",
   "proportions": { "height": 1.06, "headRadius": 0.165, "neck": 0.025, "torso": 0.28, "upperArm": 0.15, "forearm": 0.14, "thigh": 0.18, "shin": 0.18 },
   "style": {
+    "build": "toon",
     "stroke": "#1b1b1f",
     "strokeWidth": 12,
     "headFill": "#ffffff",

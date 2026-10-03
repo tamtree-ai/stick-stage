@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "meta": { "title": "Menu lab", "description": "Toon rig test skit (not a posted short): walk in, held prop, hand shapes, lip-sync, listener reactions." },
+  "set": "cafe-1",
+  "cast": [
+    { "id": "gus", "character": "gus", "mark": "off-left" },
+    { "id": "vera", "character": "vera", "mark": "right", "holding": { "prop": "clipboard", "hand": "R" } }
+  ],
+  "beats": [
+    { "id": "enter", "silent": true, "durationMs": 1700, "shot": { "framing": "wide" },
+      "actions": [ { "who": "gus", "do": "walkTo", "mark": "left" },
+                   { "who": "vera", "do": "look", "to": "gus" } ] },
+    { "id": "b1", "speaker": "gus", "line": "Hi! Can I see the menu?", "expression": "happy",
+      "actions": [ { "who": "gus", "do": "pose", "pose": "wave", "at": { "word": "Hi" } } ] },
+    { "id": "b2", "speaker": "vera", "line": "Today the menu is one thing.", "expression": "smug",
+      "actions": [ { "who": "vera", "do": "pose", "pose": "hold-out", "at": { "word": "menu" } } ] },
+    { "id": "b3", "speaker": "gus", "line": "Great. I'll have the other thing.", "expression": "happy",
+      "actions": [ { "who": "gus", "do": "pose", "pose": "point", "at": { "word": "other" } } ] },
+    { "id": "b4", "speaker": "vera", "line": "There is no other thing.", "expression": "deadpan",
+      "actions": [ { "who": "vera", "do": "pose", "pose": "arms-crossed", "at": { "word": "no" } } ] },
+    { "id": "b5", "speaker": "gus", "line": "Then I'll have it twice.", "expression": "laughing", "holdAfterMs": 300,
+      "actions": [ { "who": "gus", "do": "pose", "pose": "thumbs-up", "at": { "word": "twice" } } ] },
+    { "id": "b6", "silent": true, "durationMs": 1200,
+      "actions": [ { "who": "vera", "do": "pose", "pose": "facepalm", "at": { "ms": 100 } },
+                   { "who": "vera", "do": "expression", "expression": "embarrassed", "at": { "ms": 100 } },
+                   { "who": "gus", "do": "pose", "pose": "shrug", "at": { "ms": 400 } } ] }
+  ]
+}

@@ -250,3 +250,7 @@ Plan: `../planning/2026-10-02-toon-characters/plan.md` (owner approved the v2 lo
 - **The skirt follows the thighs:** its hem is laid out along the mean thigh direction, so a seated skirt lies over the lap.
 - **Known:** in `think` the back fist shows in front of the torso on toons. Fixing it means changing the pose angles, which would change the stick drawing too; left for an owner call.
 - `src/engine/props/path.ts` → `svgPath.ts`: the engine's no-filesystem lint rule matched the local `./path` import (the 3 lint errors on `main`).
+
+## 2026-10-03 (toon characters, T3)
+- **Vera and Gus now ship as toons** (`style.build: "toon"`), one milestone earlier than the plan said: the T3 test skit needs them, and T4 re-renders every science draft in toon anyway. Old stick renders in `out/` are stale. t-shoot needs a catalog re-vendor when this merges.
+- **T3 needed no new mouth code:** T1's toon face already draws Rhubarb visemes (open mouth, teeth, tongue) and lid blinks with the parametric `Mouth`. `menu-lab` (`public/skits/menu-lab/`, the brief's restaurant-menu idea, not a posted short) is the motion test: walk-in, held clipboard, wave / point / thumbs-up, lip-sync, listener looks, punch-in.

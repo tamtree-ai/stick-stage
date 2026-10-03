@@ -51,8 +51,8 @@ const markup = (lib: Library, character: string, pose: string, expression: strin
 };
 
 describe("toon build", () => {
-  it("the shipped cast stays stick until a file opts in; the science cast carries a toon block", () => {
-    for (const [id, c] of Object.entries(library.characters)) expect(c.style.build, id).toBe("stick");
+  it("the science cast ships as toons; everyone else stays stick", () => {
+    for (const [id, c] of Object.entries(library.characters)) expect(c.style.build, id).toBe(TOON_CAST.includes(id) ? "toon" : "stick");
     for (const id of TOON_CAST) expect(library.characters[id]!.toon, id).toBeDefined();
   });
 
@@ -64,7 +64,7 @@ describe("toon build", () => {
   });
 
   it("withBuild switches tier and proportions; characters without toon stay stick", () => {
-    const vera = library.characters.vera!;
+    const vera = withBuild(library.characters.vera!, "stick");
     expect(proportionsOf(vera)).toBe(vera.proportions);
     const toon = withBuild(vera, "toon");
     expect(toonOf(toon)).toBe(vera.toon);
@@ -106,7 +106,8 @@ describe("toon rig", () => {
     const svg = markup(toonLib, "vera", "idle", "neutral");
     // Skin, iris and the hair colour all come from the toon block.
     for (const c of [library.characters.vera!.toon!.skin, library.characters.vera!.toon!.eyes.iris, library.characters.vera!.toon!.hair.fill]) expect(svg).toContain(c);
-    expect(markup(library, "vera", "idle", "neutral")).not.toContain(library.characters.vera!.toon!.skin);
+    const stickLib: Library = { ...library, characters: charactersWithBuild(library.characters, "stick") };
+    expect(markup(stickLib, "vera", "idle", "neutral")).not.toContain(library.characters.vera!.toon!.skin);
   });
 });
 
