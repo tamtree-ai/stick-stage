@@ -2,6 +2,7 @@ import { evalExpressionTrack, type ExpressionKey, type FaceState } from "../face
 import type { Expression, SymbolId } from "../face/schema";
 import { speechMouth } from "../face/visemes";
 import type { MouthCue } from "../voice/schema";
+import { toonOf } from "./build";
 import { applyGait, type GaitKey } from "./gait";
 import { blinkAmount, idleOffsets } from "./idle";
 import { evalHands, evalPoseTrack, type Hands, type PoseKey } from "./pose";
@@ -154,6 +155,19 @@ const lastKeyFrame = (keys: readonly ExpressionKey[], frame: number): number => 
   return at;
 };
 
+/** Poses as a toon draws them: a pose's `toon` block replaces the angles and hands it names. */
+const toonPoses = (get: (id: string) => Pose) => {
+  const cache = new Map<string, Pose>();
+  return (id: string): Pose => {
+    const hit = cache.get(id);
+    if (hit) return hit;
+    const pose = get(id);
+    const out = pose.toon ? { ...pose, ...pose.toon } : pose;
+    cache.set(id, out);
+    return out;
+  };
+};
+
 /** Everything needed to draw one actor at `frame`. Pure: same inputs → same state. */
 export const evalActor = (
   lib: Library,
@@ -164,7 +178,7 @@ export const evalActor = (
 ): ActorState => {
   const character = getter("character", lib.characters)(tracks.character);
   const seed = tracks.seed ?? character.id;
-  const getPose = getter("pose", lib.poses);
+  const getPose = toonOf(character) ? toonPoses(getter("pose", lib.poses)) : getter("pose", lib.poses);
   const bodyAt = (f: number) => {
     const seat = evalSeat(tracks.seatKeys, f);
     const posed = evalPoseTrack(tracks.poseKeys, f, getPose);

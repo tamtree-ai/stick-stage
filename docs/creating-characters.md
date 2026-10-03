@@ -263,6 +263,8 @@ Angles are degrees. The canonical view faces right. `L` is the back limb (screen
 
 `handL` / `handR` pick a toon hand shape: `open` (default), `fist`, `point`, `thumb`, `wave`, `palmup`, `hold`. Stick figures ignore them. A held prop always closes the hand (`hold`). Shapes switch at the middle of a pose blend, since they don't tween. The thumb turns with the forearm: forward on a hanging arm, on top of an arm pointing forward or back.
 
+A pose may carry a `toon` block (`shoulderL`, `elbowL`, `shoulderR`, `elbowR`, `handL`, `handR`). Toon figures use those values in place of the base ones; stick figures ignore the block. Use it when the wider toon body needs a different arm path, as in `think`, where the stick angles would push the back fist out past the coat. The stick drawing stays byte-identical, and `tests/toon.test.ts` checks that.
+
 Shipped poses: `idle`, `point`, `shrug`, `facepalm`, `arms-up`, `arms-crossed`, `think`, `lean-in`, `recoil`, `slump`, `hands-on-hips`, `hold-phone`, `sit`, `hold-out`, `hold-chest`, `hold-up`, `high-five`, `shove`, `faint`, `wave`, `thumbs-up`.
 
 A beat names one with `{ "who": "june", "do": "pose", "pose": "arms-crossed" }`. To add a pose: write the JSON, import it in `src/data/index.ts`, and look at it in `PoseLab`. You do not draw a new limb. The rig already interpolates these angles.
@@ -301,7 +303,7 @@ An expression is shared too. Documents live in `src/data/expressions/`. Schema: 
 
 Mouth presets, in units of head radius: `neutral`, `flat`, `smile`, `grin`, `smirk`, `frown`, `pout`, `o`, `gasp`, `wail`, `clench`, `grimace`, `shout`, `wobble`. Each preset is `w`, `open`, `curve`, `skew`, `round`, `top`, `teeth`, `tongue`. Expressions blend because every mouth is a point in that space. Speech replaces the mouth with a viseme (`speechMouth` in `src/engine/face/visemes.ts`) layered on the expression.
 
-Shipped expressions: `neutral`, `happy`, `smug`, `sarcastic`, `annoyed`, `angry`, `shocked`, `sad`, `crying`, `cringe`, `confused`, `deadpan`.
+Shipped expressions: `neutral`, `happy`, `smug`, `sarcastic`, `annoyed`, `angry`, `shocked`, `sad`, `crying`, `cringe`, `confused`, `deadpan`, plus `skeptical`, `worried`, `embarrassed`, `thinking`, `laughing` (every build).
 
 Listener reactions (speaker expression → listener expression) are `src/data/reactions.json`, not part of the character.
 

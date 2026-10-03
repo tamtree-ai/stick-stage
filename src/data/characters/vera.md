@@ -7,7 +7,7 @@
 Status: draft, owner to confirm (name is a placeholder)
 
 ## Look
-Tall. A long open white lab coat over a teal bean torso (the coat is the silhouette), wild grey upswept hair, small rectangular glasses, dot eyes.
+Drawn as a toon (`style.build: "toon"`). Long auburn hair with one white streak and a side-swept fringe, teal cat-eye glasses, a gold star earring. A coral turtleneck with a belt under an open white lab coat (rolled cuffs, a planet pin, pens), a knee-length teal skirt, dark tights and ankle boots. The skirt, waist and hair carry the silhouette. The stick body in `vera.json` is kept for comparison labs only.
 
 ## Voice
 Dev voice: macOS `say` "Karen". For posting, the tamtree harness picks the TTS voice. Delivery: warm and quick, one idea per line, sure without being smug.

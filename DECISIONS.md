@@ -263,3 +263,8 @@ Plan: `../planning/2026-10-02-toon-characters/plan.md` (owner approved the v2 lo
 - **New figure kinds `galaxy`, `burst`, `fineprint`.** The galaxy shape is shared with the set part (`GalaxyShape`).
 - **Book snap:** the plan's fallback. Gus starts holding the closed book, with a thud and a burst on frame 0; there is no open → closed prop state yet.
 - `fine-print` is hand-staged in `skit.json`. Do not run `pnpm new fine-print --force`: it would rebuild the skit from `premise.json` and drop the staging.
+
+## 2026-10-04 (toon characters, finish)
+- **Poses may carry a `toon` block** (`shoulderL`, `elbowL`, `shoulderR`, `elbowR`, `handL`, `handR`). `evalActor` merges it for toon characters only (`toonPoses`), so a toon-only fix never changes a stick drawing. This settles the T2 `think` issue: the toon front hand rests on the chin and the back arm folds up behind the front elbow, so no fist pokes past the coat.
+- **Book snap by prop swap, not a prop state.** New prop `book-open`. `fine-print` starts Gus holding it (cast `holding`), and l1's `hold: book` swaps it on the beat with the thud and the burst. A second `hold` on the same hand is the general way to change an object's look; the pop-in reads as the snap.
+- Agent docs: skills `science-short` and `toon-character`, path-scoped rules in `.claude/rules/` (`toon-rig.md`, `science-skits.md`).

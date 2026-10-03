@@ -18,7 +18,10 @@
       "id": "gus",
       "character": "gus",
       "mark": "left",
-      "pose": "arms-crossed"
+      "pose": "arms-crossed",
+      "holding": {
+        "prop": "book-open"
+      }
     },
     {
       "id": "vera",

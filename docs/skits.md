@@ -113,26 +113,45 @@ Default: the beat start.
 | sign | Sign | party | placard, poster |
 | book | Book | office | books |
 | credit-card | Credit card | money | card, debit card |
+| dice | Die | maths | die, dice cube |
 | alarm-clock | Alarm clock | home | alarm, clock |
+| coin | Coin | maths | coins, penny |
+| ball | Ball (light) | maths | light ball, tennis ball, small ball |
 | laptop | Laptop | tech | computer |
+| heavy-ball | Ball (heavy) | maths | bowling ball, iron ball, cannonball, heavy |
 | phone | Phone | tech | mobile, cell, cellphone, smartphone |
+| chalk | Chalk | maths | chalk stick |
 | receipt | Receipt | money | receipts |
 | cash | Cash | money | money, bills, notes |
+| pointer-stick | Pointer stick | maths | pointer, teacher's pointer |
 | keys | Keys | home | key |
+| protractor | Protractor | maths | angle measure |
 | mic | Mic | office | microphone |
+| number-card | Number card | maths | card, flash card |
 | pill-bottle | Pill bottle | office | pills, medicine |
 | clipboard | Clipboard | office | clip board |
 | apple | Apple | food | apples |
+| magnifying-glass | Magnifying glass | science | magnifier, loupe |
+| bar-magnet | Bar magnet | science | magnet |
 | umbrella | Umbrella | home | brolly |
+| horseshoe-magnet | Horseshoe magnet | science | u magnet |
 | potted-plant | Plant | home | plant, pot plant |
+| battery | Battery | science | cell, aa battery |
 | paper-map | Map | travel | map |
 | cup | Cup | drinks | mug, coffee, tea |
+| light-bulb | Light bulb | science | bulb, lightbulb |
+| prism | Prism | science | glass prism |
 | soda-can | Soda can | drinks | can, soda, soft drink |
+| beaker | Beaker | science | glass beaker |
 | folder | Folder | office | file, folders |
+| flask | Flask | science | conical flask, erlenmeyer |
 | takeaway-coffee | Takeaway coffee | drinks | latte, takeaway, coffee cup |
 | burger | Burger | food | hamburger, cheeseburger |
+| laser-pointer | Laser pointer | science | laser |
 | pen | Pen | office | pens, biro |
+| telescope | Telescope | science | spyglass |
 | notebook | Notebook | office | notepad, journal |
+| test-tube | Test tube | science | tube, vial |
 | tablet | Tablet | tech | tablets |
 | sandwich | Sandwich | food | sarnie, sub |
 | headphones | Headphones | tech | headset, earphones |
@@ -167,7 +186,7 @@ Default: the beat start.
 | balloon | Balloon | party | balloons |
 | baby-bottle | Baby bottle | drinks | bottle baby |
 | flower-bouquet | Bouquet | party | flowers, bouquet |
-| thermos | Thermos | drinks | flask |
+| thermos | Thermos | drinks | vacuum flask |
 | megaphone | Megaphone | party | loudspeaker, bullhorn |
 | frying-pan | Frying pan | kitchen | pan, skillet |
 | suitcase | Suitcase | travel | luggage, bag |
@@ -182,9 +201,10 @@ Default: the beat start.
 | ruler | Ruler | office | rulers |
 | envelope | Envelope | office | letter, mail |
 | id-badge | ID badge | office | badge, name tag, id |
+| book-open | Open book | office | open book, reading |
 | selfie-stick | Selfie stick | tech | selfie |
 | charger | Charger | tech | charger cable, plug |
-| power-bank | Power bank | tech | battery, powerbank |
+| power-bank | Power bank | tech | portable charger, powerbank |
 | thermometer | Thermometer | tech | thermo |
 | broom | Broom | home | brooms |
 | mop | Mop | home | mops |

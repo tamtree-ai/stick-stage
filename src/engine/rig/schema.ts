@@ -138,6 +138,21 @@ export const PoseSchema = z.object({
    */
   handL: z.enum(HAND_SHAPES).optional(),
   handR: z.enum(HAND_SHAPES).optional(),
+  /**
+   * Toon-only overrides: angles (and hand shapes) a toon uses instead, where its wider body
+   * needs a different arm path. Stick figures ignore the block, so their drawing is unchanged.
+   */
+  toon: z
+    .object({
+      shoulderL: z.number().optional(),
+      elbowL: z.number().optional(),
+      shoulderR: z.number().optional(),
+      elbowR: z.number().optional(),
+      handL: z.enum(HAND_SHAPES).optional(),
+      handR: z.enum(HAND_SHAPES).optional(),
+    })
+    .strict()
+    .optional(),
   /** Big gestures get a short opposite dip before the move. */
   anticipation: z.boolean().default(false),
 });

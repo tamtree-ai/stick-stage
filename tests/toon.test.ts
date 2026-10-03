@@ -170,4 +170,18 @@ describe("toon hands (T2)", () => {
       for (const p of Object.keys(library.poses)) expect(markup(toonLib, id, p, "neutral"), `${id} ${p}`).not.toContain("NaN");
     expect(markup(toonLib, "gus", "point", "neutral")).not.toBe(markup(toonLib, "gus", "idle", "neutral"));
   });
+
+  it("a pose's toon block moves toon arms only; stick figures keep the base angles", () => {
+    const at = (lib: Library, character: string) =>
+      evalActor(lib, { character, poseKeys: [{ frame: 0, pose: "think" }], expressionKeys: [{ frame: 0, expression: "neutral" }] }, 0, FPS, FIG);
+    const think = library.poses.think!;
+    expect(think.toon).toBeDefined();
+    const toon = at(toonLib, "vera").angles;
+    expect(toon.shoulderL).toBe(think.toon!.shoulderL);
+    expect(toon.elbowR).toBe(think.toon!.elbowR);
+    const stickLib: Library = { ...library, characters: charactersWithBuild(library.characters, "stick") };
+    const stick = at(stickLib, "vera").angles;
+    expect(stick.shoulderL).toBe(think.shoulderL);
+    expect(stick.elbowR).toBe(think.elbowR);
+  });
 });
