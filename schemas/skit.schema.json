@@ -233,6 +233,10 @@
           "type": "string",
           "maxLength": 80
         },
+        "hook": {
+          "type": "string",
+          "maxLength": 60
+        },
         "subtitles": {
           "default": true,
           "type": "boolean"
@@ -1214,7 +1218,11 @@
               "scale",
               "histogram",
               "equation",
-              "image"
+              "image",
+              "progress",
+              "galaxy",
+              "burst",
+              "fineprint"
             ]
           },
           "at": {
@@ -1258,7 +1266,8 @@
             "type": "string",
             "enum": [
               "back",
-              "front"
+              "front",
+              "screen"
             ]
           },
           "params": {
@@ -4013,7 +4022,11 @@
                     "scale",
                     "histogram",
                     "equation",
-                    "image"
+                    "image",
+                    "progress",
+                    "galaxy",
+                    "burst",
+                    "fineprint"
                   ]
                 },
                 "at": {
@@ -4057,7 +4070,8 @@
                   "type": "string",
                   "enum": [
                     "back",
-                    "front"
+                    "front",
+                    "screen"
                   ]
                 },
                 "params": {

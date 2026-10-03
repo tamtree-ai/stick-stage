@@ -88,6 +88,8 @@ Default: the beat start.
 
 **Style:** `"style": "classic" | "deadpan" | "snappy" | "chaotic" | "sitcom"`. Omitted: the series style, else classic. Numbers live in `src/data/styles/`.
 
+**Hook card:** `"overlay": { "hook": "He read the whole universe." }` shows a card from frame 0, for viewers with the sound off, and hides it when the first spoken line ends. It has no "POV:" lead. It is for myth-flip and other formats that have no POV card. A `pov` wins if both are set.
+
 **Cold open:** `"coldOpen": "pov" | "none" | "teaser"`. `teaser` flashes the punchline reaction, then slides into beat one. A series `coldOpen` applies when the skit omits its own.
 
 **Language:** `meta.language` is BCP 47 (default English). `i18n.<lang>` holds `lines` (by beat id), `slams`, `pov`, `cards`, and `labels`. `pnpm render <id> --lang=es` compiles that dub. Japanese, Chinese, Korean, Arabic, Hebrew, Devanagari, and Sinhala use the Noto files in `public/fonts/`.

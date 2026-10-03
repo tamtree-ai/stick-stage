@@ -83,6 +83,7 @@ import wideClassroom from "./sets/wide-classroom.json";
 import void1 from "./sets/void-1.json";
 import blueprint1 from "./sets/blueprint-1.json";
 import space1 from "./sets/space-1.json";
+import space2 from "./sets/space-2.json";
 import lab1 from "./sets/lab-1.json";
 
 import castNotesJson from "./cast-notes.json";
@@ -113,7 +114,7 @@ export const library: Library = createLibrary({
 export const sets: Record<string, SetDef> = createSets([
   plain1, living1, lounge1, office1, park1, street1, kitchen1, bedroom1, cafe1, classroom1, meeting1, living2, park2, streetNight1, beach1, stage1,
   widePlain, wideLiving, wideLounge, wideOffice, widePark, wideStreet, wideCafe, wideClassroom,
-  void1, blueprint1, space1, lab1,
+  void1, blueprint1, space1, space2, lab1,
 ]);
 
 /** One conservative profile for TikTok / Reels / Shorts overlays (verify against real screenshots in M4). */

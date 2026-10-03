@@ -277,7 +277,11 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
     shakes,
     audio,
     sfx: sfx.sort((a, b) => a.frame - b.frame),
-    pov: skit.overlay.pov ? { text: skit.overlay.pov, from: 4, to: durationInFrames } : undefined,
+    pov: skit.overlay.pov
+      ? { text: skit.overlay.pov, from: 4, to: durationInFrames }
+      : skit.overlay.hook
+        ? { text: skit.overlay.hook, from: 0, to: spoken[0] ? msToFrame(spoken[0].zeroMs + spoken[0].line!.durationMs, fps) : durationInFrames }
+        : undefined,
     // A slam belongs to its shot: it ends at the next cut.
     slams: slams
       .sort((a, b) => a.from - b.from)

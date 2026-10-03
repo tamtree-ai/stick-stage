@@ -93,7 +93,7 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[], style = styleBy
       card: sc.card,
       labels: sc.labels,
       figures: sc.figures,
-      overlay: { ...doc.overlay, pov: sc.pov ?? (s === 0 ? doc.overlay.pov : undefined) },
+      overlay: { ...doc.overlay, pov: sc.pov ?? (s === 0 ? doc.overlay.pov : undefined), hook: s === 0 ? doc.overlay.hook : undefined },
       timing: {
         gapMs: gap,
         leadInMs: s === 0 ? doc.timing.leadInMs : transMs(s) + gap,

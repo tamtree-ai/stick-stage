@@ -77,3 +77,62 @@ export const ImageParams = z.strictObject({
   frame: z.enum(["border", "eyepiece", "monitor", "none"]).default("border"),
 });
 
+
+/** One part of a whole on a `progress` bar. `dim` and `ask` are 0…1 so `set` cues tween them. */
+const SegmentSchema = z.strictObject({
+  label: text,
+  /** In units of the bar's `total`. Animate it from 0 to grow the segment. */
+  value: z.number().min(0).max(1e6),
+  color: color.optional(),
+  /** Fade the segment back (0 = full colour, 1 = faint). */
+  dim: z.number().min(0).max(1).default(0),
+  /** A big "?" over the segment (0 = none, 1 = full size). */
+  ask: z.number().min(0).max(1).default(0),
+});
+
+/**
+ * Part of a whole as one bar (a progress bar): segments fill from the left, the rest of the
+ * track stays empty. For shares that add up to a total (5 / 27 / 68 %).
+ */
+export const ProgressParams = z.strictObject({
+  segments: z.array(SegmentSchema).min(1).max(6),
+  total: z.number().positive().default(100),
+  /** After each value label ("%"). */
+  unit: z.string().max(4).default("%"),
+  /** Big line above the bar; `{0}`, `{1}` … are segment values (rounded): "{0}% read". */
+  readout: text.optional(),
+  /** A "?" on the empty rest of the track (0…1). */
+  restAsk: z.number().min(0).max(1).default(0),
+  /** A chip under one segment, pointing up at it: "you are here". `show` 0…1 pops it in. */
+  here: z
+    .strictObject({ segment: z.number().int().min(0).max(5), text: text.default("you are here"), show: z.number().min(0).max(1).default(1) })
+    .optional(),
+});
+
+/** A spiral galaxy that turns; `speedLines` (0…1) adds motion arcs ("spins too fast"). */
+export const GalaxyParams = z.strictObject({
+  /** Degrees per second. */
+  spin: z.number().min(-720).max(720).default(40),
+  speedLines: z.number().min(0).max(1).default(0),
+  /** Tilt of the disc, degrees. */
+  tilt: z.number().min(-90).max(90).default(-18),
+  caption: text.optional(),
+});
+
+/** A supernova pop: a star and rays that burst when shown, then fade to a glow. */
+export const BurstParams = z.strictObject({
+  color: color.default("highlight"),
+  /** Seconds after the show until it fades to the glow. */
+  hold: z.number().min(0.1).max(10).default(0.9),
+});
+
+/** A wall of tiny contract text (the "fine print"), drawn on line by line. */
+export const FinePrintParams = z.strictObject({
+  /** Repeated to fill the box. */
+  text: z.string().min(1).max(400).default("subject to change · not visible · not identified · see gravity · see supernovae · terms apply · "),
+  /** Text height, px at 1080 wide. */
+  size: z.number().min(6).max(40).default(13),
+  color: color.default("muted"),
+  /** Fraction of the lines shown (animate it to fill the wall). */
+  fill: z.number().min(0).max(1).default(1),
+});

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "space-2",
+  "kit": "space",
+  "palette": "nebula",
+  "description": "Nebula night: deep indigo sky with magenta and teal glows, sparkles, a spiral galaxy and a ringed planet, standing on a lavender moon. Dark, so the cast gets a light rim. For astronomy and cosmology.",
+  "tags": ["space", "astronomy", "cosmology", "galaxy", "stars", "night", "science"],
+  "groundY": 1480,
+  "figureHeightPx": 640,
+  "layers": [{ "part": "nebula-sky" }, { "part": "galaxy", "x": 0.5, "y": 0.665, "size": 0.55 }, { "part": "ringed-planet", "x": 0.09, "y": 0.49, "size": 0.8 }, { "part": "moon-floor" }],
+  "marks": { "left": 0.3, "center": 0.5, "right": 0.71 }
+}

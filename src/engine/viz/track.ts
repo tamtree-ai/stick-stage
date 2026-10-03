@@ -25,7 +25,7 @@ export type FigureTrack = {
   id: string;
   kind: string;
   rect: PxRect;
-  layer: "back" | "front";
+  layer: "back" | "front" | "screen";
   /** Params before any key. */
   base: Params;
   label?: string;

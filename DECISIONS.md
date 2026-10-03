@@ -254,3 +254,12 @@ Plan: `../planning/2026-10-02-toon-characters/plan.md` (owner approved the v2 lo
 ## 2026-10-03 (toon characters, T3)
 - **Vera and Gus now ship as toons** (`style.build: "toon"`), one milestone earlier than the plan said: the T3 test skit needs them, and T4 re-renders every science draft in toon anyway. Old stick renders in `out/` are stale. t-shoot needs a catalog re-vendor when this merges.
 - **T3 needed no new mouth code:** T1's toon face already draws Rhubarb visemes (open mouth, teeth, tongue) and lid blinks with the parametric `Mouth`. `menu-lab` (`public/skits/menu-lab/`, the brief's restaurant-menu idea, not a posted short) is the motion test: walk-in, held clipboard, wave / point / thumbs-up, lip-sync, listener looks, punch-in.
+
+## 2026-10-03 (toon characters, T4)
+- **Part of a whole is a `progress` bar, not a histogram** (owner's question on the storyboard). 5 / 27 / 68 add up to 100, so one bar shows the share directly. The empty rest of the track carries l3's "?" without extra marks, and the bar's `readout` ("5% read") ties the chart to Gus "reading" the universe. Segments `dim` and `ask` are numbers so `set` cues tween them. The drawer scales from its box height, because the figure font cap (28–46 px) is too small for a phone-size bar.
+- **Nebula night is a new set, `space-2`** (palette `nebula`, parts `nebula-sky`, `galaxy`, `ringed-planet`, `moon-floor`); `space-1` stays as it was. Palettes may set `rim`. On such a palette, Stage wraps the cast layer in one SVG filter (dilate + flood + slight blur), which settles T1 deviation 2 without recolouring outlines. The contrast QA checks the rim against the ink and the walls on rim palettes.
+- **`layer: "screen"` for figures:** drawn over everything and outside the camera, so the l5 galaxy inset stays put through the punch-in.
+- **`overlay.hook`:** a frame-0 card for muted viewers. It uses the POV card's drawing with no "POV:" lead and leaves when the first spoken line ends. Whether every myth-flip gets one is still open question 3.
+- **New figure kinds `galaxy`, `burst`, `fineprint`.** The galaxy shape is shared with the set part (`GalaxyShape`).
+- **Book snap:** the plan's fallback. Gus starts holding the closed book, with a thud and a burst on frame 0; there is no open → closed prop state yet.
+- `fine-print` is hand-staged in `skit.json`. Do not run `pnpm new fine-print --force`: it would rebuild the skit from `premise.json` and drop the staging.

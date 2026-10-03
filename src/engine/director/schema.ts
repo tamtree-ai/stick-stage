@@ -229,7 +229,15 @@ export const SkitSchema = z
     /** Off-screen voice-over (optional). */
     narrator: NarratorSchema.optional(),
     overlay: z
-      .strictObject({ pov: z.string().max(80).optional(), subtitles: z.boolean().default(true) })
+      .strictObject({
+        pov: z.string().max(80).optional(),
+        /**
+         * A hook card on frame 0 for muted viewers ("He read the whole universe."). Drawn like the
+         * POV card, no "POV:" lead; it leaves when the first spoken line ends. First scene only.
+         */
+        hook: z.string().max(60).optional(),
+        subtitles: z.boolean().default(true),
+      })
       .default({ subtitles: true }),
     timing: TimingSchema,
     /** Words on a set part. Single-scene skits only; a multi-scene skit puts `labels` on each scene. */

@@ -118,11 +118,17 @@ describe("toon checks", () => {
     expect(d.silhouette).toBeGreaterThan(0.3);
   });
 
-  it("toon outlines keep ≥ 3:1 against skin and every set palette", () => {
+  it("toon outlines keep ≥ 3:1 against skin and every set palette (dark palettes: through the rim)", () => {
     for (const id of TOON_CAST) {
       const t = library.characters[id]!.toon!;
       expect(contrastRatio(t.ink, t.skin), `${id} skin`).toBeGreaterThanOrEqual(3);
       for (const [pid, p] of Object.entries(PALETTES)) {
+        if (p.rim) {
+          // A dark ground: the light rim separates the outline from the set instead.
+          expect(contrastRatio(p.rim, t.ink), `${pid} rim vs ink`).toBeGreaterThanOrEqual(3);
+          for (const tone of [p.wallA, p.wallB]) expect(contrastRatio(p.rim, tone), `${pid} rim vs ${tone}`).toBeGreaterThanOrEqual(3);
+          continue;
+        }
         const worst = Math.min(...[p.wallA, p.wallB, p.floor, p.sky, p.shade].map((tone) => contrastRatio(t.ink, tone)));
         expect(worst, `${id} on ${pid}`).toBeGreaterThanOrEqual(3);
       }

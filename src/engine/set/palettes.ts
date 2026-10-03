@@ -8,6 +8,11 @@ export type Palette = {
   shade: string;
   sky: string;
   detail: string;
+  /**
+   * A light rim drawn around every cast member (an SVG filter on the cast layer). Set only on
+   * truly dark grounds, where the near-black outlines would vanish.
+   */
+  rim?: string;
 };
 
 /**
@@ -134,6 +139,20 @@ export const PALETTES: Record<string, Palette> = {
     shade: "#5f6ba8",
     sky: "#5d6aa8",
     detail: "#8e9ad2",
+  },
+  /**
+   * Nebula night: deep indigo bands (wallA → wallB), magenta / teal / violet glows (sky, detail,
+   * shade), a lavender moon floor. Dark, so the cast gets a light rim.
+   */
+  nebula: {
+    wallA: "#141638",
+    wallB: "#2e2a6a",
+    floor: "#6b5aa8",
+    accent: "#f6c445",
+    shade: "#7b5cff",
+    sky: "#c0479a",
+    detail: "#2bb3b1",
+    rim: "#cfd6ff",
   },
   /** The neutral void: slate teal, a faint grid floor. */
   void: {
