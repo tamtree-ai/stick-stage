@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "template": "exchange",
+  "aspect": "9:16",
+  "title": "Nobody reads the terms",
+  "description": "Every 'I agree' is a leap of faith.",
+  "hashtags": [
+    "stickfigure",
+    "relatable",
+    "termsandconditions",
+    "funfact"
+  ],
+  "pov": "POV: your friend clicks 'I agree' without reading",
+  "set": "office-1",
+  "cast": [
+    {
+      "id": "milo",
+      "character": "milo"
+    },
+    {
+      "id": "june",
+      "character": "june"
+    }
+  ],
+  "lines": [
+    {
+      "who": "milo",
+      "text": "You clicked I agree in under one second!",
+      "expression": "shocked",
+      "role": "setup"
+    },
+    {
+      "who": "june",
+      "text": "Personal best.",
+      "expression": "smug",
+      "role": "escalation"
+    },
+    {
+      "who": "milo",
+      "text": "That's forty pages. You didn't read one word.",
+      "expression": "annoyed",
+      "role": "escalation"
+    },
+    {
+      "who": "june",
+      "text": "Reading every privacy policy you accept takes seventy-six work days a year.",
+      "expression": "deadpan",
+      "role": "escalation"
+    },
+    {
+      "who": "milo",
+      "text": "Fine. I'll read it. Clause nine: they can rename your dog.",
+      "expression": "worried",
+      "role": "escalation",
+      "prop": "laptop"
+    },
+    {
+      "who": "june",
+      "text": "He never liked Biscuit.",
+      "expression": "deadpan",
+      "role": "escalation"
+    },
+    {
+      "who": "milo",
+      "text": "Clause forty-seven: they get your firstborn child!",
+      "expression": "shocked",
+      "role": "escalation",
+      "gag": "double-take"
+    },
+    {
+      "who": "june",
+      "text": "Only on weekends. Read the fine print.",
+      "expression": "deadpan",
+      "role": "escalation"
+    },
+    {
+      "who": "milo",
+      "text": "Wait. How do you know the fine print without reading it?",
+      "expression": "confused",
+      "role": "escalation"
+    },
+    {
+      "who": "june",
+      "text": "I wrote it.",
+      "expression": "smug",
+      "role": "punchline",
+      "slam": "WROTE IT",
+      "gag": "look-to-camera"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "title": "Nobody reads the terms",
+  "template": "exchange",
+  "description": "Every 'I agree' is a leap of faith.",
+  "hashtags": [
+    "stickfigure",
+    "relatable",
+    "termsandconditions",
+    "funfact"
+  ],
+  "scenes": [
+    {
+      "set": "office-1",
+      "pov": "POV: your friend clicks 'I agree' without reading",
+      "lines": [
+        {
+          "who": "milo",
+          "text": "You clicked I agree in under one second!",
+          "expression": "shocked"
+        },
+        {
+          "who": "june",
+          "text": "Personal best.",
+          "expression": "smug"
+        },
+        {
+          "who": "milo",
+          "text": "That's forty pages. You didn't read one word.",
+          "expression": "annoyed"
+        },
+        {
+          "who": "june",
+          "text": "Reading every privacy policy you accept takes seventy-six work days a year.",
+          "expression": "deadpan"
+        },
+        {
+          "who": "milo",
+          "text": "Fine. I'll read it. Clause nine: they can rename your dog.",
+          "expression": "worried",
+          "prop": "laptop"
+        },
+        {
+          "who": "june",
+          "text": "He never liked Biscuit.",
+          "expression": "deadpan"
+        },
+        {
+          "who": "milo",
+          "text": "Clause forty-seven: they get your firstborn child!",
+          "expression": "shocked",
+          "gag": "double-take"
+        },
+        {
+          "who": "june",
+          "text": "Only on weekends. Read the fine print.",
+          "expression": "deadpan"
+        },
+        {
+          "who": "milo",
+          "text": "Wait. How do you know the fine print without reading it?",
+          "expression": "confused"
+        },
+        {
+          "who": "june",
+          "text": "I wrote it.",
+          "expression": "smug",
+          "slam": "WROTE IT",
+          "gag": "look-to-camera"
+        }
+      ]
+    }
+  ]
+}
