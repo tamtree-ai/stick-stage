@@ -37,7 +37,7 @@ const dims = (shape: EyeProps["shape"], R: number): Dims => {
 };
 
 /** A lid polygon covering everything above (or below) a tilted line through the eye. */
-const lidPolygon = (
+export const lidPolygon = (
   cx: number,
   cy: number,
   rx: number,

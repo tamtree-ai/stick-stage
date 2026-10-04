@@ -1,6 +1,6 @@
 import type { CodedKind, DrawnPart, PropDef } from "./schema";
 import { isDrawn } from "./schema";
-import { pathPoints } from "./path";
+import { pathPoints } from "./svgPath";
 
 /**
  * Prop outlines in prop-local space: origin = grip point (where the hand is), up = −y,

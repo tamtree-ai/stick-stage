@@ -150,6 +150,38 @@ Hair and ears draw in a head space where `0°` is the top of the circle and posi
 
 `headwear` and `neck` are legal slots. No shipped drawing uses them yet. A new drawing declares the slot it belongs to.
 
+## The toon tier
+
+A character can also be drawn as a **toon**: skin-coloured arms and legs, clothes, hands with
+fingers, ears, a nose, and eyes with whites, a coloured iris and lids. It uses the same skeleton,
+poses, expressions, mouths and blinks as the stick figure; only the drawing changes. Vera and Gus
+carry a toon block (`src/data/characters/vera.json`); the schema is `src/engine/rig/toon/schema.ts`.
+
+```jsonc
+"style": { "build": "toon", ... },   // default "stick"; "toon" needs the block below
+"toon": {
+  "proportions": { ... },            // the toon body (the stick body keeps "proportions")
+  "skin": "#f3c9a6",
+  "body": { "shoulders": 84, "waist": 58, "hips": 74 },   // toon units: px on a 610 px figure
+  "eyes": { "iris": "#2f7d6d", "lashes": true },
+  "brows": { "color": "#5e231b", "gap": 0.5 },            // gap clears a fringe
+  "lip": "#b23c55",
+  "hair": { "kind": "long-streak", "fill": "#a2412f", "streak": "#f6ece0" },  // or curly-mop
+  "glasses": { "kind": "cat-eye", "fill": "#178f8a" },
+  "top": { "kind": "turtleneck", "fill": "#ef6b57", "belt": "#f6c445" },     // or tee (+ print)
+  "outer": { "kind": "labcoat", "fill": "#fbfaf7", "cuffAt": 0.62 },         // or varsity
+  "bottom": { "kind": "skirt", "fill": "#24566e", "legs": "#3a2e4d" },       // or jeans
+  "shoes": { "kind": "boot", "fill": "#7a4130" },                           // or sneaker
+  "details": [{ "id": "planet-pin" }]
+}
+```
+
+Every garment takes an optional `shade`, the cel-shade tone on its back side; without one it is a
+darker `fill`. Accessories are stick-only: a toon draws its own hair and glasses. The labs force a
+tier with `build` (`CharacterLabToon`, `FaceLabToon`, `PoseLabVera`, `PoseLabGus`, `PropLabToon`, `StagingLabToon`, `TalkLabToon`),
+so the same character can be compared stick vs toon. Hair, clothes and details are drawn in code,
+so a new kind (a hoodie, a bob) is a few lines in `src/engine/rig/toon/`, then owner review.
+
 ## Voice, personality, energy
 
 ```json
@@ -229,7 +261,11 @@ Angles are degrees. The canonical view faces right. `L` is the back limb (screen
 
 `bend` is optional extra bow per limb (`armL`, `armR`, `legL`, `legR`). `anticipation: true` dips the opposite way before a big gesture.
 
-Shipped poses: `idle`, `point`, `shrug`, `facepalm`, `arms-up`, `arms-crossed`, `think`, `lean-in`, `recoil`, `slump`, `hands-on-hips`, `hold-phone`, `sit`, `hold-out`, `hold-chest`, `hold-up`, `high-five`, `shove`, `faint`.
+`handL` / `handR` pick a toon hand shape: `open` (default), `fist`, `point`, `thumb`, `wave`, `palmup`, `hold`. Stick figures ignore them. A held prop always closes the hand (`hold`). Shapes switch at the middle of a pose blend, since they don't tween. The thumb turns with the forearm: forward on a hanging arm, on top of an arm pointing forward or back.
+
+A pose may carry a `toon` block (`shoulderL`, `elbowL`, `shoulderR`, `elbowR`, `handL`, `handR`). Toon figures use those values in place of the base ones; stick figures ignore the block. Use it when the wider toon body needs a different arm path, as in `think`, where the stick angles would push the back fist out past the coat. The stick drawing stays byte-identical, and `tests/toon.test.ts` checks that.
+
+Shipped poses: `idle`, `point`, `shrug`, `facepalm`, `arms-up`, `arms-crossed`, `think`, `lean-in`, `recoil`, `slump`, `hands-on-hips`, `hold-phone`, `sit`, `hold-out`, `hold-chest`, `hold-up`, `high-five`, `shove`, `faint`, `wave`, `thumbs-up`.
 
 A beat names one with `{ "who": "june", "do": "pose", "pose": "arms-crossed" }`. To add a pose: write the JSON, import it in `src/data/index.ts`, and look at it in `PoseLab`. You do not draw a new limb. The rig already interpolates these angles.
 
@@ -267,7 +303,7 @@ An expression is shared too. Documents live in `src/data/expressions/`. Schema: 
 
 Mouth presets, in units of head radius: `neutral`, `flat`, `smile`, `grin`, `smirk`, `frown`, `pout`, `o`, `gasp`, `wail`, `clench`, `grimace`, `shout`, `wobble`. Each preset is `w`, `open`, `curve`, `skew`, `round`, `top`, `teeth`, `tongue`. Expressions blend because every mouth is a point in that space. Speech replaces the mouth with a viseme (`speechMouth` in `src/engine/face/visemes.ts`) layered on the expression.
 
-Shipped expressions: `neutral`, `happy`, `smug`, `sarcastic`, `annoyed`, `angry`, `shocked`, `sad`, `crying`, `cringe`, `confused`, `deadpan`.
+Shipped expressions: `neutral`, `happy`, `smug`, `sarcastic`, `annoyed`, `angry`, `shocked`, `sad`, `crying`, `cringe`, `confused`, `deadpan`, plus `skeptical`, `worried`, `embarrassed`, `thinking`, `laughing` (every build).
 
 Listener reactions (speaker expression → listener expression) are `src/data/reactions.json`, not part of the character.
 

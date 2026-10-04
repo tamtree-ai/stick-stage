@@ -13,6 +13,8 @@ export type MouthProps = {
   m: MouthParams;
   stroke: string;
   sw: number;
+  /** Colour of the closed-mouth line (toon lips); open mouths keep the outline `stroke`. */
+  lip?: string;
 };
 
 /** Cubic edge from a to b whose midpoint lands on `midY`; `round` pushes handles outward. */
@@ -23,7 +25,7 @@ const edge = (ax: number, ay: number, bx: number, by: number, cx: number, midY: 
   return `C ${f2(h1)} ${f2(hy)} ${f2(h2)} ${f2(hy)} ${f2(bx)} ${f2(by)}`;
 };
 
-export const Mouth: React.FC<MouthProps> = ({ cx, cy, R, m, stroke, sw }) => {
+export const Mouth: React.FC<MouthProps> = ({ cx, cy, R, m, stroke, sw, lip }) => {
   const clipId = "mouth" + useId().replace(/[^a-zA-Z0-9]/g, "");
   const half = (m.w * R) / 2;
   const lift = m.curve * 0.12 * R;
@@ -40,7 +42,7 @@ export const Mouth: React.FC<MouthProps> = ({ cx, cy, R, m, stroke, sw }) => {
       <path
         d={`M ${f2(lx)} ${f2(ly)} Q ${f2(cx)} ${f2(qy)} ${f2(rx)} ${f2(ry)}`}
         fill="none"
-        stroke={stroke}
+        stroke={lip ?? stroke}
         strokeWidth={lineW}
         strokeLinecap="round"
       />

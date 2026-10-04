@@ -8,6 +8,7 @@ import { Buildings, Hydrant, Shopfront, Sidewalk } from "./street";
 import { Bed, Counter, FloorLamp, Fridge, Tv } from "./home";
 import { Board, Curtain, Sand, Sea, Umbrella } from "./venue";
 import type { PartComponent } from "./types";
+import { Galaxy, MoonFloor, NebulaSky, RingedPlanet } from "./cosmos";
 import { Blueprint, FumeHood, GridFloor, LabBench, Nebula, Planet, Starfield, VoidBackdrop, WallChart } from "./science";
 
 export const KITS = ["plain", "interior", "office", "park", "street", "beach", "abstract", "space", "lab"] as const;
@@ -65,6 +66,10 @@ export const PART_INFO: Record<string, PartInfo> = {
   starfield: { draw: Starfield, kits: ["space"], backdrop: true },
   nebula: { draw: Nebula, kits: ["space"] },
   planet: { draw: Planet, kits: ["space"] },
+  "nebula-sky": { draw: NebulaSky, kits: ["space"], backdrop: true },
+  "moon-floor": { draw: MoonFloor, kits: ["space"], backdrop: true },
+  galaxy: { draw: Galaxy, kits: ["space"] },
+  "ringed-planet": { draw: RingedPlanet, kits: ["space"] },
   "lab-bench": { draw: LabBench, kits: ["lab"] },
   "fume-hood": { draw: FumeHood, kits: ["lab"] },
   "wall-chart": { draw: WallChart, kits: ["lab"] },

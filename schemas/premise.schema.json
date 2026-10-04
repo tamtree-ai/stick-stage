@@ -113,7 +113,11 @@
               "scale",
               "histogram",
               "equation",
-              "image"
+              "image",
+              "progress",
+              "galaxy",
+              "burst",
+              "fineprint"
             ]
           },
           "at": {
@@ -157,7 +161,8 @@
             "type": "string",
             "enum": [
               "back",
-              "front"
+              "front",
+              "screen"
             ]
           },
           "params": {
@@ -719,7 +724,11 @@
                     "scale",
                     "histogram",
                     "equation",
-                    "image"
+                    "image",
+                    "progress",
+                    "galaxy",
+                    "burst",
+                    "fineprint"
                   ]
                 },
                 "at": {
@@ -763,7 +772,8 @@
                   "type": "string",
                   "enum": [
                     "back",
-                    "front"
+                    "front",
+                    "screen"
                   ]
                 },
                 "params": {

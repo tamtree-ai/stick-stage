@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Nobody reads the terms",
+    "aspect": "9:16",
+    "description": "Every 'I agree' is a leap of faith.",
+    "hashtags": [
+      "stickfigure",
+      "relatable",
+      "termsandconditions",
+      "funfact"
+    ]
+  },
+  "set": "office-1",
+  "cast": [
+    {
+      "id": "milo",
+      "character": "milo",
+      "mark": "left",
+      "seated": true
+    },
+    {
+      "id": "june",
+      "character": "june",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "pov": "POV: your friend clicks 'I agree' without reading",
+    "subtitles": true
+  },
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "milo",
+      "line": "You clicked I agree in under one second!",
+      "actions": [],
+      "expression": "shocked",
+      "role": "setup"
+    },
+    {
+      "id": "l2",
+      "speaker": "june",
+      "line": "Personal best.",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ],
+      "expression": "smug",
+      "role": "escalation"
+    },
+    {
+      "id": "l3",
+      "speaker": "milo",
+      "line": "That's forty pages. You didn't read one word.",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "hands-on-hips",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ],
+      "expression": "annoyed",
+      "role": "escalation"
+    },
+    {
+      "id": "l4",
+      "speaker": "june",
+      "line": "Reading every privacy policy you accept takes seventy-six work days a year.",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "shrug",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ],
+      "expression": "deadpan",
+      "role": "escalation"
+    },
+    {
+      "id": "l5",
+      "speaker": "milo",
+      "line": "Fine. I'll read it. Clause nine: they can rename your dog.",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "hold",
+          "prop": "laptop",
+          "hand": "R",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ],
+      "expression": "worried",
+      "role": "escalation"
+    },
+    {
+      "id": "l6",
+      "speaker": "june",
+      "line": "He never liked Biscuit.",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ],
+      "expression": "deadpan",
+      "role": "escalation"
+    },
+    {
+      "id": "l7",
+      "speaker": "milo",
+      "line": "Clause forty-seven: they get your firstborn child!",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "gag",
+          "gag": "double-take",
+          "at": {
+            "fraction": 0.2
+          }
+        }
+      ],
+      "expression": "shocked",
+      "role": "escalation"
+    },
+    {
+      "id": "l8",
+      "speaker": "june",
+      "line": "Only on weekends. Read the fine print.",
+      "actions": [
+        {
+          "who": "june",
+          "do": "pose",
+          "pose": "hands-on-hips",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ],
+      "expression": "deadpan",
+      "role": "escalation"
+    },
+    {
+      "id": "realize",
+      "silent": true,
+      "durationMs": 800,
+      "actions": [
+        {
+          "who": "milo",
+          "do": "expression",
+          "expression": "thinking",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "who": "milo",
+          "do": "symbol",
+          "symbol": "question",
+          "at": {
+            "ms": 100
+          }
+        }
+      ]
+    },
+    {
+      "id": "l9",
+      "speaker": "milo",
+      "line": "Wait. How do you know the fine print without reading it?",
+      "actions": [
+        {
+          "who": "milo",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.15
+          }
+        }
+      ],
+      "expression": "confused",
+      "role": "escalation",
+      "pauseBeforeMs": 200
+    },
+    {
+      "id": "l10",
+      "speaker": "june",
+      "line": "I wrote it.",
+      "actions": [
+        {
+          "who": "june",
+          "do": "gag",
+          "gag": "look-to-camera",
+          "at": {
+            "fraction": 0.2
+          }
+        }
+      ],
+      "expression": "smug",
+      "role": "punchline",
+      "punchline": true,
+      "pauseBeforeMs": 450,
+      "holdAfterMs": 300,
+      "text": [
+        {
+          "type": "slam",
+          "value": "WROTE IT",
+          "at": {
+            "word": "it",
+            "occurrence": 1
+          }
+        }
+      ]
+    }
+  ]
+}

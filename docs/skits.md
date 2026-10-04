@@ -62,10 +62,10 @@ Default: the beat start.
 
 | `do` | Fields |
 |---|---|
-| `pose` | `pose` (idle, point, shrug, facepalm, arms-up, arms-crossed, think, lean-in, recoil, slump, hands-on-hips, hold-phone, sit, hold-out, hold-chest, hold-up, faint), `durationFrames?` |
+| `pose` | `pose` (idle, point, shrug, facepalm, arms-up, arms-crossed, think, lean-in, recoil, slump, hands-on-hips, hold-phone, sit, hold-out, hold-chest, hold-up, high-five, shove, faint, wave, thumbs-up), `durationFrames?` |
 | `gag` | `gag` (`double-take`, `look-to-camera`, `spit-take`, `faint`, `slow-clap`, `walk-out`, `freeze-frame`). The compiler expands it. `spit-take` holds the cup. |
 | `fall` | Stiff pose, then a tilt onto the ground. `faint` uses this. |
-| `expression` | `expression` (neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan) |
+| `expression` | `expression` (neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan, skeptical, worried, embarrassed, thinking, laughing) |
 | `look` | `to`: a cast id, `"camera"`, or `{ "x": 0.5, "y": 0.2 }` |
 | `turn` | `facing?` (default: flip) |
 | `hop`, `nod` | |
@@ -87,6 +87,8 @@ Default: the beat start.
 **Speech motion:** omitted means on. Speakers nod on a stressed word and make one gesture. `"speechMotion": "off"` leaves the body to the actions you wrote. An authored pose, gag, fall, or prop move wins.
 
 **Style:** `"style": "classic" | "deadpan" | "snappy" | "chaotic" | "sitcom"`. Omitted: the series style, else classic. Numbers live in `src/data/styles/`.
+
+**Hook card:** `"overlay": { "hook": "He read the whole universe." }` shows a card from frame 0, for viewers with the sound off, and hides it when the first spoken line ends. It has no "POV:" lead. It is for myth-flip and other formats that have no POV card. A `pov` wins if both are set.
 
 **Cold open:** `"coldOpen": "pov" | "none" | "teaser"`. `teaser` flashes the punchline reaction, then slides into beat one. A series `coldOpen` applies when the skit omits its own.
 
@@ -111,26 +113,45 @@ Default: the beat start.
 | sign | Sign | party | placard, poster |
 | book | Book | office | books |
 | credit-card | Credit card | money | card, debit card |
+| dice | Die | maths | die, dice cube |
 | alarm-clock | Alarm clock | home | alarm, clock |
+| coin | Coin | maths | coins, penny |
+| ball | Ball (light) | maths | light ball, tennis ball, small ball |
 | laptop | Laptop | tech | computer |
+| heavy-ball | Ball (heavy) | maths | bowling ball, iron ball, cannonball, heavy |
 | phone | Phone | tech | mobile, cell, cellphone, smartphone |
+| chalk | Chalk | maths | chalk stick |
 | receipt | Receipt | money | receipts |
 | cash | Cash | money | money, bills, notes |
+| pointer-stick | Pointer stick | maths | pointer, teacher's pointer |
 | keys | Keys | home | key |
+| protractor | Protractor | maths | angle measure |
 | mic | Mic | office | microphone |
+| number-card | Number card | maths | card, flash card |
 | pill-bottle | Pill bottle | office | pills, medicine |
 | clipboard | Clipboard | office | clip board |
 | apple | Apple | food | apples |
+| magnifying-glass | Magnifying glass | science | magnifier, loupe |
+| bar-magnet | Bar magnet | science | magnet |
 | umbrella | Umbrella | home | brolly |
+| horseshoe-magnet | Horseshoe magnet | science | u magnet |
 | potted-plant | Plant | home | plant, pot plant |
+| battery | Battery | science | cell, aa battery |
 | paper-map | Map | travel | map |
 | cup | Cup | drinks | mug, coffee, tea |
+| light-bulb | Light bulb | science | bulb, lightbulb |
+| prism | Prism | science | glass prism |
 | soda-can | Soda can | drinks | can, soda, soft drink |
+| beaker | Beaker | science | glass beaker |
 | folder | Folder | office | file, folders |
+| flask | Flask | science | conical flask, erlenmeyer |
 | takeaway-coffee | Takeaway coffee | drinks | latte, takeaway, coffee cup |
 | burger | Burger | food | hamburger, cheeseburger |
+| laser-pointer | Laser pointer | science | laser |
 | pen | Pen | office | pens, biro |
+| telescope | Telescope | science | spyglass |
 | notebook | Notebook | office | notepad, journal |
+| test-tube | Test tube | science | tube, vial |
 | tablet | Tablet | tech | tablets |
 | sandwich | Sandwich | food | sarnie, sub |
 | headphones | Headphones | tech | headset, earphones |
@@ -165,7 +186,7 @@ Default: the beat start.
 | balloon | Balloon | party | balloons |
 | baby-bottle | Baby bottle | drinks | bottle baby |
 | flower-bouquet | Bouquet | party | flowers, bouquet |
-| thermos | Thermos | drinks | flask |
+| thermos | Thermos | drinks | vacuum flask |
 | megaphone | Megaphone | party | loudspeaker, bullhorn |
 | frying-pan | Frying pan | kitchen | pan, skillet |
 | suitcase | Suitcase | travel | luggage, bag |
@@ -180,9 +201,10 @@ Default: the beat start.
 | ruler | Ruler | office | rulers |
 | envelope | Envelope | office | letter, mail |
 | id-badge | ID badge | office | badge, name tag, id |
+| book-open | Open book | office | open book, reading |
 | selfie-stick | Selfie stick | tech | selfie |
 | charger | Charger | tech | charger cable, plug |
-| power-bank | Power bank | tech | battery, powerbank |
+| power-bank | Power bank | tech | portable charger, powerbank |
 | thermometer | Thermometer | tech | thermo |
 | broom | Broom | home | brooms |
 | mop | Mop | home | mops |

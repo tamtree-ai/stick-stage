@@ -37,8 +37,8 @@ describe("data library", () => {
       expect(s.tags.length, s.id).toBeGreaterThan(2);
     }
   });
-  it("every palette has the same seven tokens", () => {
-    for (const p of Object.values(PALETTES)) expect(Object.keys(p).sort()).toEqual(["accent", "detail", "floor", "shade", "sky", "wallA", "wallB"]);
+  it("every palette has the same seven tokens (plus an optional rim on dark grounds)", () => {
+    for (const p of Object.values(PALETTES)) expect(Object.keys(p).filter((k) => k !== "rim").sort()).toEqual(["accent", "detail", "floor", "shade", "sky", "wallA", "wallB"]);
   });
   it("every set uses known palettes and parts", () => {
     for (const s of Object.values(sets)) {

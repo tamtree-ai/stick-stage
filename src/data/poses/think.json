@@ -1,1 +1,1 @@
-{ "schemaVersion": 1, "id": "think", "torso": 2, "head": -8, "shoulderL": 22, "elbowL": 72, "shoulderR": 92, "elbowR": 128, "hipL": -6, "hipR": 6, "bend": { "armR": 0.1 } }
+{ "schemaVersion": 1, "id": "think", "torso": 2, "head": -8, "shoulderL": 22, "elbowL": 72, "shoulderR": 92, "elbowR": 128, "hipL": -6, "hipR": 6, "bend": {"armR": 0.1 }, "handL": "fist", "handR": "fist", "toon": { "shoulderR": 70, "elbowR": 135, "shoulderL": 10, "elbowL": 120 } }

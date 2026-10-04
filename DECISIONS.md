@@ -231,3 +231,40 @@ Plan: `../planning/2026-09-29-science-channel/plan.md`. Built on branch `science
 - **One real image ships:** ESA/Webb Pillars of Creation (CC BY 4.0, credit copied from esawebb.org). Nothing is fetched at render time.
 - **A figure can be shown, hidden and shown again** (found staging `old-light`: image → scale → image). A track holds `spans` (each a `show` and an optional `hide`) instead of one `show`/`hide` pair, which had silently dropped the first appearance. An image's credit is burned in for every span. `show` on a figure already on screen restarts its reveal (and still warns `figure-shown`).
 - **The three phase-1 gate shorts are staged as drafts**: `coin-due` (maths: gambler's fallacy, `blueprint-1`), `old-light` (astronomy: the Pillars' light is ~6,500 years old, Webb image, `space-1`), `slow-electrons` (EM: drift velocity, `lab-1`). Claims carry sources written from memory with `checkedBy: null`; the owner checks every one before `pnpm approve`.
+
+## 2026-10-02 (toon characters, T1)
+Plan: `../planning/2026-10-02-toon-characters/plan.md` (owner approved the v2 looks). Branch `toon-characters` from `main` @ `b89c479`. Handover: `../planning/2026-10-02-toon-characters/handover.md`.
+- **Both builds live in one character file.** `style.build` picks the tier (default `stick`); the `toon` block carries its own `proportions`, so the stick body is kept intact. Body proportions are read through `proportionsOf(c)` (skeleton, seat IK, moves, QA). Vera and Gus ship with a toon block but `build: "stick"` until T4, so the staged science drafts render unchanged; the labs force toon with `build`.
+- **Toon sizes are in toon units** (px on a 610 px figure, the scale the v2 designs were drawn at), scaled by `figureHeightPx`, so the mockup geometry ports one-to-one.
+- **The toon face reuses the parametric `Mouth`, `Brow` and `Symbols`**, so Rhubarb visemes, expression blends and symbols work on toons with no new code. `Mouth` gained an optional `lip` colour for the closed line. Toon eyes are new (`toon/face.tsx`) and read the same `FaceState` (lid, lower, lidTilt, gaze, pupil, shapes).
+- **Hair, clothes and details are kinds drawn in code** (`long-streak` / `curly-mop`, `turtleneck` / `tee`, `labcoat` / `varsity`, `skirt` / `jeans`, `boot` / `sneaker`, six details), not free SVG in JSON. A new kind is code plus owner review, as the plan's risk note said.
+- **Five expressions added for every build:** `skeptical`, `worried`, `embarrassed`, `thinking`, `laughing` (`EXTRA_EXPRESSION_IDS`; `FaceLab` cycles all 17).
+- **The catalog version changes** (character library + expressions are hashed), so t-shoot needs a re-vendor when this merges.
+- **Look-alike QA knows toons:** `characterDistance` uses toon proportions, adds hair / outer / bottom kind to the silhouette score and compares skin and the outer layer's colour. The plan's raster silhouette check (solid fill at 18 %, pixel overlap) is not built; this geometric score stands in for it.
+- **Dark garments on dark ink are accepted** (Vera's skirt and tights, Gus's jeans and hair are 1–2.7:1 against the ink). The outline separates the figure from the set, which the visual QA checks (toon ink ≥ 3:1 on every palette, and against skin).
+
+## 2026-10-03 (toon characters, T2)
+- **Hand shapes live on the pose** (`handL` / `handR`), not on a separate track. A held prop overrides with `hold`. Shapes switch at the middle of the blend (`evalHands`); they don't tween. Stick figures ignore the fields, so stick drawings are unchanged.
+- **Thumb rule:** the hand turns with the forearm (thumb forward on a hanging arm, on top when pointing forward); it mirrors only when the forearm points clearly backward (`fore.x < −0.35`), so idle sway never flips it. The T1 rule (mirror whenever the forearm pointed forward) put the thumb underneath on `point`.
+- **Two poses added:** `wave`, `thumbs-up` (`EXTRA_POSE_IDS`).
+- **The skirt follows the thighs:** its hem is laid out along the mean thigh direction, so a seated skirt lies over the lap.
+- **Known:** in `think` the back fist shows in front of the torso on toons. Fixing it means changing the pose angles, which would change the stick drawing too; left for an owner call.
+- `src/engine/props/path.ts` → `svgPath.ts`: the engine's no-filesystem lint rule matched the local `./path` import (the 3 lint errors on `main`).
+
+## 2026-10-03 (toon characters, T3)
+- **Vera and Gus now ship as toons** (`style.build: "toon"`), one milestone earlier than the plan said: the T3 test skit needs them, and T4 re-renders every science draft in toon anyway. Old stick renders in `out/` are stale. t-shoot needs a catalog re-vendor when this merges.
+- **T3 needed no new mouth code:** T1's toon face already draws Rhubarb visemes (open mouth, teeth, tongue) and lid blinks with the parametric `Mouth`. `menu-lab` (`public/skits/menu-lab/`, the brief's restaurant-menu idea, not a posted short) is the motion test: walk-in, held clipboard, wave / point / thumbs-up, lip-sync, listener looks, punch-in.
+
+## 2026-10-03 (toon characters, T4)
+- **Part of a whole is a `progress` bar, not a histogram** (owner's question on the storyboard). 5 / 27 / 68 add up to 100, so one bar shows the share directly. The empty rest of the track carries l3's "?" without extra marks, and the bar's `readout` ("5% read") ties the chart to Gus "reading" the universe. Segments `dim` and `ask` are numbers so `set` cues tween them. The drawer scales from its box height, because the figure font cap (28–46 px) is too small for a phone-size bar.
+- **Nebula night is a new set, `space-2`** (palette `nebula`, parts `nebula-sky`, `galaxy`, `ringed-planet`, `moon-floor`); `space-1` stays as it was. Palettes may set `rim`. On such a palette, Stage wraps the cast layer in one SVG filter (dilate + flood + slight blur), which settles T1 deviation 2 without recolouring outlines. The contrast QA checks the rim against the ink and the walls on rim palettes.
+- **`layer: "screen"` for figures:** drawn over everything and outside the camera, so the l5 galaxy inset stays put through the punch-in.
+- **`overlay.hook`:** a frame-0 card for muted viewers. It uses the POV card's drawing with no "POV:" lead and leaves when the first spoken line ends. Whether every myth-flip gets one is still open question 3.
+- **New figure kinds `galaxy`, `burst`, `fineprint`.** The galaxy shape is shared with the set part (`GalaxyShape`).
+- **Book snap:** the plan's fallback. Gus starts holding the closed book, with a thud and a burst on frame 0; there is no open → closed prop state yet.
+- `fine-print` is hand-staged in `skit.json`. Do not run `pnpm new fine-print --force`: it would rebuild the skit from `premise.json` and drop the staging.
+
+## 2026-10-04 (toon characters, finish)
+- **Poses may carry a `toon` block** (`shoulderL`, `elbowL`, `shoulderR`, `elbowR`, `handL`, `handR`). `evalActor` merges it for toon characters only (`toonPoses`), so a toon-only fix never changes a stick drawing. This settles the T2 `think` issue: the toon front hand rests on the chin and the back arm folds up behind the front elbow, so no fist pokes past the coat.
+- **Book snap by prop swap, not a prop state.** New prop `book-open`. `fine-print` starts Gus holding it (cast `holding`), and l1's `hold: book` swaps it on the beat with the thud and the burst. A second `hold` on the same hand is the general way to change an object's look; the pop-in reads as the snap.
+- Agent docs: skills `science-short` and `toon-character`, path-scoped rules in `.claude/rules/` (`toon-rig.md`, `science-skits.md`).

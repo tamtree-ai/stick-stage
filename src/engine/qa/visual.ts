@@ -3,6 +3,7 @@ import { stageActorsAt, xAt } from "../director/placement";
 import type { Timeline } from "../director/timeline";
 import { contrastRatio } from "../lib/color";
 import type { Library } from "../rig/actorState";
+import { toonOf } from "../rig/build";
 import { getPalette } from "../set/palettes";
 import type { SetDef } from "../set/schema";
 import { faceRect } from "../shots/framing";
@@ -148,7 +149,8 @@ export const contrastChecks = (tl: Timeline, lib: Library, set: SetDef): Finding
   const palette = getPalette(set.palette);
   const tones = [palette.wallA, palette.wallB, palette.floor, palette.sky, palette.shade];
   for (const id of new Set(tl.cast.map((c) => c.character))) {
-    const stroke = lib.characters[id]!.style.stroke;
+    const c = lib.characters[id]!;
+    const stroke = toonOf(c)?.ink ?? c.style.stroke;
     const worst = Math.min(...tones.map((t) => contrastRatio(stroke, t)));
     if (worst < 3) out.push({ check: "contrast", level: "warning", message: `${id}'s outline is only ${worst.toFixed(1)}:1 against set "${set.id}" (characters should pop)` });
   }

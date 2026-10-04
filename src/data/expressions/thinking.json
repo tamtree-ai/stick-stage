@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "thinking", "eyes": { "gaze": { "x": 0.6, "y": -0.8 } }, "brows": { "left": { "raise": 0.6, "tilt": 2 }, "right": { "raise": -0.2, "tilt": -5 } }, "mouth": { "preset": "pout", "w": 0.14, "skew": 0.4 } }

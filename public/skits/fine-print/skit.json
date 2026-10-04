@@ -12,13 +12,16 @@
       "science"
     ]
   },
-  "set": "space-1",
+  "set": "space-2",
   "cast": [
     {
       "id": "gus",
       "character": "gus",
       "mark": "left",
-      "pose": "arms-crossed"
+      "pose": "arms-crossed",
+      "holding": {
+        "prop": "book-open"
+      }
     },
     {
       "id": "vera",
@@ -27,61 +30,153 @@
     }
   ],
   "overlay": {
+    "hook": "He read the whole universe.",
     "subtitles": true
   },
   "figures": [
     {
       "id": "parts",
-      "kind": "histogram",
+      "kind": "progress",
       "at": {
         "x": 0.5,
-        "y": 0.27,
-        "w": 0.8,
-        "h": 0.22
+        "y": 0.2,
+        "w": 0.84,
+        "h": 0.2
       },
       "layer": "back",
-      "params": {
-        "source": "values",
-        "values": [
-          0,
-          0,
-          0
-        ],
-        "labels": [
-          "atoms",
-          "dark M",
-          "dark E"
-        ],
-        "share": false,
-        "yMax": 70,
-        "expected": false,
-        "count": false
-      },
       "hidden": true,
-      "reveal": "draw",
-      "label": "What the universe is made of (%)",
-      "panel": false
+      "reveal": "pop",
+      "label": "What the universe is made of",
+      "panel": true,
+      "params": {
+        "segments": [
+          {
+            "label": "atoms",
+            "value": 0,
+            "color": "#f6c445",
+            "dim": 0,
+            "ask": 0
+          },
+          {
+            "label": "dark matter",
+            "value": 0,
+            "color": "#9d7bff",
+            "dim": 0,
+            "ask": 0
+          },
+          {
+            "label": "dark energy",
+            "value": 0,
+            "color": "#35d0c2",
+            "dim": 0,
+            "ask": 0
+          }
+        ],
+        "readout": "{0}% read",
+        "restAsk": 0
+      }
     },
     {
-      "id": "here",
-      "kind": "callout",
+      "id": "snap",
+      "kind": "burst",
       "at": {
-        "x": 0.36,
-        "y": 0.2,
-        "w": 0.3,
-        "h": 0.05
+        "x": 0.31,
+        "y": 0.555,
+        "w": 0.2,
+        "h": 0.11
       },
       "layer": "front",
+      "hidden": true,
+      "reveal": "none",
       "params": {
-        "text": "you are here",
-        "target": [
-          0.26,
-          0.36
-        ]
+        "hold": 0.6
+      }
+    },
+    {
+      "id": "spin",
+      "kind": "galaxy",
+      "at": {
+        "x": 0.27,
+        "y": 0.41,
+        "w": 0.36,
+        "h": 0.13
       },
+      "layer": "screen",
+      "hidden": true,
+      "reveal": "pop",
+      "panel": true,
+      "params": {
+        "spin": 220,
+        "speedLines": 1,
+        "caption": "spins too fast"
+      }
+    },
+    {
+      "id": "nova1",
+      "kind": "burst",
+      "at": {
+        "x": 0.12,
+        "y": 0.355,
+        "w": 0.16,
+        "h": 0.09
+      },
+      "layer": "back",
+      "hidden": true,
+      "reveal": "none",
+      "params": {
+        "hold": 1.2
+      }
+    },
+    {
+      "id": "nova2",
+      "kind": "burst",
+      "at": {
+        "x": 0.88,
+        "y": 0.355,
+        "w": 0.16,
+        "h": 0.09
+      },
+      "layer": "back",
+      "hidden": true,
+      "reveal": "none",
+      "params": {
+        "hold": 1.2
+      }
+    },
+    {
+      "id": "expand",
+      "kind": "label",
+      "at": {
+        "x": 0.5,
+        "y": 0.355,
+        "w": 0.66,
+        "h": 0.04
+      },
+      "layer": "front",
+      "hidden": true,
+      "reveal": "pop",
+      "params": {
+        "text": "←  expansion speeding up  →",
+        "color": "a3",
+        "pill": true
+      }
+    },
+    {
+      "id": "fine",
+      "kind": "fineprint",
+      "at": {
+        "x": 0.5,
+        "y": 0.215,
+        "w": 0.86,
+        "h": 0.2
+      },
+      "layer": "front",
       "hidden": true,
       "reveal": "draw",
-      "panel": false
+      "params": {
+        "size": 15,
+        "color": "ink"
+      }
     }
   ],
   "template": "myth-flip",
@@ -148,13 +243,46 @@
         }
       ],
       "expression": "smug",
-      "role": "myth"
+      "role": "myth",
+      "sfx": [
+        {
+          "id": "thud",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
+      "figures": [
+        {
+          "do": "show",
+          "id": "snap",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "hide",
+          "id": "snap",
+          "at": {
+            "ms": 700
+          }
+        }
+      ]
     },
     {
       "id": "l2",
       "speaker": "vera",
       "line": "All the atoms? About 5% of it.",
-      "actions": [],
+      "actions": [
+        {
+          "who": "gus",
+          "do": "putAway",
+          "hand": "R",
+          "at": {
+            "ms": 0
+          }
+        }
+      ],
       "expression": "happy",
       "spoken": "All the atoms? About five percent of it.",
       "figures": [
@@ -172,11 +300,30 @@
             "word": "5",
             "occurrence": 1
           },
+          "durationMs": 500,
           "params": {
-            "values": [
-              5,
-              0,
-              0
+            "segments": [
+              {
+                "label": "atoms",
+                "value": 5,
+                "color": "#f6c445",
+                "dim": 0,
+                "ask": 0
+              },
+              {
+                "label": "dark matter",
+                "value": 0,
+                "color": "#9d7bff",
+                "dim": 0,
+                "ask": 0
+              },
+              {
+                "label": "dark energy",
+                "value": 0,
+                "color": "#35d0c2",
+                "dim": 0,
+                "ask": 0
+              }
             ]
           }
         }
@@ -199,7 +346,21 @@
       ],
       "expression": "smug",
       "spoken": "So the other ninety-five percent is… more planets?",
-      "role": "prediction"
+      "role": "prediction",
+      "figures": [
+        {
+          "do": "set",
+          "id": "parts",
+          "at": {
+            "word": "95",
+            "occurrence": 1
+          },
+          "durationMs": 350,
+          "params": {
+            "restAsk": 1
+          }
+        }
+      ]
     },
     {
       "id": "l4",
@@ -233,12 +394,39 @@
             "word": "matter",
             "occurrence": 1
           },
+          "durationMs": 500,
           "params": {
-            "values": [
-              5,
-              27,
-              0
+            "segments": [
+              {
+                "label": "atoms",
+                "value": 5,
+                "color": "#f6c445",
+                "dim": 0,
+                "ask": 0
+              },
+              {
+                "label": "dark matter",
+                "value": 27,
+                "color": "#9d7bff",
+                "dim": 0,
+                "ask": 0
+              },
+              {
+                "label": "dark energy",
+                "value": 0,
+                "color": "#35d0c2",
+                "dim": 0,
+                "ask": 0
+              }
             ]
+          }
+        },
+        {
+          "do": "show",
+          "id": "spin",
+          "at": {
+            "word": "Galaxies",
+            "occurrence": 1
           }
         }
       ],
@@ -256,10 +444,23 @@
           "at": {
             "fraction": 0.2
           }
+        },
+        {
+          "who": "gus",
+          "do": "symbol",
+          "symbol": "exclaim",
+          "at": {
+            "fraction": 0.35
+          },
+          "durationMs": 1200
         }
       ],
       "expression": "shocked",
-      "role": "reaction"
+      "role": "reaction",
+      "shot": {
+        "framing": "close",
+        "on": "gus"
+      }
     },
     {
       "id": "l6",
@@ -287,22 +488,83 @@
       "spoken": "Sixty-eight percent is dark energy. Far-off supernovae show the expansion speeding up.",
       "figures": [
         {
+          "do": "hide",
+          "id": "spin",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
           "do": "set",
           "id": "parts",
           "at": {
             "word": "energy",
             "occurrence": 1
           },
+          "durationMs": 500,
           "params": {
-            "values": [
-              5,
-              27,
-              68
-            ]
+            "segments": [
+              {
+                "label": "atoms",
+                "value": 5,
+                "color": "#f6c445",
+                "dim": 0,
+                "ask": 0
+              },
+              {
+                "label": "dark matter",
+                "value": 27,
+                "color": "#9d7bff",
+                "dim": 0,
+                "ask": 0
+              },
+              {
+                "label": "dark energy",
+                "value": 68,
+                "color": "#35d0c2",
+                "dim": 0,
+                "ask": 0
+              }
+            ],
+            "restAsk": 0
+          }
+        },
+        {
+          "do": "show",
+          "id": "nova1",
+          "at": {
+            "word": "supernovae",
+            "occurrence": 1
+          }
+        },
+        {
+          "do": "show",
+          "id": "nova2",
+          "at": {
+            "word": "supernovae",
+            "occurrence": 1
+          },
+          "style": "none"
+        },
+        {
+          "do": "show",
+          "id": "expand",
+          "at": {
+            "word": "expansion",
+            "occurrence": 1
           }
         }
       ],
-      "role": "why"
+      "role": "why",
+      "sfx": [
+        {
+          "id": "pop",
+          "at": {
+            "word": "supernovae",
+            "occurrence": 1
+          }
+        }
+      ]
     },
     {
       "id": "l7",
@@ -319,12 +581,89 @@
         }
       ],
       "expression": "shocked",
-      "role": "reaction"
+      "role": "reaction",
+      "figures": [
+        {
+          "do": "hide",
+          "id": "expand",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "hide",
+          "id": "nova1",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "do": "hide",
+          "id": "nova2",
+          "at": {
+            "ms": 0
+          }
+        }
+      ]
     },
     {
       "id": "l8",
       "speaker": "vera",
       "line": "Nobody knows yet.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "shrug",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "neutral",
+      "role": "why",
+      "pauseBeforeMs": 500,
+      "figures": [
+        {
+          "do": "set",
+          "id": "parts",
+          "at": {
+            "word": "Nobody",
+            "occurrence": 1
+          },
+          "durationMs": 350,
+          "params": {
+            "segments": [
+              {
+                "label": "atoms",
+                "value": 5,
+                "color": "#f6c445",
+                "dim": 0,
+                "ask": 0
+              },
+              {
+                "label": "dark matter",
+                "value": 27,
+                "color": "#9d7bff",
+                "dim": 0,
+                "ask": 1
+              },
+              {
+                "label": "dark energy",
+                "value": 68,
+                "color": "#35d0c2",
+                "dim": 0,
+                "ask": 1
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "l9",
+      "speaker": "vera",
+      "line": "Everything you've ever touched is in that 5%.",
       "actions": [
         {
           "who": "vera",
@@ -344,31 +683,55 @@
         }
       ],
       "expression": "neutral",
-      "role": "why"
-    },
-    {
-      "id": "l9",
-      "speaker": "vera",
-      "line": "Everything you've ever touched is in that 5%.",
-      "actions": [
-        {
-          "who": "vera",
-          "do": "pose",
-          "pose": "shrug",
-          "at": {
-            "fraction": 0.2
-          }
-        }
-      ],
-      "expression": "neutral",
       "spoken": "Everything you've ever touched is in that five percent.",
       "figures": [
         {
-          "do": "show",
-          "id": "here",
+          "do": "set",
+          "id": "parts",
+          "at": {
+            "ms": 0
+          },
+          "durationMs": 500,
+          "params": {
+            "segments": [
+              {
+                "label": "atoms",
+                "value": 5,
+                "color": "#f6c445",
+                "dim": 0,
+                "ask": 0
+              },
+              {
+                "label": "dark matter",
+                "value": 27,
+                "color": "#9d7bff",
+                "dim": 1,
+                "ask": 0
+              },
+              {
+                "label": "dark energy",
+                "value": 68,
+                "color": "#35d0c2",
+                "dim": 1,
+                "ask": 0
+              }
+            ]
+          }
+        },
+        {
+          "do": "set",
+          "id": "parts",
           "at": {
             "word": "touched",
             "occurrence": 1
+          },
+          "durationMs": 400,
+          "params": {
+            "here": {
+              "segment": 0,
+              "text": "you are here",
+              "show": 1
+            }
           }
         }
       ],
@@ -395,7 +758,18 @@
       "punchline": true,
       "pauseBeforeMs": 350,
       "holdAfterMs": 400,
-      "reaction": "happy"
+      "reaction": "happy",
+      "figures": [
+        {
+          "do": "show",
+          "id": "fine",
+          "at": {
+            "word": "rest",
+            "occurrence": 1
+          },
+          "durationMs": 500
+        }
+      ]
     }
   ]
 }

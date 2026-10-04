@@ -9,6 +9,8 @@ export * from "./lib/easing";
 export * from "./lib/color";
 export * from "./lib/seed";
 export * from "./rig/schema";
+export * from "./rig/build";
+export { ToonSchema, TOON_DETAILS, HAND_SHAPES, type Toon, type HandShape } from "./rig/toon/schema";
 export * from "./rig/skeleton";
 export * from "./rig/pose";
 export * from "./rig/idle";

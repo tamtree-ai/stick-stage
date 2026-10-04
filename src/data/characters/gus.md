@@ -6,7 +6,7 @@
 Status: draft, owner to confirm (name is a placeholder)
 
 ## Look
-Medium height, a slightly square head, a brown flat cap, big-pupil eyes, an olive bean torso. Stands with his arms crossed by default.
+Drawn as a toon (`style.build: "toon"`). A curly dark mop, freckles, teal headphones around his neck. A purple varsity jacket with mustard sleeves and striped ribbing over a red tee with a ringed-planet print, a star patch, cuffed jeans and white high-tops with purple stripes and red laces. Stands with his arms crossed by default. The stick body in `gus.json` is kept for comparison labs only.
 
 ## Voice
 Dev voice: macOS `say` "Fred". For posting, the tamtree harness picks the TTS voice. Delivery: confident and plausible; he believes it.

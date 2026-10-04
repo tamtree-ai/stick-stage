@@ -63,6 +63,30 @@
         }
       }
     },
+    "handL": {
+      "type": "string",
+      "enum": [
+        "open",
+        "fist",
+        "point",
+        "thumb",
+        "wave",
+        "palmup",
+        "hold"
+      ]
+    },
+    "handR": {
+      "type": "string",
+      "enum": [
+        "open",
+        "fist",
+        "point",
+        "thumb",
+        "wave",
+        "palmup",
+        "hold"
+      ]
+    },
     "anticipation": {
       "default": false,
       "type": "boolean"

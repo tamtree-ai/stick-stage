@@ -5,7 +5,7 @@
   "logline": "Gus says he has read the whole universe. Vera shows him the 95% he skipped.",
   "description": "Atoms are only about 5% of the universe; the rest is dark matter and dark energy. Sources and simplifications in the pinned comment. What else would you put in the fine print?",
   "hashtags": ["shorts", "space", "cosmology", "darkmatter", "science"],
-  "set": "space-1",
+  "set": "space-2",
   "cast": [
     { "id": "gus", "character": "gus" },
     { "id": "vera", "character": "vera" }

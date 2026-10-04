@@ -233,6 +233,10 @@
           "type": "string",
           "maxLength": 80
         },
+        "hook": {
+          "type": "string",
+          "maxLength": 60
+        },
         "subtitles": {
           "default": true,
           "type": "boolean"
@@ -404,6 +408,14 @@
           "style": {
             "type": "object",
             "properties": {
+              "build": {
+                "default": "stick",
+                "type": "string",
+                "enum": [
+                  "stick",
+                  "toon"
+                ]
+              },
               "stroke": {
                 "type": "string",
                 "pattern": "^#[0-9a-fA-F]{3,8}$"
@@ -620,6 +632,462 @@
               ]
             }
           },
+          "toon": {
+            "type": "object",
+            "properties": {
+              "proportions": {
+                "type": "object",
+                "properties": {
+                  "height": {
+                    "type": "number",
+                    "minimum": 0.5,
+                    "maximum": 1.5
+                  },
+                  "headRadius": {
+                    "type": "number",
+                    "minimum": 0.08,
+                    "maximum": 0.25
+                  },
+                  "neck": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.1
+                  },
+                  "torso": {
+                    "type": "number",
+                    "minimum": 0.1,
+                    "maximum": 0.5
+                  },
+                  "upperArm": {
+                    "type": "number",
+                    "minimum": 0.05,
+                    "maximum": 0.3
+                  },
+                  "forearm": {
+                    "type": "number",
+                    "minimum": 0.05,
+                    "maximum": 0.3
+                  },
+                  "thigh": {
+                    "type": "number",
+                    "minimum": 0.05,
+                    "maximum": 0.35
+                  },
+                  "shin": {
+                    "type": "number",
+                    "minimum": 0.05,
+                    "maximum": 0.35
+                  }
+                },
+                "required": [
+                  "height",
+                  "headRadius",
+                  "neck",
+                  "torso",
+                  "upperArm",
+                  "forearm",
+                  "thigh",
+                  "shin"
+                ]
+              },
+              "outline": {
+                "default": 6,
+                "type": "number",
+                "minimum": 2,
+                "maximum": 14
+              },
+              "ink": {
+                "default": "#1d1b2b",
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              },
+              "skin": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              },
+              "skinShade": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "shoulders": {
+                    "type": "number",
+                    "minimum": 40,
+                    "maximum": 160
+                  },
+                  "waist": {
+                    "type": "number",
+                    "minimum": 30,
+                    "maximum": 140
+                  },
+                  "hips": {
+                    "type": "number",
+                    "minimum": 40,
+                    "maximum": 160
+                  },
+                  "arm": {
+                    "default": 25,
+                    "type": "number",
+                    "minimum": 14,
+                    "maximum": 40
+                  },
+                  "neck": {
+                    "default": 22,
+                    "type": "number",
+                    "minimum": 14,
+                    "maximum": 40
+                  }
+                },
+                "required": [
+                  "shoulders",
+                  "hips"
+                ]
+              },
+              "head": {
+                "default": {
+                  "jaw": 1
+                },
+                "type": "object",
+                "properties": {
+                  "jaw": {
+                    "default": 1,
+                    "type": "number",
+                    "minimum": 0.8,
+                    "maximum": 1.1
+                  }
+                }
+              },
+              "eyes": {
+                "type": "object",
+                "properties": {
+                  "iris": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "lashes": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "iris"
+                ]
+              },
+              "brows": {
+                "type": "object",
+                "properties": {
+                  "color": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "thickness": {
+                    "default": 7,
+                    "type": "number",
+                    "minimum": 3,
+                    "maximum": 12
+                  },
+                  "gap": {
+                    "default": 0.42,
+                    "type": "number",
+                    "minimum": 0.25,
+                    "maximum": 0.7
+                  }
+                },
+                "required": [
+                  "color"
+                ]
+              },
+              "lip": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              },
+              "nose": {
+                "default": "hook",
+                "type": "string",
+                "enum": [
+                  "hook",
+                  "button",
+                  "none"
+                ]
+              },
+              "ears": {
+                "default": true,
+                "type": "boolean"
+              },
+              "cheeks": {
+                "default": {
+                  "color": "#e8737a",
+                  "opacity": 0.22
+                },
+                "type": "object",
+                "properties": {
+                  "color": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "opacity": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "color",
+                  "opacity"
+                ]
+              },
+              "nails": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              },
+              "hair": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "long-streak",
+                      "curly-mop"
+                    ]
+                  },
+                  "fill": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "shade": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "streak": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "fill"
+                ]
+              },
+              "glasses": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "cat-eye"
+                    ]
+                  },
+                  "fill": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "fill"
+                ]
+              },
+              "top": {
+                "type": "object",
+                "properties": {
+                  "fill": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "shade": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "turtleneck",
+                      "tee"
+                    ]
+                  },
+                  "belt": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "print": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  }
+                },
+                "required": [
+                  "fill",
+                  "kind"
+                ]
+              },
+              "outer": {
+                "type": "object",
+                "properties": {
+                  "fill": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "shade": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "labcoat",
+                      "varsity"
+                    ]
+                  },
+                  "sleeve": {
+                    "type": "object",
+                    "properties": {
+                      "fill": {
+                        "type": "string",
+                        "pattern": "^#[0-9a-fA-F]{3,8}$"
+                      },
+                      "shade": {
+                        "type": "string",
+                        "pattern": "^#[0-9a-fA-F]{3,8}$"
+                      }
+                    },
+                    "required": [
+                      "fill"
+                    ]
+                  },
+                  "rib": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "ribStripe": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "cuffAt": {
+                    "default": 0.7,
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "fill",
+                  "kind"
+                ]
+              },
+              "bottom": {
+                "type": "object",
+                "properties": {
+                  "fill": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "shade": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "skirt",
+                      "jeans"
+                    ]
+                  },
+                  "legs": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "cuff": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  }
+                },
+                "required": [
+                  "fill",
+                  "kind"
+                ]
+              },
+              "shoes": {
+                "type": "object",
+                "properties": {
+                  "fill": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "shade": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "boot",
+                      "sneaker"
+                    ]
+                  },
+                  "accent": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "lace": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  },
+                  "sole": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  }
+                },
+                "required": [
+                  "fill",
+                  "kind"
+                ]
+              },
+              "details": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "enum": [
+                        "pocket-pens",
+                        "planet-pin",
+                        "star-patch",
+                        "headphones",
+                        "star-earring",
+                        "freckles"
+                      ]
+                    },
+                    "color": {
+                      "type": "string",
+                      "pattern": "^#[0-9a-fA-F]{3,8}$"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              },
+              "accent": {
+                "default": "#f6c445",
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              }
+            },
+            "required": [
+              "skin",
+              "body",
+              "eyes",
+              "brows",
+              "lip",
+              "hair",
+              "top",
+              "bottom",
+              "shoes"
+            ]
+          },
           "energy": {
             "type": "number",
             "minimum": 0,
@@ -750,7 +1218,11 @@
               "scale",
               "histogram",
               "equation",
-              "image"
+              "image",
+              "progress",
+              "galaxy",
+              "burst",
+              "fineprint"
             ]
           },
           "at": {
@@ -794,7 +1266,8 @@
             "type": "string",
             "enum": [
               "back",
-              "front"
+              "front",
+              "screen"
             ]
           },
           "params": {
@@ -3549,7 +4022,11 @@
                     "scale",
                     "histogram",
                     "equation",
-                    "image"
+                    "image",
+                    "progress",
+                    "galaxy",
+                    "burst",
+                    "fineprint"
                   ]
                 },
                 "at": {
@@ -3593,7 +4070,8 @@
                   "type": "string",
                   "enum": [
                     "back",
-                    "front"
+                    "front",
+                    "screen"
                   ]
                 },
                 "params": {

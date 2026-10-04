@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ASPECTS } from "../format/aspect";
+import { HAND_SHAPES, ToonSchema } from "./toon/schema";
 
 const hex = z.string().regex(/^#[0-9a-fA-F]{3,8}$/, "expected a hex color like #1b1b1f");
 const frac = (lo: number, hi: number) => z.number().min(lo).max(hi);
@@ -42,6 +43,8 @@ export const CharacterSchema = z.object({
   aspect: z.enum(ASPECTS).optional(),
   proportions: ProportionsSchema,
   style: z.object({
+    /** Drawing tier: "stick" (default) or "toon" (needs the `toon` block). */
+    build: z.enum(["stick", "toon"]).default("stick"),
     stroke: hex,
     strokeWidth: z.number().min(2).max(30),
     headFill: hex,
@@ -76,6 +79,8 @@ export const CharacterSchema = z.object({
     mouthY: frac(0, 0.8).default(0.42),
   }),
   accessories: z.array(AccessorySchema).default([]),
+  /** The toon drawing (skin, clothes, hair). Accessories are stick-only; toon draws its own. */
+  toon: ToonSchema.optional(),
   /** How much speech motion this character does. 1 is Dash, near 0 is Moss. Default 0.55. */
   energy: z.number().min(0).max(1).optional(),
   /** One line the writer reads the way it reads cast notes. Not drawn. */
@@ -92,6 +97,9 @@ export const CharacterSchema = z.object({
       say: z.string().optional(),
     })
     .optional(),
+}).superRefine((c, ctx) => {
+  if (c.style.build === "toon" && !c.toon)
+    ctx.addIssue({ code: "custom", path: ["toon"], message: 'style.build "toon" needs a toon block (skin, body, hair, top, bottom, shoes)' });
 });
 
 export type Character = z.infer<typeof CharacterSchema>;
@@ -124,6 +132,27 @@ export const PoseSchema = z.object({
   hipR: z.number().default(5),
   kneeR: z.number().default(0),
   bend: limbBend.default({}),
+  /**
+   * Toon hand shapes (stick figures ignore them). Missing means "open", or "hold" while the
+   * hand holds a prop. Shapes switch at the middle of a pose blend; they don't tween.
+   */
+  handL: z.enum(HAND_SHAPES).optional(),
+  handR: z.enum(HAND_SHAPES).optional(),
+  /**
+   * Toon-only overrides: angles (and hand shapes) a toon uses instead, where its wider body
+   * needs a different arm path. Stick figures ignore the block, so their drawing is unchanged.
+   */
+  toon: z
+    .object({
+      shoulderL: z.number().optional(),
+      elbowL: z.number().optional(),
+      shoulderR: z.number().optional(),
+      elbowR: z.number().optional(),
+      handL: z.enum(HAND_SHAPES).optional(),
+      handR: z.enum(HAND_SHAPES).optional(),
+    })
+    .strict()
+    .optional(),
   /** Big gestures get a short opposite dip before the move. */
   anticipation: z.boolean().default(false),
 });

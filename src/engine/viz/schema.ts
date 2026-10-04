@@ -25,8 +25,11 @@ export const FigureSchema = z.strictObject({
   id: z.string().regex(/^[A-Za-z0-9_-]+$/, "letters, digits, - and _ only"),
   kind: z.enum(FIGURE_KINDS as [string, ...string[]]),
   at: FigureRectSchema.default({ x: 0.5, y: 0.32, w: 0.8, h: 0.3 }),
-  /** `back`: behind the cast (default). `front`: over them. */
-  layer: z.enum(["back", "front"]).default("back"),
+  /**
+   * `back`: behind the cast (default). `front`: over them. `screen`: over everything and fixed to
+   * the frame, so a punch-in or shake doesn't move it (an inset that stays on screen).
+   */
+  layer: z.enum(["back", "front", "screen"]).default("back"),
   params: params.default({}),
   /** Named parameter sets (`myth`, `truth`), merged over `params`. A `state` cue switches. */
   states: z.record(z.string().min(1), params).optional(),

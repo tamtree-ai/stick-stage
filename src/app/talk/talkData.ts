@@ -1,5 +1,6 @@
 import { staticFile, type CalculateMetadataFunction } from "remotion";
 import { z } from "zod";
+import { buildProp } from "../labs/build";
 import {
   buildCaptionPages,
   FRAMINGS,
@@ -104,6 +105,7 @@ export const talkLabSchema = z.object({
   skit: z.string(),
   character: z.string(),
   showLabels: z.boolean(),
+  build: buildProp,
   timeline: z.custom<TalkTimeline>().optional(),
 });
 export type TalkLabProps = z.infer<typeof talkLabSchema>;

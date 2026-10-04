@@ -1,7 +1,8 @@
 import React from "react";
 import { AbsoluteFill, Html5Audio, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { evalActor, frameShot, PovCard, SlamText, Stage, Subtitles, type ActorTracks, type StageActor } from "../../engine";
-import { library, safeArea, sets } from "../../data";
+import { safeArea, sets } from "../../data";
+import { labLibrary } from "./build";
 import { TEXT_FONT } from "../fonts";
 import type { TalkLabProps } from "../talk/talkData";
 import { Label } from "./Label";
@@ -14,7 +15,7 @@ const H = 1920;
  * on each line's expression, word-timed subtitles, a POV card and slam text. Each line's shot
  * is a locked-off camera framed at the line's first frame (a hard cut between lines).
  */
-export const TalkLab: React.FC<TalkLabProps> = ({ character, showLabels, timeline }) => {
+export const TalkLab: React.FC<TalkLabProps> = ({ character, showLabels, build, timeline }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   if (!timeline) throw new Error("TalkLab: timeline missing (calculateMetadata did not run)");
@@ -29,7 +30,7 @@ export const TalkLab: React.FC<TalkLabProps> = ({ character, showLabels, timelin
     id: character,
     x: 0.42,
     facing: "right",
-    state: evalActor(library, tracks, f, fps, set.figureHeightPx),
+    state: evalActor(labLibrary(build), tracks, f, fps, set.figureHeightPx),
   });
   const actor = actorAt(frame);
 

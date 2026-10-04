@@ -4,6 +4,7 @@
   "displayName": "Gus",
   "proportions": { "height": 0.98, "headRadius": 0.18, "neck": 0.02, "torso": 0.27, "upperArm": 0.15, "forearm": 0.14, "thigh": 0.16, "shin": 0.16 },
   "style": {
+    "build": "toon",
     "stroke": "#1b1b1f",
     "strokeWidth": 12,
     "headFill": "#ffffff",
@@ -16,6 +17,31 @@
   },
   "face": { "eyes": "big-pupil", "brows": true, "mouthSet": "default", "offsetX": 0.16, "eyeSpacing": 0.46, "eyeY": -0.02, "mouthY": 0.46 },
   "accessories": [{ "slot": "headwear", "id": "flatcap-01", "color": "#6b5a48" }],
+  "toon": {
+    "proportions": { "height": 0.98, "headRadius": 0.132, "neck": 0.008, "torso": 0.317, "upperArm": 0.175, "forearm": 0.162, "thigh": 0.205, "shin": 0.198 },
+    "skin": "#a5694a",
+    "skinShade": "#8a533a",
+    "body": { "shoulders": 116, "hips": 86, "arm": 25, "neck": 26 },
+    "eyes": { "iris": "#4a2c1a" },
+    "brows": { "color": "#1a110c", "thickness": 8, "gap": 0.36 },
+    "lip": "#4a2419",
+    "nose": "hook",
+    "cheeks": { "color": "#e8737a", "opacity": 0.18 },
+    "hair": { "kind": "curly-mop", "fill": "#271a14", "shade": "#4b3327" },
+    "top": { "kind": "tee", "fill": "#e4573a", "print": "#fff3dc" },
+    "outer": {
+      "kind": "varsity",
+      "fill": "#5b3da0",
+      "shade": "#472e84",
+      "sleeve": { "fill": "#f3b23a", "shade": "#d9962a" },
+      "rib": "#f3b23a",
+      "ribStripe": "#5b3da0",
+      "cuffAt": 0.74
+    },
+    "bottom": { "kind": "jeans", "fill": "#2f4c7a", "shade": "#253d63", "cuff": "#7d9fd0" },
+    "shoes": { "kind": "sneaker", "fill": "#fbf8f1", "accent": "#5b3da0", "lace": "#e4573a", "sole": "#e4573a" },
+    "details": [{ "id": "star-patch" }, { "id": "headphones" }, { "id": "freckles", "color": "#8a533a" }]
+  },
   "energy": 0.45,
   "personality": "the skeptic: confident, plausible and wrong, never stupid. Says what most people believe, then changes his mind on screen.",
   "voice": { "say": "Fred" }

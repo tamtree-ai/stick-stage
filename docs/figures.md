@@ -21,14 +21,14 @@ A scene lists its figures (a single-scene skit puts `figures` at the top level):
 | Field | Meaning |
 |---|---|
 | `id` | Cues and anchors name it |
-| `kind` | `plot`, `axes`, `vector`, `wave`, `orbit`, `particles`, `label`, `callout`, `numberline`, `scale`, `histogram`, `equation`, `image` |
+| `kind` | `plot`, `axes`, `vector`, `wave`, `orbit`, `particles`, `label`, `callout`, `numberline`, `scale`, `histogram`, `equation`, `image`, `progress`, `galaxy`, `burst`, `fineprint` |
 | `at` | Centre `x`, `y` and size `w`, `h`, fractions of the frame |
 | `params` | Per kind (below). Checked at compile with a path to the bad field |
 | `states`, `state` | Named param sets (`myth`, `truth`), merged over `params`; a state may set `label` |
 | `hidden` | Off until a `show` cue. Default: on from the scene start |
 | `reveal` | `draw` (default), `fade`, `pop`, `none` |
 | `label` | Caption, drawn as a title above the box |
-| `layer` | `back` (behind the cast, default) or `front` |
+| `layer` | `back` (behind the cast, default), `front`, or `screen` (over everything and fixed to the frame: a punch-in or shake doesn't move it, so an inset stays on screen) |
 | `panel` | A soft card behind it, for busy sets |
 | `tag` | Corner note: `"not to scale"`, `"cartoon model"` |
 
@@ -70,10 +70,18 @@ orbit adds `star`, `perihelion`, `aphelion`; a plot `origin`; an equation each t
 | `histogram` | `source`: `dice`, `two-dice`, `coin`, `normal`, `values`; `n` (animate it), `expected`, `share` |
 | `equation` | `tex`, `show` (parts so far), `highlight`, `strike` (term classes) |
 | `image` | `image` (id in `images.json`), `frame`: `border`, `eyepiece`, `monitor`, `none`; `from` / `to` pan and zoom |
+| `progress` | Shares of a whole as one bar: `segments: [{ label, value, color, dim, ask }]`, `total` (100), `unit` (`%`), `readout` (`"{0}% read"`, shown once segment 0 has a value), `restAsk` (a `?` on the empty rest), `here: { segment, text, show }` (a "you are here ↑" chip). `dim`, `ask`, `show` are 0…1, so `set` cues tween them |
+| `galaxy` | A spiral galaxy: `spin` (°/s), `speedLines` (0…1, "spins too fast" arcs), `tilt`, `caption` |
+| `burst` | A supernova pop on `show`: star and rays burst, settle to a glow after `hold` s; `color` |
+| `fineprint` | A wall of tiny contract text: `text` (repeated), `size`, `color`, `fill` (lines shown, animate it) |
 
 **Expressions** (`fn`, marker `x`/`y`) are a small safe language: numbers, variables (`x` and the
 plot's `vars`), `+ - * / ^`, `pi`, `e`, and `sin cos tan exp ln log sqrt abs min max floor pow …`.
 No `eval`. Animate a variable with a `set` cue on `vars`.
+
+**Part of a whole → `progress`, not `histogram`.** When the values add up to a total (5 / 27 / 68 %),
+one bar shows the share directly and the empty rest of the track is the part not yet explained. A
+histogram is for counts and distributions. `fine-print` is the worked example.
 
 **Colours** are theme slots: `ink`, `muted`, `accent`, `a1`…`a5`, `highlight`, `myth`, `truth`,
 `paper` (or a hex). The theme follows the set: ink on light grounds, chalk on the mid-tone science

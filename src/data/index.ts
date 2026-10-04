@@ -31,6 +31,8 @@ import holdUp from "./poses/hold-up.json";
 import highFive from "./poses/high-five.json";
 import shove from "./poses/shove.json";
 import faintPose from "./poses/faint.json";
+import wavePose from "./poses/wave.json";
+import thumbsUp from "./poses/thumbs-up.json";
 
 import { PROP_DOCS, PROP_IDS } from "./props";
 import miloJune from "./series/milo-june.json";
@@ -48,6 +50,11 @@ import crying from "./expressions/crying.json";
 import cringe from "./expressions/cringe.json";
 import confused from "./expressions/confused.json";
 import deadpan from "./expressions/deadpan.json";
+import skeptical from "./expressions/skeptical.json";
+import worried from "./expressions/worried.json";
+import embarrassed from "./expressions/embarrassed.json";
+import thinking from "./expressions/thinking.json";
+import laughing from "./expressions/laughing.json";
 
 import plain1 from "./sets/plain-1.json";
 import living1 from "./sets/living-1.json";
@@ -76,6 +83,7 @@ import wideClassroom from "./sets/wide-classroom.json";
 import void1 from "./sets/void-1.json";
 import blueprint1 from "./sets/blueprint-1.json";
 import space1 from "./sets/space-1.json";
+import space2 from "./sets/space-2.json";
 import lab1 from "./sets/lab-1.json";
 
 import castNotesJson from "./cast-notes.json";
@@ -90,21 +98,23 @@ import pronunciationsJson from "./pronunciations.json";
 /** Order matters: labs cycle through poses/expressions in this order. */
 export const POSE_IDS = ["idle", "point", "shrug", "facepalm", "arms-up", "arms-crossed", "think", "lean-in", "recoil", "slump", "hands-on-hips", "hold-phone"];
 /** Poses added after M1 (labs that cycle POSE_IDS skip these). */
-export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up", "high-five", "shove", "faint"];
+export const EXTRA_POSE_IDS = ["sit", "hold-out", "hold-chest", "hold-up", "high-five", "shove", "faint", "wave", "thumbs-up"];
 export { PROP_IDS };
 export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed", "angry", "shocked", "sad", "crying", "cringe", "confused", "deadpan"];
+/** Expressions added with the toon tier (labs that cycle EXPRESSION_IDS skip these; FaceLab can include them). */
+export const EXTRA_EXPRESSION_IDS = ["skeptical", "worried", "embarrassed", "thinking", "laughing"];
 
 export const library: Library = createLibrary({
   characters: [milo, june, lila, theo, moss, dash, reed, nell, pip, vera, gus],
-  poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose],
-  expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan],
+  poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose, wavePose, thumbsUp],
+  expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan, skeptical, worried, embarrassed, thinking, laughing],
   props: PROP_DOCS,
 });
 
 export const sets: Record<string, SetDef> = createSets([
   plain1, living1, lounge1, office1, park1, street1, kitchen1, bedroom1, cafe1, classroom1, meeting1, living2, park2, streetNight1, beach1, stage1,
   widePlain, wideLiving, wideLounge, wideOffice, widePark, wideStreet, wideCafe, wideClassroom,
-  void1, blueprint1, space1, lab1,
+  void1, blueprint1, space1, space2, lab1,
 ]);
 
 /** One conservative profile for TikTok / Reels / Shorts overlays (verify against real screenshots in M4). */

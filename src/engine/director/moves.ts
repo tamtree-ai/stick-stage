@@ -1,3 +1,4 @@
+import { proportionsOf } from "../rig/build";
 import { gaitFrames, type GaitKind } from "../rig/gait";
 import { toAngles } from "../rig/pose";
 import { solveSkeleton } from "../rig/skeleton";
@@ -58,7 +59,7 @@ const reach = (ctx: MoveCtx, c: CastTrack, pose: string): number => {
 /** Half the body's width at the chest (what a shove lands on). */
 const chest = (ctx: MoveCtx, c: CastTrack): number => {
   const ch = ctx.lib.characters[c.character]!;
-  const h = ctx.set.figureHeightPx * ch.proportions.height;
+  const h = ctx.set.figureHeightPx * proportionsOf(ch).height;
   return ch.style.torso.style === "bean" ? (ch.style.torso.width * h) / 2 : ch.style.strokeWidth;
 };
 

@@ -30,7 +30,7 @@ reaction close-up after the punchline); your job is to add what the joke needs a
 - A premise. Either `public/skits/<id>/premise.json` (template, cast, lines with roles, see
   `src/engine/templates/premise.ts`), or lines pasted by a person, which you copy **verbatim** into a
   `premise.json` first.
-- Cast: character ids from `src/data/characters/*.json` (`milo`, `june`, `lila`, `theo`, `moss`, `dash`).
+- Cast: character ids from `src/data/characters/*.json` (comedy: `milo`, `june`, `lila`, `theo`, `moss`, `dash`, plus `nell`, `pip`, `reed` for 16:9 only; science, drawn as toons: `vera`, `gus`). For a science short, also follow `skills/science-short/SKILL.md`.
 - Set: `src/data/sets/*.json`; each has a `description` and `tags` (the service lists them at
   `GET /sets`). Seats: `office-1` (chair at `left`), `lounge-1` (couch), `park-1` (bench) and
   `bedroom-1` (bed) seat whoever stands on a seated mark; premise staging sets `seated` for you.
@@ -58,7 +58,6 @@ pnpm direct <id> --say --json          # validate → dev voices → prep → co
      (`"at": { "word": "fine", "occurrence": 2 }`). Big gestures (`arms-up`, `recoil`) are for peaks.
    - Physical comedy: `walkTo` (entrances/exits via `off-left`/`off-right`, `speed: "run"`),
      `highFive`, `shove`, `hop`, `slideTo`, `sit`/`stand`, props (`hold`/`putAway`/`drop`), symbols
-     A premise line may already name one `prop`. Staging holds it. Do not add a second hold for that object.
      A premise line may already name one `prop`. Staging holds it. Do not add a second hold for that object.
      (`sweat`, `anger`, `blush`, `tears`, `exclaim`, `question`, `speed-lines`).
    - SFX sparingly: 1–3 per skit, on a physical hit or the punchline turn (`pnpm render SfxLab`,
@@ -186,14 +185,6 @@ The example lines illustrate staging only; they are not material to post.
 If the person names a series, read `src/data/series/<id>.json` before staging and set `meta.series` to `{ id, season, episode }`. Do not invent a series, a season, or a catchphrase. Words that are the joke go on the object: `text` on a sign hold (one line), `screen` on a laptop hold, and a scene `labels` entry for a `board` (`text`), `desk` or `tv` (`screen`). See `docs/skits.md`.
 
 A cast beat with `"voiceOver": true` is a thought: their own voice, mouth shut, italic caption. `"music": "room"` is the one original bed. It ducks under dialog and drops out on the punchline. Do not add another track.
-
-## Speech, gags, and style
-
-Speakers already nod and gesture while they talk (`speechMotion`, default on). Do not add a cycling pose on every line. An authored `pose` still wins. One optional gag per line, from `src/data/gags/`: `double-take`, `look-to-camera`, `spit-take` (needs the cup), `faint`, `slow-clap`, `walk-out`, `freeze-frame`. Write it as `{ "who", "do": "gag", "gag" }`.
-
-`style` is `classic` (the default), `deadpan`, `snappy`, `chaotic`, or `sitcom`. A skit inherits `series.style` when it omits its own. `coldOpen` may be `pov`, `none`, or `teaser` (a flash of the punchline reaction, then a rewind into beat one).
-
-`meta.language` is a BCP 47 tag. A dub lives in `i18n.<lang>` (`lines`, `slams`, `pov`, `cards`, `labels`) and is rendered with `pnpm render <id> --lang=<tag>`. Workspace characters go on `characters` and are never copied into `src/data/`.
 
 ## Speech, gags, and style
 

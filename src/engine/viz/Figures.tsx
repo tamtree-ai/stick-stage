@@ -8,8 +8,13 @@ import { Orbit, Particles } from "./draw/orbitParticles";
 import { Axes, Plot } from "./draw/plot";
 import { Callout, Histogram, Label, NumberLine } from "./draw/scales";
 import { Vectors, Wave } from "./draw/vectorWave";
+import { Burst, FinePrint, GalaxyFig, Progress } from "./draw/cosmos";
 import type {
   AxesP,
+  BurstP,
+  FinePrintP,
+  GalaxyP,
+  ProgressP,
   CalloutP,
   EquationP,
   HistogramP,
@@ -27,7 +32,7 @@ import { activeSpan, evalFigure, strikeRedraw, type FigureTrack, type Params } f
 
 export type FiguresProps = {
   figures: readonly FigureTrack[];
-  layer: "back" | "front";
+  layer: "back" | "front" | "screen";
   frame: number;
   fps: number;
   width: number;
@@ -82,6 +87,14 @@ const Body: React.FC<{
       return <NumberLine {...as<NumberLineP>()} fs={fs} />;
     case "histogram":
       return <Histogram {...as<HistogramP>()} fs={fs} />;
+    case "progress":
+      return <Progress {...as<ProgressP>()} fs={fs} />;
+    case "galaxy":
+      return <GalaxyFig {...as<GalaxyP>()} fs={fs} />;
+    case "burst":
+      return <Burst {...as<BurstP>()} />;
+    case "fineprint":
+      return <FinePrint {...as<FinePrintP>()} />;
     case "equation":
       return <Equation {...as<EquationP>()} typeset={f.typeset} />;
     case "image": {

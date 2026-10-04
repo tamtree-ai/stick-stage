@@ -1,6 +1,6 @@
 # StickStage
 
-Stick-figure comedy-skit engine on Remotion, for our own channel. Plan: `../planning/2026-09-26-revised-plan/plan.md` (milestones, gates, data contracts). Decisions not in the plan go in `DECISIONS.md`.
+Comedy-skit and science-short engine on Remotion, for our own channels. Characters draw as stick figures or as toons (`style.build`). Plan: `../planning/2026-09-26-revised-plan/plan.md` (milestones, gates, data contracts). Science channel: `../planning/2026-09-29-science-channel/`. Toon tier: `../planning/2026-10-02-toon-characters/`. Decisions not in a plan go in `DECISIONS.md`.
 
 ## Core rules
 1. **Frame-pure rendering.** Every visual is a pure function of `(frame, props)`. No `useState`/`useEffect` for animation, no CSS animations, no `Date`, no `Math.random()`. Use seeded `rand()` / `noise()` from `src/engine/lib/seed.ts`.
@@ -31,6 +31,10 @@ Stick-figure comedy-skit engine on Remotion, for our own channel. Plan: `../plan
 ## Skills
 - `topic-to-video` (`skills/topic-to-video/SKILL.md`): a topic → a ~30 s skit, end to end (writes the jokes, stages, renders, packages). Use it when asked to "make a video about X".
 - `skit-director` (`skills/skit-director/SKILL.md`): stages a human-written premise; never writes or changes a line.
+- `science-short` (`skills/science-short/SKILL.md`): a myth-flip science short with Vera and Gus, figures on the word, claims with sources; never approves.
+- `toon-character` (`skills/toon-character/SKILL.md`): add or change a toon character, a garment/hair kind, or a toon-only pose fix without touching stick drawings.
+
+Path-scoped rules live in `.claude/rules/` (`toon-rig.md` for the rig, characters and poses; `science-skits.md` for skits, figures and approval).
 
 ## Voice
 The **engine and the render service never call a TTS or an LLM.** In production the tamtree agent harness generates audio (+ optional word timings) and writes `voice.json`; see `docs/voice-contract.md`. Dev scripts in `scripts/` may (standalone mode, D1): `voice:tts` (Kokoro), `voice:say`, `write --model` / `try` (the user's own `LOCAL_LLM_*`). Never put provider keys in the repo.
@@ -39,6 +43,7 @@ The **engine and the render service never call a TTS or an LLM.** In production 
 - `src/engine/lib`: math (angle convention in `math.ts`), easing, seeds, colors
 - `src/engine/rig`: schema, FK skeleton (`solveSkeleton`), pose tracks, idle/blinks, Bézier limbs (or `style.limbs` tubes for animals), accessories (animal parts in `animalParts.tsx` / `animalHeads.tsx`), `evalActor` (`actorState.ts`: pose, expression, speech, seat, prop and symbol tracks), `<Actor>`
 - `src/engine/rig/seat.ts`: seat track + seated-leg IK (hip on the seat, feet planted)
+- `src/engine/rig/toon/`: the toon drawing tier (`style.build: "toon"` + a `toon` block): `ToonRig` on the same joints, clothes, limbs, hands, shoes, head and face. `rig/build.ts`: `toonOf`, `proportionsOf` (read body proportions through it), `withBuild`. A pose's `toon` block overrides arm angles and hands for toons only (`toonPoses` in `actorState.ts`). Guide: `docs/creating-characters.md`
 - `src/engine/props`: prop schema, per-kind drawings (`draw.tsx`), hold/drop track + fall (`track.ts`), `<PropView>`
 - `src/engine/face`: expression schema, parametric mouths (`mouths.ts`), eyes/brows/mouth/symbols (`Emanata.tsx`: !, ?, speed lines)
 - `src/engine/face/visemes.ts`: Rhubarb A–H/X → mouth params, `speechMouth` layers speech on the expression mouth
@@ -54,7 +59,7 @@ The **engine and the render service never call a TTS or an LLM.** In production 
 - `src/data`: JSON library + `index.ts` loader (validates on import), `safe-area.json`, `reactions.json` (listener reaction defaults), `sfx.json` (SFX manifest with licenses)
 - `scripts/`: `sheet.ts`, `voice-say.ts`, `prep.ts`, `compile.ts`, `render.ts`, `sfx-gen.ts`, `lib/` (prep, skit loading, Rhubarb + bundled ffmpeg, WAV reading, `synth.ts` DSP)
 - `public/skits/<id>/`: `skit.json` (labs: `script.json`), `voice.json`, `voice/*.wav` (committed); `generated/` (gitignored)
-- `src/app`: Remotion root and lab compositions (`CharacterLab`, `FaceLab`, `CloseupLab`, `CloseupSheet`, `PoseLab`, `TalkLab`, `SetLab`, `PropLab`, `StagingLab`, `SfxLab`, `ContactSheet`), `skit/` (the `Skit` / `SkitDebug` compositions); `fonts.ts` loads the local text font
+- `src/app`: Remotion root and lab compositions (`CharacterLab`, `FaceLab` (labs take `build: stick | toon` to compare tiers; `*Toon` compositions), `CloseupLab`, `CloseupSheet`, `PoseLab`, `TalkLab`, `SetLab`, `PropLab`, `StagingLab`, `SfxLab`, `ContactSheet`), `skit/` (the `Skit` / `SkitDebug` compositions); `fonts.ts` loads the local text font
 
 ## Rig conventions
 Canonical view faces right; `facing: "left"` mirrors. `L` = back limb, `R` = front limb. Arms: 0° hangs along the torso, +90° forward, 180° up; elbow + flexes forward. Legs are world-relative (0° down, + forward); knee + bends back. The rig lifts the figure so the lowest foot touches `groundY`.

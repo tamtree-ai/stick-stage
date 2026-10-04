@@ -1,4 +1,5 @@
 import { add, dirFromAngle, lerp, scale, type Vec2 } from "../lib/math";
+import { proportionsOf } from "./build";
 import type { Character, PoseAngles } from "./schema";
 import { blendLegs, seatContact, seatedLegs, type SeatState } from "./seat";
 
@@ -32,7 +33,7 @@ export type RigMetrics = {
 };
 
 export const rigMetrics = (c: Character, figureHeightPx: number): RigMetrics => {
-  const heightPx = figureHeightPx * c.proportions.height;
+  const heightPx = figureHeightPx * proportionsOf(c).height;
   const sw = c.style.strokeWidth;
   return {
     heightPx,
@@ -63,7 +64,7 @@ export const solveSkeleton = (
 ): Joints => {
   const m = rigMetrics(c, figureHeightPx);
   const H = m.heightPx;
-  const P = c.proportions;
+  const P = proportionsOf(c);
 
   // Legs are world-relative, measured from the hip at the origin.
   const seat = extras.seat;

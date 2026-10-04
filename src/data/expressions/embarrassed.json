@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "embarrassed", "eyes": { "lid": 0.15, "gaze": { "x": -0.7, "y": 0.4 } }, "brows": { "raise": 0.4, "tilt": 14 }, "mouth": "wobble", "symbols": ["blush", "sweat"] }

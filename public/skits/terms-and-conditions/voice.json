@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "milo",
+      "text": "You clicked I agree in under one second!",
+      "audio": "voice/l1.wav",
+      "durationMs": 2197
+    },
+    {
+      "id": "l2",
+      "speaker": "june",
+      "text": "Personal best.",
+      "audio": "voice/l2.wav",
+      "durationMs": 927
+    },
+    {
+      "id": "l3",
+      "speaker": "milo",
+      "text": "That's forty pages. You didn't read one word.",
+      "audio": "voice/l3.wav",
+      "durationMs": 2972
+    },
+    {
+      "id": "l4",
+      "speaker": "june",
+      "text": "Reading every privacy policy you accept takes seventy-six work days a year.",
+      "audio": "voice/l4.wav",
+      "durationMs": 4338
+    },
+    {
+      "id": "l5",
+      "speaker": "milo",
+      "text": "Fine. I'll read it. Clause nine: they can rename your dog.",
+      "audio": "voice/l5.wav",
+      "durationMs": 4131
+    },
+    {
+      "id": "l6",
+      "speaker": "june",
+      "text": "He never liked Biscuit.",
+      "audio": "voice/l6.wav",
+      "durationMs": 1238
+    },
+    {
+      "id": "l7",
+      "speaker": "milo",
+      "text": "Clause forty-seven: they get your firstborn child!",
+      "audio": "voice/l7.wav",
+      "durationMs": 3251
+    },
+    {
+      "id": "l8",
+      "speaker": "june",
+      "text": "Only on weekends. Read the fine print.",
+      "audio": "voice/l8.wav",
+      "durationMs": 2466
+    },
+    {
+      "id": "l9",
+      "speaker": "milo",
+      "text": "Wait. How do you know the fine print without reading it?",
+      "audio": "voice/l9.wav",
+      "durationMs": 3149
+    },
+    {
+      "id": "l10",
+      "speaker": "june",
+      "text": "I wrote it.",
+      "audio": "voice/l10.wav",
+      "durationMs": 577
+    }
+  ]
+}

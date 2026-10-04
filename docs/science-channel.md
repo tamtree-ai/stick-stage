@@ -62,8 +62,17 @@ line carries the hints it needs (`pronounce`). See [voice-contract.md](voice-con
 
 ## The look
 
-- Sets: `void-1` (the main stage), `blueprint-1`, `lab-1`, `space-1`. The grounds are mid-tone on
-  purpose: dark outlines keep ≥ 3:1 against every tone, and figures switch to chalk colours.
+- Cast: Vera and Gus are **toons** (`style.build: "toon"`; [creating-characters.md](creating-characters.md#the-toon-tier)).
+  The comedy cast stays stick.
+- Sets: `void-1` (the main stage), `blueprint-1`, `lab-1`, `space-1`, and `space-2` (Nebula night, a
+  dark sky). The older grounds are mid-tone on purpose: dark outlines keep ≥ 3:1 against every
+  tone. A dark palette sets `rim`, and Stage puts a light rim around the cast so dark outlines still
+  read.
+- Hook card: `overlay.hook` puts a short text card on screen from frame 0 for muted viewers, and it
+  leaves when the first line ends (`fine-print`: "He read the whole universe.").
+- Figures for parts of a whole: `progress` (one bar, segments that fill on a word, a `readout`).
+  Space extras: `galaxy`, `burst`, `fineprint`. A figure on `layer: "screen"` stays put through
+  punch-ins.
 - Props (categories `maths`, `science`): dice, coin, `ball` and `heavy-ball`, chalk, pointer stick,
   protractor, `number-card` (a card with a number: `"text": "7"`), magnifying glass, magnets,
   battery, light bulb, prism, beaker, flask, test tube, laser pointer, telescope.

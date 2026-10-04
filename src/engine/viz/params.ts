@@ -202,7 +202,7 @@ export const CalloutParams = z.strictObject({
   ]),
 });
 
-import { EquationParams, HistogramParams, ImageParams, NumberLineParams } from "./paramsMore";
+import { BurstParams, EquationParams, FinePrintParams, GalaxyParams, HistogramParams, ImageParams, NumberLineParams, ProgressParams } from "./paramsMore";
 
 export const FIGURE_PARAMS = {
   plot: PlotParams,
@@ -218,6 +218,10 @@ export const FIGURE_PARAMS = {
   histogram: HistogramParams,
   equation: EquationParams,
   image: ImageParams,
+  progress: ProgressParams,
+  galaxy: GalaxyParams,
+  burst: BurstParams,
+  fineprint: FinePrintParams,
 } as const;
 export type FigureKind = keyof typeof FIGURE_PARAMS;
 export const FIGURE_KINDS = Object.keys(FIGURE_PARAMS) as FigureKind[];
@@ -234,3 +238,7 @@ export type NumberLineP = z.infer<typeof NumberLineParams>;
 export type HistogramP = z.infer<typeof HistogramParams>;
 export type EquationP = z.infer<typeof EquationParams>;
 export type ImageP = z.infer<typeof ImageParams>;
+export type ProgressP = z.infer<typeof ProgressParams>;
+export type GalaxyP = z.infer<typeof GalaxyParams>;
+export type BurstP = z.infer<typeof BurstParams>;
+export type FinePrintP = z.infer<typeof FinePrintParams>;

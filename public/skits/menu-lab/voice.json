@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "b1",
+      "speaker": "gus",
+      "text": "Hi! Can I see the menu?",
+      "audio": "voice/b1.wav",
+      "durationMs": 2259
+    },
+    {
+      "id": "b2",
+      "speaker": "vera",
+      "text": "Today the menu is one thing.",
+      "audio": "voice/b2.wav",
+      "durationMs": 1618
+    },
+    {
+      "id": "b3",
+      "speaker": "gus",
+      "text": "Great. I'll have the other thing.",
+      "audio": "voice/b3.wav",
+      "durationMs": 2449
+    },
+    {
+      "id": "b4",
+      "speaker": "vera",
+      "text": "There is no other thing.",
+      "audio": "voice/b4.wav",
+      "durationMs": 1184
+    },
+    {
+      "id": "b5",
+      "speaker": "gus",
+      "text": "Then I'll have it twice.",
+      "audio": "voice/b5.wav",
+      "durationMs": 1446
+    }
+  ]
+}

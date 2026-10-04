@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "id": "worried", "eyes": { "gaze": { "x": 0, "y": 0.25 } }, "brows": { "raise": 0.5, "tilt": 18 }, "mouth": "frown" }
