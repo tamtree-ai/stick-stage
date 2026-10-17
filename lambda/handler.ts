@@ -39,8 +39,11 @@ try {
 }
 
 const s3 = new S3Client({});
+// Lambda has no GPU: without software GL, Chrome's GPU process hangs and Remotion times out
+// connecting. One Chrome process is also kinder to the sandbox and to a small vCPU share.
+const chromiumOptions = { gl: "swangle", enableMultiProcessOnLinux: false } as const;
 // Once per container: the Remotion bundle is built on the first render and reused while warm.
-const backend = remotionBackend({ entryPoint: path.join(ROOT, "src/app/index.ts"), browserExecutable: process.env.STICKSTAGE_BROWSER || undefined, symlinkPublicDir: true });
+const backend = remotionBackend({ entryPoint: path.join(ROOT, "src/app/index.ts"), browserExecutable: process.env.STICKSTAGE_BROWSER || undefined, chromiumOptions, symlinkPublicDir: true });
 const run = renderPipeline({ project: PROJECT, backend, prep: childPrep(ROOT, { requireLipSync: true }), skitIdOf: (id) => `${JOBS}/${id}` });
 
 export const handler = async (event: Envelope, context: LambdaContext): Promise<Reply | null> => {

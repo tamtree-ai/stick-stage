@@ -4,7 +4,7 @@
  * by default) with the components from `stickstage/remotion`.
  */
 import { bundle } from "@remotion/bundler";
-import { renderFrames, renderMedia, renderStill, selectComposition, type CancelSignal } from "@remotion/renderer";
+import { renderFrames, renderMedia, renderStill, selectComposition, type CancelSignal, type ChromiumOptions } from "@remotion/renderer";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -46,13 +46,15 @@ export const remotionBackend = (opts: {
   compositions?: { skit?: string; debug?: string; sheet?: string };
   /** Use this Chrome / headless shell instead of Remotion's download. */
   browserExecutable?: string;
+  /** Chrome flags for every render, e.g. `{ gl: "swangle" }` where there is no GPU (AWS Lambda). */
+  chromiumOptions?: ChromiumOptions;
   /**
    * Symlink `public/` into the bundle instead of copying it, so skit folders written after the
    * one-time bundle are still served (long-running services). No effect on Windows.
    */
   symlinkPublicDir?: boolean;
 }): RenderBackend => {
-  const browserExecutable = opts.browserExecutable ?? null;
+  const browser = { browserExecutable: opts.browserExecutable ?? null, chromiumOptions: opts.chromiumOptions ?? {} };
   const ids = { skit: "Skit", debug: "SkitDebug", sheet: "ContactSheet", ...opts.compositions };
   let bundled: Promise<string> | undefined;
   const serveUrl = () => (bundled ??= bundle({ entryPoint: opts.entryPoint, symlinkPublicDir: opts.symlinkPublicDir ?? false }));
@@ -60,10 +62,10 @@ export const remotionBackend = (opts: {
   const renderSkit: RenderBackend["renderSkit"] = async (skitId, out, o = {}) => {
     const url = await serveUrl();
     const inputProps = { skit: skitId, showLabels: !!o.debug, ...(o.omitHook ? { omitHook: true } : {}), ...(o.lang ? { lang: o.lang } : {}) };
-    const composition = await selectComposition({ serveUrl: url, id: o.debug ? ids.debug : ids.skit, inputProps, browserExecutable });
+    const composition = await selectComposition({ serveUrl: url, id: o.debug ? ids.debug : ids.skit, inputProps, ...browser });
     fs.mkdirSync(path.dirname(out), { recursive: true });
     await renderMedia({
-      browserExecutable,
+      ...browser,
       serveUrl: url,
       composition,
       inputProps,
@@ -82,7 +84,7 @@ export const remotionBackend = (opts: {
 
   const renderSheet: RenderBackend["renderSheet"] = async (o) => {
     const url = await serveUrl();
-    const comp = await selectComposition({ serveUrl: url, id: o.id, inputProps: o.inputProps, browserExecutable });
+    const comp = await selectComposition({ serveUrl: url, id: o.id, inputProps: o.inputProps, ...browser });
     const from = o.from ?? 0;
     const to = Math.min(o.to ?? comp.durationInFrames - 1, comp.durationInFrames - 1);
     const step = Math.max(1, o.step ?? Math.ceil((to - from + 1) / (o.maxTiles ?? 48)));
@@ -90,7 +92,7 @@ export const remotionBackend = (opts: {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "stickstage-sheet-"));
     try {
       await renderFrames({
-        browserExecutable,
+        ...browser,
         serveUrl: url,
         composition: comp,
         inputProps: comp.props,
@@ -115,9 +117,9 @@ export const remotionBackend = (opts: {
         tileWidth: Math.round(comp.width * scale),
         tileHeight: Math.round(comp.height * scale),
       };
-      const sheet = await selectComposition({ serveUrl: url, id: ids.sheet, inputProps: sheetProps, browserExecutable });
+      const sheet = await selectComposition({ serveUrl: url, id: ids.sheet, inputProps: sheetProps, ...browser });
       fs.mkdirSync(path.dirname(o.out), { recursive: true });
-      await renderStill({ serveUrl: url, composition: sheet, inputProps: sheetProps, output: o.out, imageFormat: "png", browserExecutable });
+      await renderStill({ serveUrl: url, composition: sheet, inputProps: sheetProps, output: o.out, imageFormat: "png", ...browser });
       return o.out;
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
@@ -127,17 +129,17 @@ export const remotionBackend = (opts: {
   const still: RenderBackend["renderStill"] = async (skitId, frame, out, o = {}) => {
     const url = await serveUrl();
     const inputProps = { skit: skitId, showLabels: !!o.debug };
-    const composition = await selectComposition({ serveUrl: url, id: o.debug ? ids.debug : ids.skit, inputProps, browserExecutable });
+    const composition = await selectComposition({ serveUrl: url, id: o.debug ? ids.debug : ids.skit, inputProps, ...browser });
     fs.mkdirSync(path.dirname(out), { recursive: true });
-    await renderStill({ serveUrl: url, composition, inputProps, frame, output: out, imageFormat: "png", browserExecutable, timeoutInMilliseconds: o.timeoutInMilliseconds });
+    await renderStill({ serveUrl: url, composition, inputProps, frame, output: out, imageFormat: "png", ...browser, timeoutInMilliseconds: o.timeoutInMilliseconds });
     return out;
   };
 
   const renderComposition: RenderBackend["renderComposition"] = async (id, inputProps, out) => {
     const url = await serveUrl();
-    const composition = await selectComposition({ serveUrl: url, id, inputProps, browserExecutable });
+    const composition = await selectComposition({ serveUrl: url, id, inputProps, ...browser });
     fs.mkdirSync(path.dirname(out), { recursive: true });
-    await renderStill({ serveUrl: url, composition, inputProps, output: out, imageFormat: "png", browserExecutable });
+    await renderStill({ serveUrl: url, composition, inputProps, output: out, imageFormat: "png", ...browser });
     return out;
   };
 

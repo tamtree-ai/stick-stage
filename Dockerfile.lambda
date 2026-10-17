@@ -51,10 +51,13 @@ RUN pnpm install --frozen-lockfile \
 COPY . .
 RUN node -e "if (typeof Intl.Segmenter !== 'function') process.exit(1); new Intl.Segmenter('ja', { granularity: 'word' })"
 # Lambda's filesystem is read-only except /tmp, so job folders live there; and Lambda runs as an
-# unprivileged user, so everything must be world-readable.
+# unprivileged user, so everything must be world-readable. Remotion launches Chrome through
+# `setpriv --pdeathsig` whenever setpriv is on PATH, and Lambda's sandbox refuses setpriv's
+# capability call ("keep process capabilities failed"), so Chrome never starts: remove it.
 RUN node_modules/.bin/remotion browser ensure \
  && rm -rf public/skits/_jobs && ln -s /tmp/jobs public/skits/_jobs \
- && chmod -R a+rX /app /opt/rhubarb /opt/ric
+ && chmod -R a+rX /app /opt/rhubarb /opt/ric \
+ && rm -f /usr/bin/setpriv
 
 ENV NODE_ENV=production \
     RHUBARB_PATH=/opt/rhubarb/rhubarb \
