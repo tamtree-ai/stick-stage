@@ -17,5 +17,5 @@
     "lib": ["DOM", "ES2022"],
     "types": ["node"]
   },
-  "include": ["src", "scripts", "tests", "remotion.config.ts", "vitest.config.ts", "eslint.config.js"]
+  "include": ["src", "scripts", "tests", "lambda", "remotion.config.ts", "vitest.config.ts", "eslint.config.js"]
 }
