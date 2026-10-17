@@ -53,11 +53,13 @@ export const remotionBackend = (opts: {
    * one-time bundle are still served (long-running services). No effect on Windows.
    */
   symlinkPublicDir?: boolean;
+  /** A bundle made ahead of time (`bundle()`'s outDir): renders use it instead of bundling on first use. */
+  bundleDir?: string;
 }): RenderBackend => {
   const browser = { browserExecutable: opts.browserExecutable ?? null, chromiumOptions: opts.chromiumOptions ?? {} };
   const ids = { skit: "Skit", debug: "SkitDebug", sheet: "ContactSheet", ...opts.compositions };
   let bundled: Promise<string> | undefined;
-  const serveUrl = () => (bundled ??= bundle({ entryPoint: opts.entryPoint, symlinkPublicDir: opts.symlinkPublicDir ?? false }));
+  const serveUrl = () => (bundled ??= opts.bundleDir ? Promise.resolve(opts.bundleDir) : bundle({ entryPoint: opts.entryPoint, symlinkPublicDir: opts.symlinkPublicDir ?? false }));
 
   const renderSkit: RenderBackend["renderSkit"] = async (skitId, out, o = {}) => {
     const url = await serveUrl();

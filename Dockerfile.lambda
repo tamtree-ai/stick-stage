@@ -15,7 +15,8 @@ RUN set -eux; \
     echo "a9a9074862cff47b2d59b8bf399a678a3b0b74f9452ad6ad94cb292913dd8667  /tmp/rhubarb.zip" | sha256sum -c -; \
     unzip -q /tmp/rhubarb.zip -d /opt; \
     mv "/opt/Rhubarb-Lip-Sync-${RHUBARB_VERSION}-Linux" /opt/rhubarb; \
-    rm /tmp/rhubarb.zip
+    rm /tmp/rhubarb.zip; \
+    chmod -R a+rX /opt/rhubarb
 
 # The Lambda Runtime Interface Client is a native addon: build it apart so the compilers stay out of the image.
 FROM node:22-bookworm-slim AS ric
@@ -24,7 +25,7 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends g++ make cmake unzip libcurl4-openssl-dev autoconf automake libtool python3; \
     rm -rf /var/lib/apt/lists/*
 WORKDIR /opt/ric
-RUN npm init -y >/dev/null && npm install aws-lambda-ric@3
+RUN npm init -y >/dev/null && npm install aws-lambda-ric@3 && chmod -R a+rX /opt/ric
 
 FROM node:22-bookworm-slim
 
@@ -44,25 +45,32 @@ COPY --from=ric /opt/ric /opt/ric
 RUN npm install -g pnpm@11.17.0
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-# Kokoro is a dev-script dependency the render never uses (see Dockerfile).
+# Kokoro is a dev-script dependency the render never uses (see Dockerfile). Lambda runs as an
+# unprivileged user, so every layer makes its own files world-readable in the step that writes
+# them: a chmod in a later layer would store a second copy of node_modules.
 RUN pnpm install --frozen-lockfile \
  && rm -rf node_modules/kokoro-js node_modules/@huggingface node_modules/.pnpm/kokoro-js@* \
-      node_modules/.pnpm/@huggingface+transformers@* node_modules/.pnpm/onnxruntime-* node_modules/.pnpm/phonemizer@*
+      node_modules/.pnpm/@huggingface+transformers@* node_modules/.pnpm/onnxruntime-* node_modules/.pnpm/phonemizer@* \
+ && chmod -R a+rX node_modules
 COPY . .
 RUN node -e "if (typeof Intl.Segmenter !== 'function') process.exit(1); new Intl.Segmenter('ja', { granularity: 'word' })"
-# Lambda's filesystem is read-only except /tmp, so job folders live there; and Lambda runs as an
-# unprivileged user, so everything must be world-readable. Remotion launches Chrome through
-# `setpriv --pdeathsig` whenever setpriv is on PATH, and Lambda's sandbox refuses setpriv's
+# Lambda's filesystem is read-only except /tmp, so job folders live there. Remotion launches Chrome
+# through `setpriv --pdeathsig` whenever setpriv is on PATH, and Lambda's sandbox refuses setpriv's
 # capability call ("keep process capabilities failed"), so Chrome never starts: remove it.
 RUN node_modules/.bin/remotion browser ensure \
+ && chmod -R a+rX node_modules/.remotion \
  && rm -rf public/skits/_jobs && ln -s /tmp/jobs public/skits/_jobs \
- && chmod -R a+rX /app /opt/rhubarb /opt/ric \
  && rm -f /usr/bin/setpriv
+# The Remotion bundle, built once here instead of by webpack on every cold start (~20 s).
+# It symlinks public/, so job folders written under /tmp/jobs at run time are still served.
+RUN node_modules/.bin/tsx scripts/lambda-bundle.ts /app/build/bundle \
+ && chmod -R a+rX /app/build
 
 ENV NODE_ENV=production \
     RHUBARB_PATH=/opt/rhubarb/rhubarb \
     HOME=/tmp \
     XDG_CACHE_HOME=/tmp/.cache \
+    STICKSTAGE_BUNDLE_DIR=/app/build/bundle \
     NODE_OPTIONS=--import=tsx
 ENTRYPOINT ["/opt/ric/node_modules/.bin/aws-lambda-ric"]
 CMD ["lambda/index.handler"]

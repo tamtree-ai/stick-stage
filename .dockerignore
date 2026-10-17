@@ -9,3 +9,4 @@ tools
 public/skits/*/generated
 public/skits/_jobs
 packages/stickstage/dist
+build
