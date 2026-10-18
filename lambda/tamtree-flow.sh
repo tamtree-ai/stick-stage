@@ -14,14 +14,15 @@
 #   STICKSTAGE_REGION    default ap-southeast-2
 #   TAMTREE_URL          Tamtree's base URL                       (e.g. https://tamtree.example.com)
 #   TAMTREE_API_KEY      API key with write:flows
-#   TAMTREE_CREDENTIAL   the AWS role connection's credential id
+#   TAMTREE_CREDENTIAL   optional: the AWS role connection's id (/credentials/<id>/edit). Unset, pick
+#                        the connection in the render step's Connection list after import.
 set -euo pipefail
 
 skit=${1:?usage: lambda/tamtree-flow.sh <skitId> [flow name]}
 name=${2:-"StickStage render: $skit"}
 dir="$(cd "$(dirname "$0")/.." && pwd)/public/skits/$skit"
 : "${STICKSTAGE_BUCKET:?set STICKSTAGE_BUCKET}" "${TAMTREE_URL:?set TAMTREE_URL}"
-: "${TAMTREE_API_KEY:?set TAMTREE_API_KEY}" "${TAMTREE_CREDENTIAL:?set TAMTREE_CREDENTIAL}"
+: "${TAMTREE_API_KEY:?set TAMTREE_API_KEY}"
 fn=${STICKSTAGE_FUNCTION:-tamtree-stickstage-render}
 region=${STICKSTAGE_REGION:-ap-southeast-2}
 [[ -f "$dir/skit.json" && -f "$dir/voice.json" ]] || { echo "no skit.json + voice.json in $dir" >&2; exit 1; }
@@ -30,7 +31,7 @@ aws s3 cp "$dir/voice" "s3://$STICKSTAGE_BUCKET/inputs/$skit/" --recursive --reg
 
 definition=$(jq -n \
   --slurpfile s "$dir/skit.json" --slurpfile v "$dir/voice.json" \
-  --arg prefix "inputs/$skit/" --arg fn "$fn" --arg region "$region" --arg cred "$TAMTREE_CREDENTIAL" '{
+  --arg prefix "inputs/$skit/" --arg fn "$fn" --arg region "$region" --arg cred "${TAMTREE_CREDENTIAL:-}" '{
   api_version: "tamtree.dev/v1",
   flow_type: "pipeline",
   nodes: [
@@ -43,7 +44,7 @@ definition=$(jq -n \
       } } },
     { id: "render", type: "tamtree.cloud_function", position: [540, 160],
       note: "One render per call. The function POSTs its result to the callback when the MP4 is in S3.",
-      credentials: { aws_role: $cred },
+      credentials: (if $cred == "" then {} else { aws_role: $cred } end),
       params: { provider: "aws_lambda", region: $region, function: $fn, mode: "envelope",
                 wait_for: "callback", timeout_s: 60, max_wait_s: 1800, batch: "per_run" } },
     { id: "video", type: "tamtree.set", position: [780, 160],
@@ -62,6 +63,7 @@ definition=$(jq -n \
 }')
 
 jq -n --arg name "$name" --argjson definition "$definition" '{ name: $name, definition: $definition }' |
-  curl -fsS -X POST "${TAMTREE_URL%/}/v1/flows" \
+  curl -sS --fail-with-body -X POST "${TAMTREE_URL%/}/v1/flows" \
     -H "Authorization: Bearer $TAMTREE_API_KEY" -H "content-type: application/json" --data-binary @- |
   jq '{ id, name, status: (.status // .version_status // null) }'
+[[ -n "${TAMTREE_CREDENTIAL:-}" ]] || echo "No connection bound: open the render step and pick your AWS role connection." >&2
