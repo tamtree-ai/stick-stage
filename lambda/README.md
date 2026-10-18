@@ -209,6 +209,9 @@ lambda/tamtree-flow.sh fine                     # optional 2nd argument: the wor
 | `TAMTREE_CREDENTIAL` | no | The AWS role connection's ID (from `/credentials/<id>/edit`). Unset, pick the connection in the editor |
 | `STICKSTAGE_FUNCTION` | no | Default `tamtree-stickstage-render` |
 | `STICKSTAGE_REGION` | no | Default `ap-southeast-2` |
+| `TAMTREE_FILES_CONNECTION` | no | A **Storage** role connection that can read `$BUCKET/jobs/*` (see 5.4). Set, the render step reads the MP4 from S3, so it still works after the 1-hour link expires |
+| `STICKSTAGE_COPY_BUCKET` | no | Adds a **copy** step that writes the MP4 to this bucket by reading `$binary.mp4` |
+| `TAMTREE_COPY_CREDENTIAL` | no | The Storage role connection the copy step writes with (read-write on `STICKSTAGE_COPY_BUCKET`). It may be the same connection as `TAMTREE_FILES_CONNECTION` |
 
 It prints the new workflow's `id` and `name`. Each run creates a new workflow, so delete the old one if you run it again.
 
@@ -218,6 +221,28 @@ It prints the new workflow's `id` and `name`. Each run creates a new workflow, s
 2. Click **Run**. The render step waits for the callback for a minute or two, then the **video** step shows `title`, `video_url` (works for 1 hour) and `video_key`.
 
 **Run the workflow, not one step on its own:** a single-step Test only captures the call and never waits for the callback.
+
+### 5.4 Pass the video on as a file
+
+The reply carries each output twice. `outputs.mp4` is the JSON the **video** step reads. `binary.mp4` is the same file as a Tamtree attachment: `url`, `file_name`, `mime_type`, `size_bytes`, `expires_at`, and `s3: {bucket, key, region}`. A later step reads it as `$binary.mp4`, for example *S3 — Put object* with **Upload file from attachment** set to `mp4`, or a YouTube upload with its attachment set to `mp4`. Tamtree copies the file in only when such a step runs, and the run output shows it as *in s3://… · copied when a step reads it* until then.
+
+Without a Files connection, Tamtree downloads it through the 1-hour link. To keep it readable for longer, make a second **AWS role** connection with *What the role is for* set to **Storage (S3 buckets)**:
+
+- `BucketNames=$BUCKET`, plus the copy bucket if you use one
+- `KeyPrefix=jobs/`
+- `Access=read-write` if the same connection does the copy
+
+Then list the same buckets in the connection's **S3 buckets** field, click **Test**, and pass its ID as `TAMTREE_FILES_CONNECTION` (and `TAMTREE_COPY_CREDENTIAL`):
+
+```sh
+AWS_PROFILE=<profile> STICKSTAGE_BUCKET=$BUCKET \
+TAMTREE_URL=https://<your tamtree host> TAMTREE_API_KEY='<api key>' \
+TAMTREE_FILES_CONNECTION=<storage connection id> \
+STICKSTAGE_COPY_BUCKET=<second bucket> TAMTREE_COPY_CREDENTIAL=<storage connection id> \
+lambda/tamtree-flow.sh fine
+```
+
+This needs a Tamtree with storage roles and signed reply files (`TAMTREE_BINARY_SOURCE_KEY` set). On an older one, `binary` arrives only as links under `json._files`.
 
 **Tamtree behind HTTP basic auth:** that's fine as long as `/v1/*` (the API) and `/webhook/resume/*` (the callback) are outside it. The script sends only the API key, and the function's callback carries no password.
 

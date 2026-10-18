@@ -22,9 +22,17 @@ import { PROJECT, ROOT, WS } from "../scripts/lib/tools";
 type LambdaContext = { getRemainingTimeInMillis(): number };
 type Envelope = { v: 1; items?: { json: Record<string, unknown> }[]; callback?: { url: string } };
 type RenderInput = { skit?: unknown; voice?: unknown; audio?: Record<string, string>; options?: Record<string, unknown> };
-type Reply = { items: { json: Record<string, unknown> }[]; logs: string[]; error?: { code: string; message: string; retryable: boolean } };
+/** Tamtree's reply file (EnvelopeBinary): a link, plus the lasting S3 location a Files connection reads. */
+type ReplyFile = { url: string; file_name: string; mime_type: string; size_bytes: number; expires_at: string; s3: { bucket: string; key: string; region?: string } };
+type Reply = {
+  items: { json: Record<string, unknown>; binary?: Record<string, ReplyFile> }[];
+  logs: string[];
+  error?: { code: string; message: string; retryable: boolean };
+};
 
 const BUCKET = process.env.STICKSTAGE_BUCKET ?? "";
+/** Lambda sets AWS_REGION; it is the bucket's region as long as the two are deployed together. */
+const REGION = process.env.AWS_REGION ?? "";
 /** In the image, public/skits/_jobs is a symlink to /tmp/jobs: the only writable place on Lambda. */
 const JOBS = "_jobs";
 /** Answer this long before Lambda's own timeout, so a render that runs too long still reports. */
@@ -82,14 +90,27 @@ const render = async (event: Envelope, context: LambdaContext): Promise<Reply> =
     const result = await run(job, { dir, signal: controller.signal, update: (p) => p.stage && console.log(`stage ${p.stage}`) });
 
     const outputs: Record<string, unknown> = {};
+    // The same files as Tamtree attachments: a later step reads $binary.mp4 as a file. `s3` lets a
+    // step with a Files connection read it after the link has expired. `outputs` stays for flows built on it.
+    const binary: Record<string, ReplyFile> = {};
+    const expiresAt = new Date(Date.now() + SIGNED_URL_S * 1000).toISOString();
     for (const [name, o] of Object.entries(result.outputs ?? {})) {
       const key = `jobs/${id}/${path.basename(o.file)}`;
       await s3.send(new PutObjectCommand({ Bucket: BUCKET, Key: key, Body: fs.readFileSync(path.join(dir, o.file)), ContentType: o.type }));
       const url = await getSignedUrl(s3, new GetObjectCommand({ Bucket: BUCKET, Key: key }), { expiresIn: SIGNED_URL_S });
       outputs[name] = { bucket: BUCKET, key, type: o.type, bytes: o.bytes, url };
+      binary[name] = {
+        url,
+        file_name: path.basename(o.file),
+        mime_type: o.type,
+        size_bytes: o.bytes,
+        expires_at: expiresAt,
+        s3: { bucket: BUCKET, key, region: REGION || undefined },
+      };
     }
     const warnings = [...job.warnings, ...(result.warnings ?? [])];
-    return { items: [{ json: { jobId: id, title: result.title, durationSec: result.durationSec, check: result.check, warnings, outputs } }], logs: warnings };
+    const json = { jobId: id, title: result.title, durationSec: result.durationSec, check: result.check, warnings, outputs };
+    return { items: [{ json, binary }], logs: warnings };
   } catch (e) {
     if (e instanceof JobFailure) {
       const message = e.code === "cancelled" ? "the render ran out of Lambda time" : e.message;
