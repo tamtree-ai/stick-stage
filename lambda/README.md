@@ -37,7 +37,43 @@ Nothing in this folder holds an account ID or a secret. The bucket comes from th
 
 If the envelope carries a `callback`, the reply is POSTed there, and the function returns nothing. That is how Tamtree's *Wait for: A callback when it finishes* gets its result.
 
-## 1. Build the image
+## Before you start
+
+Use zsh, as in Tamtree's guides. Every command below takes `$P`, so a profile and region are always passed explicitly.
+
+| You are… | Do |
+|---|---|
+| Deploying for the first time | [1](#1-set-up-the-terminal-every-new-terminal) → [2](#2-build-the-image) → [3](#3-create-the-aws-resources-once) → [5](#5-test-it) → [6](#6-connect-tamtree) |
+| Shipping a code change | [1](#1-set-up-the-terminal-every-new-terminal) → [4](#4-ship-a-new-version) → [5](#5-test-it) |
+| Testing or connecting Tamtree only | [1](#1-set-up-the-terminal-every-new-terminal) → [5](#5-test-it) or [6](#6-connect-tamtree) |
+
+## 1. Set up the terminal (every new terminal)
+
+Run both steps each time you open a terminal. zsh doesn't keep the variables between terminals, and an ECR login lasts only 12 hours.
+
+**1a. Set the variables.** Use an admin profile for the account the function lives in.
+
+```sh
+P=(--profile <profile> --region ap-southeast-2)
+ACCOUNT=$(aws sts get-caller-identity $P --query Account --output text) && echo $ACCOUNT
+BUCKET=tamtree-stickstage-${ACCOUNT}
+REGISTRY=${ACCOUNT}.dkr.ecr.ap-southeast-2.amazonaws.com
+REPO=${REGISTRY}/tamtree-stickstage
+FN=tamtree-stickstage-render
+ROLE=tamtree-stickstage-exec
+```
+
+Check that `echo $ACCOUNT` prints the account you expect. If it prints nothing or the wrong account, every step after this one fails. The function's name must start with `tamtree-`, because Tamtree's role template allows only that prefix.
+
+**1b. Log Docker in to ECR.** Do this before any `docker push`.
+
+```sh
+aws ecr get-login-password $P | docker login --username AWS --password-stdin $REGISTRY
+```
+
+It should print `Login Succeeded`. If a push later fails with `403 Forbidden`, run this again.
+
+## 2. Build the image
 
 ```sh
 pnpm lambda:build          # docker build --platform linux/amd64 --provenance=false -f Dockerfile.lambda -t stickstage-lambda .
@@ -46,72 +82,93 @@ pnpm lambda:build          # docker build --platform linux/amd64 --provenance=fa
 - **amd64 only:** Rhubarb has no arm64 release. On Apple Silicon the build runs under emulation; the first build takes several minutes.
 - **`--provenance=false` is required:** Lambda rejects the manifest list that buildx produces by default.
 
-## 2. Create the AWS resources (once)
+## 3. Create the AWS resources (once)
 
-zsh, as in Tamtree's guides. Use an admin profile for the account the function lives in. The function's name must start with `tamtree-`, because Tamtree's role template allows only that prefix.
+Do this only on the first deploy, after [1](#1-set-up-the-terminal-every-new-terminal) and [2](#2-build-the-image). Run the steps in order.
+
+**3a. Check the account's limits.** A new account may be capped at 10 concurrent executions and 3008 MB of memory (see [Troubleshooting](#troubleshooting)).
 
 ```sh
-P=(--profile <profile> --region ap-southeast-2)
-ACCOUNT=$(aws sts get-caller-identity $P --query Account --output text)
-BUCKET=tamtree-stickstage-${ACCOUNT}
-REGISTRY=${ACCOUNT}.dkr.ecr.ap-southeast-2.amazonaws.com
-REPO=${REGISTRY}/tamtree-stickstage
-FN=tamtree-stickstage-render
-ROLE=tamtree-stickstage-exec
-
-# Pre-flight: a new account may be limited to 10 concurrent executions and 3008 MB (see Troubleshooting)
 aws lambda get-account-settings $P --query AccountLimit.ConcurrentExecutions
+```
 
-# Bucket for inputs and outputs; everything expires after a day
+**3b. Create the bucket** for inputs and outputs. Everything in it expires after a day.
+
+```sh
 aws s3api create-bucket $P --bucket $BUCKET --create-bucket-configuration LocationConstraint=ap-southeast-2
 aws s3api put-public-access-block $P --bucket $BUCKET --public-access-block-configuration \
   BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
 aws s3api put-bucket-lifecycle-configuration $P --bucket $BUCKET --lifecycle-configuration \
   '{"Rules":[{"ID":"expire-1d","Status":"Enabled","Filter":{"Prefix":""},"Expiration":{"Days":1}}]}'
+```
 
-# Image repository; keep the last 5 images
+**3c. Create the image repository.** It keeps the last 5 images.
+
+```sh
 aws ecr create-repository $P --repository-name tamtree-stickstage --image-scanning-configuration scanOnPush=true
 aws ecr put-lifecycle-policy $P --repository-name tamtree-stickstage --lifecycle-policy-text \
   '{"rules":[{"rulePriority":1,"description":"keep the last 5 images","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":5},"action":{"type":"expire"}}]}'
+```
 
-# Execution role: logs, plus read/write on this bucket only
+**3d. Create the execution role.** It can write logs, and read and write this bucket only.
+
+```sh
 aws iam create-role $P --role-name $ROLE --assume-role-policy-document \
   '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"lambda.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
 aws iam attach-role-policy $P --role-name $ROLE \
   --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 aws iam put-role-policy $P --role-name $ROLE --policy-name stickstage-bucket --policy-document \
   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:GetObject\",\"s3:PutObject\"],\"Resource\":\"arn:aws:s3:::${BUCKET}/*\"}]}"
+```
 
-# Logs kept 14 days instead of forever
+**3e. Create the log group.** Logs are kept for 14 days, not forever.
+
+```sh
 aws logs create-log-group $P --log-group-name /aws/lambda/$FN
 aws logs put-retention-policy $P --log-group-name /aws/lambda/$FN --retention-in-days 14
+```
 
-# Push the image, tagged with the commit it was built from
-aws ecr get-login-password $P | docker login --username AWS --password-stdin $REGISTRY
+**3f. Push the image**, tagged with the commit it was built from. This needs the login from [1b](#1-set-up-the-terminal-every-new-terminal).
+
+```sh
 IMAGE=${REPO}:$(git rev-parse --short HEAD)
 docker tag stickstage-lambda $IMAGE && docker push $IMAGE
+```
 
-# The function. 10240 MB (about 6 vCPUs) is the target; use 3008 if the account is capped.
+**3g. Create the function.** Use 10240 MB (about 6 vCPUs) if the account allows it, and 3008 MB if it is capped.
+
+```sh
 aws lambda create-function $P --function-name $FN \
   --package-type Image --code ImageUri=$IMAGE --architectures x86_64 \
   --role arn:aws:iam::${ACCOUNT}:role/${ROLE} \
   --memory-size 10240 --timeout 900 --ephemeral-storage Size=4096 \
   --environment "Variables={STICKSTAGE_BUCKET=${BUCKET}}"
 aws lambda wait function-active-v2 $P --function-name $FN
+```
 
-# No automatic retries: a retried render costs money and makes a second video
+If it says Lambda cannot assume the role, wait about ten seconds for IAM to catch up, then run it again.
+
+**3h. Turn off automatic retries.** A retried render costs money and makes a second video.
+
+```sh
 aws lambda put-function-event-invoke-config $P --function-name $FN \
   --maximum-retry-attempts 0 --maximum-event-age-in-seconds 3600
+```
 
+**3i. Check the function:**
+
+```sh
 aws lambda get-function-configuration $P --function-name $FN \
   --query '{state:State,memory:MemorySize,timeout:Timeout,arch:Architectures[0]}'
 ```
 
-If `create-function` says Lambda cannot assume the role, wait about ten seconds for IAM to catch up and run it again.
+## 4. Ship a new version
 
-## 3. Ship a new version
+Do [1](#1-set-up-the-terminal-every-new-terminal) first, including the login.
 
-Commit first, so the image tag matches the code in it.
+**4a. Commit first**, so the image tag matches the code in it.
+
+**4b. Build, push and update the function:**
 
 ```sh
 pnpm lambda:build
@@ -121,7 +178,7 @@ aws lambda update-function-code $P --function-name $FN --image-uri $IMAGE
 aws lambda wait function-updated-v2 $P --function-name $FN
 ```
 
-## 4. Test it
+## 5. Test it
 
 **Upload the `fine` skit's audio and build an event:**
 
@@ -169,9 +226,9 @@ docker run --rm --platform linux/amd64 -p 9000:8080 --read-only --tmpfs /tmp:siz
 curl -s -XPOST localhost:9000/2015-03-31/functions/function/invocations -d @/tmp/stickstage-event.json | jq .
 ```
 
-## 5. Connect Tamtree
+## 6. Connect Tamtree
 
-### 5.1 The AWS role connection
+### 6.1 The AWS role connection
 
 Tamtree calls the function through an **AWS role** connection: a role in your account that Tamtree assumes, with an External ID only this connection knows. No keys are stored.
 
@@ -184,7 +241,7 @@ Tamtree calls the function through an **AWS role** connection: a role in your ac
    ```
 5. Paste it into the connection and click **Test**.
 
-### 5.2 The workflow
+### 6.2 The workflow
 
 `tamtree-flow.sh` uploads a skit's audio to the bucket, then creates this workflow through Tamtree's API:
 
@@ -209,20 +266,20 @@ lambda/tamtree-flow.sh fine                     # optional 2nd argument: the wor
 | `TAMTREE_CREDENTIAL` | no | The AWS role connection's ID (from `/credentials/<id>/edit`). Unset, pick the connection in the editor |
 | `STICKSTAGE_FUNCTION` | no | Default `tamtree-stickstage-render` |
 | `STICKSTAGE_REGION` | no | Default `ap-southeast-2` |
-| `TAMTREE_FILES_CONNECTION` | no | A **Storage** role connection that can read `$BUCKET/jobs/*` (see 5.4). Set, the render step reads the MP4 from S3, so it still works after the 1-hour link expires |
+| `TAMTREE_FILES_CONNECTION` | no | A **Storage** role connection that can read `$BUCKET/jobs/*` (see 6.4). Set, the render step reads the MP4 from S3, so it still works after the 1-hour link expires |
 | `STICKSTAGE_COPY_BUCKET` | no | Adds a **copy** step that writes the MP4 to this bucket by reading `$binary.mp4` |
 | `TAMTREE_COPY_CREDENTIAL` | no | The Storage role connection the copy step writes with (read-write on `STICKSTAGE_COPY_BUCKET`). It may be the same connection as `TAMTREE_FILES_CONNECTION` |
 
 It prints the new workflow's `id` and `name`. Each run creates a new workflow, so delete the old one if you run it again.
 
-### 5.3 Run it
+### 6.3 Run it
 
 1. Open the workflow (*StickStage render: fine*) and click the **render** step. Under **Connection**, pick the AWS role connection, then save. Skip this if you passed `TAMTREE_CREDENTIAL`.
 2. Click **Run**. The render step waits for the callback for a minute or two, then the **video** step shows `title`, `video_url` (works for 1 hour) and `video_key`.
 
 **Run the workflow, not one step on its own:** a single-step Test only captures the call and never waits for the callback.
 
-### 5.4 Pass the video on as a file
+### 6.4 Pass the video on as a file
 
 The reply carries each output twice. `outputs.mp4` is the JSON the **video** step reads. `binary.mp4` is the same file as a Tamtree attachment: `url`, `file_name`, `mime_type`, `size_bytes`, `expires_at`, and `s3: {bucket, key, region}`. A later step reads it as `$binary.mp4`, for example *S3 — Put object* with **Upload file from attachment** set to `mp4`, or a YouTube upload with its attachment set to `mp4`. Tamtree copies the file in only when such a step runs, and the run output shows it as *in s3://… · copied when a step reads it* until then.
 
@@ -269,4 +326,5 @@ At $0.0000166667 per GB-second, a warm draft like this costs about $0.004. Lambd
 | `INIT_REPORT … Status: timeout` in the log | Lambda's init phase has a 10 s limit; the first call after a deploy loads the image lazily | Harmless: Lambda reruns init inside the call. It costs time only on cold starts |
 | `render-failed: the render ran out of Lambda time` | The render needed more than 15 minutes | More memory (more CPU), or `quality: "draft"` |
 | The Tamtree step waits until it gives up | The callback never arrived | Check the function's log for `Tamtree refused the callback`, and that `/webhook/resume/*` is reachable from the internet |
+| `docker push`: `403 Forbidden` on a `HEAD` request to `/v2/…/blobs/…` | The ECR login has expired (it lasts 12 hours), or it was for another account because `$P` was empty | Run [section 1](#1-set-up-the-terminal-every-new-terminal) again: check that `$ACCOUNT` is right, then log in (1b) |
 | An S3 `NoSuchKey` error | The bucket deletes everything after a day | Upload the audio again (`tamtree-flow.sh` does it) |
