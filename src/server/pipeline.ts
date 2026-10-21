@@ -91,7 +91,12 @@ export const renderPipeline =
 
     update({ stage: "check", ...meta });
     const check = checkSkitIn(o.project, id, result);
-    if (!check.ok && !job.options.skipCheck) throw new JobFailure("check-failed", `self-check found ${check.errors} error(s)`, { check });
+    if (!check.ok && !job.options.skipCheck) {
+      // Name the first error, so the failure reads on its own without opening the report.
+      const first = check.findings.find((f) => f.level === "error");
+      const more = check.errors > 1 ? ` (+${check.errors - 1} more)` : "";
+      throw new JobFailure("check-failed", `self-check found ${check.errors} error(s): ${first?.message ?? "see the report"}${more}`, { check });
+    }
 
     update({ stage: "render", progress: 0, check });
     const base = path.join(dir, "out", slug(doc.meta.title));
