@@ -18,6 +18,7 @@ import { JobFailure, type Job } from "../src/server/jobs";
 import { childPrep, renderPipeline } from "../src/server/pipeline";
 import { parseSubmission, writeSubmission } from "../src/server/submit";
 import { PROJECT, ROOT, WS } from "../scripts/lib/tools";
+import { toFindings, type EnvelopeFinding } from "./findings";
 
 type LambdaContext = { getRemainingTimeInMillis(): number };
 type Envelope = { v: 1; items?: { json: Record<string, unknown> }[]; callback?: { url: string } };
@@ -28,6 +29,8 @@ type Reply = {
   items: { json: Record<string, unknown>; binary?: Record<string, ReplyFile> }[];
   logs: string[];
   error?: { code: string; message: string; retryable: boolean };
+  /** Tamtree 2.7.0: the detail as data. An older Tamtree ignores it and reads `logs`. */
+  findings?: EnvelopeFinding[];
 };
 
 const BUCKET = process.env.STICKSTAGE_BUCKET ?? "";
@@ -110,7 +113,8 @@ const render = async (event: Envelope, context: LambdaContext): Promise<Reply> =
     }
     const warnings = [...job.warnings, ...(result.warnings ?? [])];
     const json = { jobId: id, title: result.title, durationSec: result.durationSec, check: result.check, warnings, outputs };
-    return { items: [{ json, binary }], logs: warnings };
+    // Warnings and info from the self-check ride along on a success too.
+    return { items: [{ json, binary }], logs: warnings, findings: toFindings(result.check?.findings ?? []) };
   } catch (e) {
     if (e instanceof JobFailure) {
       const message = e.code === "cancelled" ? "the render ran out of Lambda time" : e.message;
@@ -125,10 +129,13 @@ const render = async (event: Envelope, context: LambdaContext): Promise<Reply> =
   }
 };
 
+// `logs` keeps the JSON lines until every Tamtree that calls this reads `findings` (2.7.0);
+// the newer run view hides lines that duplicate a finding.
 const failure = (code: string, message: string, details: unknown[]): Reply => ({
   items: [],
   logs: details.map((d) => JSON.stringify(d)),
   error: { code, message, retryable: false },
+  findings: toFindings(details),
 });
 
 const download = async (key: string): Promise<Uint8Array> => {
