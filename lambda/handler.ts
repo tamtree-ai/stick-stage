@@ -18,10 +18,19 @@ import { JobFailure, type Job } from "../src/server/jobs";
 import { childPrep, renderPipeline } from "../src/server/pipeline";
 import { parseSubmission, writeSubmission } from "../src/server/submit";
 import { PROJECT, ROOT, WS } from "../scripts/lib/tools";
+import { checkOnly, DESCRIPTION, type CheckReply } from "./check";
 import { toFindings, type EnvelopeFinding } from "./findings";
 
 type LambdaContext = { getRemainingTimeInMillis(): number };
-type Envelope = { v: 1; items?: { json: Record<string, unknown> }[]; callback?: { url: string } };
+type Envelope = {
+  v: 1;
+  items?: { json: Record<string, unknown> }[];
+  callback?: { url: string };
+  /** Tamtree 2.7.0: validate and answer findings, no render (lambda/check.ts). */
+  check_only?: boolean;
+  /** Tamtree 2.7.0: answer what this function returns, no render. */
+  describe?: boolean;
+};
 type RenderInput = { skit?: unknown; voice?: unknown; audio?: Record<string, string>; options?: Record<string, unknown> };
 /** Tamtree's reply file (EnvelopeBinary): a link, plus the lasting S3 location a Files connection reads. */
 type ReplyFile = { url: string; file_name: string; mime_type: string; size_bytes: number; expires_at: string; s3: { bucket: string; key: string; region?: string } };
@@ -63,7 +72,10 @@ const backend = remotionBackend({
 });
 const run = renderPipeline({ project: PROJECT, backend, prep: childPrep(ROOT, { requireLipSync: true }), skitIdOf: (id) => `${JOBS}/${id}` });
 
-export const handler = async (event: Envelope, context: LambdaContext): Promise<Reply | null> => {
+export const handler = async (event: Envelope, context: LambdaContext): Promise<Reply | CheckReply | typeof DESCRIPTION | null> => {
+  // Neither renders, and Tamtree always waits for their answer, so neither takes a callback.
+  if (event.describe) return DESCRIPTION;
+  if (event.check_only) return checkOnly(PROJECT, (event.items?.[0]?.json ?? {}) as RenderInput);
   const reply = await render(event, context);
   if (!event.callback) return reply;
   // Never log the callback URL: it is a single-use bearer capability.

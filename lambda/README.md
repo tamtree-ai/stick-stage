@@ -37,6 +37,10 @@ Nothing in this folder holds an account ID or a secret. The bucket comes from th
 
 If the envelope carries a `callback`, the reply is POSTed there, and the function returns nothing. That is how Tamtree's *Wait for: A callback when it finishes* gets its result.
 
+**Check first (Tamtree 2.7.0).** With `"check_only": true`, nothing is rendered and `audio` isn't needed. The function runs the request's checks (skit errors, unsupported beats, approval, `voice-missing`, `voice-stale`), then the director's self-check on estimated timings, as `POST /validate` does. It answers `{ checked: true, items: [], findings }`. Request errors are `error` findings and stop Tamtree's step before the render. Self-check errors come back as warnings, because frame timing depends on the real voices and the render checks again. Set the step's *Check first* to **Check, then run**, or use **Only check** as a step ahead of TTS. Code in [`check.ts`](check.ts).
+
+**Describe.** `{"v": 1, "describe": true}` returns the `output_schema` of the reply item above, so later Tamtree steps offer its fields before a run. There's no `input_schema`: this function reads item 0's `json`, not `inputs`.
+
 ## Before you start
 
 Use zsh, as in Tamtree's guides. Every command below takes `$P`, so a profile and region are always passed explicitly.
