@@ -100,6 +100,18 @@ describe("contact", () => {
     if (cut?.framing === "close") expect(cut.reason).toContain("moving");
     expect(cut).toBeDefined();
   });
+  it("a face close-up steps back for a pose that lands after its first second", () => {
+    // A punchline's recoil at 60% of a long line: the cut is planned before it, the face must still fit after it.
+    const r = compile([
+      silent("w", [], 600),
+      silent("p", [
+        { who: "june", do: "expression", expression: "shocked", at: { ms: 0 } },
+        { who: "june", do: "pose", pose: "recoil", at: { ms: 1600 } },
+      ], 3000),
+    ]);
+    expect(r.timeline.shots.some((s) => s.on === "june")).toBe(true);
+    expect(check(r).findings.filter((f) => f.check === "faces-safe" && f.level === "error")).toEqual([]);
+  });
   it("contact needs another cast member", () => {
     const [e] = errorsOf(() => compile([silent("s", [{ who: "june", do: "shove", target: "june" }])]));
     expect(e!.path).toBe("beats[0].actions[0].target");

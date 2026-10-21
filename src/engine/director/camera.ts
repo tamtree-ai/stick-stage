@@ -53,7 +53,11 @@ export const solveShots = (
   const faceCamera = (c: ShotPlan["cuts"][number], end: number): { framing: Framing; camera: Camera; note: string } => {
     const last = Math.min(end - 1, c.frame + Math.round(fps));
     const frames = [...new Set([c.frame, ...[0.25, 0.5, 0.75, 1].map((t) => Math.round(c.frame + t * (last - c.frame))), Math.min(end - 1, settle(c.on, c.frame))])];
-    const subject = frames.map((f) => actorsAt(f).find((a) => a.id === c.on)!);
+    // A pose landing after that first second (a recoil late in the punchline) doesn't move the
+    // camera, but the face still has to fit where the pose puts it.
+    const track = cast.find((x) => x.id === c.on)!;
+    const later = track.poseKeys.filter((k) => k.frame > last && k.frame < end).map((k) => Math.min(end - 1, k.frame + (k.durationFrames ?? 4) + 2));
+    const subject = [...new Set([...frames, ...later])].map((f) => actorsAt(f).find((a) => a.id === c.on)!);
     // Step back (extreme → close → medium) until the face features stay in the safe area over
     // the shot: a moving head, or one near the stage edge where the camera can't center it.
     const ladder: Framing[] = c.framing === "extreme" ? ["extreme", "close", "medium"] : c.framing === "close" ? ["close", "medium"] : [c.framing];
