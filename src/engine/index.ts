@@ -42,6 +42,7 @@ export { Face } from "./face/Face";
 export * from "./set/schema";
 export * from "./set/palettes";
 export * from "./set/seating";
+export * from "./set/compose";
 export * from "./set/catalog";
 export * from "./catalog";
 export * from "./draft";

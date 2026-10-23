@@ -23,6 +23,7 @@ import { SkitComposition } from "./skit/SkitComposition";
 import { calculateSkitMetadata, skitCompositionSchema } from "./skit/skitData";
 import { SFX_LAB_FRAMES, SfxLab } from "./labs/SfxLab";
 import { SafeAreaLab, safeAreaLabSchema } from "./labs/SafeAreaLab";
+import { PLACE_LAB_SIZE, PlaceLab, placeLabSchema } from "./labs/PlaceLab";
 import { SHAPE_LAB_FRAMES, ShapeLab, shapeLabSchema } from "./labs/ShapeLab";
 import { calculateVizLabMetadata, VIZ_LAB_FRAMES, VizLab, vizLabSchema } from "./labs/VizLab";
 
@@ -62,6 +63,7 @@ export const RemotionRoot: React.FC = () => (
       width={W}
       height={H}
     />
+    <Still id="PlaceLab" component={PlaceLab} schema={placeLabSchema} defaultProps={{ cast: ["tofu", "bobo"], showLabels: true }} {...PLACE_LAB_SIZE} />
     {/* Toon tier (science cast): the same labs with style.build forced to "toon". */}
     <Composition
       id="CharacterLabToon"

@@ -29,6 +29,7 @@ export const LAB_PALETTES: Record<Kit, string[]> = {
   abstract: ["void", "blueprint", "deep-space"],
   space: ["deep-space", "void", "blueprint"],
   lab: ["lab-white", "mint", "void"],
+  story: ["story-day", "story-sunset", "story-night"],
 };
 
 type Row = { part: string; kit: Kit };

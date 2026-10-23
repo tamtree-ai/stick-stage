@@ -1,4 +1,4 @@
-import { ImageManifestSchema, PronunciationsSchema, type Pronunciation, type ImageDef, buildCatalog, createLibrary, createSets, migrate, MusicManifestSchema, SafeAreaProfilesSchema, SeriesSchema, type MusicManifest, type SafeAreaProfiles, type Series, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type Catalog, type SafeArea, type SetDef, type SfxManifest } from "../engine/core";
+import { composePlace, ImageManifestSchema, PronunciationsSchema, type Pronunciation, type ImageDef, buildCatalog, createLibrary, createSets, migrate, MusicManifestSchema, SafeAreaProfilesSchema, SeriesSchema, type MusicManifest, type SafeAreaProfiles, type Series, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type Catalog, type SafeArea, type SetDef, type SfxManifest } from "../engine/core";
 
 import milo from "./characters/milo.json";
 import june from "./characters/june.json";
@@ -117,10 +117,19 @@ export const library: Library = createLibrary({
   props: PROP_DOCS,
 });
 
+/** Story-kit sets for the shape cast, composed from one-line places (`set/compose.ts`). */
+const STORY_SETS: SetDef[] = [
+  composePlace("story-park", { setting: "park", seats: ["left", "right"], description: "A sunny park with a low bench under the cast, trees at the edges and a path. Both can sit." }),
+  composePlace("story-clubhouse", { setting: "clubhouse", description: "Outside the round clubhouse with its flag: the story cast's home base." }),
+  composePlace("story-garden", { setting: "garden", features: ["house"], description: "A back garden with a picket fence, flowers, an apple tree and a little house." }),
+  composePlace("story-bedroom", { setting: "bedroom", time: "night", seats: ["left"], description: "A bedroom at night: the bed on the left (they sit on it), a starry window." }),
+];
+
 export const sets: Record<string, SetDef> = createSets([
   plain1, living1, lounge1, office1, park1, street1, kitchen1, bedroom1, cafe1, classroom1, meeting1, living2, park2, streetNight1, beach1, stage1,
   widePlain, wideLiving, wideLounge, wideOffice, widePark, wideStreet, wideCafe, wideClassroom,
   void1, blueprint1, space1, space2, lab1,
+  ...STORY_SETS,
 ]);
 
 /** One conservative profile for TikTok / Reels / Shorts overlays (verify against real screenshots in M4). */
