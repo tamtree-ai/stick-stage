@@ -42,7 +42,7 @@ export const evalSeat = (keys: readonly SeatKey[] | undefined, frame: number): S
 export const seatContact = (c: Character, m: RigMetrics): number => {
   // A shape body reaches a little below the hip (`rig/shape/body.tsx`).
   const s = shapeOf(c);
-  if (s) return shapeBuildMetrics(s).bodyWidth * m.heightPx * 0.22;
+  if (s) return shapeBuildMetrics(s).bodyWidth * m.heightPx * (s.plan === "quadruped" ? 0.3 : 0.22);
   return c.style.torso.style === "bean" ? c.style.torso.width * m.heightPx * 0.25 : m.strokeWidth * 0.5;
 };
 

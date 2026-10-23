@@ -9,6 +9,7 @@ import type { RigProps } from "../Rig";
 import { Tail, Torso } from "./body";
 import { DetailsBehind } from "./details";
 import { ShapeHead, ShapeHeadBack } from "./face";
+import { QuadRig } from "./QuadRig";
 import { backTone, lookOf } from "./look";
 import { edgeTone } from "./palette";
 import { shapeBuildMetrics } from "./proportions";
@@ -35,7 +36,9 @@ const Limb: React.FC<{ root: Vec2; joint: Vec2; tip: Vec2; side: 1 | -1; w: numb
  * of the same colour. Draw order: tail, backpack, far ears, far arm, legs, torso, head, near
  * arm, held props.
  */
-export const ShapeRig: React.FC<RigProps & { shape: Shape }> = ({
+export const ShapeRig: React.FC<RigProps & { shape: Shape }> = (p) => (p.shape.plan === "quadruped" ? <QuadRig {...p} /> : <BipedRig {...p} />);
+
+const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
   character,
   shape,
   joints: j,

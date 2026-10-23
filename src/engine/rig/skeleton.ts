@@ -1,6 +1,7 @@
 import { add, dirFromAngle, lerp, scale, type Vec2 } from "../lib/math";
 import { proportionsOf, shapeOf } from "./build";
 import type { Character, PoseAngles } from "./schema";
+import { solveQuadruped } from "./shape/quadruped";
 import { blendLegs, seatContact, seatedLegs, type SeatState } from "./seat";
 
 export type Joints = {
@@ -46,6 +47,16 @@ export const rigMetrics = (c: Character, figureHeightPx: number): RigMetrics => 
   };
 };
 
+/**
+ * The lowest point the figure stands on (y, figure space; 0 when grounded): the feet, and a
+ * quadruped's front paws too.
+ */
+export const supportBottom = (c: Character, j: Joints, m: RigMetrics): number => {
+  const feet = Math.max(j.footL.y, j.footR.y) + m.footRy;
+  if (shapeOf(c)?.plan !== "quadruped") return feet;
+  return Math.max(feet, Math.max(j.handL.y, j.handR.y) + m.footRy * 1.35);
+};
+
 export type Extras = {
   /** Multiplier on torso length (breathing). */
   torsoScale?: number;
@@ -66,6 +77,9 @@ export const solveSkeleton = (
   const m = rigMetrics(c, figureHeightPx);
   const H = m.heightPx;
   const P = proportionsOf(c);
+  const shape = shapeOf(c);
+  if (shape?.plan === "quadruped")
+    return solveQuadruped(shape, p, m, { body: P.torso * H, upper: P.thigh * H, lower: P.shin * H, headR: m.headR }, extras);
 
   // Legs are world-relative, measured from the hip at the origin.
   const seat = extras.seat;

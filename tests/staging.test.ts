@@ -8,6 +8,7 @@ import {
   propBounds,
   propUnit,
   rigMetrics,
+  supportBottom,
   SEAT_HEIGHT,
   seatContact,
   seatHeightAt,
@@ -22,7 +23,7 @@ import { SCENES } from "../src/app/labs/stagingScenes";
 const FIG = 720;
 const FPS = 30;
 const chars = Object.keys(library.characters);
-const footBottom = (s: ReturnType<typeof evalActor>) => Math.max(s.joints.footL.y, s.joints.footR.y) + s.metrics.footRy;
+const footBottom = (s: ReturnType<typeof evalActor>) => supportBottom(s.character, s.joints, s.metrics);
 
 describe("two-bone leg IK", () => {
   it("reaches a reachable target and goes straight toward an unreachable one", () => {

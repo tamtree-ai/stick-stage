@@ -782,7 +782,8 @@
           "default": "biped",
           "type": "string",
           "enum": [
-            "biped"
+            "biped",
+            "quadruped"
           ]
         },
         "species": {

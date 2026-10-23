@@ -33,7 +33,7 @@ import {
 
 const FIG = 620;
 const FPS = 30;
-const SHAPE_CAST = ["tofu", "bobo", "pim", "mabel", "otto", "fennel"];
+const SHAPE_CAST = ["tofu", "bobo", "pim", "mabel", "otto", "fennel", "biscuit"];
 
 const markup = (lib: Library, character: string, pose: string, expression: string, frame = 0) => {
   const s = evalActor(lib, { character, poseKeys: [{ frame: 0, pose }], expressionKeys: [{ frame: 0, expression }] }, frame, FPS, FIG);
@@ -132,6 +132,8 @@ describe("shape cast", () => {
   for (const id of SHAPE_CAST) {
     it(`${id}: lowest foot on the ground in every pose`, () => {
       const c = library.characters[id]!;
+      // A quadruped may stand on a front paw; "quadruped plan" checks paws and feet together.
+      if (shapeOf(c)?.plan === "quadruped") return;
       for (const p of Object.values(library.poses)) {
         const j = solveSkeleton(c, toAngles(p), FIG);
         const bottom = Math.max(j.footL.y, j.footR.y) + rigMetrics(c, FIG).footRy;
@@ -162,5 +164,52 @@ describe("shape cast", () => {
   it("forcing the shape tier leaves stick and toon characters as they were", () => {
     const shapeLib: Library = { ...library, characters: charactersWithBuild(library.characters, "shape") };
     for (const id of ["milo", "june", "vera"]) expect(markup(shapeLib, id, "point", "happy")).toBe(markup(library, id, "point", "happy"));
+  });
+});
+
+describe("quadruped plan", () => {
+  const dog = library.characters.biscuit!;
+  const pose = (id: string) => toAngles(library.poses[id]!);
+  const ground = (j: ReturnType<typeof solveSkeleton>) => {
+    const m = rigMetrics(dog, FIG);
+    return Math.max(j.footL.y, j.footR.y, j.handL.y + m.footRy * 0.35, j.handR.y + m.footRy * 0.35) + m.footRy;
+  };
+
+  it("biscuit is a quadruped and its body runs front to back, not up", () => {
+    expect(shapeOf(dog)?.plan).toBe("quadruped");
+    const j = solveSkeleton(dog, pose("idle"), FIG);
+    expect(Math.abs(j.shoulder.x - j.hip.x)).toBeGreaterThan(Math.abs(j.shoulder.y - j.hip.y) * 2);
+    expect(j.head.y).toBeLessThan(j.shoulder.y);
+  });
+
+  it("the lowest paw or foot is on the ground in every pose", () => {
+    for (const p of Object.keys(library.poses)) expect(Math.abs(ground(solveSkeleton(dog, pose(p), FIG))), p).toBeLessThan(0.5);
+  });
+
+  it("wave lifts the near front paw; sit drops the rump and raises the chest", () => {
+    const idle = solveSkeleton(dog, pose("idle"), FIG);
+    const wave = solveSkeleton(dog, pose("wave"), FIG);
+    expect(wave.handR.y).toBeLessThan(wave.handL.y - 10);
+    const sit = solveSkeleton(dog, pose("sit"), FIG);
+    expect(sit.shoulder.y - sit.hip.y).toBeLessThan(idle.shoulder.y - idle.hip.y - 10);
+  });
+
+  it("folded-arm poses keep the front legs standing", () => {
+    for (const p of ["arms-crossed", "hold-chest"]) {
+      const j = solveSkeleton(dog, pose(p), FIG);
+      expect(j.handR.y - j.shoulder.y, p).toBeGreaterThan(0);
+    }
+  });
+
+  it("draws every pose and expression; holds a prop in the near paw", () => {
+    const exprs = [...EXPRESSION_IDS, ...EXTRA_EXPRESSION_IDS];
+    Object.keys(library.poses).forEach((p, i) => expect(markup(library, "biscuit", p, exprs[i % exprs.length]!, i * 5), p).not.toMatch(/NaN|Infinity|undefined/));
+  });
+
+  it("a quadruped spec parses with every build", () => {
+    for (const build of SHAPE_BUILDS) {
+      const lib = withSpec("q", { plan: "quadruped", color: "tan", build, tail: { kind: "long" }, ears: { kind: "pointed" } });
+      expect(markup(lib, "q", "idle", "happy"), build).not.toMatch(/NaN|Infinity|undefined/);
+    }
   });
 });

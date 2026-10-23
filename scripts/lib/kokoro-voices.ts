@@ -24,6 +24,7 @@ export const KOKORO_VOICES: Readonly<Record<string, string>> = {
   mabel: "bf_isabella",
   otto: "bm_lewis",
   fennel: "bm_daniel",
+  biscuit: "af_nova",
 };
 export const KOKORO_NARRATOR = "am_michael";
 export const KOKORO_DEFAULT = "af_heart";

@@ -45,7 +45,7 @@ describe("aspect", () => {
         .filter((c) => c.aspect === "16:9")
         .map((c) => c.id)
         .sort(),
-    ).toEqual(["bobo", "fennel", "mabel", "nell", "otto", "pim", "pip", "reed", "tofu"]);
+    ).toEqual(["biscuit", "bobo", "fennel", "mabel", "nell", "otto", "pim", "pip", "reed", "tofu"]);
     expect(catalog.characters.filter((c) => c.aspect === "9:16").map((c) => c.id)).toEqual(expect.arrayContaining(["milo", "june"]));
     expect(catalog.sets.filter((s) => s.aspect === "16:9").map((s) => s.id)).toEqual(expect.arrayContaining(["wide-living", "wide-office", "wide-park", "wide-street", "wide-cafe", "wide-plain", "wide-lounge", "wide-classroom"]));
     expect(catalog.sets.find((s) => s.id === "living-1")?.aspect).toBe("9:16");

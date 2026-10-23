@@ -9,8 +9,8 @@ import { ShapeColor } from "./palette";
  */
 const mult = (lo: number, hi: number) => z.number().min(lo).max(hi);
 
-/** Skeletons. Only the biped ships today; the others are planned body plans. */
-export const SHAPE_PLANS = ["biped"] as const;
+/** Skeletons: upright, or on four legs (`shape/quadruped.ts`). Bird, blob and object plans are planned. */
+export const SHAPE_PLANS = ["biped", "quadruped"] as const;
 /** Body proportion presets (`shape/proportions.ts`). */
 export const SHAPE_BUILDS = ["kid", "adult", "tall", "tiny", "round"] as const;
 export const HEAD_KINDS = ["circle", "oval", "wide", "pear"] as const;
