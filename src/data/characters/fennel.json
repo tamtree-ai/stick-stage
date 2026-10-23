@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "fennel",
+  "displayName": "Fennel",
+  "aspect": "16:9",
+  "style": {
+    "build": "shape"
+  },
+  "shape": {
+    "species": "fox",
+    "build": "tall",
+    "color": "coral",
+    "belly": "cream",
+    "ears": {
+      "kind": "pointed",
+      "size": 1.2,
+      "inner": "cream"
+    },
+    "muzzle": {
+      "kind": "snout",
+      "color": "cream"
+    },
+    "tail": {
+      "kind": "fluffy",
+      "color": "coral"
+    },
+    "hands": "charcoal",
+    "feet": "charcoal",
+    "details": [
+      {
+        "id": "backpack",
+        "color": "grass"
+      }
+    ]
+  },
+  "energy": 0.7,
+  "personality": "A tall, fast fox who exaggerates every story.",
+  "voice": {
+    "say": "Daniel"
+  }
+}

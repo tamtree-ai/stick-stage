@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "mabel",
+  "displayName": "Mabel",
+  "aspect": "16:9",
+  "style": {
+    "build": "shape"
+  },
+  "shape": {
+    "species": "cat",
+    "build": "kid",
+    "color": "orange",
+    "belly": "cream",
+    "ears": {
+      "kind": "pointed",
+      "inner": "peach"
+    },
+    "muzzle": {
+      "kind": "oval",
+      "color": "cream",
+      "nose": "berry"
+    },
+    "tail": {
+      "kind": "curl"
+    },
+    "markings": [
+      {
+        "kind": "stripes",
+        "color": "#d9762e"
+      }
+    ],
+    "details": [
+      {
+        "id": "glasses",
+        "color": "charcoal"
+      }
+    ]
+  },
+  "energy": 0.45,
+  "personality": "Calm and clever; notices what everyone missed.",
+  "voice": {
+    "say": "Karen"
+  }
+}

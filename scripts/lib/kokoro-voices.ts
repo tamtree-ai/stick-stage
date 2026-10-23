@@ -18,6 +18,12 @@ export const KOKORO_VOICES: Readonly<Record<string, string>> = {
   theo: "am_liam",
   vera: "af_nova",
   gus: "am_eric",
+  tofu: "af_sky",
+  bobo: "am_puck",
+  pim: "af_nicole",
+  mabel: "bf_isabella",
+  otto: "bm_lewis",
+  fennel: "bm_daniel",
 };
 export const KOKORO_NARRATOR = "am_michael";
 export const KOKORO_DEFAULT = "af_heart";

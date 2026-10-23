@@ -87,6 +87,48 @@
         "hold"
       ]
     },
+    "toon": {
+      "type": "object",
+      "properties": {
+        "shoulderL": {
+          "type": "number"
+        },
+        "elbowL": {
+          "type": "number"
+        },
+        "shoulderR": {
+          "type": "number"
+        },
+        "elbowR": {
+          "type": "number"
+        },
+        "handL": {
+          "type": "string",
+          "enum": [
+            "open",
+            "fist",
+            "point",
+            "thumb",
+            "wave",
+            "palmup",
+            "hold"
+          ]
+        },
+        "handR": {
+          "type": "string",
+          "enum": [
+            "open",
+            "fist",
+            "point",
+            "thumb",
+            "wave",
+            "palmup",
+            "hold"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
     "anticipation": {
       "default": false,
       "type": "boolean"

@@ -11,6 +11,12 @@ import nell from "./characters/nell.json";
 import pip from "./characters/pip.json";
 import vera from "./characters/vera.json";
 import gus from "./characters/gus.json";
+import tofu from "./characters/tofu.json";
+import bobo from "./characters/bobo.json";
+import pim from "./characters/pim.json";
+import mabel from "./characters/mabel.json";
+import otto from "./characters/otto.json";
+import fennel from "./characters/fennel.json";
 
 import idle from "./poses/idle.json";
 import point from "./poses/point.json";
@@ -105,7 +111,7 @@ export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed
 export const EXTRA_EXPRESSION_IDS = ["skeptical", "worried", "embarrassed", "thinking", "laughing"];
 
 export const library: Library = createLibrary({
-  characters: [milo, june, lila, theo, moss, dash, reed, nell, pip, vera, gus],
+  characters: [milo, june, lila, theo, moss, dash, reed, nell, pip, vera, gus, tofu, bobo, pim, mabel, otto, fennel],
   poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose, wavePose, thumbsUp],
   expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan, skeptical, worried, embarrassed, thinking, laughing],
   props: PROP_DOCS,

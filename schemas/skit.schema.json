@@ -351,6 +351,16 @@
             ]
           },
           "proportions": {
+            "default": {
+              "height": 1,
+              "headRadius": 0.15,
+              "neck": 0.02,
+              "torso": 0.26,
+              "upperArm": 0.16,
+              "forearm": 0.15,
+              "thigh": 0.2,
+              "shin": 0.19
+            },
             "type": "object",
             "properties": {
               "height": {
@@ -413,23 +423,30 @@
                 "type": "string",
                 "enum": [
                   "stick",
-                  "toon"
+                  "toon",
+                  "shape"
                 ]
               },
               "stroke": {
+                "default": "#1b1b1f",
                 "type": "string",
                 "pattern": "^#[0-9a-fA-F]{3,8}$"
               },
               "strokeWidth": {
+                "default": 12,
                 "type": "number",
                 "minimum": 2,
                 "maximum": 30
               },
               "headFill": {
+                "default": "#fff6ee",
                 "type": "string",
                 "pattern": "^#[0-9a-fA-F]{3,8}$"
               },
               "torso": {
+                "default": {
+                  "style": "line"
+                },
                 "oneOf": [
                   {
                     "type": "object",
@@ -469,23 +486,27 @@
                 ]
               },
               "limbCurve": {
+                "default": 0.35,
                 "type": "number",
                 "minimum": 0,
                 "maximum": 1
               },
               "hands": {
+                "default": "nub",
                 "type": "string",
                 "enum": [
                   "nub"
                 ]
               },
               "feet": {
+                "default": "oval",
                 "type": "string",
                 "enum": [
                   "oval"
                 ]
               },
               "footFill": {
+                "default": "#3d3d48",
                 "type": "string",
                 "pattern": "^#[0-9a-fA-F]{3,8}$"
               },
@@ -542,22 +563,22 @@
                 "type": "string",
                 "pattern": "^#[0-9a-fA-F]{3,8}$"
               }
-            },
-            "required": [
-              "stroke",
-              "strokeWidth",
-              "headFill",
-              "torso",
-              "limbCurve",
-              "hands",
-              "feet",
-              "footFill"
-            ]
+            }
           },
           "face": {
+            "default": {
+              "eyes": "dot",
+              "brows": true,
+              "mouthSet": "default",
+              "offsetX": 0.14,
+              "eyeSpacing": 0.44,
+              "eyeY": -0.06,
+              "mouthY": 0.42
+            },
             "type": "object",
             "properties": {
               "eyes": {
+                "default": "dot",
                 "type": "string",
                 "enum": [
                   "big-pupil",
@@ -565,6 +586,7 @@
                 ]
               },
               "brows": {
+                "default": true,
                 "type": "boolean"
               },
               "mouthSet": {
@@ -595,11 +617,7 @@
                 "minimum": 0,
                 "maximum": 0.8
               }
-            },
-            "required": [
-              "eyes",
-              "brows"
-            ]
+            }
           },
           "accessories": {
             "default": [],
@@ -1088,6 +1106,936 @@
               "shoes"
             ]
           },
+          "shape": {
+            "type": "object",
+            "properties": {
+              "plan": {
+                "default": "biped",
+                "type": "string",
+                "enum": [
+                  "biped"
+                ]
+              },
+              "species": {
+                "type": "string",
+                "maxLength": 40
+              },
+              "build": {
+                "default": "kid",
+                "type": "string",
+                "enum": [
+                  "kid",
+                  "adult",
+                  "tall",
+                  "tiny",
+                  "round"
+                ]
+              },
+              "size": {
+                "default": 1,
+                "type": "number",
+                "minimum": 0.6,
+                "maximum": 1.4
+              },
+              "color": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "red",
+                      "coral",
+                      "orange",
+                      "sunflower",
+                      "lemon",
+                      "lime",
+                      "grass",
+                      "mint",
+                      "teal",
+                      "sky",
+                      "blue",
+                      "navy",
+                      "lilac",
+                      "purple",
+                      "berry",
+                      "pink",
+                      "blush",
+                      "peach",
+                      "sand",
+                      "tan",
+                      "brown",
+                      "chocolate",
+                      "cream",
+                      "white",
+                      "grey",
+                      "slate",
+                      "charcoal",
+                      "black"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  }
+                ]
+              },
+              "head": {
+                "default": {
+                  "kind": "circle",
+                  "size": 1
+                },
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "default": "circle",
+                    "type": "string",
+                    "enum": [
+                      "circle",
+                      "oval",
+                      "wide",
+                      "pear"
+                    ]
+                  },
+                  "size": {
+                    "default": 1,
+                    "type": "number",
+                    "minimum": 0.8,
+                    "maximum": 1.3
+                  },
+                  "color": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "red",
+                          "coral",
+                          "orange",
+                          "sunflower",
+                          "lemon",
+                          "lime",
+                          "grass",
+                          "mint",
+                          "teal",
+                          "sky",
+                          "blue",
+                          "navy",
+                          "lilac",
+                          "purple",
+                          "berry",
+                          "pink",
+                          "blush",
+                          "peach",
+                          "sand",
+                          "tan",
+                          "brown",
+                          "chocolate",
+                          "cream",
+                          "white",
+                          "grey",
+                          "slate",
+                          "charcoal",
+                          "black"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^#[0-9a-fA-F]{3,8}$"
+                      }
+                    ]
+                  }
+                }
+              },
+              "body": {
+                "default": {
+                  "kind": "bean",
+                  "width": 1
+                },
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "default": "bean",
+                    "type": "string",
+                    "enum": [
+                      "bean",
+                      "pear",
+                      "egg",
+                      "block",
+                      "barrel"
+                    ]
+                  },
+                  "width": {
+                    "default": 1,
+                    "type": "number",
+                    "minimum": 0.7,
+                    "maximum": 1.4
+                  },
+                  "color": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "red",
+                          "coral",
+                          "orange",
+                          "sunflower",
+                          "lemon",
+                          "lime",
+                          "grass",
+                          "mint",
+                          "teal",
+                          "sky",
+                          "blue",
+                          "navy",
+                          "lilac",
+                          "purple",
+                          "berry",
+                          "pink",
+                          "blush",
+                          "peach",
+                          "sand",
+                          "tan",
+                          "brown",
+                          "chocolate",
+                          "cream",
+                          "white",
+                          "grey",
+                          "slate",
+                          "charcoal",
+                          "black"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^#[0-9a-fA-F]{3,8}$"
+                      }
+                    ]
+                  }
+                }
+              },
+              "limbs": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "red",
+                      "coral",
+                      "orange",
+                      "sunflower",
+                      "lemon",
+                      "lime",
+                      "grass",
+                      "mint",
+                      "teal",
+                      "sky",
+                      "blue",
+                      "navy",
+                      "lilac",
+                      "purple",
+                      "berry",
+                      "pink",
+                      "blush",
+                      "peach",
+                      "sand",
+                      "tan",
+                      "brown",
+                      "chocolate",
+                      "cream",
+                      "white",
+                      "grey",
+                      "slate",
+                      "charcoal",
+                      "black"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  }
+                ]
+              },
+              "hands": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "red",
+                      "coral",
+                      "orange",
+                      "sunflower",
+                      "lemon",
+                      "lime",
+                      "grass",
+                      "mint",
+                      "teal",
+                      "sky",
+                      "blue",
+                      "navy",
+                      "lilac",
+                      "purple",
+                      "berry",
+                      "pink",
+                      "blush",
+                      "peach",
+                      "sand",
+                      "tan",
+                      "brown",
+                      "chocolate",
+                      "cream",
+                      "white",
+                      "grey",
+                      "slate",
+                      "charcoal",
+                      "black"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  }
+                ]
+              },
+              "feet": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "red",
+                      "coral",
+                      "orange",
+                      "sunflower",
+                      "lemon",
+                      "lime",
+                      "grass",
+                      "mint",
+                      "teal",
+                      "sky",
+                      "blue",
+                      "navy",
+                      "lilac",
+                      "purple",
+                      "berry",
+                      "pink",
+                      "blush",
+                      "peach",
+                      "sand",
+                      "tan",
+                      "brown",
+                      "chocolate",
+                      "cream",
+                      "white",
+                      "grey",
+                      "slate",
+                      "charcoal",
+                      "black"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  }
+                ]
+              },
+              "belly": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "red",
+                      "coral",
+                      "orange",
+                      "sunflower",
+                      "lemon",
+                      "lime",
+                      "grass",
+                      "mint",
+                      "teal",
+                      "sky",
+                      "blue",
+                      "navy",
+                      "lilac",
+                      "purple",
+                      "berry",
+                      "pink",
+                      "blush",
+                      "peach",
+                      "sand",
+                      "tan",
+                      "brown",
+                      "chocolate",
+                      "cream",
+                      "white",
+                      "grey",
+                      "slate",
+                      "charcoal",
+                      "black"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  }
+                ]
+              },
+              "ears": {
+                "default": {
+                  "kind": "none",
+                  "size": 1
+                },
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "default": "none",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "round",
+                      "long",
+                      "floppy",
+                      "pointed",
+                      "small",
+                      "antennae"
+                    ]
+                  },
+                  "size": {
+                    "default": 1,
+                    "type": "number",
+                    "minimum": 0.5,
+                    "maximum": 1.8
+                  },
+                  "color": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "red",
+                          "coral",
+                          "orange",
+                          "sunflower",
+                          "lemon",
+                          "lime",
+                          "grass",
+                          "mint",
+                          "teal",
+                          "sky",
+                          "blue",
+                          "navy",
+                          "lilac",
+                          "purple",
+                          "berry",
+                          "pink",
+                          "blush",
+                          "peach",
+                          "sand",
+                          "tan",
+                          "brown",
+                          "chocolate",
+                          "cream",
+                          "white",
+                          "grey",
+                          "slate",
+                          "charcoal",
+                          "black"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^#[0-9a-fA-F]{3,8}$"
+                      }
+                    ]
+                  },
+                  "inner": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "red",
+                          "coral",
+                          "orange",
+                          "sunflower",
+                          "lemon",
+                          "lime",
+                          "grass",
+                          "mint",
+                          "teal",
+                          "sky",
+                          "blue",
+                          "navy",
+                          "lilac",
+                          "purple",
+                          "berry",
+                          "pink",
+                          "blush",
+                          "peach",
+                          "sand",
+                          "tan",
+                          "brown",
+                          "chocolate",
+                          "cream",
+                          "white",
+                          "grey",
+                          "slate",
+                          "charcoal",
+                          "black"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^#[0-9a-fA-F]{3,8}$"
+                      }
+                    ]
+                  }
+                }
+              },
+              "muzzle": {
+                "default": {
+                  "kind": "none"
+                },
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "default": "none",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "oval",
+                      "snout",
+                      "beak"
+                    ]
+                  },
+                  "color": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "red",
+                          "coral",
+                          "orange",
+                          "sunflower",
+                          "lemon",
+                          "lime",
+                          "grass",
+                          "mint",
+                          "teal",
+                          "sky",
+                          "blue",
+                          "navy",
+                          "lilac",
+                          "purple",
+                          "berry",
+                          "pink",
+                          "blush",
+                          "peach",
+                          "sand",
+                          "tan",
+                          "brown",
+                          "chocolate",
+                          "cream",
+                          "white",
+                          "grey",
+                          "slate",
+                          "charcoal",
+                          "black"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^#[0-9a-fA-F]{3,8}$"
+                      }
+                    ]
+                  },
+                  "nose": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "red",
+                              "coral",
+                              "orange",
+                              "sunflower",
+                              "lemon",
+                              "lime",
+                              "grass",
+                              "mint",
+                              "teal",
+                              "sky",
+                              "blue",
+                              "navy",
+                              "lilac",
+                              "purple",
+                              "berry",
+                              "pink",
+                              "blush",
+                              "peach",
+                              "sand",
+                              "tan",
+                              "brown",
+                              "chocolate",
+                              "cream",
+                              "white",
+                              "grey",
+                              "slate",
+                              "charcoal",
+                              "black"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "pattern": "^#[0-9a-fA-F]{3,8}$"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "const": "none"
+                      }
+                    ]
+                  }
+                }
+              },
+              "eyes": {
+                "default": {
+                  "kind": "dot",
+                  "size": 1,
+                  "spacing": 1
+                },
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "default": "dot",
+                    "type": "string",
+                    "enum": [
+                      "dot",
+                      "oval",
+                      "wide"
+                    ]
+                  },
+                  "size": {
+                    "default": 1,
+                    "type": "number",
+                    "minimum": 0.7,
+                    "maximum": 1.5
+                  },
+                  "spacing": {
+                    "default": 1,
+                    "type": "number",
+                    "minimum": 0.7,
+                    "maximum": 1.4
+                  }
+                }
+              },
+              "brows": {
+                "default": false,
+                "type": "boolean"
+              },
+              "cheeks": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "red",
+                      "coral",
+                      "orange",
+                      "sunflower",
+                      "lemon",
+                      "lime",
+                      "grass",
+                      "mint",
+                      "teal",
+                      "sky",
+                      "blue",
+                      "navy",
+                      "lilac",
+                      "purple",
+                      "berry",
+                      "pink",
+                      "blush",
+                      "peach",
+                      "sand",
+                      "tan",
+                      "brown",
+                      "chocolate",
+                      "cream",
+                      "white",
+                      "grey",
+                      "slate",
+                      "charcoal",
+                      "black"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{3,8}$"
+                  }
+                ]
+              },
+              "tail": {
+                "default": {
+                  "kind": "none",
+                  "size": 1
+                },
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "default": "none",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "puff",
+                      "long",
+                      "curl",
+                      "stub",
+                      "fluffy"
+                    ]
+                  },
+                  "size": {
+                    "default": 1,
+                    "type": "number",
+                    "minimum": 0.5,
+                    "maximum": 1.8
+                  },
+                  "color": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "red",
+                          "coral",
+                          "orange",
+                          "sunflower",
+                          "lemon",
+                          "lime",
+                          "grass",
+                          "mint",
+                          "teal",
+                          "sky",
+                          "blue",
+                          "navy",
+                          "lilac",
+                          "purple",
+                          "berry",
+                          "pink",
+                          "blush",
+                          "peach",
+                          "sand",
+                          "tan",
+                          "brown",
+                          "chocolate",
+                          "cream",
+                          "white",
+                          "grey",
+                          "slate",
+                          "charcoal",
+                          "black"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^#[0-9a-fA-F]{3,8}$"
+                      }
+                    ]
+                  }
+                }
+              },
+              "hair": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "tuft",
+                      "bob",
+                      "bun",
+                      "spikes",
+                      "curls",
+                      "pigtails"
+                    ]
+                  },
+                  "color": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "red",
+                          "coral",
+                          "orange",
+                          "sunflower",
+                          "lemon",
+                          "lime",
+                          "grass",
+                          "mint",
+                          "teal",
+                          "sky",
+                          "blue",
+                          "navy",
+                          "lilac",
+                          "purple",
+                          "berry",
+                          "pink",
+                          "blush",
+                          "peach",
+                          "sand",
+                          "tan",
+                          "brown",
+                          "chocolate",
+                          "cream",
+                          "white",
+                          "grey",
+                          "slate",
+                          "charcoal",
+                          "black"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^#[0-9a-fA-F]{3,8}$"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "kind",
+                  "color"
+                ]
+              },
+              "markings": {
+                "default": [],
+                "maxItems": 3,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "eye-patch",
+                        "spots",
+                        "stripes"
+                      ]
+                    },
+                    "color": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "red",
+                            "coral",
+                            "orange",
+                            "sunflower",
+                            "lemon",
+                            "lime",
+                            "grass",
+                            "mint",
+                            "teal",
+                            "sky",
+                            "blue",
+                            "navy",
+                            "lilac",
+                            "purple",
+                            "berry",
+                            "pink",
+                            "blush",
+                            "peach",
+                            "sand",
+                            "tan",
+                            "brown",
+                            "chocolate",
+                            "cream",
+                            "white",
+                            "grey",
+                            "slate",
+                            "charcoal",
+                            "black"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^#[0-9a-fA-F]{3,8}$"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "color"
+                  ]
+                }
+              },
+              "details": {
+                "default": [],
+                "maxItems": 4,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "enum": [
+                        "scarf",
+                        "bow",
+                        "cap",
+                        "bobble-hat",
+                        "glasses",
+                        "badge",
+                        "necktie",
+                        "crown",
+                        "backpack",
+                        "flower"
+                      ]
+                    },
+                    "color": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "red",
+                            "coral",
+                            "orange",
+                            "sunflower",
+                            "lemon",
+                            "lime",
+                            "grass",
+                            "mint",
+                            "teal",
+                            "sky",
+                            "blue",
+                            "navy",
+                            "lilac",
+                            "purple",
+                            "berry",
+                            "pink",
+                            "blush",
+                            "peach",
+                            "sand",
+                            "tan",
+                            "brown",
+                            "chocolate",
+                            "cream",
+                            "white",
+                            "grey",
+                            "slate",
+                            "charcoal",
+                            "black"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^#[0-9a-fA-F]{3,8}$"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "color"
+            ]
+          },
           "energy": {
             "type": "number",
             "minimum": 0,
@@ -1123,9 +2071,7 @@
         "required": [
           "schemaVersion",
           "id",
-          "proportions",
-          "style",
-          "face"
+          "style"
         ]
       }
     },

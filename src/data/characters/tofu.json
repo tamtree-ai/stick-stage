@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "tofu",
+  "displayName": "Tofu",
+  "aspect": "16:9",
+  "style": {
+    "build": "shape"
+  },
+  "shape": {
+    "species": "rabbit",
+    "build": "kid",
+    "color": "blush",
+    "belly": "cream",
+    "ears": {
+      "kind": "long",
+      "size": 1.1,
+      "inner": "pink"
+    },
+    "muzzle": {
+      "kind": "oval",
+      "color": "cream",
+      "nose": "berry"
+    },
+    "tail": {
+      "kind": "puff",
+      "color": "white"
+    },
+    "cheeks": "pink",
+    "details": [
+      {
+        "id": "scarf",
+        "color": "teal"
+      }
+    ]
+  },
+  "energy": 0.85,
+  "personality": "Eager, asks why about everything, first to try.",
+  "voice": {
+    "say": "Samantha"
+  }
+}

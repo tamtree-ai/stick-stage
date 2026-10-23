@@ -6,8 +6,9 @@ import { renderAccessories } from "./accessories";
 import type { SymbolId } from "../face/schema";
 import { PropView } from "../props/PropView";
 import { propAngle, type PropState } from "../props/track";
-import { proportionsOf, toonOf } from "./build";
+import { proportionsOf, shapeOf, toonOf } from "./build";
 import { limbControl, limbPath } from "./limbs";
+import { ShapeRig } from "./shape/ShapeRig";
 import { ToonRig } from "./toon/ToonRig";
 import type { Character, PoseAngles } from "./schema";
 import type { Joints, RigMetrics } from "./skeleton";
@@ -60,6 +61,8 @@ const Limb: React.FC<LimbProps> = ({ root, joint, tip, curve, side, stroke, sw, 
 
 /** Renders one figure in figure space (root on the ground at 0,0, facing right). */
 export const Rig: React.FC<RigProps> = (p) => {
+  const shape = shapeOf(p.character);
+  if (shape) return <ShapeRig {...p} shape={shape} />;
   const toon = toonOf(p.character);
   return toon ? <ToonRig {...p} toon={toon} /> : <StickRig {...p} />;
 };

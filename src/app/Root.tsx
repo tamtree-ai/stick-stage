@@ -23,6 +23,7 @@ import { SkitComposition } from "./skit/SkitComposition";
 import { calculateSkitMetadata, skitCompositionSchema } from "./skit/skitData";
 import { SFX_LAB_FRAMES, SfxLab } from "./labs/SfxLab";
 import { SafeAreaLab, safeAreaLabSchema } from "./labs/SafeAreaLab";
+import { SHAPE_LAB_FRAMES, ShapeLab, shapeLabSchema } from "./labs/ShapeLab";
 import { calculateVizLabMetadata, VIZ_LAB_FRAMES, VizLab, vizLabSchema } from "./labs/VizLab";
 
 const FPS = 30;
@@ -31,6 +32,36 @@ const H = 1920;
 
 export const RemotionRoot: React.FC = () => (
   <>
+    {/* Shape tier (story cast): every shape character in one 16:9 frame. */}
+    <Composition
+      id="ShapeLab"
+      component={ShapeLab}
+      schema={shapeLabSchema}
+      defaultProps={{ set: "wide-plain", cast: [], showLabels: true }}
+      durationInFrames={SHAPE_LAB_FRAMES}
+      fps={FPS}
+      width={1920}
+      height={1080}
+    />
+    <Still
+      id="ShapeLineup"
+      component={ShapeLab}
+      schema={shapeLabSchema}
+      defaultProps={{ set: "wide-park", cast: [], showLabels: true, hold: { pose: "wave", expression: "happy" } }}
+      width={1920}
+      height={1080}
+    />
+    <Composition
+      id="TalkLabShape"
+      component={TalkLab}
+      schema={talkLabSchema}
+      defaultProps={{ skit: "talklab", character: "tofu", showLabels: true }}
+      calculateMetadata={calculateTalkLabMetadata}
+      durationInFrames={FPS}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
     {/* Toon tier (science cast): the same labs with style.build forced to "toon". */}
     <Composition
       id="CharacterLabToon"

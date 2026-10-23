@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "bobo",
+  "displayName": "Bobo",
+  "aspect": "16:9",
+  "style": {
+    "build": "shape"
+  },
+  "shape": {
+    "species": "bear",
+    "build": "round",
+    "color": "brown",
+    "belly": "tan",
+    "ears": {
+      "kind": "round",
+      "size": 0.9,
+      "inner": "tan"
+    },
+    "muzzle": {
+      "kind": "oval",
+      "color": "sand"
+    },
+    "details": [
+      {
+        "id": "cap",
+        "color": "red"
+      }
+    ]
+  },
+  "energy": 0.55,
+  "personality": "Big, gentle and slow to worry; always has a snack.",
+  "voice": {
+    "say": "Fred"
+  }
+}

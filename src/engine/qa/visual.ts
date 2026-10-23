@@ -3,7 +3,8 @@ import { stageActorsAt, xAt } from "../director/placement";
 import type { Timeline } from "../director/timeline";
 import { contrastRatio } from "../lib/color";
 import type { Library } from "../rig/actorState";
-import { toonOf } from "../rig/build";
+import { shapeOf, toonOf } from "../rig/build";
+import { lookOf } from "../rig/shape/look";
 import { getPalette } from "../set/palettes";
 import type { SetDef } from "../set/schema";
 import { faceRect } from "../shots/framing";
@@ -150,6 +151,14 @@ export const contrastChecks = (tl: Timeline, lib: Library, set: SetDef): Finding
   const tones = [palette.wallA, palette.wallB, palette.floor, palette.sky, palette.shade];
   for (const id of new Set(tl.cast.map((c) => c.character))) {
     const c = lib.characters[id]!;
+    const sh = shapeOf(c);
+    if (sh) {
+      // No outline: the body colour itself must part from the set.
+      const body = lookOf(sh).body;
+      const worstBody = Math.min(...tones.map((t) => contrastRatio(body, t)));
+      if (worstBody < 1.2) out.push({ check: "contrast", level: "warning", message: `${id}'s body colour is only ${worstBody.toFixed(2)}:1 against set "${set.id}" (shape figures have no outline; pick a colour that parts from the set)` });
+      continue;
+    }
     const stroke = toonOf(c)?.ink ?? c.style.stroke;
     const worst = Math.min(...tones.map((t) => contrastRatio(stroke, t)));
     if (worst < 3) out.push({ check: "contrast", level: "warning", message: `${id}'s outline is only ${worst.toFixed(1)}:1 against set "${set.id}" (characters should pop)` });

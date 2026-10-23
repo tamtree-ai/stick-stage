@@ -25,6 +25,7 @@ import { thumbFlip } from "../src/engine/rig/toon/limbs";
 const FIG = 720;
 const FPS = 30;
 const TOON_CAST = ["vera", "gus"];
+const SHAPE_CAST = ["tofu", "bobo", "pim", "mabel", "otto", "fennel"];
 const toonLib: Library = { ...library, characters: charactersWithBuild(library.characters, "toon") };
 
 const markup = (lib: Library, character: string, pose: string, expression: string, frame = 0) => {
@@ -51,8 +52,9 @@ const markup = (lib: Library, character: string, pose: string, expression: strin
 };
 
 describe("toon build", () => {
-  it("the science cast ships as toons; everyone else stays stick", () => {
-    for (const [id, c] of Object.entries(library.characters)) expect(c.style.build, id).toBe(TOON_CAST.includes(id) ? "toon" : "stick");
+  it("the science cast ships as toons; the story cast as shapes; everyone else stays stick", () => {
+    for (const [id, c] of Object.entries(library.characters))
+      expect(c.style.build, id).toBe(TOON_CAST.includes(id) ? "toon" : SHAPE_CAST.includes(id) ? "shape" : "stick");
     for (const id of TOON_CAST) expect(library.characters[id]!.toon, id).toBeDefined();
   });
 

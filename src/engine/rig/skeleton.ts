@@ -1,5 +1,5 @@
 import { add, dirFromAngle, lerp, scale, type Vec2 } from "../lib/math";
-import { proportionsOf } from "./build";
+import { proportionsOf, shapeOf } from "./build";
 import type { Character, PoseAngles } from "./schema";
 import { blendLegs, seatContact, seatedLegs, type SeatState } from "./seat";
 
@@ -37,7 +37,8 @@ export const rigMetrics = (c: Character, figureHeightPx: number): RigMetrics => 
   const sw = c.style.strokeWidth;
   return {
     heightPx,
-    headR: c.proportions.headRadius * heightPx,
+    // Toons keep the stick head size; a shape figure's head comes from its build.
+    headR: (shapeOf(c) ? proportionsOf(c) : c.proportions).headRadius * heightPx,
     strokeWidth: sw,
     footRx: 0.055 * heightPx * c.style.footLength,
     footRy: 0.026 * heightPx,
