@@ -11,7 +11,8 @@ const hex = (h: string): [number, number, number] => {
   return [parseInt(n.slice(0, 2), 16), parseInt(n.slice(2, 4), 16), parseInt(n.slice(4, 6), 16)];
 };
 
-const colorDist = (a: string, b: string): number => {
+/** RGB distance between two hex colours (0–441). */
+export const colorDist = (a: string, b: string): number => {
   const [ar, ag, ab] = hex(a);
   const [br, bg, bb] = hex(b);
   return Math.hypot(ar - br, ag - bg, ab - bb);

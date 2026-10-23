@@ -20,7 +20,8 @@ export type CheckInput = {
 };
 
 /** The M5 self-check: story rules + visual QA over every scene of a compiled skit. Pure. */
-export const checkSkit = ({ result, lib, sets, safeArea }: CheckInput): CheckReport => {
+export const checkSkit = ({ result, lib, sets: catalogSets, safeArea }: CheckInput): CheckReport => {
+  const sets = result.program.sets ? { ...catalogSets, ...result.program.sets } : catalogSets;
   const hint = (e: string): Expression["closeup"] => lib.expressions[e]?.closeup;
   const multi = result.scenes.length > 1;
   const findings: Finding[] = [...programChecks(result.program), ...distinctFindings(result, lib)];

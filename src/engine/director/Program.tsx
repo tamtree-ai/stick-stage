@@ -41,7 +41,9 @@ const Bed: React.FC<{ program: Program; audio?: boolean }> = ({ program, audio =
 };
 
 /** A compiled skit: its scenes in order, joined by their transitions. A teaser or slam hook plays first. */
-export const SkitProgram: React.FC<SkitProgramProps> = ({ program, sets, ...rest }) => {
+export const SkitProgram: React.FC<SkitProgramProps> = ({ program, sets: catalogSets, ...rest }) => {
+  // Places composed at compile time ride on the program.
+  const sets = program.sets ? { ...catalogSets, ...program.sets } : catalogSets;
   const hook = program.hook;
   const hookScene = hook ? program.scenes[hook.scene] : undefined;
   const picture = hook && hookScene ? (

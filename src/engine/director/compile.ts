@@ -7,6 +7,7 @@ import { coverOf } from "./cover";
 import { fromZodIssues, SkitError, type Diagnostic } from "./diagnostics";
 import { applyHook, type HookKind } from "./hooks";
 import { msToFrame } from "./layout";
+import { placeSets } from "./places";
 import { docBeats, isNarration, SkitSchema, type Beat, type CastMember, type Skit, type SkitDoc } from "./schema";
 import { compileScene, type CompileInput } from "./scene";
 import { styleById, type StyleId } from "./style";
@@ -126,9 +127,10 @@ export const compileSkit = (input: CompileInput): CompileResult => {
   const show = doc.meta.series ? input.series?.[doc.meta.series.id] : undefined;
   const style = styleById(doc.style ?? show?.style);
   const cold = (doc.coldOpen ?? show?.coldOpen) as HookKind | undefined;
-  const sceneInput = withCharacters({ ...input, style }, doc);
+  const placed = placeSets(doc);
+  const sceneInput = withCharacters({ ...input, style, sets: { ...input.sets, ...placed.sets } }, doc);
   const diags: Diagnostic[] = [];
-  const resolved = resolveScenes(doc, diags, style);
+  const resolved = resolveScenes(placed.doc, diags, style);
   const scenes: CompiledScene[] = [];
   for (const r of resolved) {
     let found: Diagnostic[];
@@ -165,6 +167,7 @@ export const compileSkit = (input: CompileInput): CompileResult => {
     durationInFrames: lastScene.from + lastScene.timeline.durationInFrames,
     scenes: programScenes,
     ...(music ? { music } : {}),
+    ...(Object.keys(placed.sets).length ? { sets: placed.sets } : {}),
   };
   const covered = { ...program, cover: coverOf(program, doc.meta.series) };
   const hooked = cold && cold !== "pov" ? applyHook(covered, cold) : covered;

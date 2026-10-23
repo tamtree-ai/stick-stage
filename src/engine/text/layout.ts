@@ -6,6 +6,11 @@ import { safeRect, type Rect, type SafeArea } from "./safeArea";
  * measure what is drawn. Widths are estimates for the bold sans text font (Montserrat 700–900).
  */
 export const SUBTITLE = { y: 0.62, fontSize: 74, lineHeight: 1.15, fill: "#ffffff", highlight: "#ffd84a", outline: "#111114", box: "#16161aee" } as const;
+/** Story episodes (style "story"): a lower, smaller caption under the cast, like broadcast subtitles. */
+export const STORY_SUBTITLE = { y: 0.88, fontSize: 58 } as const;
+/** Caption height and size for a timeline's directing style. */
+export const subtitleSpec = (directing?: { id: string }): { y: number; fontSize: number } =>
+  directing?.id === "story" ? STORY_SUBTITLE : { y: SUBTITLE.y, fontSize: SUBTITLE.fontSize };
 export const POV = { fontSize: 52, lineHeight: 1.18, fill: "#16161a", card: "#ffffff" } as const;
 export const SLAM = { y: 0.64, fontSize: 190, lineHeight: 1, fill: "#ffffff", outline: "#111114" } as const;
 

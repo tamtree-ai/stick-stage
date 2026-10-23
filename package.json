@@ -9,6 +9,7 @@
     "diagnose": "tsx scripts/diagnose.ts",
     "demo": "tsx scripts/demo.ts",
     "try": "tsx scripts/try.ts",
+    "story": "tsx scripts/story.ts",
     "dev": "remotion studio src/app/index.ts",
     "still": "remotion still src/app/index.ts",
     "render": "tsx scripts/render.ts",

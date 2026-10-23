@@ -95,6 +95,93 @@
       "type": "string",
       "minLength": 1
     },
+    "place": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "type": "string",
+          "enum": [
+            "park",
+            "garden",
+            "meadow",
+            "forest",
+            "beach",
+            "village",
+            "clubhouse",
+            "bedroom",
+            "living-room",
+            "kitchen"
+          ]
+        },
+        "time": {
+          "default": "day",
+          "type": "string",
+          "enum": [
+            "day",
+            "sunset",
+            "night"
+          ]
+        },
+        "season": {
+          "default": "summer",
+          "type": "string",
+          "enum": [
+            "summer",
+            "autumn"
+          ]
+        },
+        "features": {
+          "default": [],
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "tree",
+              "apple-tree",
+              "tall-tree",
+              "bush",
+              "flowers",
+              "pond",
+              "rock",
+              "fence",
+              "house",
+              "clubhouse",
+              "bench",
+              "path",
+              "window",
+              "door",
+              "rug",
+              "bed",
+              "table",
+              "shelf"
+            ]
+          }
+        },
+        "seats": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "seed": {
+          "default": 1,
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "setting"
+      ],
+      "additionalProperties": false
+    },
     "cast": {
       "minItems": 1,
       "maxItems": 4,
@@ -316,7 +403,8 @@
         "deadpan",
         "snappy",
         "chaotic",
-        "sitcom"
+        "sitcom",
+        "story"
       ]
     },
     "coldOpen": {
@@ -4689,6 +4777,93 @@
           "set": {
             "type": "string",
             "minLength": 1
+          },
+          "place": {
+            "type": "object",
+            "properties": {
+              "setting": {
+                "type": "string",
+                "enum": [
+                  "park",
+                  "garden",
+                  "meadow",
+                  "forest",
+                  "beach",
+                  "village",
+                  "clubhouse",
+                  "bedroom",
+                  "living-room",
+                  "kitchen"
+                ]
+              },
+              "time": {
+                "default": "day",
+                "type": "string",
+                "enum": [
+                  "day",
+                  "sunset",
+                  "night"
+                ]
+              },
+              "season": {
+                "default": "summer",
+                "type": "string",
+                "enum": [
+                  "summer",
+                  "autumn"
+                ]
+              },
+              "features": {
+                "default": [],
+                "maxItems": 10,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "tree",
+                    "apple-tree",
+                    "tall-tree",
+                    "bush",
+                    "flowers",
+                    "pond",
+                    "rock",
+                    "fence",
+                    "house",
+                    "clubhouse",
+                    "bench",
+                    "path",
+                    "window",
+                    "door",
+                    "rug",
+                    "bed",
+                    "table",
+                    "shelf"
+                  ]
+                }
+              },
+              "seats": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "seed": {
+                "default": 1,
+                "type": [
+                  "string",
+                  "number"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 200
+              }
+            },
+            "required": [
+              "setting"
+            ],
+            "additionalProperties": false
           },
           "cast": {
             "type": "array",

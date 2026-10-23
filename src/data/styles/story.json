@@ -1,0 +1,19 @@
+{
+  "id": "story",
+  "reactionMs": 1500,
+  "gapMs": 450,
+  "fadeMs": 600,
+  "minPunchGapMs": 2500,
+  "closeupBudgetMs": 8000,
+  "minCloseupMs": 1500,
+  "oneThingFrames": 8,
+  "sfx": "actions",
+  "punchIns": "default",
+  "emotion": "default",
+  "coverage": "default",
+  "shakes": false,
+  "speedLines": false,
+  "reactors": 1,
+  "transition": "fade",
+  "length": [30, 600]
+}

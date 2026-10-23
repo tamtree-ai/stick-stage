@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PlaceSchema } from "../set/compose";
 import { SYMBOLS } from "../face/schema";
 import type { Aspect } from "../format/aspect";
 import { ScreenTextSchema, SignTextSchema } from "../lib/screenText";
@@ -185,6 +186,8 @@ export const SceneSchema = z.strictObject({
   id: z.string().regex(/^[A-Za-z0-9_-]+$/, "letters, digits, - and _ only"),
   /** Default: the skit's `set`. */
   set: z.string().min(1).optional(),
+  /** A place described instead of a catalog set: `{ "setting": "park", "time": "sunset" }` (story kit). */
+  place: PlaceSchema.optional(),
   /** Who is in this scene and where. Default: the whole cast at their skit marks (none on a card scene). `[]`: nobody (narrator-only). */
   cast: z.array(SceneCastSchema).optional(),
   /** How this scene comes in (ignored on the first scene). Default: a 400 ms fade. */
@@ -225,6 +228,8 @@ export const SkitSchema = z
     meta: MetaSchema,
     /** The set (single-scene skits), or the default set for scenes. */
     set: z.string().min(1).optional(),
+    /** A described place instead of `set` (story kit, `set/compose.ts`); scenes may each have their own. */
+    place: PlaceSchema.optional(),
     cast: z.array(CastSchema).min(1).max(4),
     /** Off-screen voice-over (optional). */
     narrator: NarratorSchema.optional(),
@@ -267,9 +272,11 @@ export const SkitSchema = z
     if (d.beats && d.scenes) ctx.addIssue({ code: "custom", path: ["scenes"], message: `use either "beats" (one scene) or "scenes", not both` });
     if (!d.beats && !d.scenes) ctx.addIssue({ code: "custom", path: ["beats"], message: `a skit needs "beats" (or "scenes")` });
     if (d.scenes && d.figures) ctx.addIssue({ code: "custom", path: ["figures"], message: `a multi-scene skit puts "figures" on each scene` });
-    if (!d.set && !d.scenes) ctx.addIssue({ code: "custom", path: ["set"], message: `a skit needs a "set"` });
+    if (!d.set && !d.place && !d.scenes) ctx.addIssue({ code: "custom", path: ["set"], message: `a skit needs a "set" (or a "place")` });
+    if (d.set && d.place) ctx.addIssue({ code: "custom", path: ["place"], message: `give a "set" or a "place", not both` });
     d.scenes?.forEach((sc, i) => {
-      if (!sc.set && !d.set) ctx.addIssue({ code: "custom", path: ["scenes", i, "set"], message: `scene "${sc.id}" needs a "set" (or give the skit one)` });
+      if (!sc.set && !sc.place && !d.set && !d.place) ctx.addIssue({ code: "custom", path: ["scenes", i, "set"], message: `scene "${sc.id}" needs a "set" or a "place" (or give the skit one)` });
+      if (sc.set && sc.place) ctx.addIssue({ code: "custom", path: ["scenes", i, "place"], message: `scene "${sc.id}": give a "set" or a "place", not both` });
     });
     if (d.narrator && d.cast.some((c) => c.id === d.narrator!.id))
       ctx.addIssue({ code: "custom", path: ["narrator", "id"], message: `the narrator's id "${d.narrator.id}" is also a cast id; rename one` });
@@ -282,7 +289,7 @@ export type SkitDoc = Omit<SkitParsed, "meta"> & {
 export type SkitInput = z.input<typeof SkitSchema>;
 
 /** One resolved scene, as the director compiles it (a single-scene skit is exactly this). */
-export type Skit = Omit<SkitDoc, "set" | "beats" | "scenes"> & { set: string; beats: Beat[]; card?: Card };
+export type Skit = Omit<SkitDoc, "set" | "place" | "beats" | "scenes"> & { set: string; beats: Beat[]; card?: Card };
 
 /** Is this beat a voice-over (spoken by the skit's narrator)? */
 export const isNarration = (skit: Pick<SkitDoc, "narrator">, b: Pick<Beat, "speaker">): boolean => !!skit.narrator && b.speaker === skit.narrator.id;

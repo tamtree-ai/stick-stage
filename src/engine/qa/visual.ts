@@ -5,11 +5,15 @@ import { contrastRatio } from "../lib/color";
 import type { Library } from "../rig/actorState";
 import { shapeOf, toonOf } from "../rig/build";
 import { lookOf } from "../rig/shape/look";
+import { colorDist } from "./distinct";
+
+/** Shape figures: the least RGB distance between body colour and a set tone. */
+const SHAPE_MIN_DIST = 48;
 import { getPalette } from "../set/palettes";
 import type { SetDef } from "../set/schema";
 import { faceRect } from "../shots/framing";
 import { pageAt } from "../text/captions";
-import { cardLayout, inside, LIST, listLayout, overlaps, povRect, slamRect, SLAM, SUBTITLE, subtitleRect } from "../text/layout";
+import { cardLayout, inside, LIST, subtitleSpec, listLayout, overlaps, povRect, slamRect, SLAM, SUBTITLE, subtitleRect } from "../text/layout";
 import { safeRect, type Rect, type SafeArea } from "../text/safeArea";
 import type { Finding } from "./types";
 
@@ -74,7 +78,8 @@ export const visualChecks = ({ tl, lib, set, safeArea }: Ctx): Finding[] => {
     const page = pageAt(tl.pages, ms);
     const slamUp = tl.slams.some((s) => frame >= s.from - 4 && frame < s.to);
     if (page && !slamUp) {
-      const { rect, lines } = subtitleRect(page.text, W, H, safeArea);
+      const spec = subtitleSpec(tl.directing);
+      const { rect, lines } = subtitleRect(page.text, W, H, safeArea, spec.y, spec.fontSize);
       for (const f of faces)
         if (overlaps(rect, f.rect))
           once(`sub-${shot.frame}-${f.id}`, { check: "overlay-collision", level: "warning", frame, message: `subtitle "${page.text.trim()}" covers ${f.id}'s face at ${at(frame)}` });
@@ -153,10 +158,11 @@ export const contrastChecks = (tl: Timeline, lib: Library, set: SetDef): Finding
     const c = lib.characters[id]!;
     const sh = shapeOf(c);
     if (sh) {
-      // No outline: the body colour itself must part from the set.
+      // No outline, so the figure parts from the set by colour (hue counts, not only brightness):
+      // its body against what it stands in front of.
       const body = lookOf(sh).body;
-      const worstBody = Math.min(...tones.map((t) => contrastRatio(body, t)));
-      if (worstBody < 1.2) out.push({ check: "contrast", level: "warning", message: `${id}'s body colour is only ${worstBody.toFixed(2)}:1 against set "${set.id}" (shape figures have no outline; pick a colour that parts from the set)` });
+      const near = Math.min(...[palette.wallA, palette.wallB, palette.floor, palette.sky].map((t) => colorDist(body, t)));
+      if (near < SHAPE_MIN_DIST) out.push({ check: "contrast", level: "warning", message: `${id}'s body colour is close to set "${set.id}" (distance ${near.toFixed(0)}, min ${SHAPE_MIN_DIST}); shape figures have no outline, so pick a colour that parts from the set` });
       continue;
     }
     const stroke = toonOf(c)?.ink ?? c.style.stroke;
