@@ -14,7 +14,10 @@ export const SHAPE_PLANS = ["biped", "quadruped"] as const;
 /** Body proportion presets (`shape/proportions.ts`). */
 export const SHAPE_BUILDS = ["kid", "adult", "tall", "tiny", "round"] as const;
 export const HEAD_KINDS = ["circle", "oval", "wide", "pear"] as const;
-export const BODY_KINDS = ["bean", "pear", "egg", "block", "barrel"] as const;
+export const BODY_KINDS = ["bean", "pear", "egg", "block", "barrel", "drop"] as const;
+/** Arms, wings (birds) or none (blobs, objects). Legs, or none: the body sits on the ground. */
+export const ARM_KINDS = ["arms", "wings", "none"] as const;
+export const LEG_KINDS = ["legs", "none"] as const;
 export const EAR_KINDS = ["none", "round", "long", "floppy", "pointed", "small", "antennae"] as const;
 export const MUZZLE_KINDS = ["none", "oval", "snout", "beak"] as const;
 export const EYE_KINDS = ["dot", "oval", "wide"] as const;
@@ -40,6 +43,8 @@ export const ShapeSchema = z.object({
   body: z
     .object({ kind: z.enum(BODY_KINDS).default("bean"), width: mult(0.7, 1.4).default(1), color: ShapeColor.optional() })
     .default({ kind: "bean", width: 1 }),
+  arms: z.enum(ARM_KINDS).default("arms"),
+  legs: z.enum(LEG_KINDS).default("legs"),
   /** Arms and legs; missing means the body colour. */
   limbs: ShapeColor.optional(),
   /** Hands and feet (mittens, socks, hooves); missing means a little darker than the limbs. */

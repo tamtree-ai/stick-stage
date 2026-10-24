@@ -1,3 +1,4 @@
+import { offstageChecks } from "./visual";
 import { withProgramAssets } from "../director/places";
 import type { CompileResult } from "../director/compile";
 import type { Expression } from "../face/schema";
@@ -34,6 +35,7 @@ export const checkSkit = ({ result, lib: catalogLib, sets: catalogSets, safeArea
       ...closeupChecks(tl, skit, hint),
       ...pacingChecks(tl),
       ...visualChecks({ tl, lib, set: sets[tl.set]!, safeArea: aspectOfFrame(tl.width, tl.height) === "16:9" ? WIDE_SAFE_AREA : safeArea }),
+      ...offstageChecks({ tl, lib, set: sets[tl.set]! }),
     ];
     // Report skit-absolute frames.
     findings.push(...scene.map((f) => ({ ...f, frame: f.frame === undefined ? undefined : f.frame + ps.from, scene: multi ? ps.id : undefined })));

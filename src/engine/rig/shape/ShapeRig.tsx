@@ -30,6 +30,22 @@ const Limb: React.FC<{ root: Vec2; joint: Vec2; tip: Vec2; side: 1 | -1; w: numb
   );
 };
 
+/** A wing: a tapered leaf from the shoulder to the tip, flapping with the arm angles. */
+const Wing: React.FC<{ root: Vec2; tip: Vec2; w: number; fill: string; held: React.ReactNode }> = ({ root, tip, w, fill, held }) => {
+  const dx = tip.x - root.x;
+  const dy = tip.y - root.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = (-dy / len) * w;
+  const ny = (dx / len) * w;
+  const d = `M${f2(root.x)},${f2(root.y)} Q${f2(root.x + dx * 0.5 + nx)},${f2(root.y + dy * 0.5 + ny)} ${f2(tip.x)},${f2(tip.y)} Q${f2(root.x + dx * 0.4 - nx * 0.3)},${f2(root.y + dy * 0.4 - ny * 0.3)} ${f2(root.x)},${f2(root.y)} Z`;
+  return (
+    <g>
+      <path d={d} fill={fill} />
+      {held}
+    </g>
+  );
+};
+
 /**
  * One shape figure in figure space, on the stick rig's joints. Flat fills, no outlines: the far
  * limbs are a tone darker and the near arm carries a thin darker edge so it reads over a body
@@ -77,6 +93,12 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
   const arm = (s: "L" | "R") => {
     const back = s === "L";
     const hand = at(back ? j.handL : j.handR);
+    if (shape.arms === "none") return <g key={`arm${s}`}>{held(s)}</g>;
+    if (shape.arms === "wings") {
+      // Longer than the arm and a shade darker, so the near wing reads over a body of the same colour.
+      const tip = add(shoulder, { x: (hand.x - shoulder.x) * 1.35, y: (hand.y - shoulder.y) * 1.35 });
+      return <Wing key={`arm${s}`} root={shoulder} tip={tip} w={limbW * 2.4} fill={back ? backTone(look.limbs) : edgeTone(look.limbs)} held={held(s)} />;
+    }
     return (
       <g key={`arm${s}`}>
         <Limb
@@ -97,6 +119,7 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
   const footRy = Math.max(m.footRy, limbW * 0.45);
   const leg = (s: "L" | "R") => {
     const back = s === "L";
+    if (shape.legs === "none") return null;
     const foot = back ? j.footL : j.footR;
     return (
       <g key={`leg${s}`}>

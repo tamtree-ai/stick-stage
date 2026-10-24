@@ -19,7 +19,7 @@ import type { Finding } from "./types";
 
 /** Visual QA on sampled frames: faces in the safe area, overlays not covering faces, contrast. */
 
-export const VISUAL_CHECKS = ["faces-safe", "overlay-collision", "overlay-fit", "contrast"];
+export const VISUAL_CHECKS = ["faces-safe", "overlay-collision", "overlay-fit", "contrast", "speaker-offstage"];
 
 const FACE = ["medium", "close", "extreme"];
 
@@ -168,6 +168,25 @@ export const contrastChecks = (tl: Timeline, lib: Library, set: SetDef): Finding
     const stroke = toonOf(c)?.ink ?? c.style.stroke;
     const worst = Math.min(...tones.map((t) => contrastRatio(stroke, t)));
     if (worst < 3) out.push({ check: "contrast", level: "warning", message: `${id}'s outline is only ${worst.toFixed(1)}:1 against set "${set.id}" (characters should pop)` });
+  }
+  return out;
+};
+
+/**
+ * A cast member who speaks while off stage for the whole line (their scene mark is off-left /
+ * off-right and they never walk on). Usually a scene that forgot to give them a mark.
+ */
+export const offstageChecks = ({ tl, lib, set }: { tl: Timeline; lib: Library; set: SetDef }): Finding[] => {
+  const out: Finding[] = [];
+  const W = tl.width;
+  for (const b of tl.beats) {
+    if (b.kind !== "line" || !b.speaker || b.narrator) continue;
+    const frames = [b.from, Math.floor((b.from + b.to) / 2), Math.max(b.from, b.to - 1)];
+    const away = frames.every((f) => {
+      const a = stageActorsAt(lib, tl.cast, set, f, tl.fps, W).find((x) => x.id === b.speaker);
+      return !a || a.x < 0 || a.x > 1;
+    });
+    if (away) out.push({ check: "speaker-offstage", level: "error", frame: b.from, message: `"${b.speaker}" speaks "${b.id}" from off stage the whole time; give them a mark in this scene, or walk them on` });
   }
   return out;
 };

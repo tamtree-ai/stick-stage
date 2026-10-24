@@ -25,7 +25,7 @@ import { thumbFlip } from "../src/engine/rig/toon/limbs";
 const FIG = 720;
 const FPS = 30;
 const TOON_CAST = ["vera", "gus"];
-const SHAPE_CAST = ["tofu", "bobo", "pim", "mabel", "otto", "fennel", "biscuit"];
+const SHAPE_CAST = ["tofu", "bobo", "pim", "mabel", "otto", "fennel", "biscuit", "wren", "blip"];
 const toonLib: Library = { ...library, characters: charactersWithBuild(library.characters, "toon") };
 
 const markup = (lib: Library, character: string, pose: string, expression: string, frame = 0) => {

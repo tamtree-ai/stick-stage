@@ -33,7 +33,7 @@ import {
 
 const FIG = 620;
 const FPS = 30;
-const SHAPE_CAST = ["tofu", "bobo", "pim", "mabel", "otto", "fennel", "biscuit"];
+const SHAPE_CAST = ["tofu", "bobo", "pim", "mabel", "otto", "fennel", "biscuit", "wren", "blip"];
 
 const markup = (lib: Library, character: string, pose: string, expression: string, frame = 0) => {
   const s = evalActor(lib, { character, poseKeys: [{ frame: 0, pose }], expressionKeys: [{ frame: 0, expression }] }, frame, FPS, FIG);

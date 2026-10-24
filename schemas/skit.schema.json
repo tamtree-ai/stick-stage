@@ -1349,7 +1349,8 @@
                       "pear",
                       "egg",
                       "block",
-                      "barrel"
+                      "barrel",
+                      "drop"
                     ]
                   },
                   "width": {
@@ -1400,6 +1401,23 @@
                     ]
                   }
                 }
+              },
+              "arms": {
+                "default": "arms",
+                "type": "string",
+                "enum": [
+                  "arms",
+                  "wings",
+                  "none"
+                ]
+              },
+              "legs": {
+                "default": "legs",
+                "type": "string",
+                "enum": [
+                  "legs",
+                  "none"
+                ]
               },
               "limbs": {
                 "anyOf": [

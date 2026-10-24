@@ -106,3 +106,13 @@ describe("workspace props (the draw rung)", () => {
     expect(propPrompt("a red kite", []).prompt).toContain('"a-red-kite"');
   });
 });
+
+describe("speaker-offstage", () => {
+  it("catches a line spoken from off stage (a scene that forgot a mark)", () => {
+    const doc = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "../public/skits/biscuit-shell/skit.json"), "utf8"));
+    const share = doc.scenes.find((s: { id: string }) => s.id === "share");
+    share.cast = share.cast.map((c: { id: string; mark?: string }) => (c.id === "pim" ? { id: "pim" } : c));
+    const found = checkDraft(doc, src).check.findings.filter((f) => f.check === "speaker-offstage");
+    expect(found.map((f) => f.message).join()).toContain('"pim" speaks "p2"');
+  });
+});

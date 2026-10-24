@@ -42,6 +42,8 @@ const table = (s: Shape) => (s.plan === "quadruped" ? QUAD_BUILDS : BUILDS)[s.bu
 
 export const shapeProportions = (s: Shape): Proportions => {
   const b = table(s);
+  // Legless: the skeleton keeps stub legs so the body rests just on the ground.
+  const stub = s.legs === "none" && s.plan === "biped";
   return {
     height: b.height * s.size,
     headRadius: b.headRadius * s.head.size,
@@ -49,8 +51,8 @@ export const shapeProportions = (s: Shape): Proportions => {
     torso: b.torso,
     upperArm: b.upperArm,
     forearm: b.forearm,
-    thigh: b.thigh,
-    shin: b.shin,
+    thigh: stub ? 0.03 : b.thigh,
+    shin: stub ? 0.03 : b.shin,
   };
 };
 

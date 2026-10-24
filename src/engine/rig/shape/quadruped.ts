@@ -36,8 +36,9 @@ export const solveQuadruped = (s: Shape, p: PoseAngles, m: RigMetrics, len: Leng
     const ankle = add(knee, scale(dirFromAngle(hipA - kneeA), len.lower));
     return { knee, ankle, foot: add(ankle, footOffset) };
   };
-  const bL = backLeg(p.hipL, p.kneeL);
-  const bR = backLeg(p.hipR, p.kneeR);
+  // Sitting folds the back legs under the rump (a seat sits the same way as the sit pose).
+  const bL = backLeg(lerp(p.hipL, 85, sit), lerp(p.kneeL, 100, sit));
+  const bR = backLeg(lerp(p.hipR, 88, sit), lerp(p.kneeR, 104, sit));
   const backDrop = Math.max(bL.foot.y, bR.foot.y);
 
   // Pitch: the lean, then sitting tips the front up just enough for the front paws to reach the floor.

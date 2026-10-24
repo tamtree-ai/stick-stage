@@ -26,6 +26,9 @@ const torsoPath = (kind: Look["s"]["body"]["kind"], T: number, W: number): strin
       return rect(W * 0.22);
     case "barrel":
       return e((ext - T) / 2, W * 0.55, h / 2);
+    case "drop":
+      // A blob: wide and flat at the bottom, rising to a soft point under the head.
+      return `M0,${f2(-T - W * 0.1)} C${f2(W * 0.2)},${f2(-T * 0.7)} ${f2(W * 0.62)},${f2(-T * 0.25)} ${f2(W * 0.6)},${f2(ext * 0.3)} C${f2(W * 0.58)},${f2(ext)} ${f2(W * 0.3)},${f2(ext)} 0,${f2(ext)} C${f2(-W * 0.3)},${f2(ext)} ${f2(-W * 0.58)},${f2(ext)} ${f2(-W * 0.6)},${f2(ext * 0.3)} C${f2(-W * 0.62)},${f2(-T * 0.25)} ${f2(-W * 0.2)},${f2(-T * 0.7)} 0,${f2(-T - W * 0.1)} Z`;
     default:
       return rect(W / 2);
   }
