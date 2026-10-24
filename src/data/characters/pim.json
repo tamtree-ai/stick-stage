@@ -10,7 +10,7 @@
     "species": "penguin",
     "build": "tiny",
     "color": "navy",
-    "belly": "white",
+    "belly": "cream",
     "muzzle": {
       "kind": "beak",
       "color": "orange"
@@ -25,7 +25,7 @@
     "details": [
       {
         "id": "bow",
-        "color": "sunflower"
+        "color": "coral"
       }
     ]
   },

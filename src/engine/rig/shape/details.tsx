@@ -1,5 +1,5 @@
 import React from "react";
-import { darken } from "../../lib/color";
+import { shade } from "../../lib/color";
 import { f2 } from "../../lib/math";
 import type { Look } from "./look";
 
@@ -16,14 +16,14 @@ export const DetailsOnHead: React.FC<{ R: number; look: Look }> = ({ R, look }) 
       {d.cap ? (
         <g fill={d.cap}>
           <path d={`M${p(-0.92)},${p(-0.3)} C${p(-0.95)},${p(-1.12)} ${p(0.85)},${p(-1.15)} ${p(0.92)},${p(-0.4)} Z`} />
-          <path d={`M${p(0.55)},${p(-0.42)} Q${p(1.25)},${p(-0.5)} ${p(1.38)},${p(-0.3)} L${p(0.6)},${p(-0.26)} Z`} fill={darken(d.cap, 0.12)} />
+          <path d={`M${p(0.55)},${p(-0.42)} Q${p(1.25)},${p(-0.5)} ${p(1.38)},${p(-0.3)} L${p(0.6)},${p(-0.26)} Z`} fill={shade(d.cap, 0.19)} />
         </g>
       ) : null}
       {d["bobble-hat"] ? (
         <g fill={d["bobble-hat"]}>
           <path d={`M${p(-0.95)},${p(-0.32)} C${p(-0.95)},${p(-1.2)} ${p(0.95)},${p(-1.2)} ${p(0.95)},${p(-0.32)} Z`} />
-          <rect x={-0.98 * R} y={-0.42 * R} width={1.96 * R} height={0.2 * R} rx={0.1 * R} fill={darken(d["bobble-hat"], 0.14)} />
-          <circle cx={0} cy={-1.12 * R} r={0.18 * R} fill="#ffffff" />
+          <rect x={-0.98 * R} y={-0.42 * R} width={1.96 * R} height={0.2 * R} rx={0.1 * R} fill={shade(d["bobble-hat"], 0.22)} />
+          <circle cx={0} cy={-1.12 * R} r={0.18 * R} fill="#fbf8f2" />
         </g>
       ) : null}
       {d.crown ? (
@@ -35,7 +35,7 @@ export const DetailsOnHead: React.FC<{ R: number; look: Look }> = ({ R, look }) 
       {d.bow ? (
         <g fill={d.bow} transform={`translate(${p(-0.35)} ${p(-0.92)}) rotate(-15)`}>
           <path d={`M0,0 L${p(-0.3)},${p(-0.18)} L${p(-0.3)},${p(0.18)} Z M0,0 L${p(0.3)},${p(-0.18)} L${p(0.3)},${p(0.18)} Z`} />
-          <circle r={0.08 * R} fill={darken(d.bow, 0.15)} />
+          <circle r={0.08 * R} fill={shade(d.bow, 0.24)} />
         </g>
       ) : null}
       {d.flower ? (
@@ -43,7 +43,7 @@ export const DetailsOnHead: React.FC<{ R: number; look: Look }> = ({ R, look }) 
           {[0, 72, 144, 216, 288].map((a) => (
             <circle key={a} cx={Math.cos((a * Math.PI) / 180) * 0.14 * R} cy={Math.sin((a * Math.PI) / 180) * 0.14 * R} r={0.11 * R} fill={d.flower} />
           ))}
-          <circle r={0.09 * R} fill="#f8bf2e" />
+          <circle r={0.09 * R} fill="#fbb954" />
         </g>
       ) : null}
       {d.glasses ? (
@@ -73,13 +73,13 @@ export const DetailsOnBody: React.FC<BodyProps> = ({ T, W, look }) => {
       {d.badge ? (
         <g>
           <circle cx={W * 0.2} cy={-T * 0.62} r={W * 0.11} fill={d.badge} />
-          <circle cx={W * 0.2} cy={-T * 0.62} r={W * 0.055} fill={darken(d.badge, 0.18)} />
+          <circle cx={W * 0.2} cy={-T * 0.62} r={W * 0.055} fill={shade(d.badge, 0.29)} />
         </g>
       ) : null}
       {d.scarf ? (
         <g fill={d.scarf}>
           <rect x={-W * 0.55} y={-T * 1.04} width={W * 1.1} height={T * 0.2} rx={T * 0.1} />
-          <path d={`M${f2(-W * 0.3)},${f2(-T * 0.9)} L${f2(-W * 0.42)},${f2(-T * 0.45)} L${f2(-W * 0.18)},${f2(-T * 0.48)} L${f2(-W * 0.12)},${f2(-T * 0.9)} Z`} fill={darken(d.scarf, 0.1)} />
+          <path d={`M${f2(-W * 0.3)},${f2(-T * 0.9)} L${f2(-W * 0.42)},${f2(-T * 0.45)} L${f2(-W * 0.18)},${f2(-T * 0.48)} L${f2(-W * 0.12)},${f2(-T * 0.9)} Z`} fill={shade(d.scarf, 0.16)} />
         </g>
       ) : null}
     </g>

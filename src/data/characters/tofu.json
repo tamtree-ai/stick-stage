@@ -10,7 +10,6 @@
     "species": "rabbit",
     "build": "kid",
     "color": "blush",
-    "belly": "cream",
     "ears": {
       "kind": "long",
       "size": 1.1,
@@ -18,20 +17,20 @@
     },
     "muzzle": {
       "kind": "oval",
-      "color": "cream",
       "nose": "berry"
     },
     "tail": {
       "kind": "puff",
-      "color": "white"
+      "color": "cream"
     },
     "cheeks": "pink",
     "details": [
       {
         "id": "scarf",
-        "color": "teal"
+        "color": "sunflower"
       }
-    ]
+    ],
+    "belly": "cream"
   },
   "energy": 0.85,
   "personality": "Eager, asks why about everything, first to try.",

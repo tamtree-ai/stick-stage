@@ -8,7 +8,7 @@ import type { Look } from "./look";
  * `T` px, `W` px wide, front toward +x. The body reaches a little below the hip so the legs
  * come out from under it.
  */
-const torsoPath = (kind: Look["s"]["body"]["kind"], T: number, W: number): string => {
+export const torsoPath = (kind: Look["s"]["body"]["kind"], T: number, W: number): string => {
   const ext = W * 0.22;
   const h = T + ext;
   const e = (cy: number, rx: number, ry: number) =>
@@ -34,7 +34,7 @@ const torsoPath = (kind: Look["s"]["body"]["kind"], T: number, W: number): strin
   }
 };
 
-export const Torso: React.FC<{ T: number; W: number; look: Look }> = ({ T, W, look }) => {
+export const Torso: React.FC<{ T: number; W: number; look: Look; details?: boolean }> = ({ T, W, look, details = true }) => {
   const clipId = "shb" + useId().replace(/[^a-zA-Z0-9]/g, "");
   const d = torsoPath(look.s.body.kind, T, W);
   const { spots, stripes } = look.marks;
@@ -61,7 +61,7 @@ export const Torso: React.FC<{ T: number; W: number; look: Look }> = ({ T, W, lo
           </g>
         ) : null}
       </g>
-      <DetailsOnBody T={T} W={W} look={look} />
+      {details ? <DetailsOnBody T={T} W={W} look={look} /> : null}
     </g>
   );
 };

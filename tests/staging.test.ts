@@ -4,6 +4,7 @@ import {
   evalActor,
   evalSeat,
   fallPose,
+  risePose,
   PROP_BOUNDS,
   propBounds,
   propUnit,
@@ -185,6 +186,24 @@ describe("props", () => {
       expect(p.y).toBeLessThanOrEqual(rest + 1e-6);
       expect(fallPose(phone, { x: 10, y: -300 }, 20, t, FIG)).toEqual(p);
     }
+  });
+  it("a floating prop (the balloon) rises when let go, ever higher, and settles upright", () => {
+    const balloon = library.props.balloon!;
+    expect(balloon.floats).toBe(true);
+    const tracks: ActorTracks = {
+      character: "milo",
+      poseKeys: [{ frame: 0, pose: "idle" }],
+      expressionKeys: [{ frame: 0, expression: "neutral" }],
+      propKeys: [
+        { frame: 0, hand: "R", prop: "balloon" },
+        { frame: 10, hand: "R", prop: null, drop: true },
+      ],
+    };
+    const at = (f: number) => evalActor(library, tracks, f, FPS, FIG).props.dropped[0]!;
+    const ys = [12, 20, 40, 70, 100].map((f) => at(f).y);
+    for (let i = 1; i < ys.length; i++) expect(ys[i]!).toBeLessThan(ys[i - 1]!);
+    expect(Math.abs(at(100).angle)).toBeLessThanOrEqual(10);
+    expect(risePose({ x: 0, y: -300 }, 0, 0, FIG)).toEqual({ x: 0, y: -300, angle: 0 });
   });
 });
 

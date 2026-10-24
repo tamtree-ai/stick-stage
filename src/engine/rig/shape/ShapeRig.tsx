@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { add, f2, lerpVec, sub, type Vec2 } from "../../lib/math";
 import { PropView } from "../../props/PropView";
 import { propAngle } from "../../props/track";
@@ -6,12 +6,13 @@ import { torsoFrame } from "../accessoryKit";
 import { proportionsOf } from "../build";
 import { limbControl, limbPath } from "../limbs";
 import type { RigProps } from "../Rig";
-import { Tail, Torso } from "./body";
-import { DetailsBehind } from "./details";
-import { ShapeHead, ShapeHeadBack } from "./face";
+import { Tail, Torso, torsoPath } from "./body";
+import { DetailsBehind, DetailsOnBody } from "./details";
+import { ShapeHead, ShapeHeadBack, ShapeHeadSymbols } from "./face";
 import { QuadRig } from "./QuadRig";
 import { backTone, lookOf, propLine } from "./look";
-import { edgeTone } from "./palette";
+import { castTone, edgeTone } from "./palette";
+import { GroundShadow, Soft } from "./soft";
 import { shapeBuildMetrics } from "./proportions";
 import type { Shape } from "./schema";
 
@@ -20,15 +21,9 @@ const LIMB_CURVE = 0.3;
 /** Where the arms leave the body, up the torso from the hip; the skeleton's shoulder sits under the chin. */
 const SHOULDER_AT = 0.76;
 
-const Limb: React.FC<{ root: Vec2; joint: Vec2; tip: Vec2; side: 1 | -1; w: number; fill: string; edge?: string }> = ({ root, joint, tip, side, w, fill, edge }) => {
-  const d = limbPath(root, limbControl(root, joint, tip, LIMB_CURVE, side), tip);
-  return (
-    <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-      {edge ? <path d={d} stroke={edge} strokeWidth={w * 1.16} /> : null}
-      <path d={d} stroke={fill} strokeWidth={w} />
-    </g>
-  );
-};
+const Limb: React.FC<{ root: Vec2; joint: Vec2; tip: Vec2; side: 1 | -1; w: number; fill: string }> = ({ root, joint, tip, side, w, fill }) => (
+  <path d={limbPath(root, limbControl(root, joint, tip, LIMB_CURVE, side), tip)} fill="none" stroke={fill} strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" />
+);
 
 /** A wing: a tapered leaf from the shoulder to the tip, flapping with the arm angles. */
 const Wing: React.FC<{ root: Vec2; tip: Vec2; w: number; fill: string; held: React.ReactNode }> = ({ root, tip, w, fill, held }) => {
@@ -48,9 +43,10 @@ const Wing: React.FC<{ root: Vec2; tip: Vec2; w: number; fill: string; held: Rea
 
 /**
  * One shape figure in figure space, on the stick rig's joints. Flat fills, no outlines: the far
- * limbs are a tone darker and the near arm carries a thin darker edge so it reads over a body
- * of the same colour. Draw order: tail, backpack, far ears, far arm, legs, torso, head, near
- * arm, held props.
+ * limbs are a hue-shifted tone darker, and the near arm casts a soft shadow on the body so it
+ * reads over a body of the same colour. Tail, ears, legs, torso and head are one soft
+ * silhouette (`Soft`), so they flow into each other. Draw order: ground shadow, far arm,
+ * backpack, the silhouette, the near arm and its shadow, held props, emanata.
  */
 export const ShapeRig: React.FC<RigProps & { shape: Shape }> = (p) => (p.shape.plan === "quadruped" ? <QuadRig {...p} /> : <BipedRig {...p} />);
 
@@ -68,6 +64,7 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
   mirrored = false,
   fontFamily = "sans-serif",
 }) => {
+  const clipId = "sha" + useId().replace(/[^a-zA-Z0-9]/g, "");
   const look = lookOf(shape);
   const bm = shapeBuildMetrics(shape);
   const W = bm.bodyWidth * m.heightPx;
@@ -99,17 +96,21 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
       const tip = add(shoulder, { x: (hand.x - shoulder.x) * 1.35, y: (hand.y - shoulder.y) * 1.35 });
       return <Wing key={`arm${s}`} root={shoulder} tip={tip} w={limbW * 2.4} fill={back ? backTone(look.limbs) : edgeTone(look.limbs)} held={held(s)} />;
     }
+    const joint = at(back ? j.elbowL : j.elbowR);
     return (
       <g key={`arm${s}`}>
-        <Limb
-          root={shoulder}
-          joint={at(back ? j.elbowL : j.elbowR)}
-          tip={hand}
-          side={-1}
-          w={limbW}
-          fill={back ? backTone(look.limbs) : look.limbs}
-          edge={back ? undefined : edgeTone(look.body)}
-        />
+        {back ? null : (
+          // The near arm's shadow on the body: the arm nudged down and back, clipped to the torso.
+          <g transform={torsoTransform}>
+            <g clipPath={`url(#${clipId})`}>
+              <g transform={`rotate(${f2(-angle)}) translate(${f2(-j.hip.x - limbW * 0.22)} ${f2(-j.hip.y + limbW * 0.28)})`}>
+                <Limb root={shoulder} joint={joint} tip={hand} side={-1} w={limbW * 1.05} fill={castTone(look.body)} />
+                <circle cx={hand.x} cy={hand.y} r={limbW * 0.66} fill={castTone(look.body)} />
+              </g>
+            </g>
+          </g>
+        )}
+        <Limb root={shoulder} joint={joint} tip={hand} side={-1} w={limbW} fill={back ? backTone(look.limbs) : look.limbs} />
         {held(s)}
         <circle cx={hand.x} cy={hand.y} r={limbW * 0.62} fill={back ? backTone(look.hands) : look.hands} />
       </g>
@@ -129,33 +130,40 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
     );
   };
 
+  const headProps = { R, look, face, blink, frame, symbolsSince, symbolAges, mirrored, seed: character.id };
   return (
     <g>
+      <GroundShadow cx={j.hip.x} rx={W * 0.62} />
+      <defs>
+        <clipPath id={clipId}>
+          <path d={torsoPath(look.s.body.kind, T, W)} />
+        </clipPath>
+      </defs>
+      {arm("L")}
       <g transform={torsoTransform}>
-        <Tail T={T} W={W} look={look} frame={frame} />
         <DetailsBehind T={T} W={W} look={look} />
       </g>
-      <g transform={headTransform}>
-        <ShapeHeadBack R={R} look={look} frame={frame} />
-      </g>
-      {arm("L")}
-      {leg("L")}
-      {leg("R")}
+      <Soft r={limbW * 0.3}>
+        <g transform={torsoTransform}>
+          <Tail T={T} W={W} look={look} frame={frame} />
+        </g>
+        <g transform={headTransform}>
+          <ShapeHeadBack R={R} look={look} frame={frame} />
+        </g>
+        {leg("L")}
+        {leg("R")}
+        <g transform={torsoTransform}>
+          <Torso T={T} W={W} look={look} details={false} />
+        </g>
+        <g transform={headTransform}>
+          <ShapeHead {...headProps} withSymbols={false} />
+        </g>
+      </Soft>
       <g transform={torsoTransform}>
-        <Torso T={T} W={W} look={look} />
+        <DetailsOnBody T={T} W={W} look={look} />
       </g>
       <g transform={headTransform}>
-        <ShapeHead
-          R={R}
-          look={look}
-          face={face}
-          blink={blink}
-          frame={frame}
-          symbolsSince={symbolsSince}
-          symbolAges={symbolAges}
-          mirrored={mirrored}
-          seed={character.id}
-        />
+        <ShapeHeadSymbols {...headProps} />
       </g>
       {arm("R")}
       {props.dropped.map((d, i) => (

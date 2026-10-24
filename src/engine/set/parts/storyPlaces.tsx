@@ -1,5 +1,5 @@
 import React from "react";
-import { darken, lighten, mix } from "../../lib/color";
+import { mixOk as mix, shade } from "../../lib/color";
 import { derived } from "../palettes";
 import { SEAT_HEIGHT } from "./seats";
 import { storyHorizon } from "./storyOutdoor";
@@ -18,14 +18,14 @@ export const StoryHouse: PartComponent = ({ part, palette, W, H, groundY, fig, m
   const base = part.y !== undefined ? part.y * H : storyHorizon(groundY, fig) + fig * 0.14;
   const w = s * 0.62;
   const h = s * 0.42;
-  const wall = lighten(palette.wallA, 0.55);
+  const wall = shade(palette.wallA, -0.63);
   const roof = palette.accent;
   return (
     <g transform={flipAt(part.flip, cx)}>
       <rect x={cx - w / 2} y={base - h} width={w} height={h} fill={wall} />
       <path d={`M${cx - w * 0.6},${base - h} L${cx},${base - h - s * 0.3} L${cx + w * 0.6},${base - h} Z`} fill={roof} />
-      <rect x={cx - w * 0.12} y={base - h * 0.55} width={w * 0.24} height={h * 0.55} rx={w * 0.12} fill={darken(roof, 0.15)} />
-      <rect x={cx + w * 0.2} y={base - h * 0.78} width={w * 0.2} height={w * 0.18} rx={w * 0.03} fill={lighten(palette.sky, 0.2)} />
+      <rect x={cx - w * 0.12} y={base - h * 0.55} width={w * 0.24} height={h * 0.55} rx={w * 0.12} fill={shade(roof, 0.24)} />
+      <rect x={cx + w * 0.2} y={base - h * 0.78} width={w * 0.2} height={w * 0.18} rx={w * 0.03} fill={shade(palette.sky, -0.23)} />
     </g>
   );
 };
@@ -37,14 +37,14 @@ export const StoryClubhouse: PartComponent = ({ part, palette, W, H, groundY, fi
   const base = partBase(part, H, groundY) - fig * 0.02;
   const w = s * 1.1;
   const h = s * 0.62;
-  const wall = lighten(palette.accent, 0.5);
-  const door = darken(palette.accent, 0.1);
+  const wall = shade(palette.accent, -0.57);
+  const door = shade(palette.accent, 0.16);
   return (
     <g transform={flipAt(part.flip, cx)}>
       <path d={`M${cx - w / 2},${base} V${base - h * 0.55} A${w / 2},${h * 0.45} 0 0 1 ${cx + w / 2},${base - h * 0.55} V${base} Z`} fill={wall} />
       <path d={`M${cx - w * 0.16},${base} V${base - h * 0.32} A${w * 0.16},${w * 0.16} 0 0 1 ${cx + w * 0.16},${base - h * 0.32} V${base} Z`} fill={door} />
-      <circle cx={cx + w * 0.3} cy={base - h * 0.62} r={w * 0.08} fill={lighten(palette.sky, 0.25)} />
-      <circle cx={cx - w * 0.3} cy={base - h * 0.62} r={w * 0.08} fill={lighten(palette.sky, 0.25)} />
+      <circle cx={cx + w * 0.3} cy={base - h * 0.62} r={w * 0.08} fill={shade(palette.sky, -0.29)} />
+      <circle cx={cx - w * 0.3} cy={base - h * 0.62} r={w * 0.08} fill={shade(palette.sky, -0.29)} />
       <rect x={cx - s * 0.008} y={base - h - s * 0.32} width={s * 0.016} height={s * 0.34} fill={palette.shade} />
       <path d={`M${cx},${base - h - s * 0.32} l${s * 0.18},${s * 0.05} l${-s * 0.18},${s * 0.05} Z`} fill={palette.accent} />
     </g>
@@ -61,9 +61,9 @@ export const StoryBench: PartComponent = ({ part, palette, W, H, groundY, fig, m
   const wood = derived(palette).wood;
   return (
     <g>
-      <rect x={cx - w / 2} y={seatTop - s * 0.13} width={w} height={s * 0.05} rx={s * 0.025} fill={lighten(wood, 0.1)} />
-      <rect x={cx - w * 0.42} y={seatTop} width={s * 0.04} height={base - seatTop} rx={s * 0.015} fill={darken(wood, 0.1)} />
-      <rect x={cx + w * 0.42 - s * 0.04} y={seatTop} width={s * 0.04} height={base - seatTop} rx={s * 0.015} fill={darken(wood, 0.1)} />
+      <rect x={cx - w / 2} y={seatTop - s * 0.13} width={w} height={s * 0.05} rx={s * 0.025} fill={shade(wood, -0.11)} />
+      <rect x={cx - w * 0.42} y={seatTop} width={s * 0.04} height={base - seatTop} rx={s * 0.015} fill={shade(wood, 0.16)} />
+      <rect x={cx + w * 0.42 - s * 0.04} y={seatTop} width={s * 0.04} height={base - seatTop} rx={s * 0.015} fill={shade(wood, 0.16)} />
       <rect x={cx - w / 2 - s * 0.02} y={seatTop - s * 0.01} width={w + s * 0.04} height={s * 0.045} rx={s * 0.02} fill={wood} />
     </g>
   );
@@ -83,7 +83,7 @@ export const StoryWall: PartComponent = ({ palette, W, groundY, fig }) => {
 export const StoryFloor: PartComponent = ({ palette, W, H, groundY, fig }) => (
   <g>
     <rect x={0} y={groundY - fig * 0.04} width={W} height={H - groundY + fig * 0.04} fill={palette.floor} />
-    <rect x={0} y={groundY - fig * 0.04} width={W} height={fig * 0.015} fill={darken(palette.floor, 0.1)} />
+    <rect x={0} y={groundY - fig * 0.04} width={W} height={fig * 0.015} fill={shade(palette.floor, 0.16)} />
   </g>
 );
 
@@ -95,13 +95,13 @@ export const StoryWindow: PartComponent = ({ part, palette, W, H, groundY, fig, 
   const w = s * 0.34;
   const h = s * 0.4;
   const night = part.variant === "night";
-  const pane = night ? darken(palette.sky, 0.6) : lighten(palette.sky, 0.1);
-  const frame = lighten(palette.shade, 0.3);
+  const pane = night ? shade(palette.sky, 0.96) : shade(palette.sky, -0.11);
+  const frame = shade(palette.shade, -0.34);
   return (
     <g>
       <rect x={cx - w / 2 - s * 0.02} y={cy - h / 2 - s * 0.02} width={w + s * 0.04} height={h + s * 0.04} rx={s * 0.03} fill={frame} />
       <rect x={cx - w / 2} y={cy - h / 2} width={w} height={h} rx={s * 0.02} fill={pane} />
-      {night ? <circle cx={cx + w * 0.2} cy={cy - h * 0.2} r={s * 0.03} fill={lighten(palette.accent, 0.5)} /> : <ellipse cx={cx - w * 0.15} cy={cy - h * 0.1} rx={w * 0.22} ry={h * 0.07} fill={lighten(pane, 0.6)} />}
+      {night ? <circle cx={cx + w * 0.2} cy={cy - h * 0.2} r={s * 0.03} fill={shade(palette.accent, -0.57)} /> : <ellipse cx={cx - w * 0.15} cy={cy - h * 0.1} rx={w * 0.22} ry={h * 0.07} fill={shade(pane, -0.69)} />}
       <rect x={cx - s * 0.008} y={cy - h / 2} width={s * 0.016} height={h} fill={frame} />
       <rect x={cx - w / 2} y={cy - s * 0.008} width={w} height={s * 0.016} fill={frame} />
     </g>
@@ -117,7 +117,7 @@ export const StoryDoor: PartComponent = ({ part, palette, W, groundY, fig, marks
   return (
     <g>
       <path d={`M${cx - w / 2},${base} V${base - h + w / 2} A${w / 2},${w / 2} 0 0 1 ${cx + w / 2},${base - h + w / 2} V${base} Z`} fill={palette.accent} />
-      <circle cx={cx + w * 0.3} cy={base - h * 0.45} r={s * 0.018} fill={lighten(palette.accent, 0.6)} />
+      <circle cx={cx + w * 0.3} cy={base - h * 0.45} r={s * 0.018} fill={shade(palette.accent, -0.69)} />
     </g>
   );
 };
@@ -128,8 +128,8 @@ export const StoryRug: PartComponent = ({ part, palette, W, groundY, fig, marks 
   const cx = partX(part, W, marks, 0.5);
   return (
     <g>
-      <ellipse cx={cx} cy={groundY + fig * 0.02} rx={s * 0.7} ry={s * 0.08} fill={lighten(palette.accent, 0.35)} />
-      <ellipse cx={cx} cy={groundY + fig * 0.02} rx={s * 0.5} ry={s * 0.05} fill={lighten(palette.accent, 0.55)} />
+      <ellipse cx={cx} cy={groundY + fig * 0.02} rx={s * 0.7} ry={s * 0.08} fill={shade(palette.accent, -0.40)} />
+      <ellipse cx={cx} cy={groundY + fig * 0.02} rx={s * 0.5} ry={s * 0.05} fill={shade(palette.accent, -0.63)} />
     </g>
   );
 };
@@ -146,9 +146,9 @@ export const StoryBed: PartComponent = ({ part, palette, W, H, groundY, fig, mar
   return (
     <g transform={flipAt(part.flip, cx)}>
       <rect x={cx - w / 2 - s * 0.03} y={top - s * 0.22} width={s * 0.06} height={base - top + s * 0.22} rx={s * 0.03} fill={wood} />
-      <rect x={cx - w / 2} y={top} width={w} height={base - top} rx={s * 0.03} fill={darken(wood, 0.08)} />
+      <rect x={cx - w / 2} y={top} width={w} height={base - top} rx={s * 0.03} fill={shade(wood, 0.13)} />
       <rect x={cx - w / 2} y={top - s * 0.04} width={w} height={s * 0.07} rx={s * 0.035} fill={cover} />
-      <ellipse cx={cx - w * 0.33} cy={top - s * 0.06} rx={s * 0.1} ry={s * 0.04} fill={lighten(palette.wallA, 0.7)} />
+      <ellipse cx={cx - w * 0.33} cy={top - s * 0.06} rx={s * 0.1} ry={s * 0.04} fill={shade(palette.wallA, -0.80)} />
     </g>
   );
 };
@@ -162,8 +162,8 @@ export const StoryTable: PartComponent = ({ part, palette, W, H, groundY, fig, m
   const wood = derived(palette).wood;
   return (
     <g>
-      <rect x={cx - w * 0.38} y={top} width={s * 0.035} height={base - top} fill={darken(wood, 0.1)} />
-      <rect x={cx + w * 0.38 - s * 0.035} y={top} width={s * 0.035} height={base - top} fill={darken(wood, 0.1)} />
+      <rect x={cx - w * 0.38} y={top} width={s * 0.035} height={base - top} fill={shade(wood, 0.16)} />
+      <rect x={cx + w * 0.38 - s * 0.035} y={top} width={s * 0.035} height={base - top} fill={shade(wood, 0.16)} />
       <rect x={cx - w / 2} y={top - s * 0.03} width={w} height={s * 0.04} rx={s * 0.02} fill={wood} />
     </g>
   );
@@ -198,10 +198,10 @@ export const StorySofa: PartComponent = ({ part, palette, W, H, groundY, fig, ma
   const arm = s * 0.07;
   return (
     <g>
-      <rect x={cx - w / 2} y={seatTop - s * 0.17} width={w} height={s * 0.2} rx={s * 0.06} fill={darken(cloth, 0.08)} />
+      <rect x={cx - w / 2} y={seatTop - s * 0.17} width={w} height={s * 0.2} rx={s * 0.06} fill={shade(cloth, 0.13)} />
       <rect x={cx - w / 2} y={seatTop} width={w} height={base - seatTop - s * 0.01} rx={s * 0.03} fill={cloth} />
-      <rect x={cx - w / 2 - arm * 0.6} y={seatTop - s * 0.07} width={arm} height={base - seatTop + s * 0.06} rx={arm / 2} fill={lighten(cloth, 0.08)} />
-      <rect x={cx + w / 2 - arm * 0.4} y={seatTop - s * 0.07} width={arm} height={base - seatTop + s * 0.06} rx={arm / 2} fill={lighten(cloth, 0.08)} />
+      <rect x={cx - w / 2 - arm * 0.6} y={seatTop - s * 0.07} width={arm} height={base - seatTop + s * 0.06} rx={arm / 2} fill={shade(cloth, -0.09)} />
+      <rect x={cx + w / 2 - arm * 0.4} y={seatTop - s * 0.07} width={arm} height={base - seatTop + s * 0.06} rx={arm / 2} fill={shade(cloth, -0.09)} />
     </g>
   );
 };

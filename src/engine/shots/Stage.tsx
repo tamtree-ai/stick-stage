@@ -52,7 +52,9 @@ export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame,
   const cam = camera ?? FULL_FRAME(width, height);
   const palette = getPalette(set.palette);
   const figs = figures?.length ? { figures, frame, fps, width, height, theme: themeFor(palette), fontFamily } : undefined;
-  const rimId = "rim" + useId().replace(/[^a-zA-Z0-9]/g, "");
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
+  const rimId = "rim" + uid;
+  const lightId = "light" + uid;
   const t = `translate(${f2(width / 2)} ${f2(height / 2)}) scale(${f2(cam.scale)}) translate(${f2(-cam.cx)} ${f2(-cam.cy)})`;
   return (
     <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} style={{ display: "block" }}>
@@ -60,10 +62,13 @@ export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame,
         <SetLayers set={set} width={width} height={height} layer="background" labels={labels} fontFamily={fontFamily} />
         {figs ? <Figures {...figs} layer="back" /> : null}
         {palette.rim ? <RimFilter id={rimId} color={palette.rim} radius={(set.figureHeightPx / 640) * 6} /> : null}
+        {palette.light ? <LightFilter id={lightId} color={palette.light} /> : null}
         <g filter={palette.rim ? `url(#${rimId})` : undefined}>
-          {actors.map((a) => (
-            <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY + (a.dy ?? 0)} facing={a.facing} frame={frame} fontFamily={fontFamily} tilt={a.tilt} />
-          ))}
+          <g filter={palette.light ? `url(#${lightId})` : undefined}>
+            {actors.map((a) => (
+              <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY + (a.dy ?? 0)} facing={a.facing} frame={frame} fontFamily={fontFamily} tilt={a.tilt} />
+            ))}
+          </g>
         </g>
         {figs ? <Figures {...figs} layer="front" /> : null}
         <SetLayers set={set} width={width} height={height} layer="foreground" labels={labels} fontFamily={fontFamily} />
@@ -85,6 +90,17 @@ const RimFilter: React.FC<{ id: string; color: string; radius: number }> = ({ id
         <feMergeNode in="rb" />
         <feMergeNode in="SourceGraphic" />
       </feMerge>
+    </filter>
+  </defs>
+);
+
+/** The place's light on the cast: a soft-light wash of `color`, kept inside the figures' shapes. */
+const LightFilter: React.FC<{ id: string; color: string }> = ({ id, color }) => (
+  <defs>
+    <filter id={id} x="-10%" y="-10%" width="120%" height="120%" colorInterpolationFilters="sRGB">
+      <feFlood floodColor={color} floodOpacity={0.45} result="f" />
+      <feBlend in="f" in2="SourceGraphic" mode="soft-light" result="lit" />
+      <feComposite in="lit" in2="SourceAlpha" operator="in" />
     </filter>
   </defs>
 );

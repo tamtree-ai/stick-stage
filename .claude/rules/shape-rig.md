@@ -21,8 +21,16 @@ the `story-episode` skill; guide `docs/stories.md`.
 - Characters are specs. A new look is a new **part kind** in `rig/shape/` (`schema.ts` enum + a
   drawer), usable by every character, not a one-off drawing. Keep `reach.ts` in step with any
   part that sticks up (the camera uses it for headroom).
-- No outlines. Parts separate by tone: far limbs `backTone`, the near arm or leg `edgeTone`.
-  Colours are tokens from `rig/shape/palette.ts`; story-kit set parts use palette roles, never raw hex.
+- No outlines. Parts separate by tone: far limbs `backTone`; the near arm (or front leg) casts a
+  `castTone` shadow on the body. Tail, ears, legs, torso and head sit inside one `Soft`
+  silhouette (`rig/shape/soft.tsx`), so they flow into each other; worn details and emanata are
+  drawn outside it (`ShapeHeadSymbols`) so they stay crisp.
+- Colours are tokens from `rig/shape/palette.ts` (Apollo / Resurrect 64 ramps). Tones come from
+  `shade()` in `lib/color.ts` (OKLCH, hue-shifted), not `darken`/`lighten`. Keep a character to one
+  colour family plus one accent. Story palettes are built by rule in `set/palettes.ts` (calm,
+  low-chroma backgrounds, 60-30-10, `light` grades the cast); story-kit parts use palette roles,
+  never raw hex.
+- Props marked `floats` (the balloon) rise when dropped (`risePose` in `props/track.ts`).
 - The quadruped runs on the biped's pose angles (back legs = legs, front legs = arms,
   torso = pitch). Don't add quadruped-only poses; map in `quadruped.ts`. Ground contact is
   `supportBottom` (paws count).

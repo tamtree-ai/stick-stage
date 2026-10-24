@@ -1,4 +1,4 @@
-import { darken, lighten, mix } from "../lib/color";
+import { darken, fromOklch, lighten, mix } from "../lib/color";
 
 export type Palette = {
   wallA: string;
@@ -15,6 +15,8 @@ export type Palette = {
   rim?: string;
   /** Sun, moon and stars (story kit); missing means a light accent. */
   glow?: string;
+  /** The place's light: a soft-light grade on the cast so it sits in the scene (story kit). */
+  light?: string;
 };
 
 /**
@@ -187,19 +189,30 @@ export const PALETTES: Record<string, Palette> = {
   },
 };
 
+/** A story palette colour by OKLCH lightness, chroma and hue. */
+const ok = (l: number, c: number, h: number): string => fromOklch({ l, c, h });
+
 /**
- * Story kit palettes (the shape tier). Brighter than the stick sets: shape figures have no
- * outline, so they part from the set by hue, not by a dark line. Roles: see `storyOutdoor.tsx`.
+ * Story kit palettes (the shape tier), built by rule so every place is in harmony with itself and
+ * leaves room for the cast:
+ * - backgrounds stay calm (chroma ≤ 0.06, accents ≤ 0.10) while shape characters sit at 0.09–0.17,
+ *   so the cast parts from the set by saturation, not by an outline;
+ * - layers recede by getting lighter, cooler and closer to the sky (far hills → near hills → ground);
+ * - one dominant hue family per place (60%), a supporting one (30%), and a split-complementary
+ *   accent (10%) for flowers, doors and roofs;
+ * - the ground sits at mid lightness so both pale (rabbit, dog) and dark (penguin) characters read.
+ * `light` grades the cast with the place's light (soft-light), so characters belong to the scene.
+ * Roles: see `storyOutdoor.tsx`.
  */
 Object.assign(PALETTES, {
-  "story-day": { wallA: "#b9e3a8", wallB: "#97d488", floor: "#86c975", accent: "#f2735a", shade: "#4f9e4a", sky: "#a7dcf3", detail: "#5fb35a", glow: "#f9d65c" },
-  "story-sunset": { wallA: "#e7b0a2", wallB: "#cf98a4", floor: "#a9b871", accent: "#f8bf2e", shade: "#6f7f4e", sky: "#f8c49a", detail: "#7f9a52", glow: "#ffe08a" },
-  "story-night": { wallA: "#3e5d8c", wallB: "#34507a", floor: "#3f6a62", accent: "#f7e15c", shade: "#24433f", sky: "#2c3e7a", detail: "#2f5a50", glow: "#f7e9a8" },
-  "story-autumn": { wallA: "#e9d39a", wallB: "#d9bb78", floor: "#c9b06a", accent: "#e8453c", shade: "#a2532e", sky: "#bfe2f2", detail: "#e58a3a", glow: "#f9d65c" },
-  "story-beach-sunset": { wallA: "#d98fa0", wallB: "#b9789a", floor: "#f0c98e", accent: "#f8bf2e", shade: "#cf9f64", sky: "#f8c49a", detail: "#7f9a52", glow: "#ffe08a" },
-  "story-beach": { wallA: "#6cc3e8", wallB: "#4aa8d6", floor: "#f3d99a", accent: "#f2735a", shade: "#d9b46a", sky: "#a7dcf3", detail: "#5fb35a", glow: "#f9d65c" },
-  "story-indoor": { wallA: "#fbe3c4", wallB: "#f3cfa2", floor: "#d9a46c", accent: "#e8453c", shade: "#b77d4c", sky: "#bfe6f7", detail: "#6cbf4f", glow: "#f9d65c" },
-  "story-bedroom": { wallA: "#d8d2f2", wallB: "#c6bdea", floor: "#b99a7a", accent: "#f59ac0", shade: "#8f7bb8", sky: "#bfe6f7", detail: "#6cbf4f", glow: "#f7e9a8" },
+  "story-day": { sky: ok(0.91, 0.035, 225), wallA: ok(0.87, 0.04, 145), wallB: ok(0.81, 0.062, 138), floor: ok(0.76, 0.07, 130), detail: ok(0.66, 0.085, 142), shade: ok(0.52, 0.05, 165), accent: ok(0.7, 0.1, 35), glow: ok(0.93, 0.09, 92) },
+  "story-sunset": { sky: ok(0.87, 0.06, 62), wallA: ok(0.8, 0.045, 22), wallB: ok(0.71, 0.05, 355), floor: ok(0.75, 0.05, 108), detail: ok(0.62, 0.06, 122), shade: ok(0.48, 0.045, 40), accent: ok(0.8, 0.1, 80), glow: ok(0.94, 0.09, 88), light: ok(0.8, 0.12, 55) },
+  "story-night": { sky: ok(0.33, 0.065, 272), wallA: ok(0.41, 0.055, 265), wallB: ok(0.37, 0.05, 255), floor: ok(0.42, 0.045, 215), detail: ok(0.36, 0.045, 200), shade: ok(0.28, 0.035, 205), accent: ok(0.88, 0.1, 95), glow: ok(0.93, 0.06, 95), light: ok(0.55, 0.1, 265) },
+  "story-autumn": { sky: ok(0.9, 0.035, 230), wallA: ok(0.87, 0.05, 88), wallB: ok(0.8, 0.06, 78), floor: ok(0.76, 0.06, 92), detail: ok(0.71, 0.1, 58), shade: ok(0.5, 0.07, 40), accent: ok(0.63, 0.12, 30), glow: ok(0.93, 0.09, 90), light: ok(0.85, 0.08, 75) },
+  "story-beach-sunset": { sky: ok(0.87, 0.06, 62), wallA: ok(0.73, 0.05, 330), wallB: ok(0.66, 0.05, 312), floor: ok(0.83, 0.055, 75), detail: ok(0.62, 0.06, 122), shade: ok(0.66, 0.05, 60), accent: ok(0.8, 0.1, 80), glow: ok(0.94, 0.09, 88), light: ok(0.8, 0.12, 55) },
+  "story-beach": { sky: ok(0.91, 0.035, 222), wallA: ok(0.8, 0.06, 218), wallB: ok(0.72, 0.07, 228), floor: ok(0.85, 0.055, 82), detail: ok(0.66, 0.07, 142), shade: ok(0.72, 0.05, 72), accent: ok(0.7, 0.1, 35), glow: ok(0.93, 0.09, 92) },
+  "story-indoor": { wallA: ok(0.93, 0.03, 78), wallB: ok(0.88, 0.04, 72), floor: ok(0.7, 0.06, 60), accent: ok(0.62, 0.1, 30), shade: ok(0.55, 0.06, 50), sky: ok(0.9, 0.035, 225), detail: ok(0.66, 0.07, 142), glow: ok(0.93, 0.09, 92), light: ok(0.9, 0.06, 75) },
+  "story-bedroom": { wallA: ok(0.88, 0.035, 292), wallB: ok(0.83, 0.04, 292), floor: ok(0.7, 0.04, 62), accent: ok(0.75, 0.08, 350), shade: ok(0.58, 0.06, 295), sky: ok(0.9, 0.035, 225), detail: ok(0.66, 0.07, 142), glow: ok(0.93, 0.05, 95) },
 } satisfies Record<string, Palette>);
 
 /** Tones every part may use, derived from the seven tokens (still no raw hex in parts). */

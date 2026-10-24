@@ -1,5 +1,5 @@
 import React from "react";
-import { darken, lighten, mix } from "../../lib/color";
+import { mixOk as mix, shade } from "../../lib/color";
 import { rand, randRange } from "../../lib/seed";
 import { derived } from "../palettes";
 import { flipAt, partBase, partX, type PartComponent } from "./types";
@@ -25,14 +25,14 @@ const Cloud: React.FC<{ x: number; y: number; s: number; fill: string }> = ({ x,
 export const StorySky: PartComponent = ({ part, palette, W, groundY, fig, seed }) => {
   const v = part.variant ?? "sun";
   const night = v === "moon";
-  const cloud = night ? lighten(palette.sky, 0.18) : lighten(palette.sky, 0.72);
-  const glow = palette.glow ?? lighten(palette.accent, night ? 0.55 : 0.25);
+  const cloud = night ? shade(palette.sky, -0.21) : shade(palette.sky, -0.83);
+  const glow = palette.glow ?? shade(palette.accent, night ? -0.63 : -0.29);
   return (
     <g>
       <rect width={W} height={groundY + 4} fill={palette.sky} />
       {v === "sun" ? (
         <g>
-          <circle cx={W * 0.82} cy={groundY * 0.2} r={fig * 0.16} fill={lighten(glow, 0.5)} opacity={0.5} />
+          <circle cx={W * 0.82} cy={groundY * 0.2} r={fig * 0.16} fill={shade(glow, -0.57)} opacity={0.5} />
           <circle cx={W * 0.82} cy={groundY * 0.2} r={fig * 0.11} fill={glow} />
         </g>
       ) : null}
@@ -77,7 +77,7 @@ export const StoryHills: PartComponent = ({ palette, W, H, groundY, fig, seed })
 /** The ground from the horizon down; `variant: "path"` lays a winding path toward the front. */
 export const StoryGround: PartComponent = ({ part, palette, W, H, groundY, fig }) => {
   const hz = storyHorizon(groundY, fig) + fig * 0.12;
-  const path = lighten(mix(palette.floor, palette.accent, 0.15), 0.35);
+  const path = shade(mix(palette.floor, palette.accent, 0.15), -0.40);
   return (
     <g>
       <rect x={0} y={hz} width={W} height={H - hz} fill={palette.floor} />
@@ -103,7 +103,7 @@ export const StoryTree: PartComponent = ({ part, palette, W, H, groundY, fig, se
     ) : (
       <g>
         <circle cx={cx} cy={top - s * 0.12} r={s * 0.3} fill={palette.detail} />
-        <circle cx={cx + s * 0.08} cy={top - s * 0.2} r={s * 0.14} fill={lighten(palette.detail, 0.12)} />
+        <circle cx={cx + s * 0.08} cy={top - s * 0.2} r={s * 0.14} fill={shade(palette.detail, -0.14)} />
       </g>
     );
   return (
@@ -143,7 +143,7 @@ export const StoryFlowers: PartComponent = ({ part, palette, W, H, groundY, fig,
       {Array.from({ length: 5 }, (_, i) => {
         const x = cx + s * (i - 2) * 0.06 + s * randRange(seed, `fx${i}`, -0.015, 0.015);
         const h = s * randRange(seed, `fh${i}`, 0.06, 0.12);
-        const petal = i % 2 ? palette.accent : lighten(palette.accent, 0.4);
+        const petal = i % 2 ? palette.accent : shade(palette.accent, -0.46);
         return (
           <g key={i}>
             <rect x={x - s * 0.006} y={base - h} width={s * 0.012} height={h} fill={palette.shade} />
@@ -160,11 +160,11 @@ export const StoryPond: PartComponent = ({ part, palette, W, H, groundY, fig, ma
   const s = fig * part.size;
   const cx = partX(part, W, marks, 0.75);
   const base = partBase(part, H, groundY) + s * 0.06;
-  const water = mix(palette.sky, darken(palette.sky, 0.2), 0.5);
+  const water = mix(palette.sky, shade(palette.sky, 0.32), 0.5);
   return (
     <g>
       <ellipse cx={cx} cy={base} rx={s * 0.42} ry={s * 0.09} fill={water} />
-      <ellipse cx={cx - s * 0.08} cy={base - s * 0.015} rx={s * 0.14} ry={s * 0.02} fill={lighten(water, 0.4)} />
+      <ellipse cx={cx - s * 0.08} cy={base - s * 0.015} rx={s * 0.14} ry={s * 0.02} fill={shade(water, -0.46)} />
     </g>
   );
 };
@@ -173,7 +173,7 @@ export const StoryRock: PartComponent = ({ part, palette, W, H, groundY, fig, ma
   const s = fig * part.size;
   const cx = partX(part, W, marks, 0.7);
   const base = partBase(part, H, groundY);
-  const c = mix(palette.wallB, darken(palette.floor, 0.3), 0.5);
+  const c = mix(palette.wallB, shade(palette.floor, 0.48), 0.5);
   return <path d={`M${cx - s * 0.14},${base} C${cx - s * 0.14},${base - s * 0.12} ${cx + s * 0.1},${base - s * 0.14} ${cx + s * 0.14},${base} Z`} fill={c} />;
 };
 
@@ -181,7 +181,7 @@ export const StoryRock: PartComponent = ({ part, palette, W, H, groundY, fig, ma
 export const StoryFence: PartComponent = ({ part, palette, W, groundY, fig }) => {
   const s = fig * part.size;
   const base = storyHorizon(groundY, fig) + fig * 0.16;
-  const c = lighten(derived(palette).wood, 0.45);
+  const c = shade(derived(palette).wood, -0.52);
   const n = Math.ceil(W / (s * 0.12));
   return (
     <g fill={c}>
