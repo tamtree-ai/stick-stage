@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { library, reactions, safeArea, sets, sfxLibrary } from "../src/data";
-import { checkDraft, missingAssets, nearest, parseSkit, SkitError, storyPrompt, subtitleSpec } from "../src/engine";
+import { checkDraft, missingAssets, nearest, parseSkit, propFromReply, propPrompt, SkitError, storyPrompt, subtitleSpec } from "../src/engine";
 
 const src = { lib: library, sets, sfx: sfxLibrary, reactions, safeArea };
 const balloon = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "../public/skits/lost-balloon/skit.json"), "utf8"));
@@ -73,5 +73,36 @@ describe("story writer prompt", () => {
     for (const s of ['"style": "story"', "clubhouse", "apple-tree", "tofu (rabbit", "otto (hippo", '"build": "shape"', "colour tokens"]) expect(system).toContain(s);
     expect(prompt).toContain("Pim learns to swim");
     expect(prompt).toContain("45 seconds");
+  });
+});
+
+describe("workspace props (the draw rung)", () => {
+  const shellDoc = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "../public/skits/biscuit-shell/skit.json"), "utf8"));
+
+  it("a story's own drawn prop compiles, rides on the program, and is not reported missing", () => {
+    const d = checkDraft(shellDoc, src);
+    expect(Object.keys(d.result.program.props ?? {})).toEqual(["seashell"]);
+    expect(missingAssets(parseSkit(shellDoc), { lib: library, sets })).toEqual([]);
+    expect(d.check.ok).toBe(true);
+  });
+
+  it("indoor seats get a sofa", () => {
+    const d = checkDraft(shellDoc, src);
+    expect(d.result.program.sets!["place-home"]!.layers.some((l) => l.part === "story-sofa" && l.seatFor.includes("left"))).toBe(true);
+  });
+
+  it("only drawn props may ride in a story (coded kinds need code)", () => {
+    const bad = clone(shellDoc);
+    bad.props = [{ schemaVersion: 1, id: "my-phone", kind: "phone", name: "Phone", category: "story", colors: { body: "#333333" } }];
+    expect(() => parseSkit(bad)).toThrow(SkitError);
+  });
+
+  it("a model's prop drawing is held to the bounds", () => {
+    const ok = JSON.stringify(shellDoc.props[0]);
+    expect(propFromReply(ok).id).toBe("seashell");
+    const far = clone(shellDoc.props[0]);
+    far.parts[0] = { shape: "circle", x: 0.9, y: 0, r: 0.1 };
+    expect(() => propFromReply(JSON.stringify(far))).toThrow(SkitError);
+    expect(propPrompt("a red kite", []).prompt).toContain('"a-red-kite"');
   });
 });

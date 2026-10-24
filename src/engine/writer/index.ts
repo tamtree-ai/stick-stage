@@ -12,3 +12,4 @@ export { skitFromReply } from "./revise";
 export { writerWorld, type WriterWorld } from "./world";
 export { missingAssets, nearest, type AssetKind, type AssetSource, type MissingAsset, type Rung } from "./assets";
 export { storyPrompt, STORY_WRITER, type StoryBrief } from "./story";
+export { propFromReply, propPrompt, PROP_WRITER } from "./propPrompt";

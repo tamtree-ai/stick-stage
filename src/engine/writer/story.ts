@@ -54,7 +54,8 @@ export const storyPrompt = (lib: Library, brief: StoryBrief): { system: string; 
     `  builds: ${list(SHAPE_BUILDS)}. head: ${list(HEAD_KINDS)}. body: ${list(BODY_KINDS)}. ears: ${list(EAR_KINDS)}. muzzle: ${list(MUZZLE_KINDS)}. eyes: ${list(EYE_KINDS)}. tail: ${list(TAIL_KINDS)}. hair: ${list(HAIR_KINDS)}. markings: ${list(MARKING_KINDS)}. details: ${list(SHAPE_DETAILS)}.`,
     `  colour tokens: ${list(SHAPE_COLOR_TOKENS)}. Pick a body colour unlike the others in the story and unlike the place (no green figure in a green park).`,
     "",
-    "When the story needs something the catalog can't draw (a bicycle, a rocket, a crowd), don't name it as a prop or pose: let the narrator say it while the camera stays on a reaction, or cut to the next scene.",
+    'A small hand-held object the props list lacks (a shell, a kite): add it to "props" as a drawn prop and hold it by its id: { "schemaVersion": 1, "id", "kind": "drawn", "name", "category": "story", "align": "upright", "colors": { "body", "accent" }, "parts": [ { "shape": "circle" | "ellipse" | "rect" | "poly", ... , "fill": "body" | "accent" } ] }. The grip is (0, 0), up is negative y, every coordinate within ±0.6. At most two per story; an owner approves them.',
+    "Anything bigger the catalog can't draw (a bicycle, a rocket, a crowd): don't name it as a prop or pose. Let the narrator say it while the camera stays on a reaction, or cut to the next scene.",
     "Keep each spoken line under 15 words. Show feelings with expressions and actions, not by naming them.",
   ].join("\n");
   const seconds = brief.seconds ?? 60;

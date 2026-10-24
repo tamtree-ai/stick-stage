@@ -9,7 +9,7 @@ import { Bed, Counter, FloorLamp, Fridge, Tv } from "./home";
 import { Board, Curtain, Sand, Sea, Umbrella } from "./venue";
 import type { PartComponent } from "./types";
 import { StoryBush, StoryFence, StoryFlowers, StoryGround, StoryHills, StoryPond, StoryRock, StorySea, StorySky, StoryTree } from "./storyOutdoor";
-import { StoryBed, StoryBench, StoryClubhouse, StoryDoor, StoryFloor, StoryHouse, StoryRug, StoryShelf, StoryTable, StoryWall, StoryWindow } from "./storyPlaces";
+import { StoryBed, StoryBench, StoryClubhouse, StoryDoor, StoryFloor, StoryHouse, StoryRug, StoryShelf, StorySofa, StoryTable, StoryWall, StoryWindow } from "./storyPlaces";
 import { Galaxy, MoonFloor, NebulaSky, RingedPlanet } from "./cosmos";
 import { Blueprint, FumeHood, GridFloor, LabBench, Nebula, Planet, Starfield, VoidBackdrop, WallChart } from "./science";
 
@@ -95,6 +95,7 @@ export const PART_INFO: Record<string, PartInfo> = {
   "story-door": { draw: StoryDoor, kits: ["story"] },
   "story-rug": { draw: StoryRug, kits: ["story"] },
   "story-bed": { draw: StoryBed, kits: ["story"] },
+  "story-sofa": { draw: StorySofa, kits: ["story"] },
   "story-table": { draw: StoryTable, kits: ["story"] },
   "story-shelf": { draw: StoryShelf, kits: ["story"] },
 };

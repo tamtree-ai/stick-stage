@@ -1,3 +1,4 @@
+import { withProgramAssets } from "../director/places";
 import type { CompileResult } from "../director/compile";
 import type { Expression } from "../face/schema";
 import type { Library } from "../rig/actorState";
@@ -20,7 +21,8 @@ export type CheckInput = {
 };
 
 /** The M5 self-check: story rules + visual QA over every scene of a compiled skit. Pure. */
-export const checkSkit = ({ result, lib, sets: catalogSets, safeArea }: CheckInput): CheckReport => {
+export const checkSkit = ({ result, lib: catalogLib, sets: catalogSets, safeArea }: CheckInput): CheckReport => {
+  const lib = withProgramAssets(catalogLib, result.program);
   const sets = result.program.sets ? { ...catalogSets, ...result.program.sets } : catalogSets;
   const hint = (e: string): Expression["closeup"] => lib.expressions[e]?.closeup;
   const multi = result.scenes.length > 1;

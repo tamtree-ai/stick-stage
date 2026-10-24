@@ -10,8 +10,7 @@
     "plan": "quadruped",
     "species": "dog",
     "build": "kid",
-    "color": "sand",
-    "belly": "cream",
+    "color": "white",
     "ears": {
       "kind": "floppy",
       "color": "brown"
@@ -34,7 +33,8 @@
         "id": "scarf",
         "color": "red"
       }
-    ]
+    ],
+    "feet": "brown"
   },
   "energy": 0.9,
   "personality": "A puppy on four legs who is excited by everything and never sits still for long.",

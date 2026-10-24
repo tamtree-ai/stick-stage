@@ -154,7 +154,8 @@
               "rug",
               "bed",
               "table",
-              "shelf"
+              "shelf",
+              "sofa"
             ]
           }
         },
@@ -2161,6 +2162,405 @@
           "schemaVersion",
           "id",
           "style"
+        ]
+      }
+    },
+    "props": {
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "type": "number",
+            "const": 1
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "size": {
+            "default": 1,
+            "type": "number",
+            "minimum": 0.3,
+            "maximum": 3
+          },
+          "colors": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              },
+              "accent": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              },
+              "screen": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{3,8}$"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "align": {
+            "type": "string",
+            "enum": [
+              "forearm",
+              "upright"
+            ]
+          },
+          "angle": {
+            "default": 0,
+            "type": "number"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 24
+          },
+          "screen": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tags": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "aliases": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "rank": {
+            "default": 1000,
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "kind": {
+            "type": "string",
+            "const": "drawn"
+          },
+          "parts": {
+            "minItems": 1,
+            "maxItems": 24,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "shape": {
+                      "type": "string",
+                      "const": "rect"
+                    },
+                    "x": {
+                      "type": "number",
+                      "minimum": -0.6,
+                      "maximum": 0.6
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": -0.6,
+                      "maximum": 0.6
+                    },
+                    "w": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 1.2
+                    },
+                    "h": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 1.2
+                    },
+                    "rx": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 0.6
+                    },
+                    "fill": {
+                      "default": "body",
+                      "type": "string"
+                    },
+                    "stroke": {
+                      "type": "boolean"
+                    },
+                    "angle": {
+                      "type": "number"
+                    },
+                    "opacity": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  },
+                  "required": [
+                    "shape",
+                    "x",
+                    "y",
+                    "w",
+                    "h"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "shape": {
+                      "type": "string",
+                      "const": "circle"
+                    },
+                    "x": {
+                      "type": "number",
+                      "minimum": -0.6,
+                      "maximum": 0.6
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": -0.6,
+                      "maximum": 0.6
+                    },
+                    "r": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 0.6
+                    },
+                    "fill": {
+                      "default": "body",
+                      "type": "string"
+                    },
+                    "stroke": {
+                      "type": "boolean"
+                    },
+                    "angle": {
+                      "type": "number"
+                    },
+                    "opacity": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  },
+                  "required": [
+                    "shape",
+                    "x",
+                    "y",
+                    "r"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "shape": {
+                      "type": "string",
+                      "const": "ellipse"
+                    },
+                    "x": {
+                      "type": "number",
+                      "minimum": -0.6,
+                      "maximum": 0.6
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": -0.6,
+                      "maximum": 0.6
+                    },
+                    "rx": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 0.6
+                    },
+                    "ry": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 0.6
+                    },
+                    "fill": {
+                      "default": "body",
+                      "type": "string"
+                    },
+                    "stroke": {
+                      "type": "boolean"
+                    },
+                    "angle": {
+                      "type": "number"
+                    },
+                    "opacity": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  },
+                  "required": [
+                    "shape",
+                    "x",
+                    "y",
+                    "rx",
+                    "ry"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "shape": {
+                      "type": "string",
+                      "const": "poly"
+                    },
+                    "points": {
+                      "minItems": 3,
+                      "maxItems": 32,
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "number",
+                            "minimum": -0.6,
+                            "maximum": 0.6
+                          },
+                          {
+                            "type": "number",
+                            "minimum": -0.6,
+                            "maximum": 0.6
+                          }
+                        ],
+                        "items": false,
+                        "minItems": 2,
+                        "maxItems": 2
+                      }
+                    },
+                    "fill": {
+                      "default": "body",
+                      "type": "string"
+                    },
+                    "stroke": {
+                      "type": "boolean"
+                    },
+                    "angle": {
+                      "type": "number"
+                    },
+                    "opacity": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  },
+                  "required": [
+                    "shape",
+                    "points"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "shape": {
+                      "type": "string",
+                      "const": "line"
+                    },
+                    "x1": {
+                      "type": "number",
+                      "minimum": -0.6,
+                      "maximum": 0.6
+                    },
+                    "y1": {
+                      "type": "number",
+                      "minimum": -0.6,
+                      "maximum": 0.6
+                    },
+                    "x2": {
+                      "type": "number",
+                      "minimum": -0.6,
+                      "maximum": 0.6
+                    },
+                    "y2": {
+                      "type": "number",
+                      "minimum": -0.6,
+                      "maximum": 0.6
+                    },
+                    "fill": {
+                      "default": "body",
+                      "type": "string"
+                    },
+                    "stroke": {
+                      "type": "boolean"
+                    },
+                    "angle": {
+                      "type": "number"
+                    },
+                    "opacity": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  },
+                  "required": [
+                    "shape",
+                    "x1",
+                    "y1",
+                    "x2",
+                    "y2"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "shape": {
+                      "type": "string",
+                      "const": "path"
+                    },
+                    "d": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "fill": {
+                      "default": "body",
+                      "type": "string"
+                    },
+                    "stroke": {
+                      "type": "boolean"
+                    },
+                    "angle": {
+                      "type": "number"
+                    },
+                    "opacity": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  },
+                  "required": [
+                    "shape",
+                    "d"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "schemaVersion",
+          "id",
+          "colors",
+          "align",
+          "kind",
+          "parts"
         ]
       }
     },
@@ -4838,7 +5238,8 @@
                     "rug",
                     "bed",
                     "table",
-                    "shelf"
+                    "shelf",
+                    "sofa"
                   ]
                 }
               },

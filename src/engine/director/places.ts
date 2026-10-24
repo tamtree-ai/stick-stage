@@ -1,6 +1,8 @@
 import { composePlace } from "../set/compose";
 import type { SetDef } from "../set/schema";
+import type { Library } from "../rig/actorState";
 import type { SkitDoc } from "./schema";
+import type { Program } from "./timeline";
 
 /**
  * Turn described places into sets: the skit's `place` becomes set `place-main`, a scene's becomes
@@ -21,3 +23,7 @@ export const placeSets = (doc: SkitDoc): { doc: SkitDoc; sets: Record<string, Se
   if (!Object.keys(sets).length) return { doc, sets };
   return { doc: { ...doc, set: doc.set ?? root, ...(scenes ? { scenes } : {}) }, sets };
 };
+
+/** The catalog library with the program's workspace characters and props on top. */
+export const withProgramAssets = (lib: Library, program: Pick<Program, "characters" | "props">): Library =>
+  program.characters || program.props ? { ...lib, characters: { ...lib.characters, ...program.characters }, props: { ...lib.props, ...program.props } } : lib;

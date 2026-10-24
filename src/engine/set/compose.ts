@@ -30,6 +30,7 @@ export const FEATURES = [
   "bed",
   "table",
   "shelf",
+  "sofa",
 ] as const;
 export type Setting = (typeof SETTINGS)[number];
 export type Feature = (typeof FEATURES)[number];
@@ -86,6 +87,7 @@ const PART_OF: Record<Feature, { part: string; variant?: string }> = {
   bed: { part: "story-bed" },
   table: { part: "story-table" },
   shelf: { part: "story-shelf" },
+  sofa: { part: "story-sofa" },
 };
 
 /** Where a feature may go: the edges (tall), anywhere behind (buildings), the ground at the edges, or fixed. */
@@ -109,6 +111,7 @@ const LANE: Record<Feature, Lane> = {
   bed: "edge",
   table: "edge",
   shelf: "wall",
+  sofa: "center",
 };
 
 /** Frame layout per aspect: ground line, figure scale, marks, and the slots each lane may use. */
@@ -155,7 +158,9 @@ export const composePlace = (id: string, input: PlaceInput, aspect: Aspect = "16
   const seed = `${p.setting}:${p.seed}`;
   const indoor = INDOOR.includes(p.setting);
   const wants = [...SETTING_FEATURES[p.setting], ...p.features];
+  // Seats: a bench outdoors, the bed in a bedroom, a sofa in other rooms.
   if (p.seats.length && !indoor && !wants.includes("bench")) wants.push("bench");
+  if (p.seats.length && indoor && p.setting !== "bedroom" && !wants.includes("sofa")) wants.push("sofa");
 
   const layers: SetPart[] = indoor
     ? [part("story-wall"), part("story-floor")]
@@ -191,6 +196,7 @@ export const composePlace = (id: string, input: PlaceInput, aspect: Aspect = "16
       if (placed.has(feat)) return;
       placed.add(feat);
       if (feat === "bench") back.push(part(pid, { mark: "center", size: 1.4, seatFor: p.seats }));
+      else if (feat === "sofa") back.push(part(pid, { mark: p.seats.length === 1 ? p.seats[0] : "center", size: p.seats.length === 1 ? 0.9 : 1.4, seatFor: p.seats }));
       else if (feat === "rug") back.push(part(pid, { mark: "center", size: 1.2 }));
       else back.push(part(pid));
       return;

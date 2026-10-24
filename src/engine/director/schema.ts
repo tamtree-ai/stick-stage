@@ -3,6 +3,7 @@ import { PlaceSchema } from "../set/compose";
 import { SYMBOLS } from "../face/schema";
 import type { Aspect } from "../format/aspect";
 import { ScreenTextSchema, SignTextSchema } from "../lib/screenText";
+import { DrawnPropSchema } from "../props/schema";
 import { CharacterSchema } from "../rig/schema";
 import { PartLabelSchema } from "../set/schema";
 import { FRAMINGS } from "../shots/framing";
@@ -260,6 +261,11 @@ export const SkitSchema = z
      * Not shipped in `src/data/`.
      */
     characters: z.array(CharacterSchema).max(4).optional(),
+    /**
+     * Workspace props: drawn props (`kind: "drawn"`) this story needs and the catalog lacks.
+     * Resolved before the catalog, like `characters`; `pnpm story promote` moves one into it.
+     */
+    props: z.array(DrawnPropSchema).max(8).optional(),
     /** Dubbed words, keyed by BCP 47. Staging stays; timing follows the new voice. */
     i18n: I18nSchema.optional(),
     /** Figures for a single-scene skit (a multi-scene skit puts them on each scene). */

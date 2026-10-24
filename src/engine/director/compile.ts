@@ -112,13 +112,14 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[], style = styleBy
 
 /** skit.json + prepared voice + library → program (scene timelines). Throws `SkitError` on any error. */
 const withCharacters = (input: CompileInput, doc: SkitDoc): CompileInput => {
-  if (!doc.characters?.length) return input;
+  if (!doc.characters?.length && !doc.props?.length) return input;
   const characters = { ...input.lib.characters };
-  for (const raw of doc.characters) {
+  for (const raw of doc.characters ?? []) {
     const parsed = CharacterSchema.safeParse(raw);
     if (parsed.success) characters[parsed.data.id] = parsed.data;
   }
-  return { ...input, lib: { ...input.lib, characters } };
+  const props = { ...input.lib.props, ...Object.fromEntries((doc.props ?? []).map((p) => [p.id, p])) };
+  return { ...input, lib: { ...input.lib, characters, props } };
 };
 
 export const compileSkit = (input: CompileInput): CompileResult => {
@@ -168,6 +169,9 @@ export const compileSkit = (input: CompileInput): CompileResult => {
     scenes: programScenes,
     ...(music ? { music } : {}),
     ...(Object.keys(placed.sets).length ? { sets: placed.sets } : {}),
+    // Workspace characters and props ride along too, so the renderer draws them without the catalog.
+    ...(doc.characters?.length ? { characters: Object.fromEntries(doc.characters.map((c) => [c.id, sceneInput.lib.characters[c.id]!])) } : {}),
+    ...(doc.props?.length ? { props: Object.fromEntries(doc.props.map((p) => [p.id, p])) } : {}),
   };
   const covered = { ...program, cover: coverOf(program, doc.meta.series) };
   const hooked = cold && cold !== "pov" ? applyHook(covered, cold) : covered;

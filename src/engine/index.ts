@@ -74,6 +74,7 @@ export * from "./qa/distinct";
 export * from "./director/post";
 export { Skit, type SkitProps } from "./director/Skit";
 export { SkitProgram, type SkitProgramProps } from "./director/Program";
+export { withProgramAssets } from "./director/places";
 export * from "./qa";
 export * from "./text/layout";
 export * from "./templates";

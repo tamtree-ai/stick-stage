@@ -7,7 +7,7 @@ import { limbControl, limbPath } from "../limbs";
 import type { RigProps } from "../Rig";
 import { Tail } from "./body";
 import { ShapeHead, ShapeHeadBack } from "./face";
-import { backTone, lookOf } from "./look";
+import { backTone, lookOf, propLine } from "./look";
 import { edgeTone } from "./palette";
 import { shapeBuildMetrics } from "./proportions";
 import type { Shape } from "./schema";
@@ -54,13 +54,13 @@ export const QuadRig: React.FC<RigProps & { shape: Shape }> = ({ character, shap
     <ellipse cx={at.x + (front ? m.footRx * 0.45 : 0)} cy={at.y + (front ? m.footRy * 0.35 : 0) + m.footRy - footRy} rx={footRx} ry={footRy} fill={back ? backTone(look.feet) : look.feet} />
   );
   const figurePx = m.heightPx / proportionsOf(character).height;
-  const propCommon = { figurePx, stroke: look.ink, sw: character.style.strokeWidth * 0.5, mirrored, fontFamily };
+  const propCommon = { figurePx, stroke: look.ink, sw: 0, mirrored, fontFamily };
   const held = (s: "L" | "R") => {
     const h = props.held[s];
     if (!h) return null;
     const hand = s === "L" ? j.handL : j.handR;
     const elbow = s === "L" ? j.elbowL : j.elbowR;
-    return <PropView def={h.def} x={hand.x} y={hand.y} angle={propAngle(h.def, elbow, hand)} scale={h.pop} {...propCommon} />;
+    return <PropView def={h.def} x={hand.x} y={hand.y} angle={propAngle(h.def, elbow, hand)} scale={h.pop} {...propCommon} sw={propLine(h.def)} />;
   };
   const far = backTone(look.limbs);
   const legRoot = (v: Vec2, back: boolean) => ({ x: v.x + (back ? bh * 0.12 : -bh * 0.08), y: v.y });
@@ -111,7 +111,7 @@ export const QuadRig: React.FC<RigProps & { shape: Shape }> = ({ character, shap
       {held("L")}
       {paw(j.handR, false, true)}
       {props.dropped.map((d, i) => (
-        <PropView key={i} def={d.def} x={d.x} y={d.y} angle={d.angle} {...propCommon} />
+        <PropView key={i} def={d.def} x={d.x} y={d.y} angle={d.angle} {...propCommon} sw={propLine(d.def)} />
       ))}
     </g>
   );

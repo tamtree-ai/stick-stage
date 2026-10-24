@@ -186,3 +186,22 @@ export const StoryShelf: PartComponent = ({ part, palette, W, H, groundY, fig, m
     </g>
   );
 };
+
+/** A round-armed sofa; cast on `seatFor` marks sit on it. */
+export const StorySofa: PartComponent = ({ part, palette, W, H, groundY, fig, marks }) => {
+  const s = fig * part.size;
+  const w = s * 0.8;
+  const cx = partX(part, W, marks, 0.5);
+  const base = partBase(part, H, groundY);
+  const seatTop = base - SEAT_HEIGHT["story-sofa"] * s;
+  const cloth = mix(palette.accent, palette.wallB, 0.35);
+  const arm = s * 0.07;
+  return (
+    <g>
+      <rect x={cx - w / 2} y={seatTop - s * 0.17} width={w} height={s * 0.2} rx={s * 0.06} fill={darken(cloth, 0.08)} />
+      <rect x={cx - w / 2} y={seatTop} width={w} height={base - seatTop - s * 0.01} rx={s * 0.03} fill={cloth} />
+      <rect x={cx - w / 2 - arm * 0.6} y={seatTop - s * 0.07} width={arm} height={base - seatTop + s * 0.06} rx={arm / 2} fill={lighten(cloth, 0.08)} />
+      <rect x={cx + w / 2 - arm * 0.4} y={seatTop - s * 0.07} width={arm} height={base - seatTop + s * 0.06} rx={arm / 2} fill={lighten(cloth, 0.08)} />
+    </g>
+  );
+};

@@ -10,7 +10,7 @@
 Status: draft, team to confirm
 
 ## Look
-A sandy puppy on four legs: floppy brown ears, a brown patch round one eye, a cream snout and tummy, a long wagging tail and a red scarf. The only four-legged member of the cast.
+A white puppy on four legs: floppy brown ears, a brown patch round one eye, brown paws, a cream snout, a long wagging tail and a red scarf. White so he parts from sand, floors and grass alike. The only four-legged member of the cast.
 
 ## Voice
 Dev voice: macOS `say` "Junior", Kokoro `af_nova`. For posting, the tamtree harness picks the TTS voice.

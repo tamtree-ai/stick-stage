@@ -91,6 +91,7 @@ const mentions = (doc: SkitDoc) => {
 
 export const missingAssets = (doc: SkitDoc, src: AssetSource): MissingAsset[] => {
   const custom = new Set((doc.characters ?? []).map((c) => c.id));
+  const customProps = new Set((doc.props ?? []).map((p) => p.id));
   const props = Object.values(src.lib.props).map((d) => {
     const m = propMeta(d);
     return { id: m.id, also: [m.name, ...m.aliases, ...m.tags] };
@@ -111,7 +112,7 @@ export const missingAssets = (doc: SkitDoc, src: AssetSource): MissingAsset[] =>
           report("spec", `write "${m.id}" as a shape spec in "characters" (style.build "shape", shape.color, a few part kinds)`, nearest(m.id, ids(src.lib.characters)));
         break;
       case "prop":
-        if (!src.lib.props[m.id]) {
+        if (!src.lib.props[m.id] && !customProps.has(m.id)) {
           const near = nearest(m.id, props);
           if (near) report("near", `no "${m.id}" prop; "${near}" is close`, near);
           else report("draw", `no "${m.id}" prop or anything like it: draw it once (owner approves), or narrate it instead`);

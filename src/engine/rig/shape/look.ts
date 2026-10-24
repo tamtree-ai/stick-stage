@@ -68,3 +68,6 @@ export const lookOf = (s: Shape): Look => {
 };
 
 export { backTone };
+
+/** Props in a shape figure's hands match the flat look: drawn props lose their outline; coded kinds keep a thin one for their details. */
+export const propLine = (def: { kind: string }): number => (def.kind === "drawn" ? 0 : 3);

@@ -10,7 +10,7 @@ import { Tail, Torso } from "./body";
 import { DetailsBehind } from "./details";
 import { ShapeHead, ShapeHeadBack } from "./face";
 import { QuadRig } from "./QuadRig";
-import { backTone, lookOf } from "./look";
+import { backTone, lookOf, propLine } from "./look";
 import { edgeTone } from "./palette";
 import { shapeBuildMetrics } from "./proportions";
 import type { Shape } from "./schema";
@@ -61,7 +61,7 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
   const torsoTransform = `translate(${f2(j.hip.x)} ${f2(j.hip.y)}) rotate(${f2(angle)})`;
   const headTransform = `translate(${f2(j.head.x)} ${f2(j.head.y)}) rotate(${f2(j.headTilt)})`;
   const figurePx = m.heightPx / proportionsOf(character).height;
-  const propCommon = { figurePx, stroke: look.ink, sw: character.style.strokeWidth * 0.5, mirrored, fontFamily };
+  const propCommon = { figurePx, stroke: look.ink, sw: 0, mirrored, fontFamily };
 
   // The whole arm moves down with the shoulder, so its lengths and angles stay the skeleton's.
   const drop = sub(lerpVec(j.hip, j.neck, SHOULDER_AT), j.shoulder);
@@ -72,7 +72,7 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
     if (!h) return null;
     const hand = at(s === "L" ? j.handL : j.handR);
     const elbow = at(s === "L" ? j.elbowL : j.elbowR);
-    return <PropView def={h.def} x={hand.x} y={hand.y} angle={propAngle(h.def, elbow, hand)} scale={h.pop} {...propCommon} />;
+    return <PropView def={h.def} x={hand.x} y={hand.y} angle={propAngle(h.def, elbow, hand)} scale={h.pop} {...propCommon} sw={propLine(h.def)} />;
   };
   const arm = (s: "L" | "R") => {
     const back = s === "L";
@@ -136,7 +136,7 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
       </g>
       {arm("R")}
       {props.dropped.map((d, i) => (
-        <PropView key={i} def={d.def} x={d.x} y={d.y} angle={d.angle} {...propCommon} />
+        <PropView key={i} def={d.def} x={d.x} y={d.y} angle={d.angle} {...propCommon} sw={propLine(d.def)} />
       ))}
     </g>
   );
