@@ -139,6 +139,7 @@ const FRAMES: Record<Aspect, { groundY: number; fig: number; marks: Record<strin
 const paletteOf = (p: Place): string => {
   if (p.setting === "bedroom") return "story-bedroom";
   if (INDOOR.includes(p.setting)) return "story-indoor";
+  if (p.setting === "beach" && p.time === "sunset") return "story-beach-sunset";
   if (p.time === "night") return "story-night";
   if (p.time === "sunset") return "story-sunset";
   if (p.setting === "beach") return "story-beach";
