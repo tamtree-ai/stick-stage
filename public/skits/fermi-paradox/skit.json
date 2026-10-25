@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Fermi Paradox",
+    "aspect": "9:16",
+    "description": "Billions of stars. Zero calls. Sources and simplifications in the pinned comment.",
+    "hashtags": [
+      "science",
+      "space",
+      "fermiparadox",
+      "aliens"
+    ]
+  },
+  "set": "space-1",
+  "cast": [
+    {
+      "id": "gus",
+      "character": "gus",
+      "mark": "left",
+      "pose": "arms-crossed"
+    },
+    {
+      "id": "vera",
+      "character": "vera",
+      "mark": "right"
+    }
+  ],
+  "overlay": {
+    "pov": "If aliens exist, why so quiet?",
+    "subtitles": true
+  },
+  "template": "myth-flip",
+  "claims": [
+    {
+      "text": "Radio searches for signals from other civilisations began in 1960 (Project Ozma) and have found no confirmed signal.",
+      "source": "OpenStax, Astronomy 2e, §30.4 The Search for Extraterrestrial Intelligence (openstax.org)",
+      "checkedBy": null,
+      "beats": [
+        "l4"
+      ]
+    },
+    {
+      "text": "The Milky Way contains hundreds of billions of stars.",
+      "source": "OpenStax, Astronomy 2e, Chapter 25 The Milky Way Galaxy (openstax.org)",
+      "checkedBy": null,
+      "beats": [
+        "l6",
+        "l9"
+      ]
+    },
+    {
+      "text": "On average, every star in the Milky Way has at least one planet.",
+      "source": "Cassan et al. 2012, 'One or more bound planets per Milky Way star from microlensing observations', Nature 481, 167-169",
+      "checkedBy": null,
+      "beats": [
+        "l6"
+      ]
+    },
+    {
+      "text": "The Milky Way is about 13 billion years old; Earth is about 4.5 billion years old.",
+      "source": "OpenStax, Astronomy 2e, Chapter 25 The Milky Way Galaxy and §7.1 Overview of Our Planetary System (openstax.org)",
+      "checkedBy": null,
+      "beats": [
+        "l7"
+      ]
+    },
+    {
+      "text": "The Fermi paradox is the contradiction between the high estimated chance of alien civilisations and the lack of any evidence for them.",
+      "source": "Encyclopaedia Britannica, 'Fermi paradox' (britannica.com)",
+      "checkedBy": null,
+      "beats": [
+        "l9"
+      ]
+    }
+  ],
+  "simplifications": [
+    "'Not one clear signal' means none confirmed: the 1977 'Wow!' signal was never seen again.",
+    "Searches so far cover only a tiny slice of the sky and of radio frequencies, so silence is not proof that nobody is there.",
+    "'Most stars have planets' is a survey average, not a count."
+  ],
+  "beats": [
+    {
+      "id": "l1",
+      "speaker": "gus",
+      "line": "Space is huge. Aliens must be everywhere.",
+      "actions": [],
+      "expression": "smug",
+      "role": "myth"
+    },
+    {
+      "id": "l2",
+      "speaker": "vera",
+      "line": "Maybe. But then, where is everybody?",
+      "actions": [],
+      "expression": "thinking",
+      "role": "pushback"
+    },
+    {
+      "id": "l3",
+      "speaker": "gus",
+      "line": "If they're out there, we'd hear them easily.",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "pose",
+          "pose": "arms-crossed",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "smug",
+      "role": "prediction"
+    },
+    {
+      "id": "l4",
+      "speaker": "vera",
+      "line": "We've listened since 1960. Not one clear signal.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "hold",
+          "prop": "headphones",
+          "hand": "R",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "neutral",
+      "spoken": "We've listened since nineteen sixty. Not one clear signal.",
+      "role": "demo"
+    },
+    {
+      "id": "l5",
+      "speaker": "gus",
+      "line": "...huh.",
+      "actions": [
+        {
+          "who": "gus",
+          "do": "gag",
+          "gag": "double-take",
+          "at": {
+            "fraction": 0.2
+          }
+        }
+      ],
+      "expression": "shocked",
+      "role": "reaction"
+    },
+    {
+      "id": "l6",
+      "speaker": "vera",
+      "line": "Our galaxy has billions of stars, and most have planets.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "happy",
+      "role": "why"
+    },
+    {
+      "id": "l7",
+      "speaker": "vera",
+      "line": "And it's billions of years older than Earth.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "point",
+          "at": {
+            "fraction": 0.1
+          }
+        }
+      ],
+      "expression": "thinking",
+      "role": "why"
+    },
+    {
+      "id": "l8",
+      "speaker": "vera",
+      "line": "Big numbers feel like proof. Without evidence, they're just a guess.",
+      "actions": [
+        {
+          "who": "vera",
+          "do": "putAway",
+          "hand": "R",
+          "at": {
+            "ms": 0
+          }
+        },
+        {
+          "who": "vera",
+          "do": "pose",
+          "pose": "shrug",
+          "at": {
+            "fraction": 0.2
+          }
+        }
+      ],
+      "expression": "neutral",
+      "role": "why-it-felt-true"
+    },
+    {
+      "id": "l9",
+      "speaker": "vera",
+      "line": "So many stars, and total silence. That's the Fermi paradox.",
+      "actions": [],
+      "expression": "happy",
+      "role": "takeaway",
+      "text": [
+        {
+          "type": "slam",
+          "value": "FERMI PARADOX",
+          "at": {
+            "word": "paradox",
+            "occurrence": 1
+          }
+        }
+      ],
+      "punchline": true,
+      "pauseBeforeMs": 350,
+      "holdAfterMs": 400,
+      "reaction": "happy"
+    },
+    {
+      "id": "l10",
+      "speaker": "gus",
+      "line": "Unless they heard us. And they're hiding.",
+      "actions": [],
+      "expression": "worried",
+      "role": "loop",
+      "punchline": false,
+      "reaction": false
+    }
+  ]
+}

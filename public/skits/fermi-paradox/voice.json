@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "gus",
+      "text": "Space is huge. Aliens must be everywhere.",
+      "audio": "voice/l1.wav",
+      "durationMs": 3478
+    },
+    {
+      "id": "l2",
+      "speaker": "vera",
+      "text": "Maybe. But then, where is everybody?",
+      "audio": "voice/l2.wav",
+      "durationMs": 2580
+    },
+    {
+      "id": "l3",
+      "speaker": "gus",
+      "text": "If they're out there, we'd hear them easily.",
+      "audio": "voice/l3.wav",
+      "durationMs": 2474
+    },
+    {
+      "id": "l4",
+      "speaker": "vera",
+      "text": "We've listened since 1960. Not one clear signal.",
+      "spoken": "We've listened since nineteen sixty. Not one clear signal.",
+      "audio": "voice/l4.wav",
+      "durationMs": 3525
+    },
+    {
+      "id": "l5",
+      "speaker": "gus",
+      "text": "...huh.",
+      "audio": "voice/l5.wav",
+      "durationMs": 748
+    },
+    {
+      "id": "l6",
+      "speaker": "vera",
+      "text": "Our galaxy has billions of stars, and most have planets.",
+      "audio": "voice/l6.wav",
+      "durationMs": 3496
+    },
+    {
+      "id": "l7",
+      "speaker": "vera",
+      "text": "And it's billions of years older than Earth.",
+      "audio": "voice/l7.wav",
+      "durationMs": 1998
+    },
+    {
+      "id": "l8",
+      "speaker": "vera",
+      "text": "Big numbers feel like proof. Without evidence, they're just a guess.",
+      "audio": "voice/l8.wav",
+      "durationMs": 4075
+    },
+    {
+      "id": "l9",
+      "speaker": "vera",
+      "text": "So many stars, and total silence. That's the Fermi paradox.",
+      "audio": "voice/l9.wav",
+      "durationMs": 4335
+    },
+    {
+      "id": "l10",
+      "speaker": "gus",
+      "text": "Unless they heard us. And they're hiding.",
+      "audio": "voice/l10.wav",
+      "durationMs": 2683
+    }
+  ]
+}
