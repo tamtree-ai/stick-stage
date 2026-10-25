@@ -176,12 +176,28 @@
         "description": {
           "type": "string",
           "maxLength": 200
+        },
+        "look": {
+          "type": "string",
+          "enum": [
+            "bright",
+            "retro",
+            "pastel"
+          ]
         }
       },
       "required": [
         "setting"
       ],
       "additionalProperties": false
+    },
+    "look": {
+      "type": "string",
+      "enum": [
+        "bright",
+        "retro",
+        "pastel"
+      ]
     },
     "cast": {
       "minItems": 1,
@@ -2233,6 +2249,10 @@
           "angle": {
             "default": 0,
             "type": "number"
+          },
+          "floats": {
+            "default": false,
+            "type": "boolean"
           },
           "text": {
             "type": "string",
@@ -5278,6 +5298,14 @@
               "description": {
                 "type": "string",
                 "maxLength": 200
+              },
+              "look": {
+                "type": "string",
+                "enum": [
+                  "bright",
+                  "retro",
+                  "pastel"
+                ]
               }
             },
             "required": [

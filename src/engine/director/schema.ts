@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { PlaceSchema } from "../set/compose";
+import { STORY_LOOKS } from "../set/storyPalettes";
 import { SYMBOLS } from "../face/schema";
 import type { Aspect } from "../format/aspect";
 import { ScreenTextSchema, SignTextSchema } from "../lib/screenText";
@@ -231,6 +232,8 @@ export const SkitSchema = z
     set: z.string().min(1).optional(),
     /** A described place instead of `set` (story kit, `set/compose.ts`); scenes may each have their own. */
     place: PlaceSchema.optional(),
+    /** Colour look for every described place: "bright" (storybook, default), "retro" (screen print), "pastel". A place's own `look` wins. */
+    look: z.enum(STORY_LOOKS).optional(),
     cast: z.array(CastSchema).min(1).max(4),
     /** Off-screen voice-over (optional). */
     narrator: NarratorSchema.optional(),

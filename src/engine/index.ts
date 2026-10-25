@@ -88,6 +88,7 @@ export * from "./viz/expr";
 export * from "./voice/spoken";
 export * from "./voice/pronounce";
 export * from "./voice/phrasing";
+export { STORY_LOOKS, storyPaletteId, type StoryLook } from "./set/storyPalettes";
 export * from "./viz/physics";
 export * from "./viz/params";
 export * from "./viz/schema";

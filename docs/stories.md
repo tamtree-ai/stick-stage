@@ -64,6 +64,20 @@ sets: `story-park`, `story-clubhouse`, `story-garden`, `story-bedroom`.
 Marks in a 16:9 story place: `far-left`, `left`, `center`, `right`, `far-right`, plus `off-left` /
 `off-right` for entrances (`walkTo`).
 
+### Colour looks
+
+Described places come in three colour looks. Set one for the whole episode with a top-level
+`"look"`; a scene's `place` may override it with its own `"look"`.
+
+| `look` | Feel |
+|---|---|
+| `bright` (default) | Storybook TV: clean, mid-light colours, one colour family per place |
+| `retro` | Mid-century screen print: warm paper, mustard, ochre, burnt orange and teal, a fixed ink set shared by every place |
+| `pastel` | Soft and quiet, low saturation: calm or bedtime stories |
+
+`pnpm still PaletteLab out/PaletteLab.png` shows all three on the same places. The colour rules
+live in `src/engine/set/storyPalettes.ts`.
+
 ## The shape cast
 
 | id | What | Plan |

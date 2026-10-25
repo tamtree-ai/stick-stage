@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { Aspect } from "../format/aspect";
 import { rand, randRange } from "../lib/seed";
 import { SetSchema, type SetDef, type SetPart } from "./schema";
+import { STORY_LOOKS, storyPaletteId } from "./storyPalettes";
 
 /**
  * Places from a description: `{ setting: "park", time: "sunset", features: ["pond", "bench"] }`
@@ -48,6 +49,8 @@ export const PlaceSchema = z.strictObject({
   seed: z.union([z.string(), z.number()]).default(1),
   /** One line for whoever reads the catalog. */
   description: z.string().max(200).optional(),
+  /** Colour look: "bright" (storybook), "retro" (screen print) or "pastel". Missing: the skit's `look`, else bright. */
+  look: z.enum(STORY_LOOKS).optional(),
 });
 export type Place = z.infer<typeof PlaceSchema>;
 export type PlaceInput = z.input<typeof PlaceSchema>;
@@ -136,7 +139,9 @@ const FRAMES: Record<Aspect, { groundY: number; fig: number; marks: Record<strin
   },
 };
 
-const paletteOf = (p: Place): string => {
+const paletteOf = (p: Place): string => storyPaletteId(basePaletteOf(p), p.look);
+
+const basePaletteOf = (p: Place): string => {
   if (p.setting === "bedroom") return "story-bedroom";
   if (INDOOR.includes(p.setting)) return "story-indoor";
   if (p.setting === "beach" && p.time === "sunset") return "story-beach-sunset";

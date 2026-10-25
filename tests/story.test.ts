@@ -22,6 +22,16 @@ describe("story format", () => {
     expect(checkDraft(one, src).result.program.sets!["place-main"]!.palette).toBe("story-beach");
   });
 
+  it("the skit's look colours every described place; a place's own look wins", () => {
+    const doc = clone(balloon);
+    doc.look = "retro";
+    doc.scenes[2].place.look = "pastel";
+    const sets = checkDraft(doc, src).result.program.sets!;
+    expect(sets["place-club"]!.palette).toBe("story-day@retro");
+    expect(sets["place-park"]!.palette).toBe("story-sunset@pastel");
+    expect(checkDraft(balloon, src).result.program.sets!["place-club"]!.palette).toBe("story-day");
+  });
+
   it("set and place together are refused", () => {
     const bad = clone(balloon);
     bad.scenes[0].set = "story-park";

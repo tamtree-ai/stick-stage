@@ -13,11 +13,12 @@ export const placeSets = (doc: SkitDoc): { doc: SkitDoc; sets: Record<string, Se
   const sets: Record<string, SetDef> = {};
   const aspect = doc.meta.aspect;
   const root = doc.place ? "place-main" : undefined;
-  if (doc.place) sets[root!] = composePlace(root!, doc.place, aspect);
+  const looked = (p: NonNullable<SkitDoc["place"]>) => (p.look || !doc.look ? p : { ...p, look: doc.look });
+  if (doc.place) sets[root!] = composePlace(root!, looked(doc.place), aspect);
   const scenes = doc.scenes?.map((sc) => {
     if (!sc.place) return sc;
     const id = `place-${sc.id}`;
-    sets[id] = composePlace(id, sc.place, aspect);
+    sets[id] = composePlace(id, looked(sc.place), aspect);
     return { ...sc, set: id };
   });
   if (!Object.keys(sets).length) return { doc, sets };
