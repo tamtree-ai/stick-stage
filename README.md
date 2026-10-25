@@ -159,8 +159,9 @@ Motion is reviewed as video, not stills. Rendering is frame-pure: every visual i
 
 ## License
 
-No license has been chosen yet. All rights reserved.
+StickStage's own code is [MIT licensed](LICENSE). Remotion, Kokoro, Rhubarb and the SFX and figure
+assets keep their own licences (see `src/data/sfx.json` and [docs/figures.md](docs/figures.md)).
 
-StickStage depends on Remotion, which is free for individuals and companies of up to 3 people.
+StickStage depends on Remotion, which is not covered by the MIT licence. It is free for individuals and companies of up to 3 people.
 Larger companies need a [company license](https://www.remotion.dev/license), and part-timers and
 contractors count toward the limit.

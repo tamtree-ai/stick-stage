@@ -2,6 +2,7 @@
   "name": "stickstage",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "Stick-figure comedy skit engine on Remotion",
   "scripts": {
