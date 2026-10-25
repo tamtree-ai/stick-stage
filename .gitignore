@@ -7,3 +7,4 @@ public/skits/*/generated
 tools/
 packages/stickstage/dist
 public/skits/_jobs
+__pycache__/

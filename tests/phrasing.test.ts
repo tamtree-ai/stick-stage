@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deliveryFor, phrasesOf } from "../src/engine";
+import { deliveryFor, performedText, phrasesOf } from "../src/engine";
 
 describe("phrasing (how a line is performed)", () => {
   it("splits at punctuation with a pause after each phrase but the last", () => {
@@ -29,7 +29,12 @@ describe("phrasing (how a line is performed)", () => {
     expect(narrator.speed).toBeLessThan(1);
     expect(narrator.pauseScale).toBeGreaterThan(1);
   });
+  it("gives a style-prompted TTS an acting direction ahead of the words", () => {
+    expect(performedText({ text: "A shell!", expression: "excited" })).toMatch(/^Say this excitedly.*: A shell!$/);
+    expect(performedText({ text: "Hi", spoken: "Hello", narrator: true })).toMatch(/storyteller.*: Hello$/);
+    expect(deliveryFor({ expression: "happy" }).intensity).toBeGreaterThan(deliveryFor({}).intensity);
+  });
   it("scales the pauses by the delivery", () => {
-    expect(phrasesOf("No. Never.", { speed: 1, pauseScale: 2 })[0]!.pauseMs).toBe(840);
+    expect(phrasesOf("No. Never.", { pauseScale: 2 })[0]!.pauseMs).toBe(840);
   });
 });

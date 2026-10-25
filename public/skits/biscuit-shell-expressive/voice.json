@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "n1",
+      "speaker": "narrator",
+      "text": "Biscuit was digging at the beach, as usual.",
+      "audio": "voice/n1.wav",
+      "durationMs": 2766
+    },
+    {
+      "id": "n2",
+      "speaker": "narrator",
+      "text": "And then he found something shiny.",
+      "audio": "voice/n2.wav",
+      "durationMs": 1887
+    },
+    {
+      "id": "b1",
+      "speaker": "biscuit",
+      "text": "A shell! A real one! It's mine!",
+      "audio": "voice/b1.wav",
+      "durationMs": 3320
+    },
+    {
+      "id": "p1",
+      "speaker": "pim",
+      "text": "Ooh, can I hold it? Just for a second?",
+      "audio": "voice/p1.wav",
+      "durationMs": 3733
+    },
+    {
+      "id": "b2",
+      "speaker": "biscuit",
+      "text": "No. It's my shell.",
+      "audio": "voice/b2.wav",
+      "durationMs": 3012
+    },
+    {
+      "id": "n3",
+      "speaker": "narrator",
+      "text": "Pim's beak drooped all the way down.",
+      "audio": "voice/n3.wav",
+      "durationMs": 2795
+    },
+    {
+      "id": "m1",
+      "speaker": "mabel",
+      "text": "That's a lovely shell. Does it sing?",
+      "audio": "voice/m1.wav",
+      "durationMs": 2498
+    },
+    {
+      "id": "b3",
+      "speaker": "biscuit",
+      "text": "I don't know. Nobody's listened to it with me.",
+      "audio": "voice/b3.wav",
+      "durationMs": 2678
+    },
+    {
+      "id": "m2",
+      "speaker": "mabel",
+      "text": "Shells sound better when you share them.",
+      "audio": "voice/m2.wav",
+      "durationMs": 1481
+    },
+    {
+      "id": "n4",
+      "speaker": "narrator",
+      "text": "So the next day, Biscuit took his shell back to the beach.",
+      "audio": "voice/n4.wav",
+      "durationMs": 3712
+    },
+    {
+      "id": "b4",
+      "speaker": "biscuit",
+      "text": "Pim! Want to listen to the sea?",
+      "audio": "voice/b4.wav",
+      "durationMs": 2171
+    },
+    {
+      "id": "p2",
+      "speaker": "pim",
+      "text": "Really? Oh, Biscuit! I can hear it!",
+      "audio": "voice/p2.wav",
+      "durationMs": 4199
+    },
+    {
+      "id": "n5",
+      "speaker": "narrator",
+      "text": "And the shell sounded better than ever.",
+      "audio": "voice/n5.wav",
+      "durationMs": 2187
+    }
+  ]
+}

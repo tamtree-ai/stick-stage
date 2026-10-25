@@ -1,0 +1,349 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Biscuit and the Shell",
+    "aspect": "16:9",
+    "description": "Biscuit finds a shell at the beach and learns to share it."
+  },
+  "style": "story",
+  "narrator": {
+    "id": "narrator",
+    "captionStyle": "italic"
+  },
+  "cast": [
+    {
+      "id": "biscuit",
+      "character": "biscuit",
+      "mark": "left"
+    },
+    {
+      "id": "pim",
+      "character": "pim",
+      "mark": "off-right"
+    },
+    {
+      "id": "mabel",
+      "character": "mabel",
+      "mark": "right"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "beach",
+      "place": {
+        "setting": "beach",
+        "features": [
+          "flowers"
+        ]
+      },
+      "cast": [
+        {
+          "id": "biscuit"
+        },
+        {
+          "id": "pim",
+          "mark": "off-right"
+        }
+      ],
+      "beats": [
+        {
+          "id": "n1",
+          "speaker": "narrator",
+          "line": "Biscuit was digging at the beach, as usual.",
+          "focus": "biscuit",
+          "actions": [
+            {
+              "who": "biscuit",
+              "do": "hop",
+              "at": {
+                "word": "digging"
+              }
+            }
+          ]
+        },
+        {
+          "id": "n2",
+          "speaker": "narrator",
+          "line": "And then he found something shiny.",
+          "focus": "biscuit",
+          "actions": [
+            {
+              "who": "biscuit",
+              "do": "hold",
+              "prop": "seashell",
+              "at": {
+                "word": "shiny."
+              }
+            },
+            {
+              "who": "biscuit",
+              "do": "expression",
+              "expression": "shocked",
+              "at": {
+                "word": "shiny."
+              }
+            }
+          ]
+        },
+        {
+          "id": "b1",
+          "speaker": "biscuit",
+          "line": "A shell! A real one! It's mine!",
+          "expression": "happy",
+          "actions": [
+            {
+              "who": "biscuit",
+              "do": "pose",
+              "pose": "hold-up",
+              "at": {
+                "word": "shell!"
+              }
+            }
+          ]
+        },
+        {
+          "id": "p1",
+          "speaker": "pim",
+          "line": "Ooh, can I hold it? Just for a second?",
+          "expression": "happy",
+          "actions": [
+            {
+              "who": "pim",
+              "do": "walkTo",
+              "mark": "right",
+              "speed": "run",
+              "at": {
+                "word": "Ooh,"
+              }
+            }
+          ]
+        },
+        {
+          "id": "b2",
+          "speaker": "biscuit",
+          "line": "No. It's my shell.",
+          "expression": "annoyed",
+          "actions": [
+            {
+              "who": "biscuit",
+              "do": "turn",
+              "facing": "left",
+              "at": {
+                "word": "No."
+              }
+            }
+          ]
+        },
+        {
+          "id": "n3",
+          "speaker": "narrator",
+          "line": "Pim's beak drooped all the way down.",
+          "focus": "pim",
+          "actions": [
+            {
+              "who": "pim",
+              "do": "expression",
+              "expression": "sad",
+              "at": {
+                "word": "beak"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "home",
+      "place": {
+        "setting": "living-room",
+        "time": "sunset",
+        "seats": [
+          "left"
+        ]
+      },
+      "transition": {
+        "type": "fade",
+        "durationMs": 600
+      },
+      "cast": [
+        {
+          "id": "biscuit",
+          "seated": true,
+          "holding": {
+            "prop": "seashell",
+            "hand": "R"
+          }
+        },
+        {
+          "id": "mabel"
+        }
+      ],
+      "beats": [
+        {
+          "id": "m1",
+          "speaker": "mabel",
+          "line": "That's a lovely shell. Does it sing?"
+        },
+        {
+          "id": "b3",
+          "speaker": "biscuit",
+          "line": "I don't know. Nobody's listened to it with me.",
+          "expression": "sad"
+        },
+        {
+          "id": "m2",
+          "speaker": "mabel",
+          "line": "Shells sound better when you share them.",
+          "expression": "happy",
+          "actions": [
+            {
+              "who": "mabel",
+              "do": "pose",
+              "pose": "point",
+              "at": {
+                "word": "share"
+              }
+            }
+          ]
+        },
+        {
+          "id": "n4",
+          "speaker": "narrator",
+          "line": "So the next day, Biscuit took his shell back to the beach.",
+          "focus": "biscuit",
+          "actions": [
+            {
+              "who": "biscuit",
+              "do": "stand",
+              "at": {
+                "word": "next"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "share",
+      "place": {
+        "setting": "beach",
+        "time": "sunset",
+        "seed": 3
+      },
+      "transition": {
+        "type": "slide",
+        "durationMs": 450
+      },
+      "cast": [
+        {
+          "id": "biscuit",
+          "holding": {
+            "prop": "seashell",
+            "hand": "R"
+          }
+        },
+        {
+          "id": "pim",
+          "mark": "right"
+        }
+      ],
+      "beats": [
+        {
+          "id": "b4",
+          "speaker": "biscuit",
+          "line": "Pim! Want to listen to the sea?",
+          "expression": "happy",
+          "actions": [
+            {
+              "who": "biscuit",
+              "do": "pose",
+              "pose": "hold-out",
+              "at": {
+                "word": "listen"
+              }
+            }
+          ]
+        },
+        {
+          "id": "p2",
+          "speaker": "pim",
+          "line": "Really? Oh, Biscuit! I can hear it!",
+          "expression": "laughing",
+          "actions": [
+            {
+              "who": "pim",
+              "do": "hop",
+              "at": {
+                "word": "hear"
+              }
+            }
+          ]
+        },
+        {
+          "id": "n5",
+          "speaker": "narrator",
+          "line": "And the shell sounded better than ever.",
+          "focus": "biscuit"
+        }
+      ]
+    }
+  ],
+  "props": [
+    {
+      "schemaVersion": 1,
+      "id": "seashell",
+      "size": 1,
+      "colors": {
+        "body": "#f9c79e",
+        "accent": "#f2735a"
+      },
+      "align": "upright",
+      "angle": 0,
+      "name": "Seashell",
+      "category": "story",
+      "tags": [],
+      "aliases": [],
+      "rank": 50,
+      "kind": "drawn",
+      "parts": [
+        {
+          "shape": "path",
+          "d": "M -0.06 0 Q -0.07 -0.06 0 -0.09 Q 0.07 -0.06 0.06 0 Z",
+          "fill": "body"
+        },
+        {
+          "shape": "line",
+          "x1": 0,
+          "y1": -0.085,
+          "x2": 0,
+          "y2": -0.005,
+          "fill": "accent"
+        },
+        {
+          "shape": "line",
+          "x1": -0.03,
+          "y1": -0.075,
+          "x2": -0.015,
+          "y2": -0.005,
+          "fill": "accent"
+        },
+        {
+          "shape": "line",
+          "x1": 0.03,
+          "y1": -0.075,
+          "x2": 0.015,
+          "y2": -0.005,
+          "fill": "accent"
+        },
+        {
+          "shape": "ellipse",
+          "x": 0,
+          "y": 0.004,
+          "rx": 0.025,
+          "ry": 0.012,
+          "fill": "accent"
+        }
+      ]
+    }
+  ]
+}

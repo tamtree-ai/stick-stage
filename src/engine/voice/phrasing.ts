@@ -10,6 +10,10 @@ export type Delivery = {
   speed: number;
   /** Multiplier on every pause between phrases. */
   pauseScale: number;
+  /** How strongly the mood is played, 0 (flat) … 1 (big), for an expressive TTS's emotion dial. */
+  intensity: number;
+  /** An acting direction for a TTS that takes a style prompt (Gemini TTS): "Say this excitedly, …". */
+  direction: string;
 };
 
 export type Phrase = {
@@ -29,30 +33,40 @@ const PAUSE_MS: readonly [RegExp, number][] = [
   [/,$/, 220],
 ];
 
-const NARRATOR: Delivery = { speed: 0.94, pauseScale: 1.25 };
+const NEUTRAL: Delivery = { speed: 1, pauseScale: 1, intensity: 0.45, direction: "Say this naturally and warmly, like a children's cartoon character, with a short pause between sentences" };
+const NARRATOR: Delivery = { speed: 0.94, pauseScale: 1.25, intensity: 0.4, direction: "Narrate this like a warm children's storyteller, unhurried, with a gentle pause at each comma and full stop" };
 
 /** Expression or delivery word → how it's said. First match wins. */
 const MOODS: readonly [RegExp, Delivery][] = [
-  [/dramatic|suspense|slow/, { speed: 0.88, pauseScale: 1.6 }],
-  [/whisper|secret|hushed/, { speed: 0.9, pauseScale: 1.2 }],
-  [/sad|crying|teary|hurt|disappoint|tired|sleepy/, { speed: 0.88, pauseScale: 1.35 }],
-  [/shock|surprise|gasp|scared|panic/, { speed: 1.04, pauseScale: 1.1 }],
-  [/excit|happy|joy|proud|laugh|smug|delight/, { speed: 1.06, pauseScale: 0.9 }],
-  [/angry|annoyed|furious|shout/, { speed: 1.05, pauseScale: 0.85 }],
+  [/dramatic|suspense|slow/, { speed: 0.88, pauseScale: 1.6, intensity: 0.75, direction: "Say this dramatically, slowly, holding a long pause before the last words" }],
+  [/whisper|secret|hushed/, { speed: 0.9, pauseScale: 1.2, intensity: 0.35, direction: "Whisper this, close and secretive" }],
+  [/sad|crying|teary|hurt|disappoint|tired|sleepy/, { speed: 0.88, pauseScale: 1.35, intensity: 0.6, direction: "Say this sadly and softly, a little slower, with a small catch in the voice and pauses between phrases" }],
+  [/shock|surprise|gasp|scared|panic/, { speed: 1.04, pauseScale: 1.1, intensity: 0.8, direction: "Say this in wide-eyed surprise, with a gasp at the start" }],
+  [/excit|happy|joy|proud|laugh|smug|delight/, { speed: 1.06, pauseScale: 0.9, intensity: 0.8, direction: "Say this excitedly, bright and bouncy, with a quick beat after each exclamation" }],
+  [/angry|annoyed|furious|shout/, { speed: 1.05, pauseScale: 0.85, intensity: 0.75, direction: "Say this crossly, clipped and firm" }],
 ];
 
 export const deliveryFor = (line: { narrator?: boolean; expression?: string; delivery?: string }): Delivery => {
   const cue = `${line.delivery ?? ""} ${line.expression ?? ""}`.toLowerCase();
   const mood = MOODS.find(([re]) => re.test(cue))?.[1];
-  if (line.narrator) return mood ? { speed: Math.min(NARRATOR.speed, mood.speed), pauseScale: Math.max(NARRATOR.pauseScale, mood.pauseScale) } : NARRATOR;
-  return mood ?? { speed: 1, pauseScale: 1 };
+  if (line.narrator)
+    return mood
+      ? { speed: Math.min(NARRATOR.speed, mood.speed), pauseScale: Math.max(NARRATOR.pauseScale, mood.pauseScale), intensity: Math.min(mood.intensity, 0.65), direction: `${NARRATOR.direction}; ${mood.direction.replace(/^Say this /, "")}` }
+      : NARRATOR;
+  return mood ?? NEUTRAL;
 };
+
+/**
+ * The text to send a style-prompted TTS (Gemini TTS: "Say cheerfully: Have a wonderful day!"):
+ * the acting direction, then the words to say. The line's caption `text` stays as it is.
+ */
+export const performedText = (line: { text: string; spoken?: string; narrator?: boolean; expression?: string; delivery?: string }): string => `${deliveryFor(line).direction}: ${line.spoken ?? line.text}`;
 
 /**
  * Phrases of a line: breaks after , ; : — … . ! ? (a run like "?!" or "..." stays together).
  * Breaks need a space after the punctuation, so decimals ("3.5") stay whole.
  */
-export const phrasesOf = (text: string, d: Delivery = { speed: 1, pauseScale: 1 }): Phrase[] => {
+export const phrasesOf = (text: string, d: Pick<Delivery, "pauseScale"> = NEUTRAL): Phrase[] => {
   const parts = text
     .trim()
     // "Well — that" → "Well— that", so the dash ends the phrase before it.

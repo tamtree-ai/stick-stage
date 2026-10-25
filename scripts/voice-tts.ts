@@ -1,5 +1,5 @@
 /**
- * Local voices: pnpm voice:tts <skitId> [--voice-<character>=<kokoroVoice>]
+ * Local voices: pnpm voice:tts <skitId> [--tts=chatterbox] [--voice-<character>=<kokoroVoice>]
  *
  * Voices every spoken line of public/skits/<id>/skit.json with Kokoro in this process (or
  * LOCAL_TTS_BASE_URL, see scripts/lib/tts.ts) and writes voice/<lineId>.wav + voice.json in the
@@ -17,17 +17,18 @@ import path from "node:path";
 const args = process.argv.slice(2);
 const id = args.find((a) => !a.startsWith("--"));
 if (!id) {
-  console.error("usage: pnpm voice:tts <skitId> [--voice-<character>=<kokoroVoice>]");
+  console.error("usage: pnpm voice:tts <skitId> [--tts=chatterbox] [--voice-<character>=<kokoroVoice>]");
   process.exit(1);
 }
 const voices = Object.fromEntries(args.flatMap((a) => (a.startsWith("--voice-") && a.includes("=") ? [a.slice(8).split("=") as [string, string]] : [])));
+const tts = args.find((a) => a.startsWith("--tts="))?.slice(6);
 const dir = skitDir(id);
 if (!fs.existsSync(path.join(dir, "skit.json"))) {
   console.error(`No skit at public/skits/${id}/skit.json (labs with script.json use pnpm voice:say). ${DOCTOR_HINT}`);
   process.exit(1);
 }
 try {
-  await voiceSkitDir(dir, ttsFromEnv(), { voices });
+  await voiceSkitDir(dir, ttsFromEnv(tts ? { ...process.env, STICKSTAGE_TTS: tts } : process.env), { voices });
 } catch (e) {
   console.error(e instanceof SkitError ? formatDiagnostics(e.diagnostics) : e instanceof Error ? e.message : e);
   process.exit(1);
