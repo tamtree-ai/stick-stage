@@ -1,4 +1,5 @@
 import React, { useId } from "react";
+import { shade } from "../../lib/color";
 import { f2, mid, type Vec2 } from "../../lib/math";
 import { PropView } from "../../props/PropView";
 import { propAngle } from "../../props/track";
@@ -16,6 +17,18 @@ import type { Shape } from "./schema";
 const Leg: React.FC<{ root: Vec2; joint: Vec2; tip: Vec2; w: number; fill: string }> = ({ root, joint, tip, w, fill }) => (
   <path d={limbPath(root, limbControl(root, joint, tip, 0.18, 1), tip)} fill="none" stroke={fill} strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" />
 );
+
+/** A collar round a four-legged neck: a band across the neck between the shoulders and the head, and a tag. */
+const Collar: React.FC<{ from: Vec2; head: Vec2; R: number; color: string }> = ({ from, head, R, color }) => {
+  const at = { x: from.x + (head.x - from.x) * 0.42, y: from.y + (head.y - from.y) * 0.42 };
+  const deg = (Math.atan2(head.y - from.y, head.x - from.x) * 180) / Math.PI;
+  return (
+    <g transform={`translate(${f2(at.x)} ${f2(at.y)}) rotate(${f2(deg)})`}>
+      <rect x={-R * 0.12} y={-R * 0.62} width={R * 0.24} height={R * 1.24} rx={R * 0.12} fill={color} />
+      <circle cx={R * 0.02} cy={R * 0.66} r={R * 0.1} fill={shade(color, -0.1)} />
+    </g>
+  );
+};
 
 /**
  * A four-legged shape figure on the quadruped joints (`shape/quadruped.ts`): a capsule body from
@@ -70,17 +83,21 @@ export const QuadRig: React.FC<RigProps & { shape: Shape }> = ({ character, shap
   const headProps = { R, look, face, blink, frame, symbolsSince, symbolAges, mirrored, seed: character.id };
   const frontRoot = legRoot(j.shoulder, false);
   // Body space → figure space, nudged down and back: where the near front leg's shadow falls.
+  const toWorld = (x: number, y: number): Vec2 => {
+    const a = (angle * Math.PI) / 180;
+    return { x: c.x + x * Math.cos(a) - y * Math.sin(a), y: c.y + x * Math.sin(a) + y * Math.cos(a) };
+  };
   const toFigure = `rotate(${f2(-angle)}) translate(${f2(-c.x - limbW * 0.25)} ${f2(-c.y + limbW * 0.2)})`;
   return (
     <g>
       <GroundShadow cx={c.x} rx={rx * 1.05} />
-      <Soft r={limbW * 0.3}>
+      <Soft r={limbW * 0.3} color={far}>
         <Leg root={frontRoot} joint={j.elbowL} tip={j.handL} w={limbW} fill={far} />
         {paw(j.handL, true, true)}
         <Leg root={legRoot(j.hip, true)} joint={j.kneeL} tip={j.ankleL} w={limbW} fill={far} />
         {paw(j.footL, true, false)}
       </Soft>
-      <Soft r={limbW * 0.3}>
+      <Soft r={limbW * 0.3} color={look.body}>
         {tail}
         <g transform={headT}>
           <ShapeHeadBack R={R} look={look} frame={frame} />
@@ -113,8 +130,9 @@ export const QuadRig: React.FC<RigProps & { shape: Shape }> = ({ character, shap
         </g>
         <g transform={bodyT}>
           {look.details.backpack ? <rect x={-rx * 0.35} y={lift - ry * 1.25} width={rx * 0.6} height={ry * 0.6} rx={ry * 0.2} fill={look.details.backpack} /> : null}
-          {look.details.scarf ? <rect x={rx * 0.55} y={lift - ry * 1.05} width={ry * 0.5} height={ry * 1.3} rx={ry * 0.2} fill={look.details.scarf} /> : null}
+  
         </g>
+        {look.details.scarf ? <Collar from={toWorld(rx * 0.72, lift - ry * 0.55)} head={j.head} R={R} color={look.details.scarf} /> : null}
         <g transform={headT}>
           <ShapeHead {...headProps} withSymbols={false} />
         </g>

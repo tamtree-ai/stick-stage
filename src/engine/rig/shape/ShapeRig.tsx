@@ -143,7 +143,7 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
       <g transform={torsoTransform}>
         <DetailsBehind T={T} W={W} look={look} />
       </g>
-      <Soft r={limbW * 0.3}>
+      <Soft r={limbW * 0.3} color={look.body}>
         <g transform={torsoTransform}>
           <Tail T={T} W={W} look={look} frame={frame} />
         </g>
@@ -160,7 +160,7 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
         </g>
       </Soft>
       <g transform={torsoTransform}>
-        <DetailsOnBody T={T} W={W} look={look} />
+        <DetailsOnBody T={T} W={W} look={look} frame={frame} />
       </g>
       <g transform={headTransform}>
         <ShapeHeadSymbols {...headProps} />

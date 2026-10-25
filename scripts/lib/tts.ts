@@ -10,12 +10,37 @@
 import fs from "node:fs";
 import { DOCTOR_HINT, kokoroCacheDir } from "./doctor";
 
+export type Audio = { audio: Float32Array; rate: number };
+
 export interface Tts {
   /** Name + model, recorded in the cache key. */
   readonly id: string;
   /** One line, written to `wav` (16-bit PCM). */
   speak(text: string, voice: string, wav: string): Promise<void>;
+  /** One phrase as samples, at `speed` (1 = normal). */
+  synth(text: string, voice: string, speed?: number): Promise<Audio>;
 }
+
+/** 16-bit PCM mono WAV → float samples. */
+export const wavSamples = (bytes: Buffer): Audio => {
+  let rate = 24000;
+  for (let at = 12; at + 8 <= bytes.length; ) {
+    const id = bytes.toString("ascii", at, at + 4);
+    const size = bytes.readUInt32LE(at + 4);
+    if (id === "fmt ") {
+      rate = bytes.readUInt32LE(at + 12);
+      if (bytes.readUInt16LE(at + 22) !== 16 || bytes.readUInt16LE(at + 10) !== 1) throw new Error("expected mono 16-bit PCM WAV");
+    }
+    if (id === "data") {
+      const n = Math.floor(Math.min(size, bytes.length - at - 8) / 2);
+      const audio = new Float32Array(n);
+      for (let i = 0; i < n; i++) audio[i] = bytes.readInt16LE(at + 8 + i * 2) / 32768;
+      return { audio, rate };
+    }
+    at += 8 + size + (size % 2);
+  }
+  throw new Error("WAV has no data chunk");
+};
 
 /** Float samples → 16-bit PCM mono WAV. */
 export const pcm16Wav = (samples: Float32Array, rate: number): Buffer => {
@@ -40,7 +65,7 @@ export const pcm16Wav = (samples: Float32Array, rate: number): Buffer => {
 
 export const KOKORO_MODEL = "onnx-community/Kokoro-82M-v1.0-ONNX";
 
-type KokoroModel = { generate(text: string, o: { voice: string }): Promise<{ audio: Float32Array; sampling_rate: number }>; voices: Record<string, unknown> };
+type KokoroModel = { generate(text: string, o: { voice: string; speed?: number }): Promise<{ audio: Float32Array; sampling_rate: number }>; voices: Record<string, unknown> };
 
 /** Kokoro in this process: loaded once, q8 weights on the CPU. */
 export const kokoroTts = (log: (s: string) => void = console.log): Tts => {
@@ -67,11 +92,15 @@ export const kokoroTts = (log: (s: string) => void = console.log): Tts => {
     })());
   return {
     id: `kokoro-js:${KOKORO_MODEL}:q8`,
-    speak: async (text, voice, wav) => {
+    synth: async (text, voice, speed = 1) => {
       const tts = await load();
       if (!(voice in tts.voices)) throw new Error(`"${voice}" is not a Kokoro voice. Pick one of: ${Object.keys(tts.voices).join(", ")}`);
-      const out = await tts.generate(text, { voice });
-      fs.writeFileSync(wav, pcm16Wav(out.audio, out.sampling_rate));
+      const out = await tts.generate(text, { voice, speed });
+      return { audio: out.audio, rate: out.sampling_rate };
+    },
+    speak: async function (text, voice, wav) {
+      const out = await this.synth(text, voice);
+      fs.writeFileSync(wav, pcm16Wav(out.audio, out.rate));
     },
   };
 };
@@ -80,18 +109,22 @@ export const kokoroTts = (log: (s: string) => void = console.log): Tts => {
 export const httpTts = (baseUrl: string, opts: { model?: string; apiKey?: string } = {}): Tts => {
   const base = baseUrl.replace(/\/+$/, "");
   const model = opts.model ?? "kokoro";
+  const fetchWav = async (text: string, voice: string, speed = 1): Promise<Buffer> => {
+    const res = await fetch(`${base}/audio/speech`, {
+      method: "POST",
+      headers: { "content-type": "application/json", ...(opts.apiKey ? { authorization: `Bearer ${opts.apiKey}` } : {}) },
+      body: JSON.stringify({ model, input: text, voice, response_format: "wav", ...(speed !== 1 ? { speed } : {}) }),
+    });
+    if (!res.ok) throw new Error(`${base}/audio/speech answered ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    const bytes = Buffer.from(await res.arrayBuffer());
+    if (bytes.subarray(0, 4).toString() !== "RIFF") throw new Error(`${base}/audio/speech did not return a WAV file`);
+    return bytes;
+  };
   return {
     id: `http:${base}:${model}`,
+    synth: async (text, voice, speed) => wavSamples(await fetchWav(text, voice, speed)),
     speak: async (text, voice, wav) => {
-      const res = await fetch(`${base}/audio/speech`, {
-        method: "POST",
-        headers: { "content-type": "application/json", ...(opts.apiKey ? { authorization: `Bearer ${opts.apiKey}` } : {}) },
-        body: JSON.stringify({ model, input: text, voice, response_format: "wav" }),
-      });
-      if (!res.ok) throw new Error(`${base}/audio/speech answered ${res.status}: ${(await res.text()).slice(0, 200)}`);
-      const bytes = Buffer.from(await res.arrayBuffer());
-      if (bytes.subarray(0, 4).toString() !== "RIFF") throw new Error(`${base}/audio/speech did not return a WAV file`);
-      fs.writeFileSync(wav, bytes);
+      fs.writeFileSync(wav, await fetchWav(text, voice));
     },
   };
 };

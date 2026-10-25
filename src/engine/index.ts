@@ -87,6 +87,7 @@ export * from "./director/scienceChecks";
 export * from "./viz/expr";
 export * from "./voice/spoken";
 export * from "./voice/pronounce";
+export * from "./voice/phrasing";
 export * from "./viz/physics";
 export * from "./viz/params";
 export * from "./viz/schema";

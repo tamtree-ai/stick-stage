@@ -189,6 +189,8 @@ export type SkitLine = {
   /** Words in the line with a pronunciation hint (`pronunciations.json`), for the TTS. */
   pronounce?: Pronunciation[];
   delivery?: string;
+  /** The beat's expression, for how the line is said (`deliveryFor`). */
+  expression?: string;
   /** A voice-over line: voice it with `doc.narrator.voice`, not a character's voice. */
   narrator?: true;
 };
@@ -199,7 +201,7 @@ export const skitLines = (doc: SkitDoc, lexicon: readonly Pronunciation[] = []):
     if (b.silent || !b.speaker || !b.line || b.audio.source !== "tts") return [];
     const said = b.spoken ?? b.line;
     const pronounce = pronunciationsFor(said, lexicon);
-    const extra = { ...(b.spoken ? { spoken: b.spoken } : {}), ...(pronounce.length ? { pronounce } : {}) };
+    const extra = { ...(b.spoken ? { spoken: b.spoken } : {}), ...(pronounce.length ? { pronounce } : {}), ...(b.expression ? { expression: b.expression } : {}) };
     if (isNarration(doc, b)) return [{ id: b.id, speaker: b.speaker, character: b.speaker, text: b.line, ...extra, delivery: b.delivery, narrator: true as const }];
     const character = doc.cast.find((c) => c.id === b.speaker)?.character ?? b.speaker;
     return [{ id: b.id, speaker: b.speaker, character, text: b.line, ...extra, delivery: b.delivery }];

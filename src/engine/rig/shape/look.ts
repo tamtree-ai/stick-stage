@@ -47,7 +47,7 @@ const opt = (c: ShapeColorValue | undefined): string | undefined => (c === undef
 const mouthOf = (main: string): Look["mouth"] => {
   const h = toOklch(main);
   const hue = h.c < 0.03 ? 15 : (15 + Math.max(-12, Math.min(12, ((h.h - 15 + 540) % 360) - 180)) * 0.25 + 360) % 360;
-  return { inside: fromOklch({ l: 0.47, c: 0.12, h: hue }), tongue: fromOklch({ l: 0.74, c: 0.12, h: hue - 4 }), teeth: colorOf("white") };
+  return { inside: fromOklch({ l: 0.4, c: 0.11, h: hue }), tongue: fromOklch({ l: 0.72, c: 0.12, h: hue - 4 }), teeth: colorOf("white") };
 };
 
 export const lookOf = (s: Shape): Look => {

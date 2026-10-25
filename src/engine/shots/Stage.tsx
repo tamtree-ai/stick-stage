@@ -59,7 +59,7 @@ export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame,
   return (
     <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} style={{ display: "block" }}>
       <g transform={t}>
-        <SetLayers set={set} width={width} height={height} layer="background" labels={labels} fontFamily={fontFamily} />
+        <SetLayers set={set} width={width} height={height} layer="background" labels={labels} fontFamily={fontFamily} frame={frame} />
         {figs ? <Figures {...figs} layer="back" /> : null}
         {palette.rim ? <RimFilter id={rimId} color={palette.rim} radius={(set.figureHeightPx / 640) * 6} /> : null}
         {palette.light ? <LightFilter id={lightId} color={palette.light} /> : null}
@@ -71,7 +71,7 @@ export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame,
           </g>
         </g>
         {figs ? <Figures {...figs} layer="front" /> : null}
-        <SetLayers set={set} width={width} height={height} layer="foreground" labels={labels} fontFamily={fontFamily} />
+        <SetLayers set={set} width={width} height={height} layer="foreground" labels={labels} fontFamily={fontFamily} frame={frame} />
       </g>
       {figs ? <Figures {...figs} layer="screen" /> : null}
     </svg>

@@ -1,7 +1,6 @@
 import React from "react";
 import { Brow } from "../../face/Brows";
 import type { FaceState } from "../../face/expressions";
-import { lidPolygon } from "../../face/Eyes";
 import { Mouth } from "../../face/Mouth";
 import type { SymbolId } from "../../face/schema";
 import { Symbols } from "../../face/Symbols";
@@ -9,70 +8,8 @@ import { clamp, f2 } from "../../lib/math";
 import { EarFront, EarsBack, faceLayout, HairBack, HairFront, headPath } from "./head";
 import type { Look } from "./look";
 import { DetailsOnHead } from "./details";
-
-const WHITE = "#ffffff";
-const WATER = "#9fd8f5";
-
-type EyeProps = {
-  x: number;
-  y: number;
-  R: number;
-  face: FaceState;
-  blink: number;
-  look: Look;
-  behind: string;
-};
-
-/** A shape eye: a dark dot (or a white with a dot) with a highlight; lids in the colour behind it. */
-const ShapeEye: React.FC<EyeProps> = ({ x, y, R, face, blink, look, behind }) => {
-  const { kind, size } = look.s.eyes;
-  const ink = look.ink;
-  const shape = face.eyeShape;
-  const lineW = R * 0.05;
-  if (shape === "closed-happy" || shape === "closed" || blink > 0.7) {
-    const w = R * 0.1 * size;
-    const d =
-      shape === "closed-happy"
-        ? `M${f2(x - w)},${f2(y + w * 0.35)} Q${f2(x)},${f2(y - w * 0.9)} ${f2(x + w)},${f2(y + w * 0.35)}`
-        : `M${f2(x - w)},${f2(y)} Q${f2(x)},${f2(y + w * 0.6)} ${f2(x + w)},${f2(y)}`;
-    return <path d={d} fill="none" stroke={ink} strokeWidth={lineW} strokeLinecap="round" />;
-  }
-  const wide = kind === "wide" || shape === "shock";
-  const squint = shape === "squint" ? 0.45 : 1;
-  const pupil = 0.8 + 0.2 * face.pupil;
-  const dotRx = R * (kind === "oval" ? 0.08 : 0.075) * size * pupil * (wide ? 0.85 : 1);
-  const dotRy = R * (kind === "oval" ? 0.13 : 0.1) * size * pupil * squint * (wide ? 0.85 : 1);
-  const whiteRx = R * 0.14 * size * (shape === "shock" ? 1.15 : 1);
-  const whiteRy = R * 0.16 * size * (shape === "shock" ? 1.2 : 1) * squint;
-  const px = x + face.gaze.x * R * (wide ? 0.05 : 0.035);
-  const py = y + face.gaze.y * R * (wide ? 0.05 : 0.035);
-  const lid = clamp(Math.max(face.lid, blink), 0, 1);
-  const tilt = face.lidTilt * -1;
-  const lidRx = (wide ? whiteRx : dotRx) * 1.25;
-  const lidRy = (wide ? whiteRy : dotRy) * 1.15;
-  return (
-    <g>
-      {wide ? <ellipse cx={x} cy={y} rx={whiteRx} ry={whiteRy} fill={WHITE} /> : null}
-      {shape === "teary" ? (
-        <ellipse cx={x} cy={y + dotRy * 1.2} rx={dotRx * 1.8} ry={dotRy * 0.5} fill={WATER} />
-      ) : null}
-      <ellipse cx={px} cy={py} rx={dotRx} ry={dotRy} fill={ink} />
-      <circle cx={px + dotRx * 0.35} cy={py - dotRy * 0.4} r={dotRx * 0.34} fill={WHITE} />
-      {lid > 0.04 || Math.abs(tilt) > 2 ? (
-        <polygon
-          points={lidPolygon(x, y, lidRx, lidRy, Math.max(lid, 0.12), tilt, "top")}
-          fill={behind}
-        />
-      ) : null}
-      {face.lower > 0.04 ? (
-        <polygon
-          points={lidPolygon(x, y, lidRx, lidRy, face.lower * 0.5, -tilt, "bottom")}
-          fill={behind}
-        />
-      ) : null}
-    </g>
-  );
-};
+import { patchPath, ShapeEye } from "./eyes";
+import { blushOf, SHAPE_DRAWN_SYMBOLS, ShapeSymbols } from "./symbols";
 
 /** Muzzle, snout or beak, with the nose and the mouth. Returns where the mouth sits. */
 const Muzzle: React.FC<{ R: number; look: Look; face: FaceState }> = ({ R, look, face }) => {
@@ -174,6 +111,7 @@ export const ShapeHead: React.FC<ShapeHeadProps> = ({
 }) => {
   const L = faceLayout(R, look.s.eyes.spacing);
   const patchColor = look.marks["eye-patch"];
+  const ageOf = (id: SymbolId) => symbolAges?.[id] ?? frame - symbolsSince;
   const symbols = {
     R,
     faceX: L.fx,
@@ -190,16 +128,22 @@ export const ShapeHead: React.FC<ShapeHeadProps> = ({
   return (
     <g>
       <path d={headPath(R, look.s.head.kind)} fill={look.head} />
-      {patchColor ? (
-        <ellipse cx={L.exR + 0.02 * R} cy={L.eyeY} rx={0.24 * R} ry={0.27 * R} fill={patchColor} />
-      ) : null}
+      {patchColor ? <path d={patchPath(L.exR, L.eyeY, R)} fill={patchColor} /> : null}
       {look.cheeks ? (
         <g fill={look.cheeks} opacity={0.6}>
           <circle cx={L.exR + 0.24 * R} cy={0.2 * R} r={0.13 * R} />
           <circle cx={L.exL - 0.3 * R} cy={0.2 * R} r={0.1 * R} />
         </g>
       ) : null}
-      <Symbols symbols={face.symbols.filter((s) => s === "blush")} {...symbols} />
+      <ShapeSymbols
+        symbols={face.symbols.filter((s) => s === "blush")}
+        R={R}
+        eyes={[L.exL, L.exR]}
+        eyeY={L.eyeY}
+        frame={frame}
+        ageOf={ageOf}
+        cheeks={blushOf(look.cheeks)}
+      />
       <ShapeEye
         x={L.exL}
         y={L.eyeY}
@@ -221,7 +165,7 @@ export const ShapeHead: React.FC<ShapeHeadProps> = ({
       <Muzzle R={R} look={look} face={face} />
       <HairFront R={R} look={look} />
       <EarFront R={R} look={look} frame={frame} />
-      {withSymbols ? <DetailsOnHead R={R} look={look} /> : null}
+      {withSymbols ? <DetailsOnHead R={R} look={look} frame={frame} /> : null}
       {look.s.brows ? (
         <>
           <Brow
@@ -247,7 +191,7 @@ export const ShapeHead: React.FC<ShapeHeadProps> = ({
         </>
       ) : null}
       {withSymbols ? (
-        <Symbols symbols={face.symbols.filter((s) => s !== "blush")} {...symbols} />
+        <Overlays {...symbols} face={face} look={look} eyes={[L.exL, L.exR]} ageOf={ageOf} />
       ) : null}
     </g>
   );
@@ -268,11 +212,11 @@ export const ShapeHeadSymbols: React.FC<ShapeHeadProps> = ({
   seed,
 }) => {
   const L = faceLayout(R, look.s.eyes.spacing);
+  const ageOf = (id: SymbolId) => symbolAges?.[id] ?? frame - symbolsSince;
   return (
     <g>
-      <DetailsOnHead R={R} look={look} />
-      <Symbols
-        symbols={face.symbols.filter((s) => s !== "blush")}
+      <DetailsOnHead R={R} look={look} frame={frame} />
+      <Overlays
         R={R}
         faceX={L.fx}
         eyeY={L.eyeY}
@@ -284,7 +228,34 @@ export const ShapeHeadSymbols: React.FC<ShapeHeadProps> = ({
         stroke={look.ink}
         mirrored={mirrored}
         seed={seed}
+        face={face}
+        look={look}
+        eyes={[L.exL, L.exR]}
+        ageOf={ageOf}
       />
     </g>
   );
 };
+
+/** Emanata over the head: flat shape tears and sweat; the shared marks (!, ?, anger) for the rest. */
+const Overlays: React.FC<
+  Omit<React.ComponentProps<typeof Symbols>, "symbols"> & {
+    face: FaceState;
+    look: Look;
+    eyes: readonly number[];
+    ageOf: (id: SymbolId) => number;
+  }
+> = ({ face, look, eyes, ageOf, ...marks }) => (
+  <g>
+    <ShapeSymbols
+      symbols={face.symbols.filter((s) => s !== "blush")}
+      R={marks.R}
+      eyes={eyes}
+      eyeY={marks.eyeY}
+      frame={marks.frame}
+      ageOf={ageOf}
+      cheeks={blushOf(look.cheeks)}
+    />
+    <Symbols symbols={face.symbols.filter((s) => !SHAPE_DRAWN_SYMBOLS.includes(s))} {...marks} />
+  </g>
+);

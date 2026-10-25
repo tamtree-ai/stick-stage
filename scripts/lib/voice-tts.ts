@@ -2,10 +2,10 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { parseSkit, skitLines, type VoiceManifest } from "../../src/engine";
+import { deliveryFor, parseSkit, phrasesOf, skitLines, type VoiceManifest } from "../../src/engine";
 import { wavDurationMs } from "../../src/node";
 import { KOKORO_DEFAULT, KOKORO_NARRATOR, KOKORO_VOICES } from "./kokoro-voices";
-import type { Tts } from "./tts";
+import { pcm16Wav, type Audio, type Tts } from "./tts";
 
 export type VoiceOptions = {
   /** Character id (or "narrator") → voice, over the defaults. */
@@ -16,6 +16,40 @@ export type VoiceOptions = {
 /** Which voice each line gets: the override, the house cast's Kokoro voice, then the default. */
 export const voiceFor = (character: string, narrator: boolean, voices: Record<string, string> = {}): string =>
   narrator ? (voices.narrator ?? KOKORO_NARRATOR) : (voices[character] ?? KOKORO_VOICES[character] ?? KOKORO_DEFAULT);
+
+/** Cut the silence a TTS leaves around a phrase, keeping `padMs` so consonants aren't clipped. */
+export const trimSilence = ({ audio, rate }: Audio, padMs = 40, floor = 0.012): Float32Array => {
+  let a = 0;
+  let b = audio.length - 1;
+  while (a < b && Math.abs(audio[a]!) < floor) a++;
+  while (b > a && Math.abs(audio[b]!) < floor) b--;
+  const pad = Math.round((rate * padMs) / 1000);
+  return audio.subarray(Math.max(0, a - pad), Math.min(audio.length, b + pad + 1));
+};
+
+/**
+ * Say a line as it's meant: phrase by phrase at the line's delivery speed, with real pauses at
+ * its punctuation (`phrasesOf`, `deliveryFor`), so "A shell! A real one! It's mine!" lands as three
+ * beats instead of one breath.
+ */
+export const performLine = async (tts: Tts, text: string, voice: string, line: { narrator?: boolean; expression?: string; delivery?: string }): Promise<Audio> => {
+  const d = deliveryFor(line);
+  const parts: Float32Array[] = [];
+  let rate = 24000;
+  for (const p of phrasesOf(text, d)) {
+    const out = await tts.synth(p.text, voice, d.speed);
+    rate = out.rate;
+    parts.push(trimSilence(out));
+    if (p.pauseMs > 0) parts.push(new Float32Array(Math.round((rate * p.pauseMs) / 1000)));
+  }
+  const all = new Float32Array(parts.reduce((n, p) => n + p.length, 0));
+  let at = 0;
+  for (const p of parts) {
+    all.set(p, at);
+    at += p.length;
+  }
+  return { audio: all, rate };
+};
 
 export const voiceSkitDir = async (dir: string, tts: Tts, o: VoiceOptions = {}): Promise<VoiceManifest> => {
   const log = o.log ?? console.log;
@@ -29,10 +63,13 @@ export const voiceSkitDir = async (dir: string, tts: Tts, o: VoiceOptions = {}):
   const out: VoiceManifest["lines"] = [];
   for (const line of lines) {
     const voice = voiceFor(line.character, !!line.narrator, o.voices);
-    const key = crypto.createHash("sha256").update(JSON.stringify([tts.id, voice, line.text])).digest("hex").slice(0, 24);
+    const said = line.spoken ?? line.text;
+    const d = deliveryFor(line);
+    const key = crypto.createHash("sha256").update(JSON.stringify([tts.id, voice, said, "phrased-1", d])).digest("hex").slice(0, 24);
     const cached = path.join(cache, `${key}.wav`);
     if (!fs.existsSync(cached)) {
-      await tts.speak(line.text, voice, cached);
+      const out = await performLine(tts, said, voice, line);
+      fs.writeFileSync(cached, pcm16Wav(out.audio, out.rate));
       made++;
       log(`  ${line.id} (${voice}): ${line.text}`);
     }

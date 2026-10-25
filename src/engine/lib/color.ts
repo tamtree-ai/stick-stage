@@ -101,7 +101,7 @@ const hueToward = (h: number, target: number, deg: number): number => {
 export const shade = (hex: string, t: number): string => {
   const o = toOklch(hex);
   // Near-neutrals (white fur, grey) shade toward a cool lilac, not toward flat grey.
-  if (t >= 0 && o.c < 0.02) return fromOklch({ l: o.l - t * 0.42 * o.l, c: o.c + t * 0.07, h: 280 });
+  if (t >= 0 && o.c < 0.02) return fromOklch({ l: o.l - t * 0.42 * o.l, c: o.c + t * 0.04, h: 280 });
   if (t >= 0) return fromOklch({ l: o.l - t * 0.42 * o.l, c: o.c * (1 + t * 0.08), h: hueToward(o.h, 285, t * 30) });
   const u = -t;
   return fromOklch({ l: o.l + u * (1 - o.l) * 0.85, c: o.c * (1 - u * 0.55), h: o.c < 0.02 ? o.h : hueToward(o.h, 85, u * 22) });

@@ -193,26 +193,26 @@ export const PALETTES: Record<string, Palette> = {
 const ok = (l: number, c: number, h: number): string => fromOklch({ l, c, h });
 
 /**
- * Story kit palettes (the shape tier), built by rule so every place is in harmony with itself and
- * leaves room for the cast:
- * - backgrounds stay calm (chroma ≤ 0.06, accents ≤ 0.10) while shape characters sit at 0.09–0.17,
- *   so the cast parts from the set by saturation, not by an outline;
- * - layers recede by getting lighter, cooler and closer to the sky (far hills → near hills → ground);
+ * Story kit palettes (the shape tier): "storybook bright", chosen over a calm pastel
+ * and a retro print (`PaletteLab` keeps those two for comparison). Built by rule so each place is
+ * in harmony with itself and leaves room for the cast:
+ * - clean, mid-light fills (chroma 0.06–0.13, accents to 0.17), like a TV cartoon, not washed out;
  * - one dominant hue family per place (60%), a supporting one (30%), and a split-complementary
  *   accent (10%) for flowers, doors and roofs;
+ * - layers recede by getting lighter and closer to the sky (far hills → near hills → ground);
  * - the ground sits at mid lightness so both pale (rabbit, dog) and dark (penguin) characters read.
  * `light` grades the cast with the place's light (soft-light), so characters belong to the scene.
  * Roles: see `storyOutdoor.tsx`.
  */
 Object.assign(PALETTES, {
-  "story-day": { sky: ok(0.91, 0.035, 225), wallA: ok(0.87, 0.04, 145), wallB: ok(0.81, 0.062, 138), floor: ok(0.76, 0.07, 130), detail: ok(0.66, 0.085, 142), shade: ok(0.52, 0.05, 165), accent: ok(0.7, 0.1, 35), glow: ok(0.93, 0.09, 92) },
-  "story-sunset": { sky: ok(0.87, 0.06, 62), wallA: ok(0.8, 0.045, 22), wallB: ok(0.71, 0.05, 355), floor: ok(0.75, 0.05, 108), detail: ok(0.62, 0.06, 122), shade: ok(0.48, 0.045, 40), accent: ok(0.8, 0.1, 80), glow: ok(0.94, 0.09, 88), light: ok(0.8, 0.12, 55) },
-  "story-night": { sky: ok(0.33, 0.065, 272), wallA: ok(0.41, 0.055, 265), wallB: ok(0.37, 0.05, 255), floor: ok(0.42, 0.045, 215), detail: ok(0.36, 0.045, 200), shade: ok(0.28, 0.035, 205), accent: ok(0.88, 0.1, 95), glow: ok(0.93, 0.06, 95), light: ok(0.55, 0.1, 265) },
-  "story-autumn": { sky: ok(0.9, 0.035, 230), wallA: ok(0.87, 0.05, 88), wallB: ok(0.8, 0.06, 78), floor: ok(0.76, 0.06, 92), detail: ok(0.71, 0.1, 58), shade: ok(0.5, 0.07, 40), accent: ok(0.63, 0.12, 30), glow: ok(0.93, 0.09, 90), light: ok(0.85, 0.08, 75) },
-  "story-beach-sunset": { sky: ok(0.87, 0.06, 62), wallA: ok(0.73, 0.05, 330), wallB: ok(0.66, 0.05, 312), floor: ok(0.83, 0.055, 75), detail: ok(0.62, 0.06, 122), shade: ok(0.66, 0.05, 60), accent: ok(0.8, 0.1, 80), glow: ok(0.94, 0.09, 88), light: ok(0.8, 0.12, 55) },
-  "story-beach": { sky: ok(0.91, 0.035, 222), wallA: ok(0.8, 0.06, 218), wallB: ok(0.72, 0.07, 228), floor: ok(0.85, 0.055, 82), detail: ok(0.66, 0.07, 142), shade: ok(0.72, 0.05, 72), accent: ok(0.7, 0.1, 35), glow: ok(0.93, 0.09, 92) },
-  "story-indoor": { wallA: ok(0.93, 0.03, 78), wallB: ok(0.88, 0.04, 72), floor: ok(0.7, 0.06, 60), accent: ok(0.62, 0.1, 30), shade: ok(0.55, 0.06, 50), sky: ok(0.9, 0.035, 225), detail: ok(0.66, 0.07, 142), glow: ok(0.93, 0.09, 92), light: ok(0.9, 0.06, 75) },
-  "story-bedroom": { wallA: ok(0.88, 0.035, 292), wallB: ok(0.83, 0.04, 292), floor: ok(0.7, 0.04, 62), accent: ok(0.75, 0.08, 350), shade: ok(0.58, 0.06, 295), sky: ok(0.9, 0.035, 225), detail: ok(0.66, 0.07, 142), glow: ok(0.93, 0.05, 95) },
+  "story-day": { sky: ok(0.86, 0.075, 230), wallA: ok(0.84, 0.09, 140), wallB: ok(0.77, 0.115, 140), floor: ok(0.72, 0.12, 135), detail: ok(0.62, 0.13, 145), shade: ok(0.48, 0.09, 160), accent: ok(0.66, 0.16, 30), glow: ok(0.92, 0.13, 95) },
+  "story-sunset": { sky: ok(0.82, 0.1, 55), wallA: ok(0.74, 0.08, 20), wallB: ok(0.64, 0.08, 350), floor: ok(0.7, 0.09, 110), detail: ok(0.56, 0.1, 125), shade: ok(0.42, 0.07, 40), accent: ok(0.82, 0.14, 85), glow: ok(0.94, 0.12, 90), light: ok(0.8, 0.14, 55) },
+  "story-night": { sky: ok(0.3, 0.09, 275), wallA: ok(0.38, 0.08, 268), wallB: ok(0.34, 0.07, 255), floor: ok(0.4, 0.07, 215), detail: ok(0.36, 0.07, 200), shade: ok(0.27, 0.05, 205), accent: ok(0.88, 0.13, 95), glow: ok(0.94, 0.08, 95), light: ok(0.55, 0.12, 265) },
+  "story-autumn": { sky: ok(0.87, 0.06, 230), wallA: ok(0.84, 0.09, 85), wallB: ok(0.76, 0.11, 72), floor: ok(0.72, 0.1, 90), detail: ok(0.68, 0.15, 55), shade: ok(0.48, 0.1, 38), accent: ok(0.6, 0.17, 30), glow: ok(0.93, 0.12, 92), light: ok(0.85, 0.1, 75) },
+  "story-beach": { sky: ok(0.88, 0.07, 225), wallA: ok(0.74, 0.1, 220), wallB: ok(0.64, 0.11, 232), floor: ok(0.86, 0.08, 85), detail: ok(0.62, 0.12, 145), shade: ok(0.72, 0.08, 72), accent: ok(0.66, 0.16, 30), glow: ok(0.93, 0.12, 92) },
+  "story-beach-sunset": { sky: ok(0.82, 0.1, 55), wallA: ok(0.66, 0.09, 330), wallB: ok(0.58, 0.09, 310), floor: ok(0.82, 0.08, 75), detail: ok(0.56, 0.1, 125), shade: ok(0.62, 0.07, 60), accent: ok(0.82, 0.14, 85), glow: ok(0.94, 0.12, 90), light: ok(0.8, 0.14, 55) },
+  "story-indoor": { wallA: ok(0.9, 0.06, 85), wallB: ok(0.84, 0.08, 75), floor: ok(0.64, 0.09, 55), accent: ok(0.6, 0.15, 30), shade: ok(0.52, 0.08, 45), sky: ok(0.88, 0.06, 225), detail: ok(0.62, 0.12, 145), glow: ok(0.93, 0.12, 92), light: ok(0.9, 0.08, 75) },
+  "story-bedroom": { wallA: ok(0.84, 0.06, 290), wallB: ok(0.78, 0.075, 290), floor: ok(0.64, 0.06, 60), accent: ok(0.72, 0.12, 350), shade: ok(0.54, 0.08, 295), sky: ok(0.88, 0.06, 225), detail: ok(0.62, 0.12, 145), glow: ok(0.93, 0.06, 95) },
 } satisfies Record<string, Palette>);
 
 /** Tones every part may use, derived from the seven tokens (still no raw hex in parts). */

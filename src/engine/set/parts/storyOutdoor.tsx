@@ -8,7 +8,14 @@ import { flipAt, partBase, partX, type PartComponent } from "./types";
  * The story kit, outdoors: flat, outline-free shapes for the shape tier (round hills, lollipop
  * trees, puffy clouds). Palette roles: `sky`; `wallA` / `wallB` far and near hills; `floor` the
  * ground; `detail` foliage, `shade` its dark side; `accent` flowers, doors and roofs.
+ *
+ * Ambient motion runs off the composition `frame` only (never the scene or the dialog): clouds
+ * drift, crowns and flowers sway, the sea rolls, stars twinkle. It is slow and small on purpose,
+ * so the set breathes without pulling the eye from the cast.
  */
+
+/** A slow wave, phase-shifted per part so neighbours don't move in step. */
+const sway = (frame: number, seed: string, key: string, speed: number): number => Math.sin(frame * speed + randRange(seed, `ph-${key}`, 0, Math.PI * 2));
 
 /** Where the story ground starts: a low horizon, so the hills read behind short figures. */
 export const storyHorizon = (groundY: number, fig: number) => groundY - fig * 0.26;
@@ -22,7 +29,7 @@ const Cloud: React.FC<{ x: number; y: number; s: number; fill: string }> = ({ x,
 );
 
 /** Sky with clouds; `variant`: "sun" (default), "moon" (stars and a moon), "plain". */
-export const StorySky: PartComponent = ({ part, palette, W, groundY, fig, seed }) => {
+export const StorySky: PartComponent = ({ part, palette, W, groundY, fig, seed, frame = 0 }) => {
   const v = part.variant ?? "sun";
   const night = v === "moon";
   const cloud = night ? shade(palette.sky, -0.21) : shade(palette.sky, -0.83);
@@ -32,14 +39,14 @@ export const StorySky: PartComponent = ({ part, palette, W, groundY, fig, seed }
       <rect width={W} height={groundY + 4} fill={palette.sky} />
       {v === "sun" ? (
         <g>
-          <circle cx={W * 0.82} cy={groundY * 0.2} r={fig * 0.16} fill={shade(glow, -0.57)} opacity={0.5} />
+          <circle cx={W * 0.82} cy={groundY * 0.2} r={fig * 0.16 * (1 + 0.05 * Math.sin(frame * 0.05))} fill={shade(glow, -0.57)} opacity={0.5} />
           <circle cx={W * 0.82} cy={groundY * 0.2} r={fig * 0.11} fill={glow} />
         </g>
       ) : null}
       {night ? (
         <g>
           {Array.from({ length: 26 }, (_, i) => (
-            <circle key={i} cx={W * rand(seed, `sx${i}`)} cy={groundY * randRange(seed, `sy${i}`, 0.03, 0.55)} r={fig * randRange(seed, `sr${i}`, 0.004, 0.009)} fill={glow} />
+            <circle key={i} cx={W * rand(seed, `sx${i}`)} cy={groundY * randRange(seed, `sy${i}`, 0.03, 0.55)} r={fig * randRange(seed, `sr${i}`, 0.004, 0.009)} fill={glow} opacity={0.6 + 0.4 * sway(frame, seed, `st${i}`, 0.07)} />
           ))}
           <circle cx={W * 0.8} cy={groundY * 0.18} r={fig * 0.09} fill={glow} />
           <circle cx={W * 0.8 + fig * 0.04} cy={groundY * 0.18 - fig * 0.02} r={fig * 0.08} fill={palette.sky} />
@@ -47,9 +54,13 @@ export const StorySky: PartComponent = ({ part, palette, W, groundY, fig, seed }
       ) : null}
       {v === "plain"
         ? null
-        : [0, 1, 2].map((i) => (
-            <Cloud key={i} x={W * (0.12 + 0.33 * i) + randRange(seed, `cx${i}`, -80, 80)} y={groundY * randRange(seed, `cy${i}`, 0.14, 0.38)} s={fig * randRange(seed, `cs${i}`, 0.16, 0.24)} fill={cloud} />
-          ))}
+        : [0, 1, 2].map((i) => {
+            // Drift right at a few px a second and wrap round off-screen.
+            const margin = fig * 0.5;
+            const x0 = W * (0.12 + 0.33 * i) + randRange(seed, `cx${i}`, -80, 80);
+            const x = ((((x0 + frame * fig * randRange(seed, `cv${i}`, 0.0006, 0.0011) + margin) % (W + 2 * margin)) + W + 2 * margin) % (W + 2 * margin)) - margin;
+            return <Cloud key={i} x={x} y={groundY * randRange(seed, `cy${i}`, 0.14, 0.38)} s={fig * randRange(seed, `cs${i}`, 0.16, 0.24)} fill={cloud} />;
+          })}
     </g>
   );
 };
@@ -89,7 +100,7 @@ export const StoryGround: PartComponent = ({ part, palette, W, H, groundY, fig }
 };
 
 /** A lollipop tree. `variant`: "round" (default), "tall" (a rounded cone), "apple" (with fruit). */
-export const StoryTree: PartComponent = ({ part, palette, W, H, groundY, fig, seed, marks }) => {
+export const StoryTree: PartComponent = ({ part, palette, W, H, groundY, fig, seed, marks, frame = 0 }) => {
   const s = fig * part.size;
   const cx = partX(part, W, marks, 0.15);
   const base = partBase(part, H, groundY);
@@ -109,23 +120,26 @@ export const StoryTree: PartComponent = ({ part, palette, W, H, groundY, fig, se
   return (
     <g transform={flipAt(part.flip, cx)}>
       <rect x={cx - trunkW / 2} y={top} width={trunkW} height={base - top} rx={trunkW / 2} fill={wood} />
-      {crown}
-      {v === "apple"
-        ? [0, 1, 2, 3].map((i) => (
-            <circle key={i} cx={cx + s * randRange(seed, `ax${i}`, -0.2, 0.2)} cy={top - s * randRange(seed, `ay${i}`, -0.02, 0.3)} r={s * 0.035} fill={palette.accent} />
-          ))
-        : null}
+      <g transform={`rotate(${(1.3 * sway(frame, seed, "crown", 0.035)).toFixed(3)} ${cx} ${top + s * 0.05})`}>
+        {crown}
+        {v === "apple"
+          ? [0, 1, 2, 3].map((i) => (
+              <circle key={i} cx={cx + s * randRange(seed, `ax${i}`, -0.2, 0.2)} cy={top - s * randRange(seed, `ay${i}`, -0.02, 0.3)} r={s * 0.035} fill={palette.accent} />
+            ))
+          : null}
+      </g>
     </g>
   );
 };
 
-export const StoryBush: PartComponent = ({ part, palette, W, H, groundY, fig, marks }) => {
+export const StoryBush: PartComponent = ({ part, palette, W, H, groundY, fig, seed, marks, frame = 0 }) => {
   const s = fig * part.size;
   const cx = partX(part, W, marks, 0.25);
   const base = partBase(part, H, groundY);
   const c = mix(palette.detail, palette.shade, 0.3);
+  const k = sway(frame, seed, "bush", 0.045);
   return (
-    <g fill={c}>
+    <g fill={c} transform={`translate(${cx} ${base}) scale(${(1 + 0.012 * k).toFixed(4)} ${(1 + 0.022 * k).toFixed(4)}) translate(${-cx} ${-base})`}>
       <ellipse cx={cx} cy={base - s * 0.06} rx={s * 0.22} ry={s * 0.08} />
       <circle cx={cx - s * 0.1} cy={base - s * 0.1} r={s * 0.09} />
       <circle cx={cx + s * 0.06} cy={base - s * 0.13} r={s * 0.11} />
@@ -134,7 +148,7 @@ export const StoryBush: PartComponent = ({ part, palette, W, H, groundY, fig, ma
 };
 
 /** A clump of flowers in the accent colour. */
-export const StoryFlowers: PartComponent = ({ part, palette, W, H, groundY, fig, seed, marks }) => {
+export const StoryFlowers: PartComponent = ({ part, palette, W, H, groundY, fig, seed, marks, frame = 0 }) => {
   const s = fig * part.size;
   const cx = partX(part, W, marks, 0.3);
   const base = partBase(part, H, groundY);
@@ -145,7 +159,7 @@ export const StoryFlowers: PartComponent = ({ part, palette, W, H, groundY, fig,
         const h = s * randRange(seed, `fh${i}`, 0.06, 0.12);
         const petal = i % 2 ? palette.accent : shade(palette.accent, -0.46);
         return (
-          <g key={i}>
+          <g key={i} transform={`rotate(${(5 * sway(frame, seed, `f${i}`, 0.06)).toFixed(3)} ${x} ${base})`}>
             <rect x={x - s * 0.006} y={base - h} width={s * 0.012} height={h} fill={palette.shade} />
             <circle cx={x} cy={base - h} r={s * 0.022} fill={petal} />
           </g>
@@ -156,7 +170,7 @@ export const StoryFlowers: PartComponent = ({ part, palette, W, H, groundY, fig,
 };
 
 /** A pond: a flat ellipse on the ground with a light ripple. */
-export const StoryPond: PartComponent = ({ part, palette, W, H, groundY, fig, marks }) => {
+export const StoryPond: PartComponent = ({ part, palette, W, H, groundY, fig, seed, marks, frame = 0 }) => {
   const s = fig * part.size;
   const cx = partX(part, W, marks, 0.75);
   const base = partBase(part, H, groundY) + s * 0.06;
@@ -164,7 +178,7 @@ export const StoryPond: PartComponent = ({ part, palette, W, H, groundY, fig, ma
   return (
     <g>
       <ellipse cx={cx} cy={base} rx={s * 0.42} ry={s * 0.09} fill={water} />
-      <ellipse cx={cx - s * 0.08} cy={base - s * 0.015} rx={s * 0.14} ry={s * 0.02} fill={shade(water, -0.46)} />
+      <ellipse cx={cx - s * 0.08 + s * 0.04 * sway(frame, seed, "rip", 0.03)} cy={base - s * 0.015} rx={s * (0.14 + 0.02 * sway(frame, seed, "rip2", 0.05))} ry={s * 0.02} fill={shade(water, -0.46)} />
     </g>
   );
 };
@@ -195,13 +209,18 @@ export const StoryFence: PartComponent = ({ part, palette, W, groundY, fig }) =>
 };
 
 /** Beach: the sea band at the horizon (`wallA` / `wallB` blues) and sand (`floor`) from it down. */
-export const StorySea: PartComponent = ({ palette, W, H, groundY, fig }) => {
+export const StorySea: PartComponent = ({ palette, W, H, groundY, fig, frame = 0 }) => {
   const hz = storyHorizon(groundY, fig);
+  const step = W / 12;
+  // The shoreline rolls sideways a scallop at a time and the near water bobs.
+  const roll = (frame * fig * 0.0012) % step;
+  const bob = fig * 0.005 * Math.sin(frame * 0.05);
+  const shore = hz + fig * 0.14;
   return (
     <g>
       <rect x={0} y={hz - fig * 0.04} width={W} height={H - hz} fill={palette.wallA} />
-      <rect x={0} y={hz + fig * 0.06} width={W} height={H - hz} fill={palette.wallB} />
-      <path d={`M0,${hz + fig * 0.14} ${Array.from({ length: 13 }, (_, i) => `Q${(W * (i + 0.5)) / 12},${hz + fig * 0.1} ${(W * (i + 1)) / 12},${hz + fig * 0.14}`).join(" ")} V${H} H0 Z`} fill={palette.floor} />
+      <rect x={0} y={hz + fig * 0.06 + bob} width={W} height={H - hz} fill={palette.wallB} />
+      <path d={`M${roll - step},${shore} ${Array.from({ length: 14 }, (_, i) => `Q${roll + step * (i - 0.5)},${shore - fig * 0.04} ${roll + step * i},${shore}`).join(" ")} V${H} H${roll - step} Z`} fill={palette.floor} />
     </g>
   );
 };

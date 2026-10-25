@@ -31,7 +31,7 @@ export const StoryHouse: PartComponent = ({ part, palette, W, H, groundY, fig, m
 };
 
 /** The clubhouse: a round-topped hut with a big round door and a flag. Stands on the ground line. */
-export const StoryClubhouse: PartComponent = ({ part, palette, W, H, groundY, fig, marks }) => {
+export const StoryClubhouse: PartComponent = ({ part, palette, W, H, groundY, fig, marks, frame = 0 }) => {
   const s = fig * part.size;
   const cx = partX(part, W, marks, 0.5);
   const base = partBase(part, H, groundY) - fig * 0.02;
@@ -46,7 +46,8 @@ export const StoryClubhouse: PartComponent = ({ part, palette, W, H, groundY, fi
       <circle cx={cx + w * 0.3} cy={base - h * 0.62} r={w * 0.08} fill={shade(palette.sky, -0.29)} />
       <circle cx={cx - w * 0.3} cy={base - h * 0.62} r={w * 0.08} fill={shade(palette.sky, -0.29)} />
       <rect x={cx - s * 0.008} y={base - h - s * 0.32} width={s * 0.016} height={s * 0.34} fill={palette.shade} />
-      <path d={`M${cx},${base - h - s * 0.32} l${s * 0.18},${s * 0.05} l${-s * 0.18},${s * 0.05} Z`} fill={palette.accent} />
+      {/* The flag flutters: its tip lifts and dips. */}
+      <path d={`M${cx},${base - h - s * 0.32} q${s * 0.09},${s * 0.02 * Math.sin(frame * 0.18)} ${s * 0.18},${s * 0.05 + s * 0.025 * Math.sin(frame * 0.18 + 1)} l${-s * 0.18},${s * 0.05} Z`} fill={palette.accent} />
     </g>
   );
 };

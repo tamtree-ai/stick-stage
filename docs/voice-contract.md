@@ -58,6 +58,15 @@ For a skit, the lines are the spoken beats of `skit.json`: `id` = beat id, `text
 `delivery` is a free-form hint ("flat", "whispered"). `skitLines(skit)` in the engine returns
 exactly this list.
 
+**Performance (pauses and pace).** A TTS that reads a line flat ("A shell! A real one! It's mine!"
+in one breath) sounds wrong. Each line from `skitLines` also carries the beat's `expression`. The
+engine's `deliveryFor(line)` turns `expression`, `delivery` and `narrator` into a speaking speed
+and a pause scale, and `phrasesOf(text, delivery)` splits the line at its punctuation with a pause
+after each phrase (comma ≈ 220 ms, "!" ≈ 380, "." ≈ 420, "?" ≈ 460, "…" ≈ 650, scaled). Voice
+phrase by phrase and join with those silences (`pnpm voice:tts` does; see `performLine` in
+`scripts/lib/voice-tts.ts`). Prep finds the pauses by silence detection, so captions and mouths
+line up with them.
+
 **Spoken forms and pronunciations.** A line from `skitLines` (and from `POST /validate`) may carry
 `spoken`: speak that instead of `text`, and return it in the manifest. Prep maps the spoken word
 timings back onto the caption's tokens, so subtitles highlight "ħ" while the voice says "h-bar". A
