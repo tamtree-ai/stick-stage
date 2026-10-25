@@ -62,7 +62,7 @@ export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame,
   const unit = set.figureHeightPx / 640;
   const illustrated = finish === "illustrated";
   const t = `translate(${f2(width / 2)} ${f2(height / 2)}) scale(${f2(cam.scale)}) translate(${f2(-cam.cx)} ${f2(-cam.cy)})`;
-  return (
+  const stage = (
     <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} style={{ display: "block" }}>
       <g transform={t}>
         <SetLayers set={set} width={width} height={height} layer="background" labels={labels} fontFamily={fontFamily} frame={frame} />
@@ -84,9 +84,21 @@ export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame,
         {figs ? <Figures {...figs} layer="front" /> : null}
         <SetLayers set={set} width={width} height={height} layer="foreground" labels={labels} fontFamily={fontFamily} frame={frame} />
       </g>
-      {illustrated ? <FinishOverlay width={width} height={height} /> : null}
-      {figs ? <Figures {...figs} layer="screen" /> : null}
+      {figs && !illustrated ? <Figures {...figs} layer="screen" /> : null}
     </svg>
+  );
+  if (!illustrated) return stage;
+  // The finish overlay sits on its own layer (cached between frames), with screen figures above it.
+  return (
+    <div style={{ position: "relative", width, height }}>
+      {stage}
+      <FinishOverlay width={width} height={height} />
+      {figs ? (
+        <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} style={{ position: "absolute", left: 0, top: 0 }}>
+          <Figures {...figs} layer="screen" />
+        </svg>
+      ) : null}
+    </div>
   );
 };
 
