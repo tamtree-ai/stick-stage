@@ -4,7 +4,7 @@
   "private": true,
   "license": "MIT",
   "type": "module",
-  "description": "Stick-figure comedy skit engine on Remotion",
+  "description": "Write a premise, get a captioned, lip-synced 9:16 comedy short. Open source, runs offline. Built on Remotion.",
   "scripts": {
     "bootstrap": "tsx scripts/bootstrap.ts",
     "diagnose": "tsx scripts/diagnose.ts",

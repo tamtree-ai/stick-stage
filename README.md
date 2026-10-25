@@ -1,17 +1,38 @@
 # StickStage
 
-Data-driven comedy-skit engine built on [Remotion](https://www.remotion.dev). Big-head stick
-characters, sets drawn entirely in code, TTS dialogue with lip-sync, and a director that turns a
-`skit.json` into a 9:16 short video frame by frame.
+**Write a premise, get a captioned, lip-synced 9:16 comedy short.** Open source, no account, no API
+key, and everything renders on your own computer.
 
-You write the premise and the lines. StickStage handles timing, listener reactions, shots and
-cuts (two-shots, punch-ins, emotion close-ups), subtitles, SFX and rendering.
+[![CI](https://github.com/tamtree-ai/stick-stage/actions/workflows/ci.yml/badge.svg)](https://github.com/tamtree-ai/stick-stage/actions/workflows/ci.yml)
+[![quickstart](https://github.com/tamtree-ai/stick-stage/actions/workflows/quickstart.yml/badge.svg)](https://github.com/tamtree-ai/stick-stage/actions/workflows/quickstart.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Node 22+](https://img.shields.io/badge/node-22%2B-339933.svg)](https://nodejs.org)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/tamtree-ai/stick-stage)
 
-The manual, written so a new person can follow it and so an engineer can trace one video from a topic to the posted files: [docs/README.md](docs/README.md).
+<p align="center">
+  <img src="docs/media/hero.gif" alt="Two stick figures argue about a group chat, ending on the punchline: your mom sent the thumbs up" width="300">
+</p>
+
+<p align="center"><i>One of the bundled skits, rendered by <code>pnpm render group-chat</code>.
+<a href="docs/media/group-chat.mp4">Watch it with sound</a>.</i></p>
+
+You write the premise and the lines. StickStage handles the rest: timing, listener reactions, shots
+and cuts (two-shots, punch-ins, emotion close-ups), subtitles, sound effects, and frame-by-frame
+rendering with [Remotion](https://www.remotion.dev). Characters are original, and the sets are
+drawn entirely in code.
+
+- **Runs locally.** Voices come from [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M) on your CPU. Rendering never touches the network.
+- **Everything is data.** A skit is one JSON file. Characters, sets, props and poses are JSON too, so adding one is a data change, not a rewrite.
+- **Three looks.** Stick figures, toon characters, and a shape cast for narrated stories.
+- **Works with Claude Code.** Five bundled [skills](skills/) turn "make a video about X" into a finished file.
+- **Science shorts.** Myth-flip explainers with figures timed to the words, and claims that need an owner's sign-off.
+
+The manual, written so a new person can follow it and so an engineer can trace one video from a
+topic to the posted files: [docs/README.md](docs/README.md).
 
 ## Quickstart
 
-No account, no key, no Docker. You need Node 22+ and pnpm.
+No account, no key, no Docker. You need Node 22+ and pnpm. Prefer not to install anything? Open it in [GitHub Codespaces](https://codespaces.new/tamtree-ai/stick-stage) and run the same three commands.
 
 > **Licences before you start.** StickStage renders with [Remotion](https://www.remotion.dev),
 > which is free for individuals and companies of up to 3 people. Larger companies need a
@@ -58,22 +79,29 @@ Without a model, `pnpm write prompt --brief=<file>` prints the prompt to paste i
 and `pnpm write draft --brief=<file> --reply=<file>` turns its reply into a premise. The reply's
 shape is [`schemas/writer-reply.schema.json`](schemas/writer-reply.schema.json).
 
-## Requirements
+## Gallery
 
-- Node 22+, pnpm
-- [Rhubarb Lip Sync](https://github.com/DanielSWolf/rhubarb-lip-sync) for mouths: `pnpm bootstrap`
-  installs it into `tools/`; or set `RHUBARB_PATH`, or put it on `PATH`. The macOS build is
-  Intel-only, so Apple Silicon needs Rosetta (`softwareupdate --install-rosetta`); Linux arm64 has
-  no release build (build it from source, or let the mouths be estimated)
-- Kokoro (`kokoro-js`, an optional dependency) for local voices; macOS `say` (`pnpm voice:say`) also works
-- whisper.cpp (`whisper-cli` + `WHISPER_MODEL`), only for lip-syncing to existing audio (optional)
+| Comedy skit (stick) | Science short (toon) | Story (shape cast) |
+|---|---|---|
+| <img src="docs/media/hero.gif" width="200" alt="Stick-figure comedy skit"> | <img src="docs/media/science-short.gif" width="200" alt="Science short about coin flips"> | <img src="docs/media/story.gif" width="320" alt="Narrated story about a lost balloon"> |
+| `group-chat` | `coin-due` | `lost-balloon` |
 
-```sh
-pnpm dev            # Remotion Studio
-scripts/start.sh    # render service in the background (scripts/stop.sh to stop)
-```
+The skits above are in [`public/skits/`](public/skits/), so `pnpm render <name>` makes them on your machine.
 
-Step by step, with the service and troubleshooting: [docs/getting-started.md](docs/getting-started.md).
+## Use it from Claude Code
+
+Open the repo in [Claude Code](https://claude.com/claude-code) and ask for what you want. The skills in
+[`skills/`](skills/) write the jokes, stage them, render, and package the files:
+
+> make a video about people who never read the terms and conditions
+
+| Skill | Does |
+|---|---|
+| [`topic-to-video`](skills/topic-to-video/SKILL.md) | A topic to a ~30 s skit, end to end |
+| [`skit-director`](skills/skit-director/SKILL.md) | Stages a premise you wrote; never changes a line |
+| [`science-short`](skills/science-short/SKILL.md) | A myth-flip science short with sourced claims; never approves them |
+| [`toon-character`](skills/toon-character/SKILL.md) | Adds or changes a toon character |
+| [`story-episode`](skills/story-episode/SKILL.md) | An idea to a narrated 16:9 story |
 
 ## Make a skit
 
@@ -115,13 +143,34 @@ A skit is one JSON file:
 }
 ```
 
-## Render service
+## Requirements
+
+- Node 22+, pnpm
+- [Rhubarb Lip Sync](https://github.com/DanielSWolf/rhubarb-lip-sync) for mouths: `pnpm bootstrap`
+  installs it into `tools/`; or set `RHUBARB_PATH`, or put it on `PATH`. The macOS build is
+  Intel-only, so Apple Silicon needs Rosetta (`softwareupdate --install-rosetta`); Linux arm64 has
+  no release build (build it from source, or let the mouths be estimated)
+- Kokoro (`kokoro-js`, an optional dependency) for local voices; macOS `say` (`pnpm voice:say`) also works
+- whisper.cpp (`whisper-cli` + `WHISPER_MODEL`), only for lip-syncing to existing audio (optional)
+
+```sh
+pnpm dev            # Remotion Studio
+scripts/start.sh    # render service in the background (scripts/stop.sh to stop)
+```
+
+Step by step, with the service and troubleshooting: [docs/getting-started.md](docs/getting-started.md).
+
+## Advanced: Tamtree, the render service and cloud voices
+
+StickStage is also a node in [Tamtree](https://www.tamtree.io) workflows. None of this is needed to make videos.
+
+### Render service
 
 `pnpm serve` runs StickStage as an HTTP service for tamtree: `POST /validate` (premise → skit + the
 lines to voice), `POST /render` (skit + voice.json + audio → job), `GET /jobs/:id`. `Dockerfile`
 builds the Linux image (Chrome Headless Shell + Rhubarb). API: [docs/render-service.md](docs/render-service.md).
 
-## Voices
+### Voices
 
 The engine and the render service never call a TTS or an LLM, and no provider keys live in them.
 In production the Tamtree harness writes `public/skits/<id>/voice/<line>.wav` and `voice.json`
@@ -156,6 +205,12 @@ pnpm render <Comp> out/x.mp4 --frames=a-b                 # render any lab compo
 Motion is reviewed as video, not stills. Rendering is frame-pure: every visual is a function of
 `(frame, props)`, with seeded randomness only. See [CLAUDE.md](CLAUDE.md) for the core rules and
 [DECISIONS.md](DECISIONS.md) for tuned values and design decisions.
+
+## Contributing
+
+Issues and pull requests are welcome. New characters, sets, props, SFX and skit templates are the
+easiest places to start, because they are data: see [CONTRIBUTING.md](CONTRIBUTING.md) and the
+[`good first issue`](https://github.com/tamtree-ai/stick-stage/labels/good%20first%20issue) label.
 
 ## License
 

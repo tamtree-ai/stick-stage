@@ -1,6 +1,6 @@
 # StickStage
 
-Comedy-skit and science-short engine on Remotion, for our own channels. Characters draw as stick figures or as toons (`style.build`). Plan: `../planning/2026-09-26-revised-plan/plan.md` (milestones, gates, data contracts). Science channel: `../planning/2026-09-29-science-channel/`. Toon tier: `../planning/2026-10-02-toon-characters/`. Decisions not in a plan go in `DECISIONS.md`.
+Comedy-skit and science-short engine on Remotion. Open source (MIT); Tamtree uses it for its own channels. Characters draw as stick figures or as toons (`style.build`). Plan: `../planning/2026-09-26-revised-plan/plan.md` (milestones, gates, data contracts). Science channel: `../planning/2026-09-29-science-channel/`. Toon tier: `../planning/2026-10-02-toon-characters/`. Decisions not in a plan go in `DECISIONS.md`.
 
 ## Core rules
 1. **Frame-pure rendering.** Every visual is a pure function of `(frame, props)`. No `useState`/`useEffect` for animation, no CSS animations, no `Date`, no `Math.random()`. Use seeded `rand()` / `noise()` from `src/engine/lib/seed.ts`.
