@@ -1,7 +1,8 @@
 # StickStage
 
-**Write a premise, get a captioned, lip-synced 9:16 comedy short.** Open source, no account, no API
-key, and everything renders on your own computer.
+**StickStage is an open-source stick figure video generator: write a premise, get a captioned,
+lip-synced 9:16 comedy short** for YouTube Shorts, TikTok or Reels. No account and no API key:
+voices, lip sync and rendering all run offline on your own computer, built on Remotion.
 
 [![CI](https://github.com/tamtree-ai/stick-stage/actions/workflows/ci.yml/badge.svg)](https://github.com/tamtree-ai/stick-stage/actions/workflows/ci.yml)
 [![quickstart](https://github.com/tamtree-ai/stick-stage/actions/workflows/quickstart.yml/badge.svg)](https://github.com/tamtree-ai/stick-stage/actions/workflows/quickstart.yml)
@@ -203,8 +204,46 @@ pnpm render <Comp> out/x.mp4 --frames=a-b                 # render any lab compo
 ```
 
 Motion is reviewed as video, not stills. Rendering is frame-pure: every visual is a function of
-`(frame, props)`, with seeded randomness only. See [CLAUDE.md](CLAUDE.md) for the core rules and
+`(frame, props)`, with seeded randomness only. See [AGENTS.md](AGENTS.md) for the core rules and
 [DECISIONS.md](DECISIONS.md) for tuned values and design decisions.
+
+## FAQ
+
+**Does StickStage need an API key or an internet connection?**
+No. Voices come from Kokoro running on your CPU, and rendering never touches the network. The
+first run downloads a few tools once: `pnpm bootstrap` fetches Rhubarb Lip Sync and Remotion's
+headless Chrome, and Kokoro's weights (~90 MB) download on first use. A language model is
+optional (see [Your own model](#your-own-model-optional)).
+
+**Can AI write the jokes for me?**
+Yes, if you want it to. Point `LOCAL_LLM_*` at Ollama, LM Studio, OpenRouter, OpenAI or
+Anthropic, or run `pnpm write prompt` and paste the prompt into any chatbot. With Claude Code,
+the [`topic-to-video`](skills/topic-to-video/SKILL.md) skill goes from a topic to a finished
+video. You can also write every line yourself.
+
+**What does it output?**
+A 1080×1920 (9:16) MP4 with burned-in captions. `pnpm batch` adds an `.srt`, a `.txt` and a
+`.json` for each skit, ready to post. Narrated stories render at 16:9.
+
+**Can I use the videos commercially?**
+StickStage's code is MIT. It renders with Remotion, which is free for individuals and companies
+of up to 3 people; larger companies need a
+[Remotion company licence](https://www.remotion.dev/license). Kokoro is Apache-2.0, and the SFX
+and figure assets list their own licences (see [License](#license)).
+
+**How is this different from AI video generators?**
+StickStage doesn't generate pixels with a diffusion model. A skit is a JSON file, and every frame
+is drawn from code, so the same skit and voice files render the same video every time, on an
+ordinary CPU, and you can change one line, one pose or one camera cut without re-rolling the
+whole clip.
+
+**Can I add my own characters, sets and props?**
+Yes. They are JSON data: see [creating characters](docs/creating-characters.md),
+[backgrounds](docs/creating-backgrounds.md) and [props](docs/creating-props.md).
+
+**Does it work with Codex, Cursor or other coding agents?**
+Yes. [AGENTS.md](AGENTS.md) has the build commands and rules every agent should follow, and
+[`llms.txt`](llms.txt) maps the docs. The [skills](skills/) are written for Claude Code.
 
 ## Contributing
 
