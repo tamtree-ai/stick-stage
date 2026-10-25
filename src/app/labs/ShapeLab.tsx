@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { z } from "zod";
-import { evalActor, shapeOf, Stage } from "../../engine";
+import { evalActor, FINISHES, shapeOf, Stage } from "../../engine";
 import { EXPRESSION_IDS, EXTRA_EXPRESSION_IDS, EXTRA_POSE_IDS, library, POSE_IDS, sets } from "../../data";
 import { cycleKeys } from "./cycle";
 import { Label } from "./Label";
@@ -13,6 +13,8 @@ export const shapeLabSchema = z.object({
   showLabels: z.boolean(),
   /** Hold one pose and expression (a lineup still) instead of cycling. */
   hold: z.object({ pose: z.string(), expression: z.string() }).optional(),
+  /** Stage finish to review: "flat" (house look) or "illustrated". */
+  finish: z.enum(FINISHES).optional(),
 });
 
 export const SHAPE_LAB_SEGMENT = 40;
@@ -27,7 +29,7 @@ export const shapeCast = (cast: readonly string[]): string[] =>
  * The shape cast in one 16:9 frame: everyone in a row, stepping through every pose and
  * expression a little out of step, so a reviewer sees the whole look at once.
  */
-export const ShapeLab: React.FC<z.infer<typeof shapeLabSchema>> = ({ set: setId, cast, showLabels, hold }) => {
+export const ShapeLab: React.FC<z.infer<typeof shapeLabSchema>> = ({ set: setId, cast, showLabels, hold, finish }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
   const set = sets[setId]!;
@@ -58,7 +60,7 @@ export const ShapeLab: React.FC<z.infer<typeof shapeLabSchema>> = ({ set: setId,
   const seg = Math.floor(frame / SHAPE_LAB_SEGMENT);
   return (
     <AbsoluteFill>
-      <Stage set={set} actors={actors} width={width} height={height} frame={frame} />
+      <Stage set={set} actors={actors} width={width} height={height} frame={frame} finish={finish} />
       {showLabels
         ? actors.map((a, i) => (
             <Label key={a.id} x={a.x * width - 90} y={height - 130} size={24}>

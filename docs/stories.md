@@ -78,6 +78,20 @@ Described places come in three colour looks. Set one for the whole episode with 
 `pnpm still PaletteLab out/PaletteLab.png` shows all three on the same places. The colour rules
 live in `src/engine/set/storyPalettes.ts`.
 
+### Finish
+
+A top-level `"finish"` sets how the stage is drawn on top of the colours. It works with any look and
+any drawing tier, and it is per skit, so a channel keeps its look unless a skit asks.
+
+| `finish` | Feel |
+|---|---|
+| `flat` (default) | The house look: flat fills, nothing extra |
+| `illustrated` | Picture-book print: a cel shadow and light edge on every figure (shape heads, near arms and front legs shaded on their own), an ink line heavier away from the light, a warm glow from the upper left, paper, grain and a vignette |
+
+`pnpm still ShapeLineup out/x.png --props='{"set":"wide-park","cast":["biscuit","pim"],"showLabels":false,"finish":"illustrated"}'`
+compares it on any cast. The drawing lives in `src/engine/shots/finish.tsx`. It renders slower
+(SVG filters on every figure).
+
 ## The shape cast
 
 | id | What | Plan |

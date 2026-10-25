@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { PlaceSchema } from "../set/compose";
 import { STORY_LOOKS } from "../set/storyPalettes";
+import { FINISHES } from "../shots/finishKinds";
 import { SYMBOLS } from "../face/schema";
 import type { Aspect } from "../format/aspect";
 import { ScreenTextSchema, SignTextSchema } from "../lib/screenText";
@@ -234,6 +235,8 @@ export const SkitSchema = z
     place: PlaceSchema.optional(),
     /** Colour look for every described place: "bright" (storybook, default), "retro" (screen print), "pastel". A place's own `look` wins. */
     look: z.enum(STORY_LOOKS).optional(),
+    /** Stage finish: "flat" (default, the house look) or the opt-in "illustrated" (cel shade, ink line, paper grain). */
+    finish: z.enum(FINISHES).optional(),
     cast: z.array(CastSchema).min(1).max(4),
     /** Off-screen voice-over (optional). */
     narrator: NarratorSchema.optional(),

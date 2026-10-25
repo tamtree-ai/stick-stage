@@ -3,6 +3,7 @@ import { subtitleSpec } from "../text/layout";
 import { AbsoluteFill, Html5Audio, Sequence, staticFile, useCurrentFrame } from "remotion";
 import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
+import type { Finish } from "../shots/finishKinds";
 import { Stage } from "../shots/Stage";
 import { CastLabels } from "../text/CastLabels";
 import { CardText, ListText } from "../text/ExplainerText";
@@ -28,10 +29,12 @@ export type SkitProps = {
   showLabels?: boolean;
   /** `false`: mount no dialog or SFX audio (a preview on placeholder timings has no files). Default true. */
   audio?: boolean;
+  /** Stage finish (the program's `finish`). */
+  finish?: Finish;
 };
 
 /** Renders a compiled skit: stage under the director's camera, dialog + SFX audio, text overlays. */
-export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fontFamily, showLabels, audio = true }) => {
+export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fontFamily, showLabels, audio = true, finish }) => {
   const frame = useCurrentFrame();
   const { width: W, height: H, fps } = tl;
   const actors = stageActorsAt(lib, tl.cast, set, frame, fps, W);
@@ -42,7 +45,7 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
   const direction = tl.direction ?? "ltr";
   return (
     <AbsoluteFill style={{ background: "#ffffff" }}>
-      <Stage set={set} actors={actors} width={W} height={H} frame={frame} camera={camera} fontFamily={fontFamily} labels={tl.labels} figures={tl.figures} fps={fps} />
+      <Stage set={set} actors={actors} width={W} height={H} frame={frame} camera={camera} fontFamily={fontFamily} labels={tl.labels} figures={tl.figures} fps={fps} finish={finish} />
       {audio && tl.audio.map((a) => (
         <Sequence key={`v-${a.beatId}`} from={a.frame} durationInFrames={a.durationFrames} layout="none">
           <Html5Audio src={staticFile(a.src)} />

@@ -168,6 +168,7 @@ export const compileSkit = (input: CompileInput): CompileResult => {
     durationInFrames: lastScene.from + lastScene.timeline.durationInFrames,
     scenes: programScenes,
     ...(music ? { music } : {}),
+    ...(doc.finish && doc.finish !== "flat" ? { finish: doc.finish } : {}),
     ...(Object.keys(placed.sets).length ? { sets: placed.sets } : {}),
     // Workspace characters and props ride along too, so the renderer draws them without the catalog.
     ...(doc.characters?.length ? { characters: Object.fromEntries(doc.characters.map((c) => [c.id, sceneInput.lib.characters[c.id]!])) } : {}),

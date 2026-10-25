@@ -10,6 +10,7 @@ import { Tail } from "./body";
 import { ShapeHead, ShapeHeadBack, ShapeHeadSymbols } from "./face";
 import { backTone, lookOf, propLine } from "./look";
 import { castTone } from "./palette";
+import { CelPart } from "../../shots/finish";
 import { GroundShadow, Soft } from "./soft";
 import { shapeBuildMetrics } from "./proportions";
 import type { Shape } from "./schema";
@@ -133,11 +134,15 @@ export const QuadRig: React.FC<RigProps & { shape: Shape }> = ({ character, shap
   
         </g>
         {look.details.scarf ? <Collar from={toWorld(rx * 0.72, lift - ry * 0.55)} head={j.head} R={R} color={look.details.scarf} /> : null}
-        <g transform={headT}>
-          <ShapeHead {...headProps} withSymbols={false} />
-        </g>
-        <Leg root={frontRoot} joint={j.elbowR} tip={j.handR} w={limbW} fill={look.limbs} />
-        {paw(j.handR, false, true)}
+        <CelPart mirrored={mirrored}>
+          <g transform={headT}>
+            <ShapeHead {...headProps} withSymbols={false} />
+          </g>
+        </CelPart>
+        <CelPart mirrored={mirrored}>
+          <Leg root={frontRoot} joint={j.elbowR} tip={j.handR} w={limbW} fill={look.limbs} />
+          {paw(j.handR, false, true)}
+        </CelPart>
       </Soft>
       <g transform={headT}>
         <ShapeHeadSymbols {...headProps} />

@@ -8,6 +8,7 @@ import { getPalette } from "../set/palettes";
 import { Figures } from "../viz/Figures";
 import { themeFor } from "../viz/theme";
 import type { FigureTrack } from "../viz/track";
+import { FigureFinishFilter, FinishContext, FinishLight, FinishOverlay, type Finish } from "./finish";
 
 export type StageActor = {
   id: string;
@@ -45,34 +46,45 @@ export type StageProps = {
   /** Diagrams: back-layer figures sit behind the cast, front-layer ones over it. */
   figures?: readonly FigureTrack[];
   fps?: number;
+  /** "flat" (default, the house look) or the opt-in "illustrated" finish (`shots/finish.tsx`). */
+  finish?: Finish;
 };
 
 /** Set background → actors → set foreground, under one camera transform. */
-export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame, camera, fontFamily, labels, figures, fps = 30 }) => {
+export const Stage: React.FC<StageProps> = ({ set, actors, width, height, frame, camera, fontFamily, labels, figures, fps = 30, finish = "flat" }) => {
   const cam = camera ?? FULL_FRAME(width, height);
   const palette = getPalette(set.palette);
   const figs = figures?.length ? { figures, frame, fps, width, height, theme: themeFor(palette), fontFamily } : undefined;
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const rimId = "rim" + uid;
   const lightId = "light" + uid;
+  const finishId = "fin" + uid;
+  const unit = set.figureHeightPx / 640;
+  const illustrated = finish === "illustrated";
   const t = `translate(${f2(width / 2)} ${f2(height / 2)}) scale(${f2(cam.scale)}) translate(${f2(-cam.cx)} ${f2(-cam.cy)})`;
   return (
     <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} style={{ display: "block" }}>
       <g transform={t}>
         <SetLayers set={set} width={width} height={height} layer="background" labels={labels} fontFamily={fontFamily} frame={frame} />
+        {illustrated ? <FinishLight width={width} height={height} /> : null}
         {figs ? <Figures {...figs} layer="back" /> : null}
         {palette.rim ? <RimFilter id={rimId} color={palette.rim} radius={(set.figureHeightPx / 640) * 6} /> : null}
         {palette.light ? <LightFilter id={lightId} color={palette.light} /> : null}
         <g filter={palette.rim ? `url(#${rimId})` : undefined}>
           <g filter={palette.light ? `url(#${lightId})` : undefined}>
-            {actors.map((a) => (
-              <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY + (a.dy ?? 0)} facing={a.facing} frame={frame} fontFamily={fontFamily} tilt={a.tilt} />
-            ))}
+            <FinishContext.Provider value={{ kind: finish, unit }}>
+              {illustrated ? <FigureFinishFilter id={finishId} unit={unit} /> : null}
+              {actors.map((a) => {
+                const actor = <Actor key={a.id} state={a.state} x={a.x * width} groundY={set.groundY + (a.dy ?? 0)} facing={a.facing} frame={frame} fontFamily={fontFamily} tilt={a.tilt} />;
+                return illustrated ? <g key={a.id} filter={`url(#${finishId})`}>{actor}</g> : actor;
+              })}
+            </FinishContext.Provider>
           </g>
         </g>
         {figs ? <Figures {...figs} layer="front" /> : null}
         <SetLayers set={set} width={width} height={height} layer="foreground" labels={labels} fontFamily={fontFamily} frame={frame} />
       </g>
+      {illustrated ? <FinishOverlay width={width} height={height} /> : null}
       {figs ? <Figures {...figs} layer="screen" /> : null}
     </svg>
   );

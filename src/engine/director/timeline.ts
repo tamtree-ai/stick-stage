@@ -1,3 +1,4 @@
+import type { Finish } from "../shots/finishKinds";
 import type { Character } from "../rig/schema";
 import type { PropDef } from "../props/schema";
 import type { SetDef } from "../set/schema";
@@ -170,4 +171,6 @@ export type Program = {
   /** Workspace characters and props (the skit's `characters` / `props`), merged over the catalog when drawn. */
   characters?: Record<string, Character>;
   props?: Record<string, PropDef>;
+  /** The skit's stage finish; absent means "flat". */
+  finish?: Finish;
 };

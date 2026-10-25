@@ -12,6 +12,7 @@ import { ShapeHead, ShapeHeadBack, ShapeHeadSymbols } from "./face";
 import { QuadRig } from "./QuadRig";
 import { backTone, lookOf, propLine } from "./look";
 import { castTone, edgeTone } from "./palette";
+import { CelPart } from "../../shots/finish";
 import { GroundShadow, Soft } from "./soft";
 import { shapeBuildMetrics } from "./proportions";
 import type { Shape } from "./schema";
@@ -155,9 +156,11 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
         <g transform={torsoTransform}>
           <Torso T={T} W={W} look={look} details={false} />
         </g>
-        <g transform={headTransform}>
-          <ShapeHead {...headProps} withSymbols={false} />
-        </g>
+        <CelPart mirrored={mirrored}>
+          <g transform={headTransform}>
+            <ShapeHead {...headProps} withSymbols={false} />
+          </g>
+        </CelPart>
       </Soft>
       <g transform={torsoTransform}>
         <DetailsOnBody T={T} W={W} look={look} frame={frame} />
@@ -165,7 +168,7 @@ const BipedRig: React.FC<RigProps & { shape: Shape }> = ({
       <g transform={headTransform}>
         <ShapeHeadSymbols {...headProps} />
       </g>
-      {arm("R")}
+      <CelPart mirrored={mirrored}>{arm("R")}</CelPart>
       {props.dropped.map((d, i) => (
         <PropView key={i} def={d.def} x={d.x} y={d.y} angle={d.angle} {...propCommon} sw={propLine(d.def)} />
       ))}
