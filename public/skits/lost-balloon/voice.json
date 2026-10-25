@@ -6,70 +6,70 @@
       "speaker": "narrator",
       "text": "This is the story of the lost balloon.",
       "audio": "voice/n1.wav",
-      "durationMs": 3075
+      "durationMs": 2183
     },
     {
       "id": "n2",
       "speaker": "narrator",
       "text": "Tofu had a red balloon. It was the best balloon in the whole garden.",
       "audio": "voice/n2.wav",
-      "durationMs": 5275
+      "durationMs": 4295
     },
     {
       "id": "p1",
       "speaker": "pim",
       "text": "Tofu! Tofu! Look what I can do!",
       "audio": "voice/p1.wav",
-      "durationMs": 3825
+      "durationMs": 3396
     },
     {
       "id": "t1",
       "speaker": "tofu",
       "text": "Wow, Pim! How did you do that?",
       "audio": "voice/t1.wav",
-      "durationMs": 2500
+      "durationMs": 2919
     },
     {
       "id": "n3",
       "speaker": "narrator",
       "text": "And just like that, the balloon was gone.",
       "audio": "voice/n3.wav",
-      "durationMs": 3200
+      "durationMs": 2706
     },
     {
       "id": "b1",
       "speaker": "bobo",
       "text": "Why the long ears, Tofu?",
       "audio": "voice/b1.wav",
-      "durationMs": 2050
+      "durationMs": 1868
     },
     {
       "id": "t2",
       "speaker": "tofu",
       "text": "I let go of my balloon. Now it's up in the sky.",
       "audio": "voice/t2.wav",
-      "durationMs": 3700
+      "durationMs": 4138
     },
     {
       "id": "b2",
       "speaker": "bobo",
       "text": "Then it can see the whole world from up there.",
       "audio": "voice/b2.wav",
-      "durationMs": 2675
+      "durationMs": 1855
     },
     {
       "id": "t3",
       "speaker": "tofu",
       "text": "The whole world? Lucky balloon.",
       "audio": "voice/t3.wav",
-      "durationMs": 2625
+      "durationMs": 2533
     },
     {
       "id": "n4",
       "speaker": "narrator",
       "text": "And Tofu decided that was a very good place for a balloon to be.",
       "audio": "voice/n4.wav",
-      "durationMs": 5350
+      "durationMs": 4493
     }
   ]
 }
