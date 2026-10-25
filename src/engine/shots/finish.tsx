@@ -109,11 +109,16 @@ export const FigureFinishFilter: React.FC<{ id: string; unit: number }> = ({ id,
 const speck = (dark: boolean, k: number) =>
   dark ? `0 0 0 0 0.16  0 0 0 0 0.14  0 0 0 0 0.3  ${-k} 0 0 0 ${f2(k * 0.5)}` : `0 0 0 0 1  0 0 0 0 0.97  0 0 0 0 0.9  ${k} 0 0 0 ${f2(-k * 0.5)}`;
 
-/** Noise filter: grain (fine) or paper (broad mottling), as dark or light specks. */
-const Noise: React.FC<{ id: string; freq: string; octaves: number; seed: number; dark: boolean; k: number }> = ({ id, freq, octaves, seed, dark, k }) => (
+/** Noise filter: grain (fine) or paper (broad mottling), dark and light specks from one turbulence. */
+const Noise: React.FC<{ id: string; freq: string; octaves: number; seed: number; k: [number, number] }> = ({ id, freq, octaves, seed, k }) => (
   <filter id={id} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
-    <feTurbulence type="fractalNoise" baseFrequency={freq} numOctaves={octaves} seed={seed} stitchTiles="stitch" />
-    <feColorMatrix type="matrix" values={speck(dark, k)} />
+    <feTurbulence type="fractalNoise" baseFrequency={freq} numOctaves={octaves} seed={seed} stitchTiles="stitch" result="n" />
+    <feColorMatrix in="n" type="matrix" values={speck(true, k[0])} result="d" />
+    <feColorMatrix in="n" type="matrix" values={speck(false, k[1])} result="l" />
+    <feMerge>
+      <feMergeNode in="d" />
+      <feMergeNode in="l" />
+    </feMerge>
   </filter>
 );
 
@@ -144,7 +149,9 @@ export const FinishLight: React.FC<{ width: number; height: number }> = ({ width
 
 /**
  * Paper, grain and a vignette over the whole frame (screen space, after the camera). The noise is
- * seeded and static, so every frame is the same pure function of its inputs.
+ * seeded and static, so every frame is the same pure function of its inputs. It is its own
+ * absolutely placed <svg> on a compositor layer: nothing in it changes, so Chrome rasterises the
+ * turbulence once instead of on every frame.
  */
 export const FinishOverlay: React.FC<{ width: number; height: number }> = ({ width, height }) => {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
@@ -152,22 +159,18 @@ export const FinishOverlay: React.FC<{ width: number; height: number }> = ({ wid
   const grain = f2(0.85 / scale);
   const paper = `${f2(0.009 / scale)} ${f2(0.016 / scale)}`;
   return (
-    <g pointerEvents="none">
+    <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} style={{ position: "absolute", left: 0, top: 0, pointerEvents: "none", willChange: "transform" }}>
       <defs>
         <radialGradient id={`vig${uid}`} cx="0.5" cy="0.5" r="0.75">
           <stop offset="0.62" stopColor="#2a2350" stopOpacity={0} />
           <stop offset="1" stopColor="#2a2350" stopOpacity={0.24} />
         </radialGradient>
-        <Noise id={`gd${uid}`} freq={grain} octaves={2} seed={7} dark k={0.36} />
-        <Noise id={`gl${uid}`} freq={grain} octaves={2} seed={7} dark={false} k={0.3} />
-        <Noise id={`pd${uid}`} freq={paper} octaves={3} seed={3} dark k={0.1} />
-        <Noise id={`pl${uid}`} freq={paper} octaves={3} seed={3} dark={false} k={0.08} />
+        <Noise id={`p${uid}`} freq={paper} octaves={3} seed={3} k={[0.1, 0.08]} />
+        <Noise id={`g${uid}`} freq={grain} octaves={2} seed={7} k={[0.36, 0.3]} />
       </defs>
-      <rect width={width} height={height} filter={`url(#pd${uid})`} />
-      <rect width={width} height={height} filter={`url(#pl${uid})`} />
-      <rect width={width} height={height} filter={`url(#gd${uid})`} />
-      <rect width={width} height={height} filter={`url(#gl${uid})`} />
+      <rect width={width} height={height} filter={`url(#p${uid})`} />
+      <rect width={width} height={height} filter={`url(#g${uid})`} />
       <rect width={width} height={height} fill={`url(#vig${uid})`} />
-    </g>
+    </svg>
   );
 };
