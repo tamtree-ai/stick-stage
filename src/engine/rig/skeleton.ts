@@ -1,6 +1,7 @@
 import { add, dirFromAngle, lerp, scale, type Vec2 } from "../lib/math";
-import { proportionsOf } from "./build";
+import { proportionsOf, shapeOf } from "./build";
 import type { Character, PoseAngles } from "./schema";
+import { solveQuadruped } from "./shape/quadruped";
 import { blendLegs, seatContact, seatedLegs, type SeatState } from "./seat";
 
 export type Joints = {
@@ -37,12 +38,23 @@ export const rigMetrics = (c: Character, figureHeightPx: number): RigMetrics => 
   const sw = c.style.strokeWidth;
   return {
     heightPx,
-    headR: c.proportions.headRadius * heightPx,
+    // Toons keep the stick head size; a shape figure's head comes from its build.
+    headR: (shapeOf(c) ? proportionsOf(c) : c.proportions).headRadius * heightPx,
     strokeWidth: sw,
     footRx: 0.055 * heightPx * c.style.footLength,
     footRy: 0.026 * heightPx,
     handR: sw * 0.95,
   };
+};
+
+/**
+ * The lowest point the figure stands on (y, figure space; 0 when grounded): the feet, and a
+ * quadruped's front paws too.
+ */
+export const supportBottom = (c: Character, j: Joints, m: RigMetrics): number => {
+  const feet = Math.max(j.footL.y, j.footR.y) + m.footRy;
+  if (shapeOf(c)?.plan !== "quadruped") return feet;
+  return Math.max(feet, Math.max(j.handL.y, j.handR.y) + m.footRy * 1.35);
 };
 
 export type Extras = {
@@ -65,6 +77,9 @@ export const solveSkeleton = (
   const m = rigMetrics(c, figureHeightPx);
   const H = m.heightPx;
   const P = proportionsOf(c);
+  const shape = shapeOf(c);
+  if (shape?.plan === "quadruped")
+    return solveQuadruped(shape, p, m, { body: P.torso * H, upper: P.thigh * H, lower: P.shin * H, headR: m.headR }, extras);
 
   // Legs are world-relative, measured from the hip at the origin.
   const seat = extras.seat;

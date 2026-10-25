@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Freeze } from "remotion";
 import { library, safeArea, sets } from "../../data";
-import { Skit, WIDE_SAFE_AREA } from "../../engine";
+import { Skit, WIDE_SAFE_AREA, withProgramAssets } from "../../engine";
 import { fontFor } from "../../engine/text/fonts";
 import { SLAM } from "../../engine/text/layout";
 import { TEXT_FONT } from "../fonts";
@@ -22,7 +22,7 @@ export const CoverStill: React.FC<SkitCompositionProps & { thumb?: boolean }> = 
   const area = program.width > program.height ? WIDE_SAFE_AREA : safeArea;
   const picture = (
     <Freeze frame={cover.frame}>
-      <Skit timeline={scene.timeline} set={sets[scene.timeline.set]!} lib={library} safeArea={area} fontFamily={fontFamily} showLabels={showLabels} audio={false} />
+      <Skit timeline={scene.timeline} set={program.sets?.[scene.timeline.set] ?? sets[scene.timeline.set]!} lib={withProgramAssets(library, program)} safeArea={area} fontFamily={fontFamily} showLabels={showLabels} audio={false} />
     </Freeze>
   );
   const title = (

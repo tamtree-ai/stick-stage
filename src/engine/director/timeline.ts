@@ -1,3 +1,7 @@
+import type { Finish } from "../shots/finishKinds";
+import type { Character } from "../rig/schema";
+import type { PropDef } from "../props/schema";
+import type { SetDef } from "../set/schema";
 import type { ExpressionKey } from "../face/expressions";
 import type { PropKey } from "../props/schema";
 import type { BrowKey, GazeKey, NodKey, SpeechClip, SymbolKey } from "../rig/actorState";
@@ -162,4 +166,11 @@ export type Program = {
   hook?: { kind: "teaser" | "slam"; scene: number; frame: number; prefixFrames: number; transitionFrames: number };
   /** The still the cover and thumbnail are framed from. */
   cover?: { scene: number; frame: number; title: string; badge?: string };
+  /** Sets composed from described places (`place`), by id. The renderer looks here before the catalog. */
+  sets?: Record<string, SetDef>;
+  /** Workspace characters and props (the skit's `characters` / `props`), merged over the catalog when drawn. */
+  characters?: Record<string, Character>;
+  props?: Record<string, PropDef>;
+  /** The skit's stage finish; absent means "flat". */
+  finish?: Finish;
 };

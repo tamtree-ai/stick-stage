@@ -7,6 +7,7 @@ import { coverOf } from "./cover";
 import { fromZodIssues, SkitError, type Diagnostic } from "./diagnostics";
 import { applyHook, type HookKind } from "./hooks";
 import { msToFrame } from "./layout";
+import { placeSets } from "./places";
 import { docBeats, isNarration, SkitSchema, type Beat, type CastMember, type Skit, type SkitDoc } from "./schema";
 import { compileScene, type CompileInput } from "./scene";
 import { styleById, type StyleId } from "./style";
@@ -111,13 +112,14 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[], style = styleBy
 
 /** skit.json + prepared voice + library → program (scene timelines). Throws `SkitError` on any error. */
 const withCharacters = (input: CompileInput, doc: SkitDoc): CompileInput => {
-  if (!doc.characters?.length) return input;
+  if (!doc.characters?.length && !doc.props?.length) return input;
   const characters = { ...input.lib.characters };
-  for (const raw of doc.characters) {
+  for (const raw of doc.characters ?? []) {
     const parsed = CharacterSchema.safeParse(raw);
     if (parsed.success) characters[parsed.data.id] = parsed.data;
   }
-  return { ...input, lib: { ...input.lib, characters } };
+  const props = { ...input.lib.props, ...Object.fromEntries((doc.props ?? []).map((p) => [p.id, p])) };
+  return { ...input, lib: { ...input.lib, characters, props } };
 };
 
 export const compileSkit = (input: CompileInput): CompileResult => {
@@ -126,9 +128,10 @@ export const compileSkit = (input: CompileInput): CompileResult => {
   const show = doc.meta.series ? input.series?.[doc.meta.series.id] : undefined;
   const style = styleById(doc.style ?? show?.style);
   const cold = (doc.coldOpen ?? show?.coldOpen) as HookKind | undefined;
-  const sceneInput = withCharacters({ ...input, style }, doc);
+  const placed = placeSets(doc);
+  const sceneInput = withCharacters({ ...input, style, sets: { ...input.sets, ...placed.sets } }, doc);
   const diags: Diagnostic[] = [];
-  const resolved = resolveScenes(doc, diags, style);
+  const resolved = resolveScenes(placed.doc, diags, style);
   const scenes: CompiledScene[] = [];
   for (const r of resolved) {
     let found: Diagnostic[];
@@ -165,6 +168,11 @@ export const compileSkit = (input: CompileInput): CompileResult => {
     durationInFrames: lastScene.from + lastScene.timeline.durationInFrames,
     scenes: programScenes,
     ...(music ? { music } : {}),
+    ...(doc.finish && doc.finish !== "flat" ? { finish: doc.finish } : {}),
+    ...(Object.keys(placed.sets).length ? { sets: placed.sets } : {}),
+    // Workspace characters and props ride along too, so the renderer draws them without the catalog.
+    ...(doc.characters?.length ? { characters: Object.fromEntries(doc.characters.map((c) => [c.id, sceneInput.lib.characters[c.id]!])) } : {}),
+    ...(doc.props?.length ? { props: Object.fromEntries(doc.props.map((p) => [p.id, p])) } : {}),
   };
   const covered = { ...program, cover: coverOf(program, doc.meta.series) };
   const hooked = cold && cold !== "pov" ? applyHook(covered, cold) : covered;
@@ -182,6 +190,8 @@ export type SkitLine = {
   /** Words in the line with a pronunciation hint (`pronunciations.json`), for the TTS. */
   pronounce?: Pronunciation[];
   delivery?: string;
+  /** The beat's expression, for how the line is said (`deliveryFor`). */
+  expression?: string;
   /** A voice-over line: voice it with `doc.narrator.voice`, not a character's voice. */
   narrator?: true;
 };
@@ -192,7 +202,7 @@ export const skitLines = (doc: SkitDoc, lexicon: readonly Pronunciation[] = []):
     if (b.silent || !b.speaker || !b.line || b.audio.source !== "tts") return [];
     const said = b.spoken ?? b.line;
     const pronounce = pronunciationsFor(said, lexicon);
-    const extra = { ...(b.spoken ? { spoken: b.spoken } : {}), ...(pronounce.length ? { pronounce } : {}) };
+    const extra = { ...(b.spoken ? { spoken: b.spoken } : {}), ...(pronounce.length ? { pronounce } : {}), ...(b.expression ? { expression: b.expression } : {}) };
     if (isNarration(doc, b)) return [{ id: b.id, speaker: b.speaker, character: b.speaker, text: b.line, ...extra, delivery: b.delivery, narrator: true as const }];
     const character = doc.cast.find((c) => c.id === b.speaker)?.character ?? b.speaker;
     return [{ id: b.id, speaker: b.speaker, character, text: b.line, ...extra, delivery: b.delivery }];

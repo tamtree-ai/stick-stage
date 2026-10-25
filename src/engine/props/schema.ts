@@ -99,6 +99,8 @@ const shared = {
   align: z.enum(["forearm", "upright"]),
   /** Extra rotation in degrees (+ = clockwise in the right-facing view). */
   angle: z.number().default(0),
+  /** Lighter than air (a helium balloon): let go, it rises and drifts off instead of falling. */
+  floats: z.boolean().default(false),
   /** Sign text. A hold can override it for one use. */
   text: z.string().max(24).optional(),
   /** Laptop screen words. A hold can override them for one use. */

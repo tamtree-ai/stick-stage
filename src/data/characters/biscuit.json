@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "biscuit",
+  "displayName": "Biscuit",
+  "aspect": "16:9",
+  "style": {
+    "build": "shape"
+  },
+  "shape": {
+    "plan": "quadruped",
+    "species": "dog",
+    "build": "kid",
+    "color": "white",
+    "ears": {
+      "kind": "floppy",
+      "color": "brown"
+    },
+    "muzzle": {
+      "kind": "snout",
+      "color": "cream"
+    },
+    "tail": {
+      "kind": "long"
+    },
+    "markings": [
+      {
+        "kind": "eye-patch",
+        "color": "brown"
+      }
+    ],
+    "details": [
+      {
+        "id": "scarf",
+        "color": "red"
+      }
+    ],
+    "feet": "brown"
+  },
+  "energy": 0.9,
+  "personality": "A puppy on four legs who is excited by everything and never sits still for long.",
+  "voice": {
+    "say": "Junior"
+  }
+}

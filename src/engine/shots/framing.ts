@@ -1,4 +1,6 @@
 import { clamp } from "../lib/math";
+import { shapeOf } from "../rig/build";
+import { headTop } from "../rig/shape/reach";
 import type { Rect } from "../text/safeArea";
 import type { Camera, StageActor } from "./Stage";
 
@@ -98,7 +100,12 @@ const groupShot = (
   const m = 0.04 * width;
   const x0 = Math.min(...heads.map((h) => h.head.x - 2.2 * R), ...extra.map((r) => r.x - m));
   const x1 = Math.max(...heads.map((h) => h.head.x + 2.2 * R), ...extra.map((r) => r.x + r.w + m));
-  const y0 = Math.min(...heads.map((h) => h.head.y - 1.6 * R), ...extra.map((r) => r.y - m));
+  // Headroom: 1.6 head radii, or more for a shape figure's tall ears or hat.
+  const top = (a: StageActor) => {
+    const s = shapeOf(a.state.character);
+    return s ? Math.max(1.6, headTop(s) + 0.35) : 1.6;
+  };
+  const y0 = Math.min(...heads.map((h, i) => h.head.y - top(onStage[i]!) * h.R), ...extra.map((r) => r.y - m));
   const y1 = groundY + 0.6 * R;
   const scale = clamp(Math.min(width / (x1 - x0), height / (y1 - y0)), 1, 1.6);
   return clampCamera({ scale, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 }, width, height);

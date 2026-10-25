@@ -37,6 +37,8 @@ const skitBeat = (skit: Skit, id: string) => skit.beats.find((b) => b.id === id)
 
 export const punchlineChecks = (tl: Timeline, skit: Skit): Finding[] => {
   const out: Finding[] = [];
+  // A story ends; it doesn't land a joke, so the punchline camera and reaction rules don't apply.
+  if (tl.directing?.id === "story") return out;
   tl.beats.forEach((b, i) => {
     if (!b.punchline) return;
     const inBeat = (f: number) => f >= b.from && f <= b.to;

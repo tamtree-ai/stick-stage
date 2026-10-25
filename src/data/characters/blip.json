@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "blip",
+  "displayName": "Blip",
+  "aspect": "16:9",
+  "style": {
+    "build": "shape"
+  },
+  "shape": {
+    "species": "blob",
+    "build": "round",
+    "color": "teal",
+    "arms": "none",
+    "legs": "none",
+    "body": {
+      "kind": "drop",
+      "width": 1.1
+    },
+    "head": {
+      "kind": "circle",
+      "size": 0.9
+    },
+    "cheeks": "mint",
+    "eyes": {
+      "kind": "wide",
+      "size": 1.2,
+      "spacing": 1
+    },
+    "details": [
+      {
+        "id": "flower",
+        "color": "lemon"
+      }
+    ]
+  },
+  "energy": 0.6,
+  "personality": "A friendly jelly blob from the pond who wobbles when happy and doesn't quite know what things are.",
+  "voice": {
+    "say": "Junior"
+  }
+}

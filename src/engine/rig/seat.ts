@@ -1,4 +1,5 @@
-import { proportionsOf } from "./build";
+import { proportionsOf, shapeOf } from "./build";
+import { shapeBuildMetrics } from "./shape/proportions";
 import { easeOutCubic } from "../lib/easing";
 import { clamp, DEG, dirFromAngle, lerp } from "../lib/math";
 import type { Character } from "./schema";
@@ -38,8 +39,12 @@ export const evalSeat = (keys: readonly SeatKey[] | undefined, frame: number): S
 };
 
 /** How far the seated body's underside sits below the hip joint. */
-export const seatContact = (c: Character, m: RigMetrics): number =>
-  c.style.torso.style === "bean" ? c.style.torso.width * m.heightPx * 0.25 : m.strokeWidth * 0.5;
+export const seatContact = (c: Character, m: RigMetrics): number => {
+  // A shape body reaches a little below the hip (`rig/shape/body.tsx`).
+  const s = shapeOf(c);
+  if (s) return shapeBuildMetrics(s).bodyWidth * m.heightPx * (s.plan === "quadruped" ? 0.3 : 0.22);
+  return c.style.torso.style === "bean" ? c.style.torso.width * m.heightPx * 0.25 : m.strokeWidth * 0.5;
+};
 
 export type LegAngles = { hipL: number; kneeL: number; hipR: number; kneeR: number };
 

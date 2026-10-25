@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { library, POSE_IDS } from "../src/data";
-import { evalActor, getter, rigMetrics, solveSkeleton, toAngles, blinkAmount, evalPoseTrack, type ActorTracks } from "../src/engine";
+import { evalActor, getter, rigMetrics, solveSkeleton, supportBottom, toAngles, blinkAmount, evalPoseTrack, type ActorTracks } from "../src/engine";
 
 const FIG = 760;
 const FPS = 30;
@@ -13,8 +13,7 @@ describe("grounding", () => {
         const ch = library.characters[c]!;
         const j = solveSkeleton(ch, toAngles(library.poses[p]!), FIG);
         const m = rigMetrics(ch, FIG);
-        const bottom = Math.max(j.footL.y, j.footR.y) + m.footRy;
-        expect(Math.abs(bottom)).toBeLessThan(0.5);
+        expect(Math.abs(supportBottom(ch, j, m))).toBeLessThan(0.5);
       });
     }
   }

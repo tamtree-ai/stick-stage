@@ -57,10 +57,33 @@ export const fallPose = (def: PropDef, from: Vec2, angle0: number, t: number, fi
   return { x: from.x + vx * land, y: restY - bounce, angle: REST_ANGLE };
 };
 
+// Float physics, same units: a let-go balloon starts slow, speeds up to a steady climb and
+// drifts with a slow sway, string hanging below it.
+const RISE_V = 0.38;
+const RISE_RAMP_S = 0.6;
+const DRIFT_VX = 0.06;
+const SWAY_X = 0.03;
+const SWAY_HZ = 0.7;
+const SWAY_DEG = 9;
+
+/** Where a floating prop let go `t` s ago is now: up and away, gently swaying, staying upright. */
+export const risePose = (from: Vec2, angle0: number, t: number, figurePx: number): Omit<DroppedProp, "def"> => {
+  const v = RISE_V * figurePx;
+  // Velocity ramps from 0 to v over RISE_RAMP_S (ease-in), then holds: y is its integral.
+  const rise = t < RISE_RAMP_S ? (v * t * t) / (2 * RISE_RAMP_S) : v * (t - RISE_RAMP_S / 2);
+  const sway = Math.sin(2 * Math.PI * SWAY_HZ * t);
+  const settle = Math.min(1, t / 0.8);
+  return {
+    x: from.x + DRIFT_VX * figurePx * t + SWAY_X * figurePx * sway * settle,
+    y: from.y - rise,
+    angle: lerp(angle0, 0, settle) + SWAY_DEG * Math.cos(2 * Math.PI * SWAY_HZ * t) * settle,
+  };
+};
+
 /**
  * Evaluate prop keys (sorted by frame) at `frame`. A hand holds the prop of its latest key.
- * A drop key makes the previously held prop fall; it stays on the floor until the same prop
- * is picked up again.
+ * A drop key makes the previously held prop fall (or, if it `floats`, rise away); it stays on
+ * the floor until the same prop is picked up again.
  */
 export const evalProps = (
   keys: readonly PropKey[] | undefined,
@@ -95,7 +118,9 @@ export const evalProps = (
     if (past.slice(i + 1).some((p) => p.prop === id)) return;
     const def = painted(id, before);
     const at = handAt(k.frame, k.hand);
-    const pose = fallPose(def, at.hand, propAngle(def, at.elbow, at.hand), (frame - k.frame) / fps, figurePx);
+    const t = (frame - k.frame) / fps;
+    const angle0 = propAngle(def, at.elbow, at.hand);
+    const pose = def.floats ? risePose(at.hand, angle0, t, figurePx) : fallPose(def, at.hand, angle0, t, figurePx);
     state.dropped.push({ def, ...(reframe ? reframe(pose, k.frame) : pose) });
   });
   return state;

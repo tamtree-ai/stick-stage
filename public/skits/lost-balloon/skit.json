@@ -1,0 +1,56 @@
+{
+  "$schema": "../../../schemas/skit.schema.json",
+  "schemaVersion": 2,
+  "meta": { "title": "The Lost Balloon", "aspect": "16:9", "description": "Shape-tier demo episode: three described places, a narrator, four shape characters." },
+  "style": "story",
+  "narrator": { "id": "narrator", "voice": { "say": "Daniel" }, "captionStyle": "italic" },
+  "cast": [
+    { "id": "tofu", "character": "tofu", "mark": "left" },
+    { "id": "pim", "character": "pim", "mark": "right" },
+    { "id": "bobo", "character": "bobo", "mark": "far-right" },
+    { "id": "otto", "character": "otto", "mark": "right" }
+  ],
+  "scenes": [
+    {
+      "id": "club",
+      "place": { "setting": "clubhouse", "features": ["fence"] },
+      "card": { "kicker": "A story about", "title": "The Lost Balloon", "at": [{ "word": "Lost" }] },
+      "cast": [],
+      "beats": [
+        { "id": "n1", "speaker": "narrator", "line": "This is the story of the lost balloon." }
+      ]
+    },
+    {
+      "id": "garden",
+      "place": { "setting": "garden", "features": ["house"] },
+      "transition": { "type": "slide", "durationMs": 400 },
+      "cast": [ { "id": "tofu", "holding": { "prop": "balloon", "hand": "R" } }, { "id": "pim", "mark": "off-right" } ],
+      "beats": [
+        { "id": "n2", "speaker": "narrator", "line": "Tofu had a red balloon. It was the best balloon in the whole garden.", "focus": "tofu",
+          "actions": [ { "who": "tofu", "do": "hop", "at": { "word": "best" } } ] },
+        { "id": "p1", "speaker": "pim", "line": "Tofu! Tofu! Look what I can do!", "expression": "happy",
+          "actions": [ { "who": "pim", "do": "walkTo", "mark": "right", "speed": "run", "at": { "word": "Tofu!" } } ] },
+        { "id": "t1", "speaker": "tofu", "line": "Wow, Pim! How did you do that?", "expression": "shocked",
+          "actions": [ { "who": "tofu", "do": "pose", "pose": "arms-up", "at": { "word": "Wow," } }, { "who": "tofu", "do": "drop", "hand": "R", "at": { "word": "Wow," } } ] },
+        { "id": "n3", "speaker": "narrator", "line": "And just like that, the balloon was gone.", "focus": "tofu",
+          "actions": [ { "who": "tofu", "do": "expression", "expression": "sad", "at": { "word": "just" } } ] }
+      ]
+    },
+    {
+      "id": "park",
+      "place": { "setting": "park", "time": "sunset", "seats": ["left"] },
+      "transition": { "type": "fade", "durationMs": 500 },
+      "cast": [ { "id": "tofu", "seated": true, "expression": "sad" }, { "id": "bobo", "mark": "off-right" } ],
+      "beats": [
+        { "id": "b1", "speaker": "bobo", "line": "Why the long ears, Tofu?",
+          "actions": [ { "who": "bobo", "do": "walkTo", "mark": "right", "at": { "word": "Why" } } ] },
+        { "id": "t2", "speaker": "tofu", "line": "I let go of my balloon. Now it's up in the sky.", "expression": "crying" },
+        { "id": "b2", "speaker": "bobo", "line": "Then it can see the whole world from up there.", "expression": "happy",
+          "actions": [ { "who": "bobo", "do": "pose", "pose": "arms-up", "at": { "word": "whole" } } ] },
+        { "id": "t3", "speaker": "tofu", "line": "The whole world? Lucky balloon.", "expression": "happy",
+          "actions": [ { "who": "tofu", "do": "stand", "at": { "word": "Lucky" } } ] },
+        { "id": "n4", "speaker": "narrator", "line": "And Tofu decided that was a very good place for a balloon to be.", "punchline": true }
+      ]
+    }
+  ]
+}

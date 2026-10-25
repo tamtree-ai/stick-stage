@@ -1,4 +1,5 @@
 import { darken, lighten, mix } from "../lib/color";
+import { STORY_PALETTES } from "./storyPalettes";
 
 export type Palette = {
   wallA: string;
@@ -13,6 +14,10 @@ export type Palette = {
    * truly dark grounds, where the near-black outlines would vanish.
    */
   rim?: string;
+  /** Sun, moon and stars (story kit); missing means a light accent. */
+  glow?: string;
+  /** The place's light: a soft-light grade on the cast so it sits in the scene (story kit). */
+  light?: string;
 };
 
 /**
@@ -184,6 +189,9 @@ export const PALETTES: Record<string, Palette> = {
     detail: "#7fa6b3",
   },
 };
+
+/** Story kit palettes (the shape tier) in their three looks: see `storyPalettes.ts`. */
+Object.assign(PALETTES, STORY_PALETTES);
 
 /** Tones every part may use, derived from the seven tokens (still no raw hex in parts). */
 export const derived = (p: Palette) => ({

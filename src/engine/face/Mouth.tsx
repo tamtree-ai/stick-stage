@@ -15,6 +15,8 @@ export type MouthProps = {
   sw: number;
   /** Colour of the closed-mouth line (toon lips); open mouths keep the outline `stroke`. */
   lip?: string;
+  /** Inside, tongue and teeth colours (the shape tier's soft mouth); missing means the defaults. */
+  colors?: { inside?: string; tongue?: string; teeth?: string };
 };
 
 /** Cubic edge from a to b whose midpoint lands on `midY`; `round` pushes handles outward. */
@@ -25,7 +27,7 @@ const edge = (ax: number, ay: number, bx: number, by: number, cx: number, midY: 
   return `C ${f2(h1)} ${f2(hy)} ${f2(h2)} ${f2(hy)} ${f2(bx)} ${f2(by)}`;
 };
 
-export const Mouth: React.FC<MouthProps> = ({ cx, cy, R, m, stroke, sw, lip }) => {
+export const Mouth: React.FC<MouthProps> = ({ cx, cy, R, m, stroke, sw, lip, colors }) => {
   const clipId = "mouth" + useId().replace(/[^a-zA-Z0-9]/g, "");
   const half = (m.w * R) / 2;
   const lift = m.curve * 0.12 * R;
@@ -64,13 +66,13 @@ export const Mouth: React.FC<MouthProps> = ({ cx, cy, R, m, stroke, sw, lip }) =
       <clipPath id={clipId}>
         <path d={d} />
       </clipPath>
-      <path d={d} fill={INSIDE} />
+      <path d={d} fill={colors?.inside ?? INSIDE} />
       <g clipPath={`url(#${clipId})`}>
         {m.tongue ? (
-          <ellipse cx={cx + half * 0.12} cy={botY} rx={half * 0.62} ry={openPx * 0.42} fill={TONGUE} />
+          <ellipse cx={cx + half * 0.12} cy={botY} rx={half * 0.62} ry={openPx * 0.42} fill={colors?.tongue ?? TONGUE} />
         ) : null}
         {m.teeth ? (
-          <rect x={lx - 4} y={Math.min(ly, ry, topY) - 4} width={half * 2 + 8} height={Math.max(0, topY - Math.min(ly, ry, topY)) + 4 + openPx * 0.26} fill={TEETH} />
+          <rect x={lx - 4} y={Math.min(ly, ry, topY) - 4} width={half * 2 + 8} height={Math.max(0, topY - Math.min(ly, ry, topY)) + 4 + openPx * 0.26} fill={colors?.teeth ?? TEETH} />
         ) : null}
       </g>
       <path d={d} fill="none" stroke={stroke} strokeWidth={lineW} strokeLinejoin="round" />

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "pim",
+  "displayName": "Pim",
+  "aspect": "16:9",
+  "style": {
+    "build": "shape"
+  },
+  "shape": {
+    "species": "penguin",
+    "build": "tiny",
+    "color": "navy",
+    "belly": "cream",
+    "muzzle": {
+      "kind": "beak",
+      "color": "orange"
+    },
+    "feet": "orange",
+    "hands": "navy",
+    "eyes": {
+      "kind": "dot",
+      "size": 1.2,
+      "spacing": 1
+    },
+    "details": [
+      {
+        "id": "bow",
+        "color": "coral"
+      }
+    ]
+  },
+  "energy": 0.95,
+  "personality": "Tiny, loud and very sure; a penguin who thinks they can fly.",
+  "voice": {
+    "say": "Junior"
+  }
+}

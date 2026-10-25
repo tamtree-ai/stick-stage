@@ -8,10 +8,12 @@ import { Buildings, Hydrant, Shopfront, Sidewalk } from "./street";
 import { Bed, Counter, FloorLamp, Fridge, Tv } from "./home";
 import { Board, Curtain, Sand, Sea, Umbrella } from "./venue";
 import type { PartComponent } from "./types";
+import { StoryBush, StoryFence, StoryFlowers, StoryGround, StoryHills, StoryPond, StoryRock, StorySea, StorySky, StoryTree } from "./storyOutdoor";
+import { StoryBed, StoryBench, StoryClubhouse, StoryDoor, StoryFloor, StoryHouse, StoryRug, StoryShelf, StorySofa, StoryTable, StoryWall, StoryWindow } from "./storyPlaces";
 import { Galaxy, MoonFloor, NebulaSky, RingedPlanet } from "./cosmos";
 import { Blueprint, FumeHood, GridFloor, LabBench, Nebula, Planet, Starfield, VoidBackdrop, WallChart } from "./science";
 
-export const KITS = ["plain", "interior", "office", "park", "street", "beach", "abstract", "space", "lab"] as const;
+export const KITS = ["plain", "interior", "office", "park", "street", "beach", "abstract", "space", "lab", "story"] as const;
 export type Kit = (typeof KITS)[number];
 
 export type PartInfo = {
@@ -73,6 +75,29 @@ export const PART_INFO: Record<string, PartInfo> = {
   "lab-bench": { draw: LabBench, kits: ["lab"] },
   "fume-hood": { draw: FumeHood, kits: ["lab"] },
   "wall-chart": { draw: WallChart, kits: ["lab"] },
+  // The story kit: flat, outline-free parts for the shape tier.
+  "story-sky": { draw: StorySky, kits: ["story"], backdrop: true },
+  "story-hills": { draw: StoryHills, kits: ["story"], backdrop: true },
+  "story-ground": { draw: StoryGround, kits: ["story"], backdrop: true },
+  "story-sea": { draw: StorySea, kits: ["story"], backdrop: true },
+  "story-wall": { draw: StoryWall, kits: ["story"], backdrop: true },
+  "story-floor": { draw: StoryFloor, kits: ["story"], backdrop: true },
+  "story-fence": { draw: StoryFence, kits: ["story"] },
+  "story-tree": { draw: StoryTree, kits: ["story"] },
+  "story-bush": { draw: StoryBush, kits: ["story"] },
+  "story-flowers": { draw: StoryFlowers, kits: ["story"] },
+  "story-pond": { draw: StoryPond, kits: ["story"] },
+  "story-rock": { draw: StoryRock, kits: ["story"] },
+  "story-house": { draw: StoryHouse, kits: ["story"] },
+  "story-clubhouse": { draw: StoryClubhouse, kits: ["story"] },
+  "story-bench": { draw: StoryBench, kits: ["story"] },
+  "story-window": { draw: StoryWindow, kits: ["story"] },
+  "story-door": { draw: StoryDoor, kits: ["story"] },
+  "story-rug": { draw: StoryRug, kits: ["story"] },
+  "story-bed": { draw: StoryBed, kits: ["story"] },
+  "story-sofa": { draw: StorySofa, kits: ["story"] },
+  "story-table": { draw: StoryTable, kits: ["story"] },
+  "story-shelf": { draw: StoryShelf, kits: ["story"] },
 };
 
 export const PARTS: Record<string, PartComponent> = Object.fromEntries(Object.entries(PART_INFO).map(([id, p]) => [id, p.draw]));
@@ -88,6 +113,7 @@ export const KIT_BACKDROP: Record<Kit, SetDef["layers"]> = {
   abstract: [part("void"), part("grid-floor")],
   space: [part("starfield"), part("grid-floor")],
   lab: [part("wall", { pattern: "none" }), part("floor")],
+  story: [part("story-sky"), part("story-hills"), part("story-ground")],
 };
 
 function part(id: string, extra: Partial<SetDef["layers"][number]> = {}): SetDef["layers"][number] {

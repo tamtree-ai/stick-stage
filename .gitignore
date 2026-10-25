@@ -8,3 +8,4 @@ tools/
 packages/stickstage/dist
 public/skits/_jobs
 build/
+__pycache__/

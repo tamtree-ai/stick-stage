@@ -19,6 +19,11 @@ export type PartProps = {
   marks: Record<string, number>;
   /** Font for words on a board, desk, or TV. */
   fontFamily?: string;
+  /**
+   * Composition frame, for ambient motion (drifting clouds, swaying trees). It never depends on
+   * the scene or the dialog. Missing (stills, labs) means 0.
+   */
+  frame?: number;
 };
 
 export type PartComponent = React.FC<PartProps>;

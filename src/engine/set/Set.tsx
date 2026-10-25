@@ -15,6 +15,8 @@ export type SetLayersProps = {
   /** Scene words painted onto matching parts. The shared set document stays unchanged. */
   labels?: readonly PartLabel[];
   fontFamily?: string;
+  /** Composition frame, for the parts' ambient motion. */
+  frame?: number;
 };
 
 const renderPart = (p: SetPart, i: number, props: Omit<React.ComponentProps<PartComponent>, "part" | "seed">, setId: string) => {
@@ -23,10 +25,10 @@ const renderPart = (p: SetPart, i: number, props: Omit<React.ComponentProps<Part
   return <Part key={`${p.part}-${i}`} part={p} seed={`${setId}:${p.part}:${p.seed ?? i}`} {...props} />;
 };
 
-export const SetLayers: React.FC<SetLayersProps> = ({ set, width, height, layer, labels, fontFamily }) => {
+export const SetLayers: React.FC<SetLayersProps> = ({ set, width, height, layer, labels, fontFamily, frame = 0 }) => {
   const palette = getPalette(set.palette);
   const prefix = `set-${set.id}`;
-  const common = { palette, W: width, H: height, groundY: set.groundY, fig: set.figureHeightPx, prefix, marks: set.marks, fontFamily };
+  const common = { palette, W: width, H: height, groundY: set.groundY, fig: set.figureHeightPx, prefix, marks: set.marks, fontFamily, frame };
   const paint = (p: SetPart) => applyPartLabels(p, labels);
   if (layer === "foreground") {
     return <g>{set.foreground.map((p, i) => renderPart(paint(p), i, common, set.id))}</g>;

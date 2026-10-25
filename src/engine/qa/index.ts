@@ -1,3 +1,5 @@
+import { offstageChecks } from "./visual";
+import { withProgramAssets } from "../director/places";
 import type { CompileResult } from "../director/compile";
 import type { Expression } from "../face/schema";
 import type { Library } from "../rig/actorState";
@@ -20,7 +22,9 @@ export type CheckInput = {
 };
 
 /** The M5 self-check: story rules + visual QA over every scene of a compiled skit. Pure. */
-export const checkSkit = ({ result, lib, sets, safeArea }: CheckInput): CheckReport => {
+export const checkSkit = ({ result, lib: catalogLib, sets: catalogSets, safeArea }: CheckInput): CheckReport => {
+  const lib = withProgramAssets(catalogLib, result.program);
+  const sets = result.program.sets ? { ...catalogSets, ...result.program.sets } : catalogSets;
   const hint = (e: string): Expression["closeup"] => lib.expressions[e]?.closeup;
   const multi = result.scenes.length > 1;
   const findings: Finding[] = [...programChecks(result.program), ...distinctFindings(result, lib)];
@@ -31,6 +35,7 @@ export const checkSkit = ({ result, lib, sets, safeArea }: CheckInput): CheckRep
       ...closeupChecks(tl, skit, hint),
       ...pacingChecks(tl),
       ...visualChecks({ tl, lib, set: sets[tl.set]!, safeArea: aspectOfFrame(tl.width, tl.height) === "16:9" ? WIDE_SAFE_AREA : safeArea }),
+      ...offstageChecks({ tl, lib, set: sets[tl.set]! }),
     ];
     // Report skit-absolute frames.
     findings.push(...scene.map((f) => ({ ...f, frame: f.frame === undefined ? undefined : f.frame + ps.from, scene: multi ? ps.id : undefined })));

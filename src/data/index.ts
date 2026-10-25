@@ -1,4 +1,4 @@
-import { ImageManifestSchema, PronunciationsSchema, type Pronunciation, type ImageDef, buildCatalog, createLibrary, createSets, migrate, MusicManifestSchema, SafeAreaProfilesSchema, SeriesSchema, type MusicManifest, type SafeAreaProfiles, type Series, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type Catalog, type SafeArea, type SetDef, type SfxManifest } from "../engine/core";
+import { composePlace, ImageManifestSchema, PronunciationsSchema, type Pronunciation, type ImageDef, buildCatalog, createLibrary, createSets, migrate, MusicManifestSchema, SafeAreaProfilesSchema, SeriesSchema, type MusicManifest, type SafeAreaProfiles, type Series, ReactionTableSchema, SafeAreaSchema, SfxManifestSchema, type Library, type ReactionTable, type Catalog, type SafeArea, type SetDef, type SfxManifest } from "../engine/core";
 
 import milo from "./characters/milo.json";
 import june from "./characters/june.json";
@@ -11,6 +11,15 @@ import nell from "./characters/nell.json";
 import pip from "./characters/pip.json";
 import vera from "./characters/vera.json";
 import gus from "./characters/gus.json";
+import tofu from "./characters/tofu.json";
+import bobo from "./characters/bobo.json";
+import pim from "./characters/pim.json";
+import mabel from "./characters/mabel.json";
+import otto from "./characters/otto.json";
+import fennel from "./characters/fennel.json";
+import biscuit from "./characters/biscuit.json";
+import wren from "./characters/wren.json";
+import blip from "./characters/blip.json";
 
 import idle from "./poses/idle.json";
 import point from "./poses/point.json";
@@ -105,16 +114,25 @@ export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed
 export const EXTRA_EXPRESSION_IDS = ["skeptical", "worried", "embarrassed", "thinking", "laughing"];
 
 export const library: Library = createLibrary({
-  characters: [milo, june, lila, theo, moss, dash, reed, nell, pip, vera, gus],
+  characters: [milo, june, lila, theo, moss, dash, reed, nell, pip, vera, gus, tofu, bobo, pim, mabel, otto, fennel, biscuit, wren, blip],
   poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose, wavePose, thumbsUp],
   expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan, skeptical, worried, embarrassed, thinking, laughing],
   props: PROP_DOCS,
 });
 
+/** Story-kit sets for the shape cast, composed from one-line places (`set/compose.ts`). */
+const STORY_SETS: SetDef[] = [
+  composePlace("story-park", { setting: "park", seats: ["left", "right"], description: "A sunny park with a low bench under the cast, trees at the edges and a path. Both can sit." }),
+  composePlace("story-clubhouse", { setting: "clubhouse", description: "Outside the round clubhouse with its flag: the story cast's home base." }),
+  composePlace("story-garden", { setting: "garden", features: ["house"], description: "A back garden with a picket fence, flowers, an apple tree and a little house." }),
+  composePlace("story-bedroom", { setting: "bedroom", time: "night", seats: ["left"], description: "A bedroom at night: the bed on the left (they sit on it), a starry window." }),
+];
+
 export const sets: Record<string, SetDef> = createSets([
   plain1, living1, lounge1, office1, park1, street1, kitchen1, bedroom1, cafe1, classroom1, meeting1, living2, park2, streetNight1, beach1, stage1,
   widePlain, wideLiving, wideLounge, wideOffice, widePark, wideStreet, wideCafe, wideClassroom,
   void1, blueprint1, space1, space2, lab1,
+  ...STORY_SETS,
 ]);
 
 /** One conservative profile for TikTok / Reels / Shorts overlays (verify against real screenshots in M4). */

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ASPECTS } from "../format/aspect";
+import { ShapeSchema } from "./shape/schema";
 import { HAND_SHAPES, ToonSchema } from "./toon/schema";
 
 const hex = z.string().regex(/^#[0-9a-fA-F]{3,8}$/, "expected a hex color like #1b1b1f");
@@ -15,6 +16,8 @@ export const ProportionsSchema = z.object({
   thigh: frac(0.05, 0.35),
   shin: frac(0.05, 0.35),
 });
+
+const STICK_DEFAULT_PROPORTIONS = { height: 1, headRadius: 0.15, neck: 0.02, torso: 0.26, upperArm: 0.16, forearm: 0.15, thigh: 0.2, shin: 0.19 };
 
 export const TorsoStyleSchema = z.discriminatedUnion("style", [
   z.object({ style: z.literal("line") }),
@@ -41,19 +44,20 @@ export const CharacterSchema = z.object({
    * stamped when the library loads). A workspace character may omit it and follow the skit.
    */
   aspect: z.enum(ASPECTS).optional(),
-  proportions: ProportionsSchema,
+  /** Stick body proportions. A shape character may leave them out (its build preset decides). */
+  proportions: ProportionsSchema.default(STICK_DEFAULT_PROPORTIONS),
   style: z.object({
-    /** Drawing tier: "stick" (default) or "toon" (needs the `toon` block). */
-    build: z.enum(["stick", "toon"]).default("stick"),
-    stroke: hex,
-    strokeWidth: z.number().min(2).max(30),
-    headFill: hex,
-    torso: TorsoStyleSchema,
+    /** Drawing tier: "stick" (default), "toon" (needs the `toon` block) or "shape" (needs `shape`). */
+    build: z.enum(["stick", "toon", "shape"]).default("stick"),
+    stroke: hex.default("#1b1b1f"),
+    strokeWidth: z.number().min(2).max(30).default(12),
+    headFill: hex.default("#fff6ee"),
+    torso: TorsoStyleSchema.default({ style: "line" }),
     /** Rubber-hose bow of limbs, 0 = straight segments. */
-    limbCurve: frac(0, 1),
-    hands: z.enum(["nub"]),
-    feet: z.enum(["oval"]),
-    footFill: hex,
+    limbCurve: frac(0, 1).default(0.35),
+    hands: z.enum(["nub"]).default("nub"),
+    feet: z.enum(["oval"]).default("oval"),
+    footFill: hex.default("#3d3d48"),
     /** Foot length multiplier (a hare's long feet are ~1.8). */
     footLength: frac(0.6, 2.5).default(1),
     /**
@@ -69,18 +73,20 @@ export const CharacterSchema = z.object({
     cheek: hex.optional(),
   }),
   face: z.object({
-    eyes: z.enum(["big-pupil", "dot"]),
-    brows: z.boolean(),
+    eyes: z.enum(["big-pupil", "dot"]).default("dot"),
+    brows: z.boolean().default(true),
     mouthSet: z.string().default("default"),
     /** Horizontal face shift toward facing direction, fraction of head radius (3/4 view). */
     offsetX: frac(-0.5, 0.5).default(0.14),
     eyeSpacing: frac(0.2, 0.8).default(0.44),
     eyeY: frac(-0.5, 0.5).default(-0.06),
     mouthY: frac(0, 0.8).default(0.42),
-  }),
+  }).default({ eyes: "dot", brows: true, mouthSet: "default", offsetX: 0.14, eyeSpacing: 0.44, eyeY: -0.06, mouthY: 0.42 }),
   accessories: z.array(AccessorySchema).default([]),
   /** The toon drawing (skin, clothes, hair). Accessories are stick-only; toon draws its own. */
   toon: ToonSchema.optional(),
+  /** The shape drawing: a body plan, a build and part kinds (`rig/shape/schema.ts`). */
+  shape: ShapeSchema.optional(),
   /** How much speech motion this character does. 1 is Dash, near 0 is Moss. Default 0.55. */
   energy: z.number().min(0).max(1).optional(),
   /** One line the writer reads the way it reads cast notes. Not drawn. */
@@ -100,6 +106,8 @@ export const CharacterSchema = z.object({
 }).superRefine((c, ctx) => {
   if (c.style.build === "toon" && !c.toon)
     ctx.addIssue({ code: "custom", path: ["toon"], message: 'style.build "toon" needs a toon block (skin, body, hair, top, bottom, shoes)' });
+  if (c.style.build === "shape" && !c.shape)
+    ctx.addIssue({ code: "custom", path: ["shape"], message: 'style.build "shape" needs a shape block (at least a "color")' });
 });
 
 export type Character = z.infer<typeof CharacterSchema>;

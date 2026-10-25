@@ -10,3 +10,6 @@ export { repairPrompt } from "./repair";
 export { DraftReplySchema, ReplyLineSchema, ReplySceneSchema, ReviseReplySchema, WriterReplySchema, type DraftReply, type ReviseReply, type WriterReply } from "./reply";
 export { skitFromReply } from "./revise";
 export { writerWorld, type WriterWorld } from "./world";
+export { missingAssets, nearest, type AssetKind, type AssetSource, type MissingAsset, type Rung } from "./assets";
+export { storyPrompt, STORY_WRITER, type StoryBrief } from "./story";
+export { propFromReply, propPrompt, PROP_WRITER } from "./propPrompt";

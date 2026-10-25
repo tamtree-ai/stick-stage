@@ -6,7 +6,7 @@
 import { buildCatalog, catalogVersion, checkDraft, fromPremise, parseBrief, parseSkit, premiseFromReply, repairPrompt, ReplyError, skitFromReply, SkitError, writerWorld, type CheckReport, type Diagnostic, type skitLines } from "../engine/core";
 import type { Project } from "../node";
 import { typesetForCheck } from "./typesetCheck";
-import { pronunciationsFor, type Pronunciation } from "../engine/core";
+import { deliveryFor, performedText, pronunciationsFor, type Pronunciation } from "../engine/core";
 
 const pronounceOf = (text: string, lexicon: readonly Pronunciation[] = []) => {
   const hits = pronunciationsFor(text, lexicon);
@@ -17,7 +17,13 @@ import { HttpError } from "./http";
 export { placeholderVoice, unsupportedBeats } from "../engine/core";
 
 export type VoiceHint = { provider?: string; voiceId?: string; settings?: Record<string, unknown> };
-export type LineToVoice = ReturnType<typeof skitLines>[number] & { voice?: VoiceHint };
+export type LineToVoice = ReturnType<typeof skitLines>[number] & {
+  voice?: VoiceHint;
+  /** An acting direction ("Say this excitedly, …") from the beat's expression and `delivery`. */
+  direction?: string;
+  /** `direction: text`, what a style-prompted TTS (Gemini TTS) should be given. The manifest keeps `text`. */
+  performedText?: string;
+};
 
 export type ValidateResult = {
   ok: boolean;
@@ -103,7 +109,14 @@ export const validate = (p: Project, body: unknown, notes: Readonly<Record<strin
       skit,
       ...(premise !== undefined ? { premise } : {}),
       // Voice-over lines take the skit's narrator voice; the rest their character's.
-      lines: d.lines.map((l) => ({ ...l, ...pronounceOf(l.spoken ?? l.text, p.pronunciations), voice: l.narrator ? hint(d.result.doc.narrator?.voice) : voiceHint(p, l.character) })),
+      lines: d.lines.map((l) => ({
+        ...l,
+        ...pronounceOf(l.spoken ?? l.text, p.pronunciations),
+        voice: l.narrator ? hint(d.result.doc.narrator?.voice) : voiceHint(p, l.character),
+        // How to perform it, for a style-prompted TTS: voice `performedText`, keep `text` for the manifest.
+        direction: deliveryFor(l).direction,
+        performedText: performedText(l),
+      })),
       estimatedDurationSec: d.estimatedDurationSec,
       warnings: [...corrected, ...d.warnings],
       check: d.check,

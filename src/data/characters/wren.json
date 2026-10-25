@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "wren",
+  "displayName": "Wren",
+  "aspect": "16:9",
+  "style": {
+    "build": "shape"
+  },
+  "shape": {
+    "species": "bird",
+    "build": "tiny",
+    "color": "sky",
+    "belly": "cream",
+    "arms": "wings",
+    "muzzle": {
+      "kind": "beak",
+      "color": "sunflower"
+    },
+    "feet": "sunflower",
+    "hands": "sky",
+    "tail": {
+      "kind": "stub",
+      "color": "blue"
+    },
+    "hair": {
+      "kind": "tuft",
+      "color": "blue"
+    }
+  },
+  "energy": 0.8,
+  "personality": "A small, quick bird who flies ahead to see what's coming and reports back.",
+  "voice": {
+    "say": "Samantha"
+  }
+}

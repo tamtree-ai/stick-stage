@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "otto",
+  "displayName": "Otto",
+  "aspect": "16:9",
+  "style": {
+    "build": "shape"
+  },
+  "shape": {
+    "species": "hippo",
+    "build": "adult",
+    "color": "lilac",
+    "head": {
+      "kind": "wide",
+      "size": 1.1
+    },
+    "body": {
+      "kind": "barrel",
+      "width": 1.2
+    },
+    "belly": "blush",
+    "ears": {
+      "kind": "small",
+      "size": 1.0,
+      "inner": "pink"
+    },
+    "muzzle": {
+      "kind": "snout",
+      "nose": "purple"
+    },
+    "details": [
+      {
+        "id": "badge",
+        "color": "sunflower"
+      },
+      {
+        "id": "necktie",
+        "color": "berry"
+      }
+    ]
+  },
+  "energy": 0.35,
+  "personality": "A grown-up hippo who runs the clubhouse; patient, proud of his badges.",
+  "voice": {
+    "say": "Ralph"
+  }
+}

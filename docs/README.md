@@ -16,11 +16,12 @@ Start here even if someone else set the computer up.
 4. [People, rooms, and shapes](cast-rooms-and-shapes.md). The six characters, the rooms, the joke shapes, and the rhythms.
 5. [Watch it and change it](watch-and-change.md). What to look for, and how to ask for a new line without losing the staging.
 6. [The files you hand over](files-you-hand-over.md). The video, the captions, the post text, and who posts them.
+7. [Story episodes](stories.md). Narrated 16:9 cartoons with the flat shape cast: characters as specs, places as descriptions, and what to do when the catalog can't draw something.
 
 ## If you are setting the machine up, or connecting another program
 
-7. [Set up the machine](set-up.md). Install, preview, the render service, Docker, and the errors you will actually see.
-8. [One video, end to end](end-to-end.md). Every file and every command from a topic to the posting bundle, then the same path over HTTP.
+8. [Set up the machine](set-up.md). Install, preview, the render service, Docker, and the errors you will actually see.
+9. [One video, end to end](end-to-end.md). Every file and every command from a topic to the posting bundle, then the same path over HTTP.
 
 After that, the field lists:
 

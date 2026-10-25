@@ -8,8 +8,10 @@ import deadpanJson from "../../data/styles/deadpan.json";
 import snappyJson from "../../data/styles/snappy.json";
 import chaoticJson from "../../data/styles/chaotic.json";
 import sitcomJson from "../../data/styles/sitcom.json";
+import storyJson from "../../data/styles/story.json";
 
-export const STYLE_IDS = ["classic", "deadpan", "snappy", "chaotic", "sitcom"] as const;
+/** `story`: narrated episodes (the shape tier). Slower, and no punchline rules: a story ends, it doesn't land a joke. */
+export const STYLE_IDS = ["classic", "deadpan", "snappy", "chaotic", "sitcom", "story"] as const;
 export type StyleId = (typeof STYLE_IDS)[number];
 
 export type DirectingStyle = {
@@ -48,6 +50,7 @@ export const STYLES: Record<StyleId, DirectingStyle> = {
   snappy: asStyle(snappyJson as DirectingStyle),
   chaotic: asStyle(chaoticJson as DirectingStyle),
   sitcom: asStyle(sitcomJson as DirectingStyle),
+  story: asStyle(storyJson as DirectingStyle),
 };
 
 export const CLASSIC: DirectingStyle = STYLES.classic;

@@ -70,7 +70,7 @@ Default: the beat start.
 | `turn` | `facing?` (default: flip) |
 | `hop`, `nod` | |
 | `slideTo` | `mark`, `durationFrames?` (default 8) |
-| `hold` / `putAway` / `drop` | `prop` (an id from the catalog below), `hand?` (`R` default). A sign `hold` may set `text` (one line, ≤ 24 characters). A laptop `hold` may set `screen` (≤ 3 lines, `\n` breaks, ≤ 24 characters each) |
+| `hold` / `putAway` / `drop` | `prop` (an id from the catalog below), `hand?` (`R` default). A sign `hold` may set `text` (one line, ≤ 24 characters). A laptop `hold` may set `screen` (≤ 3 lines, `\n` breaks, ≤ 24 characters each). `drop` lets go: most props fall, a prop marked `floats` (the balloon) rises and drifts away |
 | `symbol` | `symbol` (tears, sweat, blush, anger, exclaim, question, speed-lines, spray), `durationMs?` |
 | `sit` / `stand` | Needs a seat at the character's mark |
 
