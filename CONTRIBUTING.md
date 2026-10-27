@@ -24,7 +24,7 @@ video, because motion is reviewed as video, not stills. Say what you rendered in
 
 ## Ground rules
 
-These are enforced by tests and lint, and explained in [CLAUDE.md](CLAUDE.md):
+These are enforced by tests and lint, and explained in [AGENTS.md](AGENTS.md):
 
 1. **Rendering is frame-pure.** Every visual is a function of `(frame, props)`. No `Date`, no
    `Math.random()`, no state for animation. Use the seeded helpers in `src/engine/lib/seed.ts`.

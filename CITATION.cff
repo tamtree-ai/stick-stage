@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use StickStage in your work, please cite it as below."
+title: "StickStage: an open-source stick figure comedy video generator"
+type: software
+authors:
+  - name: "Tamtree"
+    website: "https://www.tamtree.io"
+version: 0.1.0
+date-released: 2026-10-26
+license: MIT
+repository-code: "https://github.com/tamtree-ai/stick-stage"
+url: "https://github.com/tamtree-ai/stick-stage"
+abstract: >-
+  StickStage turns a written premise into a captioned, lip-synced 9:16 comedy short.
+  Voices (Kokoro), lip sync (Rhubarb) and frame-by-frame rendering (Remotion) all run
+  offline, and every skit, character, set and prop is a JSON document.
+keywords:
+  - stick figure video generator
+  - text to video
+  - comedy shorts
+  - Remotion
+  - lip sync
+  - text to speech
+  - offline

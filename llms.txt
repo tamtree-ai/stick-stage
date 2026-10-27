@@ -1,0 +1,58 @@
+# StickStage
+
+> StickStage is an open-source (MIT) stick figure video generator. You write a premise and the
+> lines; it renders a captioned, lip-synced 9:16 comedy short (1080×1920 MP4) for YouTube Shorts,
+> TikTok or Reels. It runs offline with no account or API key: Kokoro voices on the CPU, Rhubarb
+> lip sync, and frame-by-frame rendering with Remotion. A skit is one JSON file.
+
+Quickstart: `pnpm install && pnpm bootstrap && pnpm demo` (Node 22+, pnpm). Make your own with
+`pnpm try "my cat ignores me"`. Coding agents must follow AGENTS.md (frame-pure rendering,
+everything is data, no network at render time). Repository: https://github.com/tamtree-ai/stick-stage
+
+## Start here
+
+- [README](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/README.md): what it is, quickstart, gallery, FAQ, licences
+- [Manual](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/README.md): the index of every guide below
+- [What you are making](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/what-you-are-making.md): the finished short, for a newcomer
+- [Your first video](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/your-first-video.md): top to bottom, sample short then your own
+- [Set up the machine](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/set-up.md): install, the service, the failures you will see
+- [AGENTS.md](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/AGENTS.md): rules and commands for coding agents
+
+## Making videos
+
+- [Writing the joke](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/writing-the-joke.md): from a topic or your own lines to a premise
+- [The skit file](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/skits.md): every field of `skit.json`
+- [People, rooms, and shapes](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/cast-rooms-and-shapes.md): exact ids for characters, sets and props
+- [Watch it and change it](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/watch-and-change.md): reviewing and fixing a render
+- [The files you hand over](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/files-you-hand-over.md): MP4, captions and post files
+- [Making a science short](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/science-channel.md): myth-flip explainers with sourced claims
+- [Story episodes](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/stories.md): narrated 16:9 stories with the shape cast
+- [Figures](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/figures.md): diagrams, equations and images timed to the words
+
+## Extending
+
+- [Creating characters](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/creating-characters.md)
+- [Creating backgrounds](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/creating-backgrounds.md)
+- [Creating props](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/creating-props.md)
+- [Contributing](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/CONTRIBUTING.md)
+
+## For developers
+
+- [For developers](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/developers.md): the developer index
+- [Programmatic guide](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/programmatic.md): validate, compile and render from code
+- [Render service API](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/render-service.md): `POST /validate`, `POST /render`, `GET /jobs/:id`
+- [One video, end to end](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/end-to-end.md): every file, command and HTTP call for one video
+- [Voices](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/voice-contract.md): the `voice.json` contract
+
+## Claude Code skills
+
+- [topic-to-video](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/skills/topic-to-video/SKILL.md): a topic to a ~30 s skit, end to end
+- [skit-director](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/skills/skit-director/SKILL.md): stages a premise you wrote
+- [science-short](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/skills/science-short/SKILL.md): a myth-flip science short
+- [toon-character](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/skills/toon-character/SKILL.md): add or change a toon character
+- [story-episode](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/skills/story-episode/SKILL.md): an idea to a narrated 16:9 story
+
+## Optional
+
+- [Design decisions](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/DECISIONS.md): tuned values and why
+- [Tamtree](https://www.tamtree.io): the workflow orchestrator that runs StickStage in production

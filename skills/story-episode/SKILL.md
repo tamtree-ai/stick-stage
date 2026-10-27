@@ -34,4 +34,4 @@ Guide: `docs/stories.md`. Plan and history: `../planning/2026-10-24-shape-toon-s
 - Don't name a prop, pose or set that isn't in the catalog without drawing or describing it.
 - Don't hand-draw a new character in code when a spec will do. New part kinds go in
   `src/engine/rig/shape/` and need the owner's OK on `ShapeLab`.
-- Don't copy an existing show's characters. Original designs only (CLAUDE.md rule 6).
+- Don't copy an existing show's characters. Original designs only (AGENTS.md rule 6).
