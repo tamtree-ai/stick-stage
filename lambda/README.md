@@ -320,6 +320,8 @@ Measured with `public/skits/fine` (an 8.9 s draft) at 3008 MB:
 
 At $0.0000166667 per GB-second, a warm draft like this costs about $0.004. Lambda's free tier (400,000 GB-seconds a month) covers roughly 1,600 of them. A 30 s **final** render has about 3× the frames at 4× the pixels, so at 3008 MB it may come close to the 15-minute limit: raise the memory first (see below).
 
+**Faster software GL (trial).** By default Chrome draws through `swangle` in one process. Set `STICKSTAGE_GL=swiftshader` on the function to draw on the CPU with multi-process Chrome instead. In a 2-CPU, 3 GB Linux container, a stick skit took 64 ms a frame against 483 with the same picture. It has not been proven on Lambda yet. If a render hangs or Chrome fails to start, remove the variable.
+
 ## Troubleshooting
 
 | Symptom | Cause | Fix |

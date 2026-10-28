@@ -61,7 +61,11 @@ try {
 const s3 = new S3Client({});
 // Lambda has no GPU: without software GL, Chrome's GPU process hangs and Remotion times out
 // connecting. One Chrome process is also kinder to the sandbox and to a small vCPU share.
-const chromiumOptions = { gl: "swangle", enableMultiProcessOnLinux: false } as const;
+// STICKSTAGE_GL=swiftshader rasterises on the CPU: in a 2-CPU Linux container a stick skit took
+// 64 ms/frame against swangle's 483, with the same picture. It needs multi-process Chrome
+// (single-process hung), and is not yet proven on Lambda; unset keeps swangle.
+const swiftshader = process.env.STICKSTAGE_GL === "swiftshader";
+const chromiumOptions = { gl: swiftshader ? "swiftshader" : "swangle", enableMultiProcessOnLinux: swiftshader } as const;
 // Dockerfile.lambda builds the bundle into the image (STICKSTAGE_BUNDLE_DIR); unset, it is built on first use.
 const backend = remotionBackend({
   entryPoint: path.join(ROOT, "src/app/index.ts"),
