@@ -12,6 +12,7 @@ Tamtree flow ──Invoke (async)──▶ tamtree-stickstage-render ──▶ S
 |---|---|
 | `handler.ts` | The handler: reads the event, downloads the audio from S3, runs `renderPipeline`, uploads the outputs, answers |
 | `index.mjs` | Re-exports the handler so the Lambda runtime client can load TypeScript (via `NODE_OPTIONS=--import=tsx`) |
+| `deploy.sh` | Builds, pushes and deploys the function, creating the AWS resources on a first run (`pnpm lambda:deploy`) |
 | `tamtree-flow.sh` | Uploads a skit's audio and creates a Tamtree workflow that renders it |
 | `../Dockerfile.lambda` | The container image (amd64) |
 | `../scripts/lambda-bundle.ts` | Builds the Remotion bundle into the image, so a cold start skips webpack |
@@ -40,6 +41,20 @@ If the envelope carries a `callback`, the reply is POSTed there, and the functio
 **Check first (Tamtree 2.7.0).** With `"check_only": true`, nothing is rendered and `audio` isn't needed. The function runs the request's checks (skit errors, unsupported beats, approval, `voice-missing`, `voice-stale`), then the director's self-check on estimated timings, as `POST /validate` does. It answers `{ checked: true, items: [], findings }`. Request errors are `error` findings and stop Tamtree's step before the render. Self-check errors come back as warnings, because frame timing depends on the real voices and the render checks again. Set the step's *Check first* to **Check, then run**, or use **Only check** as a step ahead of TTS. Code in [`check.ts`](check.ts).
 
 **Describe.** `{"v": 1, "describe": true}` returns the `output_schema` of the reply item above, so later Tamtree steps offer its fields before a run. There's no `input_schema`: this function reads item 0's `json`, not `inputs`.
+
+## Deploy in one command
+
+`lambda/deploy.sh` does sections 2–4 for you. On a first run it creates the bucket, repository, role, log group and function (skipping any that already exist); after that it builds, pushes the image tagged with the current commit, and updates the function.
+
+```sh
+AWS_PROFILE=<profile> pnpm lambda:deploy                     # commit first; --allow-dirty to skip that check
+AWS_PROFILE=<profile> STICKSTAGE_MEMORY=3008 pnpm lambda:deploy   # first deploy on a capped account
+AWS_PROFILE=<profile> pnpm lambda:deploy --skip-build        # push the image already built
+```
+
+Or with make: `make deploy PROFILE=<profile>` (add `MEMORY=3008`, `REGION=…`, `FUNCTION=…` or `FLAGS=--allow-dirty` as needed), `make push PROFILE=<profile>` to skip the build, `make build` to build only.
+
+`STICKSTAGE_REGION` (default `ap-southeast-2`) and `STICKSTAGE_FUNCTION` (default `tamtree-stickstage-render`) are optional. It doesn't check the account's limits (3a). Then [test it](#5-test-it). The manual steps below do the same thing one command at a time.
 
 ## Before you start
 

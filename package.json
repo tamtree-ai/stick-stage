@@ -26,6 +26,7 @@
     "serve": "tsx scripts/serve.ts",
     "serve:smoke": "tsx scripts/serve-smoke.ts",
     "lambda:build": "docker build --platform linux/amd64 --provenance=false -f Dockerfile.lambda -t stickstage-lambda .",
+    "lambda:deploy": "lambda/deploy.sh",
     "new": "tsx scripts/new.ts",
     "write": "tsx scripts/write.ts",
     "schema": "tsx scripts/schema.ts",
