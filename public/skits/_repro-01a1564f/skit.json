@@ -1,0 +1,153 @@
+{
+ "schemaVersion": 2,
+ "meta": {
+  "title": "Before time began",
+  "aspect": "9:16",
+  "hashtags": [
+   "stickfigure",
+   "relatable",
+   "physics",
+   "philosophy",
+   "cosmos"
+  ],
+  "description": "A question that breaks your brain."
+ },
+ "set": "plain-1",
+ "cast": [
+  {
+   "id": "milo",
+   "character": "milo",
+   "mark": "left"
+  },
+  {
+   "id": "june",
+   "character": "june",
+   "mark": "right"
+  }
+ ],
+ "overlay": {
+  "subtitles": true
+ },
+ "beats": [
+  {
+   "id": "b1",
+   "speaker": "june",
+   "line": "What came before the Big Bang?",
+   "role": "setup",
+   "expression": "confused"
+  },
+  {
+   "id": "b2",
+   "speaker": "milo",
+   "line": "What's north of the North Pole?",
+   "role": "setup",
+   "expression": "neutral"
+  },
+  {
+   "id": "b3",
+   "speaker": "june",
+   "line": "What? Nothing. That's the top of Earth.",
+   "role": "escalation",
+   "expression": "confused"
+  },
+  {
+   "id": "b4",
+   "speaker": "milo",
+   "line": "Right. You can't go further north.",
+   "role": "escalation",
+   "expression": "smug",
+   "actions": [
+    {
+     "who": "milo",
+     "do": "pose",
+     "pose": "hands-on-hips",
+     "at": {
+      "fraction": 0.3
+     }
+    }
+   ]
+  },
+  {
+   "id": "b5",
+   "speaker": "june",
+   "line": "Okay, but what does that have to do with time?",
+   "role": "escalation",
+   "expression": "confused"
+  },
+  {
+   "id": "b6",
+   "speaker": "milo",
+   "line": "Maybe asking what came before time is the same question.",
+   "role": "escalation",
+   "expression": "neutral"
+  },
+  {
+   "id": "b7",
+   "speaker": "june",
+   "line": "Wait, so there might not even be a before?",
+   "role": "escalation",
+   "expression": "shocked"
+  },
+  {
+   "id": "b8",
+   "speaker": "milo",
+   "line": "The universe didn't begin in time.",
+   "role": "escalation",
+   "expression": "neutral"
+  },
+  {
+   "id": "b9",
+   "speaker": "june",
+   "line": "Then when did it begin?",
+   "role": "escalation",
+   "expression": "confused"
+  },
+  {
+   "id": "b10",
+   "speaker": "milo",
+   "line": "Time began with the universe.",
+   "role": "escalation",
+   "expression": "smug",
+   "actions": [
+    {
+     "who": "milo",
+     "do": "pose",
+     "pose": "hands-on-hips",
+     "at": {
+      "fraction": 0.3
+     }
+    }
+   ]
+  },
+  {
+   "id": "b11",
+   "speaker": "june",
+   "line": "So how can something begin if there was no before?",
+   "role": "punchline",
+   "expression": "shocked",
+   "actions": [
+    {
+     "who": "june",
+     "do": "pose",
+     "pose": "recoil",
+     "at": {
+      "fraction": 0.6
+     }
+    }
+   ],
+   "punchline": true,
+   "reaction": "smug",
+   "pauseBeforeMs": 350,
+   "holdAfterMs": 400,
+   "text": [
+    {
+     "type": "slam",
+     "value": "BEGIN",
+     "at": {
+      "word": "begin"
+     }
+    }
+   ]
+  }
+ ]
+}

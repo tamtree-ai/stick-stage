@@ -1,0 +1,71 @@
+{
+ "schemaVersion": 1,
+ "lines": [
+  {
+   "id": "b1",
+   "speaker": "june",
+   "text": "What came before the Big Bang?",
+   "audio": "voice/b1.mp3"
+  },
+  {
+   "id": "b2",
+   "speaker": "milo",
+   "text": "What's north of the North Pole?",
+   "audio": "voice/b2.mp3"
+  },
+  {
+   "id": "b3",
+   "speaker": "june",
+   "text": "What? Nothing. That's the top of Earth.",
+   "audio": "voice/b3.mp3"
+  },
+  {
+   "id": "b4",
+   "speaker": "milo",
+   "text": "Right. You can't go further north.",
+   "audio": "voice/b4.mp3"
+  },
+  {
+   "id": "b5",
+   "speaker": "june",
+   "text": "Okay, but what does that have to do with time?",
+   "audio": "voice/b5.mp3"
+  },
+  {
+   "id": "b6",
+   "speaker": "milo",
+   "text": "Maybe asking what came before time is the same question.",
+   "audio": "voice/b6.mp3"
+  },
+  {
+   "id": "b7",
+   "speaker": "june",
+   "text": "Wait, so there might not even be a before?",
+   "audio": "voice/b7.mp3"
+  },
+  {
+   "id": "b8",
+   "speaker": "milo",
+   "text": "The universe didn't begin in time.",
+   "audio": "voice/b8.mp3"
+  },
+  {
+   "id": "b9",
+   "speaker": "june",
+   "text": "Then when did it begin?",
+   "audio": "voice/b9.mp3"
+  },
+  {
+   "id": "b10",
+   "speaker": "milo",
+   "text": "Time began with the universe.",
+   "audio": "voice/b10.mp3"
+  },
+  {
+   "id": "b11",
+   "speaker": "june",
+   "text": "So how can something begin if there was no before?",
+   "audio": "voice/b11.mp3"
+  }
+ ]
+}
