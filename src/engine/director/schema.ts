@@ -23,6 +23,7 @@ import { LINE_ROLES, scienceFields } from "./science";
 export { AnchorSchema, type Anchor } from "./anchor";
 import { AnchorSchema } from "./anchor";
 import { AudioSourceSchema, TextCueSchema } from "./cues";
+import { VerdictSchema } from "./verdictSchema";
 
 const who = z.string().min(1);
 const at = AnchorSchema.optional();
@@ -114,6 +115,8 @@ export const BeatSchema = z.strictObject({
   text: z.array(TextCueSchema).default([]),
   /** Diagram cues: show, hide, switch state, or tween a scene figure. */
   figures: z.array(FigureCueSchema).default([]),
+  /** Verdict meter after this line: the share (0–100) blaming the meter's left side. Needs `overlay.verdict`. */
+  verdict: z.number().min(0).max(100).optional(),
 });
 export type Beat = z.infer<typeof BeatSchema>;
 
@@ -248,6 +251,8 @@ export const SkitSchema = z
          * POV card, no "POV:" lead; it leaves when the first spoken line ends. First scene only.
          */
         hook: z.string().max(60).optional(),
+        /** "Who's wrong?" meter across the top; beats tip it with `verdict` (`director/verdictSchema.ts`). Replaces `pov` and `hook`. */
+        verdict: VerdictSchema.optional(),
         subtitles: z.boolean().default(true),
       })
       .default({ subtitles: true }),

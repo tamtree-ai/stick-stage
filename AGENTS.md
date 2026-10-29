@@ -37,6 +37,7 @@ Comedy-skit and science-short engine on Remotion. Open source (MIT); Tamtree use
 - `science-short` (`skills/science-short/SKILL.md`): a myth-flip science short with Vera and Gus, figures on the word, claims with sources; never approves.
 - `toon-character` (`skills/toon-character/SKILL.md`): add or change a toon character, a garment/hair kind, or a toon-only pose fix without touching stick drawings.
 - `story-episode` (`skills/story-episode/SKILL.md`): an idea → a narrated 16:9 shape-cast story (places, new characters as specs, drawn props), checked and rendered.
+- `whos-wrong` (`skills/whos-wrong/SKILL.md`): a "Who's Wrong?" episode: a petty two-sided argument with Bram and Tess, the verdict meter, the `argument` style's fast pace; the team writes the twist.
 
 Path-scoped rules live in `.claude/rules/` (`toon-rig.md` for the rig, characters and poses; `shape-rig.md` for the shape tier, story kit and places; `science-skits.md` for skits, figures and approval).
 

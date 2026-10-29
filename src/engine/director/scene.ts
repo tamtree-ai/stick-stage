@@ -19,6 +19,7 @@ import { CLASSIC, type DirectingStyle } from "./style";
 import { buildTracks } from "./tracks";
 import { sceneFigures, withDriverGestures } from "./sceneFigures";
 import type { FigureLib } from "../viz/compile";
+import { verdictEvent, verdictSafeArea, verdictTopCard } from "./verdict";
 import type { AudioClip, CardEvent, ListEvent, SfxEvent, SlamEvent, Timeline } from "./timeline";
 
 export type CompileInput = {
@@ -167,7 +168,7 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
   if (fail()) throw new SkitError(diags);
 
   const { fps, width, height } = skit.meta;
-  const safeArea = skit.meta.aspect === "16:9" ? WIDE_SAFE_AREA : (input.safeArea ?? DEFAULT_SAFE_AREA);
+  const safeArea = verdictSafeArea(skit.meta.aspect === "16:9" ? WIDE_SAFE_AREA : (input.safeArea ?? DEFAULT_SAFE_AREA), skit);
   const set = input.sets[skit.set]!;
   const partNames = new Set([...set.layers, ...set.foreground].map((p) => p.part));
   skit.labels?.forEach((label, i) => {
@@ -247,6 +248,8 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
     diags.push({ level: "warning", code: "screen-direction", path: "beats", message: "a slideTo swaps the characters' sides; screen direction breaks across cuts" });
 
   const card = cardEvent(skit, layout.beats, safeArea, durationInFrames, diags);
+  const verdict = verdictEvent(skit, layout.beats, fps, durationInFrames, diags);
+  const topCard = verdictTopCard(skit, diags);
   if (fail()) throw new SkitError(diags);
   const nextCut = (f: number) => shots.find((c) => c.frame > f)?.frame ?? durationInFrames;
   const spoken = layout.beats.filter((b) => b.kind === "line" && b.line);
@@ -277,11 +280,11 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
     shakes,
     audio,
     sfx: sfx.sort((a, b) => a.frame - b.frame),
-    pov: skit.overlay.pov
-      ? { text: skit.overlay.pov, from: 4, to: durationInFrames }
-      : skit.overlay.hook
-        ? { text: skit.overlay.hook, from: 0, to: spoken[0] ? msToFrame(spoken[0].zeroMs + spoken[0].line!.durationMs, fps) : durationInFrames }
-        : undefined,
+    pov: !topCard
+      ? undefined
+      : skit.overlay.pov
+        ? { text: topCard, from: 4, to: durationInFrames }
+        : { text: topCard, from: 0, to: spoken[0] ? msToFrame(spoken[0].zeroMs + spoken[0].line!.durationMs, fps) : durationInFrames },
     // A slam belongs to its shot: it ends at the next cut.
     slams: slams
       .sort((a, b) => a.from - b.from)
@@ -289,13 +292,14 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
     // A list belongs to its shot too: it leaves at the first cut after its first item.
     lists: lists.map((l) => ({ ...l, to: nextCut(l.at[0]!) })),
     ...(card ? { card } : {}),
+    ...(verdict ? { verdict } : {}),
     pages: skit.overlay.subtitles
       ? buildCaptionPages(spoken.map((b) => ({ startMs: (msToFrame(b.zeroMs, fps) / fps) * 1000, words: b.line!.words, narrator: b.narrator || b.thought })))
       : [],
     ...(skit.narrator ? { narratorCaption: skit.narrator.captionStyle } : {}),
     ...(figs.tracks.length ? { figures: figs.tracks } : {}),
     ...(figs.credits.length ? { credits: figs.credits.map((c) => ({ ...c, to: Math.min(c.to, durationInFrames) })) } : {}),
-    directing: { id: style.id, closeupBudgetMs: style.closeupBudgetMs, minPunchGapMs: style.minPunchGapMs, minCloseupMs: style.minCloseupMs, oneThingFrames: style.oneThingFrames, length: style.length },
+    directing: { id: style.id, closeupBudgetMs: style.closeupBudgetMs, minPunchGapMs: style.minPunchGapMs, minCloseupMs: style.minCloseupMs, oneThingFrames: style.oneThingFrames, length: style.length, ...(style.voicePace === "fast" ? { pace: "fast" as const } : {}) },
     ...(skit.meta.language ? { language: skit.meta.language, direction: fontFor(skit.meta.language).direction } : {}),
   };
   return { timeline, warnings: diags };

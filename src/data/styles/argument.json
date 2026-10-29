@@ -1,0 +1,21 @@
+{
+  "id": "argument",
+  "reactionMs": 1100,
+  "gapMs": 60,
+  "fadeMs": 160,
+  "minPunchGapMs": 1000,
+  "closeupBudgetMs": 2000,
+  "minCloseupMs": 1000,
+  "oneThingFrames": 4,
+  "sfx": "all",
+  "punchIns": "more",
+  "emotion": "default",
+  "coverage": "default",
+  "shakes": true,
+  "speedLines": false,
+  "reactors": 1,
+  "transition": "cut",
+  "punchSfx": "boom",
+  "length": [18, 30],
+  "voicePace": "fast"
+}

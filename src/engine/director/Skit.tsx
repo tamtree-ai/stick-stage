@@ -12,6 +12,7 @@ import type { SafeArea } from "../text/safeArea";
 import { SlamText } from "../text/SlamText";
 import { CreditLine } from "../text/CreditLine";
 import { Subtitles } from "../text/Subtitles";
+import { VerdictMeter } from "../text/VerdictMeter";
 import { cameraAt, shotAt } from "./camera";
 import { stageActorsAt } from "./placement";
 import { QaOverlay } from "./QaOverlay";
@@ -70,6 +71,7 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
       {tl.lists.map((l, i) => (
         <ListText key={`list-${i}`} list={l} frame={frame} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} direction={direction} />
       ))}
+      {tl.verdict ? <VerdictMeter verdict={tl.verdict} frame={frame} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} /> : null}
       <Subtitles hidden={slamUp} {...subtitleSpec(tl.directing)} pages={tl.pages} frame={frame} fps={fps} width={W} height={H} safeArea={safeArea} style={{ fontFamily }} narratorStyle={tl.narratorCaption} direction={tl.direction} />
       {tl.slams.map((s, i) => (
         <SlamText key={i} seed={`${tl.title}-${i}`} text={s.text} frame={frame} from={s.from} to={s.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} direction={direction} />
