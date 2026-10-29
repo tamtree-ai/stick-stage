@@ -3,6 +3,7 @@
 #   make deploy PROFILE=<aws profile>              build, push, update (creates resources on a first run)
 #   make deploy PROFILE=<aws profile> MEMORY=3008  first deploy on a capped account
 #   make push PROFILE=<aws profile>                push the image already built, skip the build
+#   make deploy PROFILE=<aws profile> GL=swiftshader   also set STICKSTAGE_GL on the function (GL=default removes it)
 #   make build                                     build the image only
 
 PROFILE ?= $(AWS_PROFILE)
@@ -11,12 +12,13 @@ FLAGS ?=
 DEPLOY_ENV = AWS_PROFILE=$(PROFILE) \
 	$(if $(REGION),STICKSTAGE_REGION=$(REGION)) \
 	$(if $(FUNCTION),STICKSTAGE_FUNCTION=$(FUNCTION)) \
-	$(if $(MEMORY),STICKSTAGE_MEMORY=$(MEMORY))
+	$(if $(MEMORY),STICKSTAGE_MEMORY=$(MEMORY)) \
+	$(if $(GL),STICKSTAGE_GL=$(GL))
 
 .PHONY: help build deploy push check-profile
 
 help:
-	@sed -n '1,7p' Makefile
+	@sed -n '1,8p' Makefile
 
 build:
 	pnpm lambda:build

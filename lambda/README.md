@@ -52,7 +52,7 @@ AWS_PROFILE=<profile> STICKSTAGE_MEMORY=3008 pnpm lambda:deploy   # first deploy
 AWS_PROFILE=<profile> pnpm lambda:deploy --skip-build        # push the image already built
 ```
 
-Or with make: `make deploy PROFILE=<profile>` (add `MEMORY=3008`, `REGION=…`, `FUNCTION=…` or `FLAGS=--allow-dirty` as needed), `make push PROFILE=<profile>` to skip the build, `make build` to build only.
+Or with make: `make deploy PROFILE=<profile>` (add `MEMORY=3008`, `GL=swiftshader`, `REGION=…`, `FUNCTION=…` or `FLAGS=--allow-dirty` as needed), `make push PROFILE=<profile>` to skip the build, `make build` to build only.
 
 `STICKSTAGE_REGION` (default `ap-southeast-2`) and `STICKSTAGE_FUNCTION` (default `tamtree-stickstage-render`) are optional. It doesn't check the account's limits (3a). Then [test it](#5-test-it). The manual steps below do the same thing one command at a time.
 
@@ -336,6 +336,13 @@ Measured with `public/skits/fine` (an 8.9 s draft) at 3008 MB:
 At $0.0000166667 per GB-second, a warm draft like this costs about $0.004. Lambda's free tier (400,000 GB-seconds a month) covers roughly 1,600 of them. A 30 s **final** render has about 3× the frames at 4× the pixels, so at 3008 MB it may come close to the 15-minute limit: raise the memory first (see below).
 
 **Faster software GL (trial).** By default Chrome draws through `swangle` in one process. Set `STICKSTAGE_GL=swiftshader` on the function to draw on the CPU with multi-process Chrome instead. In a 2-CPU, 3 GB Linux container, a stick skit took 64 ms a frame against 483 with the same picture. It has not been proven on Lambda yet. If a render hangs or Chrome fails to start, remove the variable.
+
+```sh
+make deploy PROFILE=<profile> GL=swiftshader   # set it (make push … GL=swiftshader skips the build)
+make deploy PROFILE=<profile> GL=default       # remove it, back to swangle
+```
+
+Without `GL`, a deploy leaves the variable as it is.
 
 ## Troubleshooting
 

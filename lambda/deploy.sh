@@ -12,6 +12,9 @@
 #   STICKSTAGE_REGION    default ap-southeast-2
 #   STICKSTAGE_FUNCTION  default tamtree-stickstage-render (must start with tamtree-)
 #   STICKSTAGE_MEMORY    MB for a new function, default 10240 (3008 on a capped account)
+#   STICKSTAGE_GL        optional: swiftshader sets the function's STICKSTAGE_GL (CPU GL, multi-process
+#                        Chrome; see lambda/handler.ts); default removes it (back to swangle). Unset,
+#                        the function's variable is left as it is.
 set -euo pipefail
 
 build=1 dirty_ok=0
@@ -28,6 +31,8 @@ export AWS_PROFILE
 region=${STICKSTAGE_REGION:-ap-southeast-2}
 fn=${STICKSTAGE_FUNCTION:-tamtree-stickstage-render}
 memory=${STICKSTAGE_MEMORY:-10240}
+gl=${STICKSTAGE_GL:-}
+case $gl in ""|swiftshader|default) ;; *) echo "STICKSTAGE_GL must be swiftshader or default" >&2; exit 1 ;; esac
 role=tamtree-stickstage-exec
 repo_name=tamtree-stickstage
 [[ $fn == tamtree-* ]] || { echo "STICKSTAGE_FUNCTION must start with tamtree- (Tamtree's role template)" >&2; exit 1; }
@@ -105,15 +110,25 @@ if aws lambda get-function "${P[@]}" --function-name "$fn" >/dev/null 2>&1; then
   step "update $fn"
   aws lambda update-function-code "${P[@]}" --function-name "$fn" --image-uri "$image" >/dev/null
   aws lambda wait function-updated-v2 "${P[@]}" --function-name "$fn"
+  if [[ -n $gl ]]; then
+    step "set STICKSTAGE_GL=$gl"
+    env_json=$(aws lambda get-function-configuration "${P[@]}" --function-name "$fn" \
+      --query 'Environment.Variables' --output json \
+      | jq -c --arg gl "$gl" '(. // {}) | if $gl == "default" then del(.STICKSTAGE_GL) else .STICKSTAGE_GL = $gl end | {Variables: .}')
+    aws lambda update-function-configuration "${P[@]}" --function-name "$fn" --environment "$env_json" >/dev/null
+    aws lambda wait function-updated-v2 "${P[@]}" --function-name "$fn"
+  fi
 else
   step "create $fn (${memory} MB)"
+  env_json=$(jq -nc --arg b "$bucket" --arg gl "$gl" \
+    '{Variables: ({STICKSTAGE_BUCKET: $b} + (if $gl == "swiftshader" then {STICKSTAGE_GL: $gl} else {} end))}')
   [[ $new_role == 1 ]] && sleep 10 # a new role takes a few seconds before Lambda can assume it
   for attempt in 1 2 3 4 5 6; do
     if aws lambda create-function "${P[@]}" --function-name "$fn" \
         --package-type Image --code ImageUri="$image" --architectures x86_64 \
         --role "arn:aws:iam::${account}:role/${role}" \
         --memory-size "$memory" --timeout 900 --ephemeral-storage Size=4096 \
-        --environment "Variables={STICKSTAGE_BUCKET=${bucket}}" >/dev/null; then
+        --environment "$env_json" >/dev/null; then
       break
     fi
     [[ $attempt == 6 ]] && exit 1
@@ -126,6 +141,6 @@ else
 fi
 
 aws lambda get-function-configuration "${P[@]}" --function-name "$fn" \
-  --query '{state:State,update:LastUpdateStatus,memory:MemorySize,timeout:Timeout,arch:Architectures[0],image:CodeSha256}' \
+  --query '{state:State,update:LastUpdateStatus,memory:MemorySize,timeout:Timeout,arch:Architectures[0],gl:Environment.Variables.STICKSTAGE_GL}' \
   --output table
 echo "bucket  $bucket   (STICKSTAGE_BUCKET for lambda/tamtree-flow.sh)"
