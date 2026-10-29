@@ -49,7 +49,7 @@ export const checkDraft = (skit: unknown, src: CatalogSource, opts?: { lang?: st
   const unsupported = unsupportedBeats(doc);
   if (unsupported.length) throw new SkitError(unsupported);
   const dubbed = opts?.lang ? applyLanguage(doc, opts.lang) : doc;
-  const lines = skitLines(dubbed);
+  const lines = skitLines(dubbed, [], opts?.series);
   const voice = opts?.voice ?? placeholderVoice(lines, dubbed.meta.language ?? "en");
   const result = compileSkit({ skit, voice, lib: src.lib, sets: src.sets, sfx: src.sfx, reactions: src.reactions, safeArea: src.safeArea, lang: opts?.lang, series: opts?.series, figures: opts?.figures });
   const check = checkSkit({ result, lib: src.lib, sets: src.sets, safeArea: src.safeArea });

@@ -36,6 +36,9 @@ export type LaidBeat = {
 
 export type Layout = { beats: LaidBeat[]; totalMs: number };
 
+/** A line that ends on a dash was interrupted: the next line comes in with no gap. */
+export const CUT_OFF = /[—–-]$/;
+
 /** Which beats are punchlines: the flagged ones, else the last spoken beat. */
 export const punchlineIndexes = (skit: Skit): Set<number> => {
   const flagged = skit.beats.flatMap((b, i) => (b.punchline ? [i] : []));
@@ -79,7 +82,9 @@ export const layoutBeats = (
     const a = beat.audio;
     const clipGap = a.source === "file" && lastClip?.src === a.src && a.startMs !== undefined ? Math.max(0, a.startMs - lastClip.endMs) : undefined;
     const gapDefault = skit.timing.gapMs === CLASSIC.gapMs ? style.gapMs : skit.timing.gapMs;
-    const gap = beat.pauseBeforeMs ?? clipGap ?? (out.length === 0 || synthetic ? 0 : gapDefault);
+    // A line cut off mid-word ("Okay, but—") is answered at once.
+    const cutOff = CUT_OFF.test(out[out.length - 1]?.beat.line?.trim() ?? "");
+    const gap = beat.pauseBeforeMs ?? clipGap ?? (out.length === 0 || synthetic || cutOff ? 0 : gapDefault);
     lastClip = a.source === "file" && a.endMs !== undefined && kind === "line" ? { src: a.src, endMs: a.endMs } : undefined;
     const line = extra.line;
     const durMs = line ? line.durationMs : (beat.durationMs ?? DEFAULT_SILENT_MS);

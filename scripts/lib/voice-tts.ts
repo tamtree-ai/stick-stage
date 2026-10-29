@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { deliveryFor, parseSkit, phrasesOf, skitLines, type VoiceManifest } from "../../src/engine";
 import { wavDurationMs } from "../../src/node";
+import { series } from "../../src/data";
 import { KOKORO_DEFAULT, KOKORO_NARRATOR, KOKORO_VOICES } from "./kokoro-voices";
 import { pcm16Wav, type Audio, type SynthJob, type Tts } from "./tts";
 
@@ -46,7 +47,7 @@ const assemble = (takes: readonly Audio[], pausesMs: readonly number[]): Audio =
  * lands as three beats instead of one breath. Every phrase of every line goes to the TTS in one
  * batch when it can take one (Chatterbox loads a big model once).
  */
-export const performLines = async (tts: Tts, lines: readonly { text: string; voice: string; line: { narrator?: boolean; expression?: string; delivery?: string } }[]): Promise<Audio[]> => {
+export const performLines = async (tts: Tts, lines: readonly { text: string; voice: string; line: { narrator?: boolean; expression?: string; delivery?: string; pace?: "normal" | "fast" } }[]): Promise<Audio[]> => {
   const plans = lines.map((l) => {
     const d = deliveryFor(l.line);
     return { d, voice: l.voice, phrases: phrasesOf(l.text, d) };
@@ -70,7 +71,7 @@ export const performLine = async (tts: Tts, text: string, voice: string, line: {
 export const voiceSkitDir = async (dir: string, tts: Tts, o: VoiceOptions = {}): Promise<VoiceManifest> => {
   const log = o.log ?? console.log;
   const doc = parseSkit(JSON.parse(fs.readFileSync(path.join(dir, "skit.json"), "utf8")));
-  const lines = skitLines(doc);
+  const lines = skitLines(doc, [], series);
   const voiceDir = path.join(dir, "voice");
   const cache = path.join(dir, "generated", "tts-cache");
   fs.mkdirSync(voiceDir, { recursive: true });

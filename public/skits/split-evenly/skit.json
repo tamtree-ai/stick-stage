@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "meta": {
+    "title": "Split it evenly",
+    "description": "Split the bill evenly, or pay for what you ordered? Who's wrong?",
+    "hashtags": ["whoswrong", "aita", "stickfigure", "splitthebill", "friends"],
+    "series": { "id": "whos-wrong", "season": 1, "episode": 1 }
+  },
+  "set": "cafe-1",
+  "style": "argument",
+  "coldOpen": "none",
+  "cast": [
+    { "id": "bram", "character": "bram", "mark": "left", "holding": { "prop": "receipt" } },
+    { "id": "tess", "character": "tess", "mark": "right" }
+  ],
+  "overlay": {
+    "verdict": { "question": "Who's wrong?", "start": 50 },
+    "subtitles": true
+  },
+  "beats": [
+    { "id": "l1", "speaker": "bram", "line": "Sixty-two dollars. Let's just split it evenly.", "expression": "happy", "verdict": 45 },
+    {
+      "id": "l2", "speaker": "tess", "line": "I had a side salad. And tap water.", "expression": "deadpan", "verdict": 68,
+      "actions": [{ "who": "tess", "do": "pose", "pose": "arms-crossed", "at": { "word": "salad" } }]
+    },
+    {
+      "id": "l3", "speaker": "bram", "line": "Splitting evenly is how friends work.", "expression": "smug", "verdict": 60,
+      "actions": [{ "who": "bram", "do": "pose", "pose": "hands-on-hips", "at": { "word": "friends" } }]
+    },
+    {
+      "id": "l4", "speaker": "tess", "line": "You had two steaks.", "expression": "annoyed", "verdict": 80,
+      "actions": [{ "who": "tess", "do": "pose", "pose": "point", "at": { "word": "two" } }]
+    },
+    { "id": "l5", "speaker": "bram", "line": "One was a sharing steak—", "expression": "neutral" },
+    { "id": "l6", "speaker": "tess", "line": "You didn't share it!", "expression": "angry", "verdict": 86 },
+    {
+      "id": "l7", "speaker": "bram", "line": "You never asked!", "expression": "annoyed", "verdict": 78,
+      "actions": [{ "who": "bram", "do": "pose", "pose": "shrug", "at": { "word": "asked" } }]
+    },
+    { "id": "l8", "speaker": "tess", "line": "Fine. I'll pay for exactly what I had.", "expression": "smug", "verdict": 74 },
+    { "id": "l9", "speaker": "bram", "line": "Great. Then let's do last Friday too.", "expression": "deadpan" },
+    { "id": "l10", "speaker": "tess", "line": "What was last Friday?", "expression": "confused" },
+    {
+      "id": "l11", "speaker": "bram", "line": "Your birthday. You had the lobster.", "expression": "deadpan", "punchline": true, "verdict": 48,
+      "pauseBeforeMs": 250,
+      "actions": [{ "who": "bram", "do": "pose", "pose": "hold-up", "at": { "word": "lobster" } }],
+      "text": [{ "type": "slam", "value": "LOBSTER.", "at": { "word": "lobster" } }]
+    }
+  ]
+}

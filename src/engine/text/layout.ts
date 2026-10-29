@@ -12,6 +12,34 @@ export const STORY_SUBTITLE = { y: 0.88, fontSize: 58 } as const;
 export const subtitleSpec = (directing?: { id: string }): { y: number; fontSize: number } =>
   directing?.id === "story" ? STORY_SUBTITLE : { y: SUBTITLE.y, fontSize: SUBTITLE.fontSize };
 export const POV = { fontSize: 52, lineHeight: 1.18, fill: "#16161a", card: "#ffffff" } as const;
+/**
+ * "Who's wrong?" meter (`VerdictMeter`): header + two-colour bar just inside the top safe edge.
+ * `band` is the share of frame height it takes, so face shots frame below it.
+ */
+export const VERDICT = {
+  top: 14,
+  titleSize: 50,
+  barHeight: 88,
+  barGap: 12,
+  nameSize: 46,
+  askSize: 54,
+  /** The frame-0 stamp's size and how long it holds before it shrinks into the header. */
+  stampSize: 150,
+  /** The stamp sits on the wall above the heads of the opening two-shot, then rises into the header. */
+  stampY: 0.25,
+  stampFrames: 26,
+  shrinkFrames: 8,
+  /** Frames the meter takes to tip to a new value. */
+  swingFrames: 12,
+  /** The comment ask should stay up at least this long. */
+  askMinMs: 1500,
+  left: "#ff5a5f",
+  right: "#3d8bfd",
+  ink: "#16161a",
+  card: "#ffffff",
+  askFill: "#ffd84a",
+  band: 0.11,
+} as const;
 export const SLAM = { y: 0.64, fontSize: 190, lineHeight: 1, fill: "#ffffff", outline: "#111114" } as const;
 
 /** Advance width of one character in em (bold geometric sans). */

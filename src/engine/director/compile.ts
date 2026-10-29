@@ -12,6 +12,7 @@ import { docBeats, isNarration, SkitSchema, type Beat, type CastMember, type Ski
 import { compileScene, type CompileInput } from "./scene";
 import { styleById, type StyleId } from "./style";
 import { scienceChecks } from "./scienceChecks";
+import { verdictAfter } from "./verdict";
 import { pronunciationsFor, type Pronunciation } from "../voice/pronounce";
 import type { Program, SceneTransition, Timeline } from "./timeline";
 
@@ -94,7 +95,13 @@ export const resolveScenes = (doc: SkitDoc, diags: Diagnostic[], style = styleBy
       card: sc.card,
       labels: sc.labels,
       figures: sc.figures,
-      overlay: { ...doc.overlay, pov: sc.pov ?? (s === 0 ? doc.overlay.pov : undefined), hook: s === 0 ? doc.overlay.hook : undefined },
+      overlay: {
+        ...doc.overlay,
+        pov: sc.pov ?? (s === 0 ? doc.overlay.pov : undefined),
+        hook: s === 0 ? doc.overlay.hook : undefined,
+        // The meter carries across scenes: later scenes start where the last one left it, without the stamp.
+        verdict: doc.overlay.verdict && (s === 0 ? doc.overlay.verdict : { ...doc.overlay.verdict, intro: false, start: verdictAfter(doc.overlay.verdict.start, doc.scenes!.slice(0, s).flatMap((x) => x.beats)) }),
+      },
       timing: {
         gapMs: gap,
         leadInMs: s === 0 ? doc.timing.leadInMs : transMs(s) + gap,
@@ -194,16 +201,20 @@ export type SkitLine = {
   expression?: string;
   /** A voice-over line: voice it with `doc.narrator.voice`, not a character's voice. */
   narrator?: true;
+  /** `fast`: the skit's style wants a shorts pace (`deliveryFor` speeds it up and cuts the pauses). */
+  pace?: "fast";
 };
 
 /** The lines a voice source must synthesize: one per spoken TTS beat (id = beat id = voice file name). */
-export const skitLines = (doc: SkitDoc, lexicon: readonly Pronunciation[] = []): SkitLine[] =>
-  docBeats(doc).flatMap((b) => {
+export const skitLines = (doc: SkitDoc, lexicon: readonly Pronunciation[] = [], series?: Readonly<Record<string, { style?: string }>>): SkitLine[] => {
+  const fastPace = styleById(doc.style ?? (doc.meta.series ? series?.[doc.meta.series.id]?.style : undefined)).voicePace === "fast";
+  return docBeats(doc).flatMap((b) => {
     if (b.silent || !b.speaker || !b.line || b.audio.source !== "tts") return [];
     const said = b.spoken ?? b.line;
     const pronounce = pronunciationsFor(said, lexicon);
-    const extra = { ...(b.spoken ? { spoken: b.spoken } : {}), ...(pronounce.length ? { pronounce } : {}), ...(b.expression ? { expression: b.expression } : {}) };
+    const extra = { ...(b.spoken ? { spoken: b.spoken } : {}), ...(pronounce.length ? { pronounce } : {}), ...(b.expression ? { expression: b.expression } : {}), ...(fastPace ? { pace: "fast" as const } : {}) };
     if (isNarration(doc, b)) return [{ id: b.id, speaker: b.speaker, character: b.speaker, text: b.line, ...extra, delivery: b.delivery, narrator: true as const }];
     const character = doc.cast.find((c) => c.id === b.speaker)?.character ?? b.speaker;
     return [{ id: b.id, speaker: b.speaker, character, text: b.line, ...extra, delivery: b.delivery }];
   });
+};

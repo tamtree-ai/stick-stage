@@ -86,7 +86,13 @@ Default: the beat start.
 
 **Speech motion:** omitted means on. Speakers nod on a stressed word and make one gesture. `"speechMotion": "off"` leaves the body to the actions you wrote. An authored pose, gag, fall, or prop move wins.
 
-**Style:** `"style": "classic" | "deadpan" | "snappy" | "chaotic" | "sitcom"`. Omitted: the series style, else classic. Numbers live in `src/data/styles/`.
+**Style:** `"style": "classic" | "deadpan" | "snappy" | "chaotic" | "sitcom" | "argument"`. Omitted: the series style, else classic. Numbers live in `src/data/styles/`. `argument` is for two people talking over each other: 60 ms between lines, hard cuts, more punch-ins, and `voicePace: "fast"`. A fast pace makes `skitLines` mark each line `pace: "fast"` (the voice is quicker, with under half the pauses; `deliveryFor` in `voice/phrasing.ts`), and the self-check warns on dead air over 400 ms between two lines, under 165 words a minute, a first word after 0.4 s, a line over 14 words, and a skit over the style's length.
+
+**Cut-off line:** a line that ends on a dash (`"One was a sharing steak—"`) is interrupted: the next line comes in with no gap, in any style. A `pauseBeforeMs` on the next beat still wins.
+
+**Verdict meter ("Who's wrong?"):** `"overlay": { "verdict": {} }` stamps WHO'S WRONG? big on frame 0, shrinks it into a header, and draws a two-colour bar under it: the left side is the first cast member (or `sides[0]`), the right the second. A beat's `"verdict": 0–100` tips the bar to that share blaming the left side when the line ends. After the punchline a comment ask ("Comment: BRAM or TESS?") pulses under the bar; keep at least 1.5 s after the punchline for it. Options: `question`, `sides`, `names` (≤ 12 characters), `start` (default 50), `ask`. The meter takes the top of the frame, so `pov` and `hook` are not drawn with it, and face shots frame below it. In a multi-scene skit it carries across scenes without the stamp. Format: `skills/whos-wrong/SKILL.md`.
+
+**Wording:** every skit is checked for phrases that read as model-written ("fun fact", "did you know", "turns out", "imagine", "delve"… the list is `AI_PHRASES` in `qa/pace.ts`; a warning) and uncontracted speech ("do not", "it is"; info).
 
 **Hook card:** `"overlay": { "hook": "He read the whole universe." }` shows a card from frame 0, for viewers with the sound off, and hides it when the first spoken line ends. It has no "POV:" lead. It is for myth-flip and other formats that have no POV card. A `pov` wins if both are set.
 

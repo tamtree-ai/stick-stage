@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "l1",
+      "speaker": "bram",
+      "text": "Sixty-two dollars. Let's just split it evenly.",
+      "audio": "voice/l1.wav",
+      "durationMs": 2763
+    },
+    {
+      "id": "l2",
+      "speaker": "tess",
+      "text": "I had a side salad. And tap water.",
+      "audio": "voice/l2.wav",
+      "durationMs": 2080
+    },
+    {
+      "id": "l3",
+      "speaker": "bram",
+      "text": "Splitting evenly is how friends work.",
+      "audio": "voice/l3.wav",
+      "durationMs": 2060
+    },
+    {
+      "id": "l4",
+      "speaker": "tess",
+      "text": "You had two steaks.",
+      "audio": "voice/l4.wav",
+      "durationMs": 939
+    },
+    {
+      "id": "l5",
+      "speaker": "bram",
+      "text": "One was a sharing steak—",
+      "audio": "voice/l5.wav",
+      "durationMs": 1369
+    },
+    {
+      "id": "l6",
+      "speaker": "tess",
+      "text": "You didn't share it!",
+      "audio": "voice/l6.wav",
+      "durationMs": 835
+    },
+    {
+      "id": "l7",
+      "speaker": "bram",
+      "text": "You never asked!",
+      "audio": "voice/l7.wav",
+      "durationMs": 833
+    },
+    {
+      "id": "l8",
+      "speaker": "tess",
+      "text": "Fine. I'll pay for exactly what I had.",
+      "audio": "voice/l8.wav",
+      "durationMs": 2146
+    },
+    {
+      "id": "l9",
+      "speaker": "bram",
+      "text": "Great. Then let's do last Friday too.",
+      "audio": "voice/l9.wav",
+      "durationMs": 2582
+    },
+    {
+      "id": "l10",
+      "speaker": "tess",
+      "text": "What was last Friday?",
+      "audio": "voice/l10.wav",
+      "durationMs": 1079
+    },
+    {
+      "id": "l11",
+      "speaker": "bram",
+      "text": "Your birthday. You had the lobster.",
+      "audio": "voice/l11.wav",
+      "durationMs": 2301
+    }
+  ]
+}
