@@ -39,6 +39,8 @@ Comedy-skit and science-short engine on Remotion. Open source (MIT); Tamtree use
 - `toon-character` (`skills/toon-character/SKILL.md`): add or change a toon character, a garment/hair kind, or a toon-only pose fix without touching stick drawings.
 - `story-episode` (`skills/story-episode/SKILL.md`): an idea → a narrated 16:9 shape-cast story (places, new characters as specs, drawn props), checked and rendered.
 - `explainer` (`skills/explainer/SKILL.md`): a topic and its data → a narrated 16:9 data story (`format: "explainer"`): charts, maps and counters bound to datasets, spoken numbers checked, chapters, variety rules.
+- `the-catch-story` (`skills/the-catch-story/SKILL.md`): a "The Catch" case script: a human, relatable, useful money story (topic test, five acts, fast-voice lines, sourced numbers).
+- `the-catch-staging` (`skills/the-catch-staging/SKILL.md`): a The Catch script → storyboard and explainer skit in the night-shift world with Nickel, data as objects, SFX and music cues.
 - `whos-wrong` (`skills/whos-wrong/SKILL.md`): a "Who's Wrong?" episode: a petty two-sided argument with Bram and Tess, the verdict meter, the `argument` style's fast pace; the team writes the twist.
 
 Path-scoped rules live in `.claude/rules/` (`toon-rig.md` for the rig, characters and poses; `shape-rig.md` for the shape tier, story kit and places; `science-skits.md` for skits, figures and approval).
