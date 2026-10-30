@@ -30,7 +30,8 @@ const visualEvents = (p: Program): Event[] =>
       const at = (f: number) => sc.from + f;
       return [
         { frame: sc.from, what: `scene ${sc.id}` },
-        ...tl.shots.map((s) => ({ frame: at(s.frame), what: "cut" })),
+        // A cut to the same camera (castless scenes) changes nothing.
+        ...tl.shots.filter((s, i) => i > 0 && JSON.stringify(s.camera) !== JSON.stringify(tl.shots[i - 1]!.camera)).map((s) => ({ frame: at(s.frame), what: "cut" })),
         ...(tl.focus ?? []).map((k) => ({ frame: at(k.frame), what: "focus" })),
         ...tl.slams.map((s) => ({ frame: at(s.from), what: "slam" })),
         ...tl.lists.flatMap((l) => l.at.map((f) => ({ frame: at(f), what: "list" }))),

@@ -353,7 +353,7 @@ export const RemotionRoot: React.FC = () => (
       id="VizLab"
       component={VizLab}
       schema={vizLabSchema}
-      defaultProps={{ showLabels: true, cast: ["milo", "june"] }}
+      defaultProps={{ showLabels: true, cast: ["milo", "june"], wide: false }}
       calculateMetadata={calculateVizLabMetadata}
       durationInFrames={VIZ_LAB_FRAMES}
       fps={FPS}

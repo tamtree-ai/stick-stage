@@ -8,7 +8,7 @@ import { msToFrame } from "../director/layout";
 import { creditLine, type ImageDef } from "./images";
 import { resolveMapViews } from "./map";
 import { slotRect } from "./slots";
-import { figureAnchor } from "./geometry";
+import { figureAnchor, figureUnit } from "./geometry";
 import { FIGURE_PARAMS, type FigureKind } from "./params";
 import type { Figure, FigureCue, Reveal } from "./schema";
 import { mergeParams, type FigureKey, type FigureTrack, type Params } from "./track";
@@ -267,7 +267,7 @@ export const compileFigures = (args: {
       });
 
   // Callouts that point at another figure's anchor ("orbit.perihelion").
-  const unit = width / 1080;
+  const unit = figureUnit(width, height);
   for (const t of tracks) {
     if (t.kind !== "callout" || typeof t.base.target !== "string") continue;
     const [fid, anchor] = (t.base.target as string).split(".");
@@ -310,6 +310,6 @@ export const figureLookTarget = (
   const m = /^figure:([A-Za-z0-9_-]+)(?:\.([A-Za-z0-9_-]+))?$/.exec(ref);
   if (!m) return undefined;
   const t = tracks.find((x) => x.id === m[1]);
-  const pt = t ? figureAnchor(t, m[2], width / 1080) : undefined;
+  const pt = t ? figureAnchor(t, m[2], figureUnit(width, height)) : undefined;
   return pt ? { x: pt.x / width, y: pt.y / height } : undefined;
 };

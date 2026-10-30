@@ -1,7 +1,7 @@
 /** Scene glue for figures: cue frames, the driver's gesture, gaze targets and framing. */
 import { clampCamera } from "../shots/framing";
 import type { Rect } from "../text/safeArea";
-import { figureAnchor } from "../viz/geometry";
+import { figureAnchor, figureUnit } from "../viz/geometry";
 import { compileFigures, figureLookTarget, type CreditEvent, type FigureLib, type TimedCue } from "../viz/compile";
 import { evalFigure, type FigureTrack } from "../viz/track";
 import type { Diagnostic } from "./diagnostics";
@@ -52,6 +52,8 @@ export const sceneFigures = (skit: Skit, layout: Layout, lib: FigureLib, diags: 
 export const figureBeat = (b: Beat): boolean => b.role === "demo" || b.figures.some((c) => c.do === "show" || c.do === "state");
 
 const FOCUS_MS = 900;
+/** Frame-height band a focused figure fills: under the top safe edge, over the captions. */
+const FOCUS_BAND = [0.08, 0.72] as const;
 
 /** Focus cues → camera keys: the figure (or its anchor) centred, zoomed to fill the frame. */
 const focusKeys = (cues: readonly TimedCue[], tracks: readonly FigureTrack[], fps: number, width: number, height: number, diags: Diagnostic[]): FocusKey[] =>
@@ -62,13 +64,18 @@ const focusKeys = (cues: readonly TimedCue[], tracks: readonly FigureTrack[], fp
       if (cue.id === "none") return [{ frame: Math.max(0, frame), durationFrames }];
       const t = tracks.find((x) => x.id === cue.id);
       if (!t) return [];
-      const pt = figureAnchor(t, cue.part, width / 1080);
+      const pt = figureAnchor(t, cue.part, figureUnit(width, height));
       if (!pt) {
         diags.push({ level: "error", code: "figure-anchor", path: `${path}.part`, message: `"${cue.id}" has no anchor "${cue.part}"`, expected: "center, top, bottom, left, right, or a kind's own anchor" });
         return [];
       }
-      const fill = Math.min(width / (t.rect.w * 1.15), height / (t.rect.h * 1.15));
-      const scale = cue.zoom ?? Math.min(3, Math.max(1.15, cue.part ? fill * 1.6 : fill));
-      return [{ frame: Math.max(0, frame), durationFrames, camera: clampCamera({ scale, cx: pt.x, cy: pt.y }, width, height) }];
+      // A whole figure lands in the band above the captions, never under them; a part may crop.
+      const [top, bottom] = FOCUS_BAND;
+      const band = (bottom - top) * height;
+      const fit = Math.min(width / (t.rect.w * 1.15), band / (t.rect.h * 1.08));
+      const scale = cue.part ? (cue.zoom ?? Math.min(3, fit * 1.6)) : Math.max(1, Math.min(cue.zoom ?? 3, fit));
+      // The stage point at the frame centre that puts the target at the band's middle.
+      const cy = pt.y + ((0.5 - (top + bottom) / 2) * height) / scale;
+      return [{ frame: Math.max(0, frame), durationFrames, camera: clampCamera({ scale, cx: pt.x, cy: cue.part ? pt.y : cy }, width, height) }];
     })
     .sort((a, b) => a.frame - b.frame);

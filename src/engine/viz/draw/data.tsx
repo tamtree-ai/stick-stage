@@ -38,7 +38,8 @@ export const LineChart: React.FC<DrawProps<LineP> & Fs> = ({ p, w, h, theme, rev
   const sw = theme.stroke * unit * (p.variant === "bold" ? 1.5 : 0.9);
   const drawn = Math.min(p.draw, phase(reveal, 0.15, 1));
   const xMax = fx(Math.min(...xs)) + (fx(Math.max(...xs)) - fx(Math.min(...xs))) * drawn;
-  const every = Math.max(1, Math.ceil(keys.length / 7));
+  const keyW = Math.max(...keys.map((k) => labelWidth(String(k), fs * 0.8))) + fs * 0.6;
+  const every = Math.max(1, Math.ceil((keys.length * keyW) / Math.max(1, w - endRoom - x0)));
   const axisOn = phase(reveal, 0, 0.2);
   return (
     <g>

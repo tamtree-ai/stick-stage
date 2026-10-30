@@ -17,11 +17,13 @@ import {
   Stage,
   type Diagnostic,
   type Typeset,
+  WIDE_SAFE_AREA,
 } from "../../engine";
 import { images, library, safeArea, sets } from "../../data";
 import { TEXT_FONT } from "../fonts";
 import { Label } from "./Label";
-import { PAGE_FRAMES, PAGES } from "./vizPages";
+import { PAGE_FRAMES, PAGES as SHORT_PAGES } from "./vizPages";
+import { DATA_PAGES } from "./vizPagesData";
 
 export const vizLabSchema = z.object({
   showLabels: z.boolean(),
@@ -30,26 +32,34 @@ export const vizLabSchema = z.object({
   /** Cast standing under the figures, for scale. */
   cast: z.array(z.string()).default(["milo", "june"]),
   equations: z.custom<Record<string, Typeset>>().optional(),
+  /** 16:9 on an explainer ground, the explainer kinds only (`--props='{"wide":true}'`). */
+  wide: z.boolean().default(false),
 });
 type Props = z.infer<typeof vizLabSchema>;
 
+const PAGES = [...SHORT_PAGES, ...DATA_PAGES];
+const pagesOf = (wide: boolean) => (wide ? DATA_PAGES : PAGES);
 export const VIZ_LAB_FRAMES = PAGE_FRAMES * PAGES.length;
 
 /** Typeset equations come from `pnpm viz:lab` (`public/qa/viz-lab-equations.json`). */
 export const calculateVizLabMetadata: CalculateMetadataFunction<Props> = async ({ props }) => {
   const res = await fetch(staticFile("qa/viz-lab-equations.json"));
   const equations = res.ok ? EquationCacheSchema.parse(await res.json()).equations : {};
-  return { props: { ...props, equations } };
+  const wide = props.wide ? { width: 1920, height: 1080, durationInFrames: PAGE_FRAMES * DATA_PAGES.length } : {};
+  return { props: { ...props, equations }, ...wide };
 };
 
 /** Every v1 figure primitive with its cues, under the cast, page by page. Watch it as video. */
-export const VizLab: React.FC<Props> = ({ showLabels, set: setOverride, cast, equations }) => {
+export const VizLab: React.FC<Props> = ({ showLabels, set: setOverride, cast: castIn, equations, wide }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
-  const index = Math.min(PAGES.length - 1, Math.floor(frame / PAGE_FRAMES));
-  const page = PAGES[index]!;
+  const pages = pagesOf(wide);
+  const cast = wide ? [] : castIn;
+  const index = Math.min(pages.length - 1, Math.floor(frame / PAGE_FRAMES));
+  const page = pages[index]!;
   const local = frame - index * PAGE_FRAMES;
-  const set = sets[setOverride ?? "plain-1"] ?? sets["plain-1"]!;
+  const fallback = wide ? "explainer-paper" : "plain-1";
+  const set = sets[setOverride ?? fallback] ?? sets[fallback]!;
   const diags: Diagnostic[] = [];
   const { tracks, credits } = compileFigures({
     figures: page.figures.map((f) => FigureSchema.parse(f)),
@@ -102,14 +112,14 @@ export const VizLab: React.FC<Props> = ({ showLabels, set: setOverride, cast, eq
             text={c.text}
             width={width}
             height={height}
-            safeArea={safeArea}
+            safeArea={wide ? WIDE_SAFE_AREA : safeArea}
             fontFamily={TEXT_FONT}
           />
         ) : null,
       )}
       {showLabels ? (
-        <Label x={40} y={1660} size={28}>
-          {`${index + 1}/${PAGES.length} ${set.id}: ${page.note}${diags.length ? `\n${diags.map((d) => `${d.path}: ${d.message}`).join("\n")}` : ""}`}
+        <Label x={40} y={height - 260} size={28}>
+          {`${index + 1}/${pages.length} ${set.id}: ${page.note}${diags.length ? `\n${diags.map((d) => `${d.path}: ${d.message}`).join("\n")}` : ""}`}
         </Label>
       ) : null}
     </AbsoluteFill>

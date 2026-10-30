@@ -4,12 +4,13 @@ import { safeRect, type SafeArea } from "./safeArea";
 /** The image credit, burned in at the bottom of the safe area (under the captions) while a NASA / ESA image is up. */
 export const CreditLine: React.FC<{ text: string; width: number; height: number; safeArea: SafeArea; fontFamily: string }> = ({ text, width, height, safeArea, fontFamily }) => {
   const safe = safeRect(safeArea, width, height);
-  const size = Math.round(width * 0.022);
+  const size = Math.round(Math.min(width, height) * 0.022);
   return (
     <div
       style={{
         position: "absolute",
-        left: safe.x,
+        // Widescreen captions own the bottom centre and the lower third the left: credits go right.
+        ...(width > height ? { right: width - (safe.x + safe.w) } : { left: safe.x }),
         bottom: height - (safe.y + safe.h) + size * 0.2,
         maxWidth: safe.w,
         fontFamily,

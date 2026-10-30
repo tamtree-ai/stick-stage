@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "lines": [
+    {
+      "id": "n1",
+      "speaker": "narrator",
+      "text": "Costco sells a whole roast chicken for less than it costs to make.",
+      "audio": "voice/n1.wav",
+      "durationMs": 3670
+    },
+    {
+      "id": "n2",
+      "speaker": "narrator",
+      "text": "So how does a store that barely profits on groceries get this big?",
+      "audio": "voice/n2.wav",
+      "durationMs": 3634
+    },
+    {
+      "id": "n3",
+      "speaker": "narrator",
+      "text": "Start with gross margin: what is left of each dollar after paying for the goods.",
+      "audio": "voice/n3.wav",
+      "durationMs": 4622
+    },
+    {
+      "id": "n4",
+      "speaker": "narrator",
+      "text": "Most supermarkets keep around 24 cents. Costco keeps about 13.",
+      "audio": "voice/n4.wav",
+      "durationMs": 5169
+    },
+    {
+      "id": "n5",
+      "speaker": "narrator",
+      "text": "The real money is the membership card.",
+      "audio": "voice/n5.wav",
+      "durationMs": 2020
+    },
+    {
+      "id": "n6",
+      "speaker": "narrator",
+      "text": "Fee income has climbed every single year, to about 4.8 billion dollars.",
+      "spoken": "Fee income has climbed every single year, to about four point eight billion dollars.",
+      "audio": "voice/n6.wav",
+      "durationMs": 4688
+    },
+    {
+      "id": "n7",
+      "speaker": "narrator",
+      "text": "That is close to all of the profit.",
+      "audio": "voice/n7.wav",
+      "durationMs": 1855
+    },
+    {
+      "id": "n8",
+      "speaker": "narrator",
+      "text": "And the card works in every country Costco opens in.",
+      "audio": "voice/n8.wav",
+      "durationMs": 3010
+    },
+    {
+      "id": "n9",
+      "speaker": "narrator",
+      "text": "Cheap chicken gets you in the door. The fee keeps the lights on.",
+      "audio": "voice/n9.wav",
+      "durationMs": 3531
+    }
+  ]
+}

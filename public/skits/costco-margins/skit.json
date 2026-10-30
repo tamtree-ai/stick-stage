@@ -1,0 +1,100 @@
+{
+  "$schema": "../../../schemas/skit.schema.json",
+  "schemaVersion": 2,
+  "format": "explainer",
+  "meta": {
+    "title": "Why Costco barely profits on groceries",
+    "description": "Look sample for explainer mode. Every number in this video is made up and labelled as such.",
+    "hashtags": ["business", "economics", "costco"]
+  },
+  "narrator": { "id": "narrator", "name": "Narrator", "voice": { "say": "Daniel" }, "captionStyle": "boxed" },
+  "datasets": {
+    "margins": {
+      "columns": ["store", "gross_pct"],
+      "rows": [["Costco", 12.6], ["Kroger", 22.3], ["Walmart", 24.1], ["Target", 28.0]],
+      "source": { "name": "Made-up sample numbers" },
+      "illustrative": true
+    },
+    "fees": {
+      "columns": ["year", "income_bn"],
+      "rows": [[2016, 2.65], [2017, 2.85], [2018, 3.14], [2019, 3.35], [2020, 3.54], [2021, 3.88], [2022, 4.22], [2023, 4.58], [2024, 4.71], [2025, 4.83]],
+      "source": { "name": "Made-up sample numbers" },
+      "illustrative": true
+    },
+    "members": {
+      "columns": ["country", "warehouses"],
+      "rows": [["USA", 620], ["CAN", 110], ["MEX", 42], ["JPN", 36], ["KOR", 19], ["GBR", 29], ["AUS", 16], ["TWN", 14], ["ESP", 5], ["FRA", 2], ["CHN", 7], ["SWE", 1], ["ISL", 1], ["NZL", 1]],
+      "source": { "name": "Made-up sample numbers" },
+      "illustrative": true
+    }
+  },
+  "scenes": [
+    {
+      "id": "puzzle",
+      "chapter": "The puzzle",
+      "set": "explainer-paper",
+      "figures": [
+        { "id": "price", "kind": "counter", "slot": "center", "reveal": "draw", "params": { "value": 4.99, "from": 9.5, "unit": { "prefix": "$", "decimals": 2 }, "caption": "rotisserie chicken", "variant": "bold" } },
+        { "id": "ask", "kind": "label", "slot": "top", "hidden": true, "reveal": "fade", "params": { "text": "How does that pay?", "size": 0.7 } }
+      ],
+      "beats": [
+        { "id": "n1", "speaker": "narrator", "line": "Costco sells a whole roast chicken for less than it costs to make.",
+          "figures": [ { "do": "focus", "id": "price", "zoom": 1.25, "at": { "word": "less" } } ] },
+        { "id": "n2", "speaker": "narrator", "line": "So how does a store that barely profits on groceries get this big?",
+          "figures": [ { "do": "focus", "id": "none", "at": { "word": "store" } }, { "do": "show", "id": "ask", "at": { "word": "barely" } } ] }
+      ]
+    },
+    {
+      "id": "margins",
+      "chapter": "Thin margins",
+      "set": "explainer-paper",
+      "transition": { "type": "slide", "durationMs": 450 },
+      "figures": [
+        { "id": "bars", "kind": "bars", "slot": "full", "hidden": true, "label": "Gross margin, cents per dollar", "params": { "series": [ { "data": "@margins.gross_pct" } ], "sort": "desc", "unit": { "suffix": "¢" } },
+          "states": { "costco": { "highlight": ["Costco"] } } }
+      ],
+      "beats": [
+        { "id": "n3", "speaker": "narrator", "line": "Start with gross margin: what is left of each dollar after paying for the goods.",
+          "figures": [ { "do": "show", "id": "bars", "at": { "word": "left" } } ] },
+        { "id": "n4", "speaker": "narrator", "line": "Most supermarkets keep around 24 cents. Costco keeps about 13.",
+          "numbers": [ { "text": "24", "data": "@margins.gross_pct[Walmart]" }, { "text": "13", "data": "@margins.gross_pct[Costco]" } ],
+          "figures": [ { "do": "state", "id": "bars", "state": "costco", "at": { "word": "Costco" } }, { "do": "focus", "id": "bars", "part": "right", "zoom": 1.5, "at": { "word": "keeps" } } ] }
+      ]
+    },
+    {
+      "id": "fees",
+      "chapter": "The membership card",
+      "set": "explainer-night",
+      "transition": { "type": "fade", "durationMs": 500 },
+      "figures": [
+        { "id": "fee-line", "kind": "line", "slot": "left", "label": "Membership fee income", "params": { "series": [ { "data": "@fees.income_bn", "color": "a2" } ], "unit": { "prefix": "$", "suffix": "bn", "decimals": 1 }, "draw": 0, "variant": "bold" } },
+        { "id": "fee-now", "kind": "counter", "slot": "right", "hidden": true, "params": { "value": "@fees.income_bn[2025]", "unit": { "prefix": "$", "suffix": "bn", "decimals": 1 }, "caption": "a year in fees", "delta": { "value": 82, "unit": { "prefix": "+", "suffix": "%" } } } }
+      ],
+      "beats": [
+        { "id": "n5", "speaker": "narrator", "line": "The real money is the membership card.",
+          "figures": [ { "do": "set", "id": "fee-line", "params": { "draw": 1 }, "durationMs": 3200, "at": { "word": "money" } } ] },
+        { "id": "n6", "speaker": "narrator", "line": "Fee income has climbed every single year, to about 4.8 billion dollars.",
+          "spoken": "Fee income has climbed every single year, to about four point eight billion dollars.",
+          "numbers": [ { "text": "4.8 billion", "data": "@fees.income_bn[2025]" } ],
+          "figures": [ { "do": "show", "id": "fee-now", "at": { "word": "billion" } } ] },
+        { "id": "n7", "speaker": "narrator", "line": "That is close to all of the profit.",
+          "figures": [ { "do": "focus", "id": "fee-now", "zoom": 1.4, "at": { "word": "close" } } ] }
+      ]
+    },
+    {
+      "id": "where",
+      "chapter": "Everywhere it goes",
+      "set": "explainer-paper",
+      "transition": { "type": "wipe", "durationMs": 450 },
+      "figures": [
+        { "id": "map", "kind": "map", "slot": "full", "reveal": "fade", "label": "Warehouses by country", "params": { "data": "@members.warehouses", "legend": true } }
+      ],
+      "beats": [
+        { "id": "n8", "speaker": "narrator", "line": "And the card works in every country Costco opens in.",
+          "figures": [ { "do": "set", "id": "map", "params": { "zoom": ["USA", "CAN", "MEX"] }, "durationMs": 1600, "at": { "word": "every" } } ] },
+        { "id": "n9", "speaker": "narrator", "line": "Cheap chicken gets you in the door. The fee keeps the lights on.",
+          "figures": [ { "do": "set", "id": "map", "params": { "zoom": "world", "points": [ { "lon": -122.2, "lat": 47.6, "label": "Head office" } ] }, "durationMs": 1400, "at": { "word": "door." } } ] }
+      ]
+    }
+  ]
+}

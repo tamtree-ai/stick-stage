@@ -1,7 +1,7 @@
 import React from "react";
 import { easeOutBack } from "../lib/easing";
 import { f2 } from "../lib/math";
-import { figureFontSize } from "./geometry";
+import { figureFontSize, figureUnit } from "./geometry";
 import { Txt, type DrawProps } from "./draw/common";
 import { Equation, ImageFigure } from "./draw/media";
 import { Orbit, Particles } from "./draw/orbitParticles";
@@ -138,7 +138,7 @@ const FigureView: React.FC<Omit<FiguresProps, "figures" | "layer"> & { f: Figure
 }) => {
   const st = evalFigure(f, frame, fps);
   if (!st.visible) return null;
-  const unit = width / 1080;
+  const unit = figureUnit(width, height);
   const { x, y, w, h } = f.rect;
   const fs = fontSize(f, unit);
   const sw = theme.stroke * unit;

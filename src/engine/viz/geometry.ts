@@ -6,7 +6,10 @@ import { clamp } from "../lib/math";
 import type { FigureTrack, PxRect } from "./track";
 import type { Typeset } from "./typeset";
 
-/** Base text size for a figure box (px). `unit` = frame width / 1080. */
+/** Figure px per px of the 1080 reference: the frame's short side, so 16:9 text isn't 1.8× too big. */
+export const figureUnit = (width: number, height: number) => Math.min(width, height) / 1080;
+
+/** Base text size for a figure box (px). `unit` = `figureUnit`. */
 export const figureFontSize = (rect: Pick<PxRect, "w" | "h">, unit: number) =>
   clamp(Math.min(rect.w, rect.h) * 0.075, 28 * unit, 46 * unit);
 
