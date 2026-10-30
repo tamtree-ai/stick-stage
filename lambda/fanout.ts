@@ -1,7 +1,8 @@
 /**
  * Fan-out for long renders (8–12 min explainers don't fit one 15-minute Lambda). The invocation
  * Tamtree calls is the coordinator: it preps, compiles and checks as usual, then invokes copies of
- * this function asynchronously, each with the same request plus `chunk: { job, segments }`. A
+ * this function asynchronously with `chunk: { job, segments }` (the request itself waits in
+ * `fanout/<job>/request.json`: an async invoke carries at most 256 KB). A
  * worker preps and compiles the same request, renders its segments (scene cuts, at most a minute
  * each) and uploads them to `fanout/<job>/<hash>.mp4`. The coordinator waits for them, and the
  * pipeline joins every segment as it does for its scene cache. Missing pieces render locally.
@@ -20,6 +21,8 @@ const MIN_FRAMES = 3600;
 const POLL_MS = 4000;
 
 export type Chunk = { job: string; segments: string[] };
+
+export const requestKey = (job: string) => `fanout/${job}/request.json`;
 
 export const segmentKey = (job: string, hash: string, ext: "mp4" | "err" = "mp4") => `fanout/${job}/${hash}.${ext}`;
 
@@ -52,10 +55,11 @@ export const lambdaFarm = (o: {
     if (!fn || process.env.STICKSTAGE_FANOUT === "off" || total < MIN_FRAMES) return;
     const bins = binSegments(segments, Math.min(MAX_WORKERS, Math.ceil(total / 1800)));
     o.log(`fan-out: ${segments.length} segments, ${total} frames over ${bins.length} workers`);
+    await o.s3.send(new PutObjectCommand({ Bucket: o.bucket, Key: requestKey(o.jobId), Body: JSON.stringify(o.items), ContentType: "application/json" }));
     await Promise.all(
       bins.map((bin) => {
         const chunk: Chunk = { job: o.jobId, segments: bin.map((s) => s.hash) };
-        return lambda.send(new InvokeCommand({ FunctionName: fn, InvocationType: "Event", Payload: JSON.stringify({ v: 1, items: o.items, chunk }) }));
+        return lambda.send(new InvokeCommand({ FunctionName: fn, InvocationType: "Event", Payload: JSON.stringify({ v: 1, chunk }) }));
       }),
     );
     const pending = new Set(segments.map((s) => s.hash));
@@ -74,6 +78,13 @@ export const lambdaFarm = (o: {
     }
     if (pending.size) o.log(`fan-out: ${pending.size} segment(s) not back in time; rendering them here`);
   };
+};
+
+/** A worker's copy of the coordinator's request. */
+export const chunkItems = async (s3: S3Client, bucket: string, chunk: Chunk): Promise<{ json: Record<string, unknown> }[]> => {
+  const body = await read(s3, bucket, requestKey(chunk.job));
+  if (!body) throw new Error(`no ${requestKey(chunk.job)}`);
+  return JSON.parse(Buffer.from(body).toString("utf8"));
 };
 
 /** Upload a worker's segments, or an error marker for each so the coordinator stops waiting. */

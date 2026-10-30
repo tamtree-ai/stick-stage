@@ -19,7 +19,7 @@ import { childPrep, renderPipeline, renderSegments } from "../src/server/pipelin
 import { parseSubmission, writeSubmission } from "../src/server/submit";
 import { PROJECT, ROOT, WS } from "../scripts/lib/tools";
 import { checkOnly, DESCRIPTION, type CheckReply } from "./check";
-import { lambdaFarm, reportChunk, type Chunk } from "./fanout";
+import { chunkItems, lambdaFarm, reportChunk, type Chunk } from "./fanout";
 import { toFindings, type EnvelopeFinding } from "./findings";
 
 type LambdaContext = { getRemainingTimeInMillis(): number };
@@ -162,7 +162,7 @@ const renderChunk = async (event: Envelope, chunk: Chunk, context: LambdaContext
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), Math.max(0, context.getRemainingTimeInMillis() - MARGIN_MS));
   try {
-    const job = await stage(event, id, dir);
+    const job = await stage({ ...event, items: await chunkItems(s3, BUCKET, chunk) }, id, dir);
     if (typeof job === "string") throw new Error(job);
     await reportChunk(s3, BUCKET, chunk, await renderSegments(steps, job, dir, chunk.segments, controller.signal));
   } catch (e) {

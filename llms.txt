@@ -27,6 +27,7 @@ everything is data, no network at render time). Repository: https://github.com/t
 - [The files you hand over](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/files-you-hand-over.md): MP4, captions and post files
 - [Making a science short](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/science-channel.md): myth-flip explainers with sourced claims
 - [Story episodes](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/stories.md): narrated 16:9 stories with the shape cast
+- [Explainers](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/explainer.md): narrated 16:9 data stories with datasets, checked numbers, chapters and variety rules
 - [Figures](https://raw.githubusercontent.com/tamtree-ai/stick-stage/main/docs/figures.md): diagrams, equations and images timed to the words
 
 ## Extending

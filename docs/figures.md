@@ -74,6 +74,10 @@ orbit adds `star`, `perihelion`, `aphelion`; a plot `origin`; an equation each t
 | `galaxy` | A spiral galaxy: `spin` (°/s), `speedLines` (0…1, "spins too fast" arcs), `tilt`, `caption` |
 | `burst` | A supernova pop on `show`: star and rays burst, settle to a glow after `hold` s; `color` |
 | `fineprint` | A wall of tiny contract text: `text` (repeated), `size`, `color`, `fill` (lines shown, animate it) |
+| `line` | Explainers. `series: [{ data, color, label, dashed }]` (data `[[key, value], …]` or `"@dataset.column"`), `draw` (animate it), `y`, `zero`, `unit: { prefix, suffix, decimals }`, `span: { from, to, label }`, `events: [{ at, label }]`, `points: [{ at, label }]`, `variant`: `clean` / `bold` |
+| `bars` | Explainers. `series` (up to 3, grouped), `orientation`, `sort`: `none` / `asc` / `desc`, `highlight: [keys]`, `grow`, `max` (fixed scale for `set` cues), `values`, `unit`, `limit`, `variant` |
+| `counter` | Explainers. A big number: `value` (a `set` cue ticks it), `from` (where the reveal ticks from), `unit`, `caption`, `delta: { value, unit, good: up / down }`, `color`, `variant` |
+| `map` | Explainers. A world map (Natural Earth, baked in): `data` by ISO alpha-3 (`[["USA", 3.2]]` or `"@dataset.column"`) for a choropleth, `highlight: [codes]`, `points: [{ lon, lat, label }]`, `routes: [{ from, to }]` + `draw`, `zoom`: `"world"`, a code, codes or `[lon0, lat0, lon1, lat1]` (a `set` cue on `zoom` flies there), `legend`, `unit`, `variant` |
 
 **Expressions** (`fn`, marker `x`/`y`) are a small safe language: numbers, variables (`x` and the
 plot's `vars`), `+ - * / ^`, `pi`, `e`, and `sin cos tan exp ln log sqrt abs min max floor pow …`.

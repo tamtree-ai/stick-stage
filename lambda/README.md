@@ -320,7 +320,20 @@ Measured with `public/skits/fine` (an 8.9 s draft) at 3008 MB:
 
 At $0.0000166667 per GB-second, a warm draft like this costs about $0.004. Lambda's free tier (400,000 GB-seconds a month) covers roughly 1,600 of them. A 30 s **final** render has about 3× the frames at 4× the pixels, so at 3008 MB it may come close to the 15-minute limit: raise the memory first (see below).
 
-**Faster software GL (trial).** By default Chrome draws through `swangle` in one process. Set `STICKSTAGE_GL=swiftshader` on the function to draw on the CPU with multi-process Chrome instead. In a 2-CPU, 3 GB Linux container, a stick skit took 64 ms a frame against 483 with the same picture. It has not been proven on Lambda yet. If a render hangs or Chrome fails to start, remove the variable.
+**Software GL.** Chrome draws on the CPU with `swiftshader` (multi-process). In production (2026-10-30) it took a ~10 minute render to ~3 minutes against the old `swangle` path. Set `STICKSTAGE_GL=swangle` on the function to go back if Chrome fails to start.
+
+## Long renders: fan-out
+
+A render over ~2 minutes of video doesn't fit one invocation at 3008 MB, so the invocation Tamtree calls becomes a coordinator. It preps, compiles and checks as usual, cuts the program into segments (scene changes, at most 1 minute each), puts the request in `fanout/<job>/request.json`, and invokes up to 8 copies of this function asynchronously with `{ "v": 1, "chunk": { "job", "segments" } }`. Each worker preps and compiles the same request, renders its segments and uploads `fanout/<job>/<hash>.mp4` (or `<hash>.err`). The coordinator joins them, adds covers and post files, and answers as usual. Anything not back in time, or a worker error, renders on the coordinator instead. Code in [`fanout.ts`](fanout.ts).
+
+It needs one more permission (the function invokes itself), and it relies on 3h (no retries):
+
+```sh
+aws iam put-role-policy $P --role-name $ROLE --policy-name stickstage-fanout --policy-document \
+  "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:ap-southeast-2:${ACCOUNT}:function:${FN}\"}]}"
+```
+
+Leave room for 9 concurrent executions (new accounts often have 10). `STICKSTAGE_FANOUT=off` renders everything in one invocation. The `fanout/` files expire with the bucket's 1-day rule.
 
 ## Troubleshooting
 

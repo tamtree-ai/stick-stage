@@ -53,7 +53,8 @@ export const createService = (o: ServiceOptions) => {
   const auth = requireBearer(o.token);
   const r = router();
   const jsonLimit = o.limits?.jsonBytes ?? 2 * MB;
-  const uploadLimit = o.limits?.uploadBytes ?? 100 * MB;
+  // Room for a 12-minute explainer's narration as 44.1 kHz WAV.
+  const uploadLimit = o.limits?.uploadBytes ?? 300 * MB;
 
   const jobOf = (ctx: Ctx) => {
     const id = ctx.params.id!;

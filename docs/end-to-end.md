@@ -265,7 +265,7 @@ Add a `-F` for every line. A `202` body is the job, with `status` of `queued`. A
 | `audio-format` | The bytes are not WAV, MP3, or OGG. A saved error page lands here. |
 | `voice-invalid`, `field-missing`, `bad-json` | A part is malformed. |
 
-`413` means the body is over 100 MB. Voice rows for beats that are not spoken are dropped, and the job records a warning.
+`413` means the body is over 300 MB. Voice rows for beats that are not spoken are dropped, and the job records a warning.
 
 `options` may include:
 

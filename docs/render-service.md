@@ -93,7 +93,7 @@ and nothing is queued:
 | `audio-format` | the file isn't WAV/MP3/OGG (e.g. a saved error page) |
 | `voice-invalid`, `field-missing`, `bad-json`, `skit.*` paths | malformed parts |
 
-`413` means the body is over 100 MB. Voice lines for non-spoken beats are dropped, with a job warning.
+`413` means the body is over 300 MB. Voice lines for non-spoken beats are dropped, with a job warning.
 
 ## `POST /prepare`
 

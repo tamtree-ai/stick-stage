@@ -17,6 +17,7 @@ Start here even if someone else set the computer up.
 5. [Watch it and change it](watch-and-change.md). What to look for, and how to ask for a new line without losing the staging.
 6. [The files you hand over](files-you-hand-over.md). The video, the captions, the post text, and who posts them.
 7. [Story episodes](stories.md). Narrated 16:9 cartoons with the flat shape cast: characters as specs, places as descriptions, and what to do when the catalog can't draw something.
+   [Explainers](explainer.md). Narrated 16:9 data stories: charts, maps and counters bound to datasets, spoken numbers checked against the data, chapters, and the variety rules.
 
 ## If you are setting the machine up, or connecting another program
 

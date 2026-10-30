@@ -55,7 +55,7 @@ export const LineChart: React.FC<DrawProps<LineP> & Fs> = ({ p, w, h, theme, rev
       {p.span ? (
         <g opacity={axisOn * 0.9}>
           <rect x={f2(fx(xOf(p.span.from)))} y={f2(fs * 0.6)} width={f2(Math.max(0, fx(xOf(p.span.to)) - fx(xOf(p.span.from))))} height={f2(h - fs * 2.4)} fill={resolveColor(theme, p.span.color)} opacity={0.16} />
-          {p.span.label ? <Txt x={(fx(xOf(p.span.from)) + fx(xOf(p.span.to))) / 2} y={fs * 1.2} size={fs * 0.75} color={resolveColor(theme, p.span.color)} halo={theme.paper} fontFamily={fontFamily}>{p.span.label}</Txt> : null}
+          {p.span.label ? <Txt x={(fx(xOf(p.span.from)) + fx(xOf(p.span.to))) / 2} y={fs * 2.6} size={fs * 0.75} color={resolveColor(theme, p.span.color)} halo={theme.paper} fontFamily={fontFamily}>{p.span.label}</Txt> : null}
         </g>
       ) : null}
       {p.events.map((e, i) => {
