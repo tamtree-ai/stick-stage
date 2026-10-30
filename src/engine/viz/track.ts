@@ -36,6 +36,8 @@ export type FigureTrack = {
   keys: FigureKey[];
   /** Equation figures: the typeset SVG. */
   typeset?: Typeset;
+  /** Datasets its params were bound from (credited on screen while it shows). */
+  sources?: string[];
   /** Image figures: the served file and its credit. */
   image?: { src: string; credit: string; width: number; height: number; impression: boolean };
 };

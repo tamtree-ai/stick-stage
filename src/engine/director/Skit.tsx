@@ -44,6 +44,8 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
   // The POV card sits where a face close-up puts the head, so it steps aside on face shots.
   const faceShot = FACE_FRAMINGS.includes(shotAt(tl, frame).framing);
   const direction = tl.direction ?? "ltr";
+  // Credits up at once share one line (an image credit and a data source, two charts side by side).
+  const credits = [...new Set((tl.credits ?? []).filter((c) => frame >= c.from && frame < c.to).map((c) => c.text))];
   return (
     <AbsoluteFill style={{ background: "#ffffff" }}>
       <Stage set={set} actors={actors} width={W} height={H} frame={frame} camera={camera} fontFamily={fontFamily} labels={tl.labels} figures={tl.figures} fps={fps} finish={finish} />
@@ -76,7 +78,7 @@ export const Skit: React.FC<SkitProps> = ({ timeline: tl, lib, set, safeArea, fo
       {tl.slams.map((s, i) => (
         <SlamText key={i} seed={`${tl.title}-${i}`} text={s.text} frame={frame} from={s.from} to={s.to} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} direction={direction} />
       ))}
-      {tl.credits?.map((c, i) => (frame >= c.from && frame < c.to ? <CreditLine key={`credit-${i}`} text={c.text} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} /> : null))}
+      {credits.length ? <CreditLine text={credits.join(" · ")} width={W} height={H} safeArea={safeArea} fontFamily={fontFamily} /> : null}
       {showLabels ? <QaOverlay tl={tl} lib={lib} set={set} safeArea={safeArea} camera={camera} frame={frame} /> : null}
       {showLabels ? <SkitLabel tl={tl} frame={frame} /> : null}
     </AbsoluteFill>

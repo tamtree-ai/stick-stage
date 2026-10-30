@@ -278,6 +278,7 @@ export const compileScene = (skitIn: Skit, input: CompileInput): { timeline: Tim
     shots,
     punchIns,
     shakes,
+    ...(figs.focus.length ? { focus: figs.focus } : {}),
     audio,
     sfx: sfx.sort((a, b) => a.frame - b.frame),
     pov: !topCard

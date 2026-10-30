@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "explainer-grid",
+  "aspect": "16:9",
+  "kit": "abstract",
+  "palette": "blueprint",
+  "description": "Blueprint grid paper across the whole frame. An explainer ground for maths, engineering and how-it-works scenes.",
+  "tags": [
+    "explainer",
+    "widescreen",
+    "maths",
+    "engineering",
+    "grid"
+  ],
+  "groundY": 1080,
+  "figureHeightPx": 560,
+  "layers": [
+    {
+      "part": "blueprint"
+    }
+  ],
+  "marks": {
+    "left": 0.25,
+    "center": 0.5,
+    "right": 0.75
+  }
+}

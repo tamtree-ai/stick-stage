@@ -90,7 +90,7 @@ export const renderPipeline =
     const meta = { title: doc.meta.title, durationSec: +(result.program.durationInFrames / result.program.fps).toFixed(2), diagnostics: result.warnings };
 
     update({ stage: "check", ...meta });
-    const check = checkSkitIn(o.project, id, result);
+    const check = checkSkitIn(o.project, id, result, job.options.history);
     if (!check.ok && !job.options.skipCheck) {
       // Name the first error, so the failure reads on its own without opening the report.
       const first = check.findings.find((f) => f.level === "error");

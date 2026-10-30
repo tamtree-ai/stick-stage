@@ -1,0 +1,22 @@
+{
+  "id": "explainer",
+  "reactionMs": 1500,
+  "gapMs": 350,
+  "fadeMs": 600,
+  "minPunchGapMs": 2500,
+  "closeupBudgetMs": 8000,
+  "minCloseupMs": 1500,
+  "oneThingFrames": 8,
+  "sfx": "punchline",
+  "punchIns": "default",
+  "emotion": "default",
+  "coverage": "default",
+  "shakes": false,
+  "speedLines": false,
+  "reactors": 1,
+  "transition": "fade",
+  "length": [
+    300,
+    900
+  ]
+}

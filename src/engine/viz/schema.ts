@@ -5,6 +5,7 @@
  */
 import { z } from "zod";
 import { FIGURE_KINDS } from "./params";
+import { SLOTS } from "./slots";
 
 const frac = z.number().min(-0.5).max(1.5);
 const params = z.record(z.string(), z.unknown());
@@ -25,6 +26,8 @@ export const FigureSchema = z.strictObject({
   id: z.string().regex(/^[A-Za-z0-9_-]+$/, "letters, digits, - and _ only"),
   kind: z.enum(FIGURE_KINDS as [string, ...string[]]),
   at: FigureRectSchema.default({ x: 0.5, y: 0.32, w: 0.8, h: 0.3 }),
+  /** A named place on the frame's layout grid (`slots.ts`); replaces `at`. */
+  slot: z.enum(SLOTS).optional(),
   /**
    * `back`: behind the cast (default). `front`: over them. `screen`: over everything and fixed to
    * the frame, so a punch-in or shake doesn't move it (an inset that stays on screen).
@@ -82,6 +85,11 @@ export const FigureCueSchema = z.discriminatedUnion("do", [
     durationMs: ms,
     by,
   }),
+  /**
+   * Camera push-in on a figure (`id`) or one of its anchors (`part`), held until the next focus;
+   * `"id": "none"` pulls back out. `zoom` default: the figure fills the frame.
+   */
+  z.strictObject({ do: z.literal("focus"), id, at, part: z.string().min(1).optional(), zoom: z.number().min(1).max(4).optional(), durationMs: ms }),
   /** Tween some params (a graph drawing on, a pointer moving, 1000 dice rolling). */
   z.strictObject({ do: z.literal("set"), id, at, params, durationMs: ms, by }),
 ]);

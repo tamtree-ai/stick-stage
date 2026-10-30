@@ -6,7 +6,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { approvalStatus, isScienceSkit, parseSkit, skitLines, SkitError, VoiceManifestSchema, type Diagnostic, type VoiceManifest } from "../engine/core";
+import { approvalStatus, isScienceSkit, parseSkit, skitLines, SkitError, VoiceManifestSchema, type Diagnostic, type Fingerprint, type VoiceManifest } from "../engine/core";
 import { HttpError } from "./http";
 import type { HookVariant, JobOptions } from "./jobs";
 import { unsupportedBeats } from "./validate";
@@ -23,6 +23,13 @@ export const audioKind = (b: Uint8Array): "wav" | "mp3" | "ogg" | undefined => {
 };
 
 const HOOKS = new Set(["pov", "teaser", "slam"]);
+
+const strings = (v: unknown) => Array.isArray(v) && v.every((x) => typeof x === "string");
+/** A fingerprint the caller kept from an earlier render's `check.fingerprint`. */
+const isFingerprint = (v: unknown): v is Fingerprint => {
+  const f = v as Record<string, unknown> | null;
+  return !!f && typeof f === "object" && strings(f.kinds) && strings(f.layout) && strings(f.sets) && strings(f.opening);
+};
 
 /** Options the multipart `options` field may set. Unknown keys are ignored. */
 export const parseOptions = (raw: Record<string, unknown>): JobOptions => {
@@ -44,6 +51,7 @@ export const parseOptions = (raw: Record<string, unknown>): JobOptions => {
     ...(cb ? { callback: cb } : {}),
     sceneCache: raw.sceneCache !== false,
     covers: raw.covers !== false,
+    ...(Array.isArray(raw.history) ? { history: raw.history.filter(isFingerprint).slice(0, 30) } : {}),
   };
 };
 

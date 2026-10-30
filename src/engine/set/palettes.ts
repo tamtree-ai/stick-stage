@@ -178,6 +178,26 @@ export const PALETTES: Record<string, Palette> = {
     sky: "#3f6f9e",
     detail: "#a9c9ea",
   },
+  /** Explainer grounds: warm paper (ink figures) and a deep ink night (chalk figures). */
+  paper: {
+    wallA: "#f6f1e6",
+    wallB: "#efe7d6",
+    floor: "#e4d9c2",
+    accent: "#e8590c",
+    shade: "#ebe2cf",
+    sky: "#f6f1e6",
+    detail: "#c9bb9c",
+  },
+  ink: {
+    wallA: "#14213a",
+    wallB: "#1d2d4d",
+    floor: "#22355a",
+    accent: "#ffd84a",
+    shade: "#1a2944",
+    sky: "#14213a",
+    detail: "#3d5580",
+    rim: "#cfd6ff",
+  },
   /** A bright, clean lab. */
   "lab-white": {
     wallA: "#e6eef0",

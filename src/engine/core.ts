@@ -88,3 +88,7 @@ export * from "./viz/theme";
 export * from "./viz/images";
 export * from "./viz/geometry";
 export * from "./viz/compile";
+export * from "./viz/slots";
+export * from "./viz/paramsData";
+export * from "./director/data";
+export * from "./director/explainer";

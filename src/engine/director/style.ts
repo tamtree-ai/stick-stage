@@ -10,12 +10,14 @@ import chaoticJson from "../../data/styles/chaotic.json";
 import sitcomJson from "../../data/styles/sitcom.json";
 import storyJson from "../../data/styles/story.json";
 import argumentJson from "../../data/styles/argument.json";
+import explainerJson from "../../data/styles/explainer.json";
 
 /**
  * `story`: narrated episodes (the shape tier). Slower, and no punchline rules: a story ends, it doesn't land a joke.
  * `argument`: two people talking over each other ("Who's wrong?"): no air between lines, fast voices, hard cuts.
+ * `explainer`: long-form narrated data stories (`format: "explainer"`): story pacing, 5–15 minutes, no punchline rules.
  */
-export const STYLE_IDS = ["classic", "deadpan", "snappy", "chaotic", "sitcom", "story", "argument"] as const;
+export const STYLE_IDS = ["classic", "deadpan", "snappy", "chaotic", "sitcom", "story", "argument", "explainer"] as const;
 export type StyleId = (typeof STYLE_IDS)[number];
 
 export type DirectingStyle = {
@@ -60,6 +62,7 @@ export const STYLES: Record<StyleId, DirectingStyle> = {
   sitcom: asStyle(sitcomJson as DirectingStyle),
   story: asStyle(storyJson as DirectingStyle),
   argument: asStyle(argumentJson as DirectingStyle),
+  explainer: asStyle(explainerJson as DirectingStyle),
 };
 
 export const CLASSIC: DirectingStyle = STYLES.classic;

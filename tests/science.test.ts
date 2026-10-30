@@ -168,7 +168,7 @@ describe("myth-flip", () => {
     expect(beats[7]).toMatchObject({ punchline: true });
     expect(beats[4]!.actions).toContainEqual(expect.objectContaining({ do: "gag", gag: "concede" }));
     expect(skit.claims?.length).toBe(2);
-    expect(skit.cast[0]).toMatchObject({ pose: "arms-crossed" });
+    expect(skit.cast![0]).toMatchObject({ pose: "arms-crossed" });
   });
   it("compiles, passes the self-check, and warns until approved", () => {
     const lines = skitLines(parseSkit(skit)).map((l) => ({ id: l.id, text: l.text, durationMs: 400 + l.text.split(/\s+/).length * 330 }));

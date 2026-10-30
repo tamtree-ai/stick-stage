@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "explainer-paper",
+  "aspect": "16:9",
+  "kit": "abstract",
+  "palette": "paper",
+  "description": "Warm paper with a soft centre light, nothing else. The light explainer ground: charts, maps and numbers in ink.",
+  "tags": [
+    "explainer",
+    "widescreen",
+    "data",
+    "business",
+    "economics",
+    "light"
+  ],
+  "groundY": 1080,
+  "figureHeightPx": 560,
+  "layers": [
+    {
+      "part": "void"
+    }
+  ],
+  "marks": {
+    "left": 0.25,
+    "center": 0.5,
+    "right": 0.75
+  }
+}

@@ -32,6 +32,7 @@
     "safearea": "tsx scripts/safearea.ts",
     "lib:build": "tsx scripts/build-lib.ts",
     "lib:pack-test": "tsx scripts/pack-test.ts",
+    "map:data": "tsx scripts/map-data.ts",
     "props:lint": "tsx scripts/props-lint.ts",
     "props:index": "tsx scripts/props-index.ts",
     "props:draw": "tsx scripts/props-draw.ts",

@@ -2,9 +2,12 @@
  * Scene figures + timed cues → `FigureTrack`s. Merges states and cues, checks each result against
  * its kind's params, resolves callout targets, typeset equations and image files.
  */
+import { bindData, creditOf, type Datasets } from "../director/data";
 import type { Diagnostic } from "../director/diagnostics";
 import { msToFrame } from "../director/layout";
 import { creditLine, type ImageDef } from "./images";
+import { resolveMapViews } from "./map";
+import { slotRect } from "./slots";
 import { figureAnchor } from "./geometry";
 import { FIGURE_PARAMS, type FigureKind } from "./params";
 import type { Figure, FigureCue, Reveal } from "./schema";
@@ -49,6 +52,8 @@ export const compileFigures = (args: {
   height: number;
   lib: FigureLib;
   diags: Diagnostic[];
+  /** The skit's datasets, for `"@id.column"` params. */
+  data?: Datasets;
   /** JSON path of figure i ("figures[0]" or "scenes[1].figures[0]"). */
   pathOf: (i: number) => string;
 }): { tracks: FigureTrack[]; credits: CreditEvent[] } => {
@@ -72,8 +77,16 @@ export const compileFigures = (args: {
     return undefined;
   };
 
-  args.figures.forEach((fig, i) => {
+  args.figures.forEach((figIn, i) => {
     const at = args.pathOf(i);
+    // Data references become numbers first, so states, cues and the param check see plain values.
+    const used = new Set<string>();
+    const bind = (p: Params, where: string) => bindData(p, args.data, where, diags, used);
+    const fig = {
+      ...figIn,
+      params: bind(figIn.params, `${at}.params`),
+      states: figIn.states && Object.fromEntries(Object.entries(figIn.states).map(([k, v]) => [k, bind(v, `${at}.states.${k}`)])),
+    };
     const states = fig.states ?? {};
     if (fig.state !== undefined && !(fig.state in states))
       diags.push({
@@ -98,11 +111,12 @@ export const compileFigures = (args: {
           `${at}.states.${name}`,
         );
     if (!base) return;
+    const box = fig.slot ? slotRect(fig.slot, width, height) : fig.at;
     const rect = {
-      x: (fig.at.x - fig.at.w / 2) * width,
-      y: (fig.at.y - fig.at.h / 2) * height,
-      w: fig.at.w * width,
-      h: fig.at.h * height,
+      x: (box.x - box.w / 2) * width,
+      y: (box.y - box.h / 2) * height,
+      w: box.w * width,
+      h: box.h * height,
     };
     const track: FigureTrack = {
       id: fig.id,
@@ -175,6 +189,7 @@ export const compileFigures = (args: {
     const mine = args.cues.filter((c) => c.cue.id === fig.id).sort((a, b) => a.frame - b.frame);
     for (const { cue, frame, path } of mine) {
       const f = Math.max(0, frame);
+      if (cue.do === "focus") continue; // the camera's (`director/sceneFigures.ts`)
       if (cue.do === "show") {
         const last = track.spans.at(-1);
         if (last && last.show.frame < f && !last.hide)
@@ -216,7 +231,7 @@ export const compileFigures = (args: {
         patch = s.params;
         keyLabel = s.label;
         style = cue.style;
-      } else patch = cue.params;
+      } else patch = bind(cue.params, `${path}.params`);
       raw = mergeParams(raw, patch);
       const params = checkParams(
         fig.kind,
@@ -236,11 +251,13 @@ export const compileFigures = (args: {
         ...(keyLabel ? { label: keyLabel } : {}),
       });
     }
+    if (used.size) track.sources = [...used];
     tracks.push(track);
   });
+  resolveMapViews(tracks, diags, (id) => args.pathOf(args.figures.findIndex((f) => f.id === id)));
 
   for (const c of args.cues)
-    if (!ids.includes(c.cue.id))
+    if (!ids.includes(c.cue.id) && !(c.cue.do === "focus" && c.cue.id === "none"))
       diags.push({
         level: "error",
         code: "unknown-figure",
@@ -273,13 +290,12 @@ export const compileFigures = (args: {
   }
 
   const credits: CreditEvent[] = tracks.flatMap((t) => {
-    const image = t.image;
-    if (!image) return [];
-    return t.spans.map((s) => ({
-      text: image.credit,
+    const texts = [...(t.image ? [t.image.credit] : []), ...(t.sources ?? []).flatMap((id) => (args.data?.[id] ? [creditOf(args.data[id])] : []))];
+    return texts.flatMap((text) => t.spans.map((s) => ({
+      text,
       from: s.show.frame,
       to: s.hide ? s.hide.frame + s.hide.durationFrames : Number.MAX_SAFE_INTEGER,
-    }));
+    })));
   });
   return { tracks, credits };
 };

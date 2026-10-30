@@ -38,7 +38,7 @@ const skitBeat = (skit: Skit, id: string) => skit.beats.find((b) => b.id === id)
 export const punchlineChecks = (tl: Timeline, skit: Skit): Finding[] => {
   const out: Finding[] = [];
   // A story ends; it doesn't land a joke, so the punchline camera and reaction rules don't apply.
-  if (tl.directing?.id === "story") return out;
+  if (tl.directing?.id === "story" || tl.directing?.id === "explainer") return out;
   tl.beats.forEach((b, i) => {
     if (!b.punchline) return;
     const inBeat = (f: number) => f >= b.from && f <= b.to;
@@ -184,11 +184,12 @@ export const programChecks = (p: Program): Finding[] => {
   const narrated = time(spoken.filter((b) => b.narrator));
   // A skit with a narrator is an explainer: it may run longer.
   const styled = tl.directing?.length;
-  const [lo, hi, kind] = narrated > 0 ? [30, 60, "explainers"] : [styled?.[0] ?? 15, styled?.[1] ?? 30, "two-person skits"];
+  const long = p.format === "explainer";
+  const [lo, hi, kind] = long ? [styled?.[0] ?? 300, styled?.[1] ?? 900, "long-form explainers"] : narrated > 0 ? [30, 60, "explainers"] : [styled?.[0] ?? 15, styled?.[1] ?? 30, "two-person skits"];
   const len = p.durationInFrames / p.fps;
   if (len < lo || len > hi) out.push({ check: "length", level: "info", message: `${len.toFixed(1)} s long (${kind} target ${lo}–${hi} s)` });
   const share = narrated / (time(spoken) || 1);
-  if (share > NARRATOR_MAX_SHARE)
+  if (!long && share > NARRATOR_MAX_SHARE)
     out.push({ check: "narrator-dominant", level: "warning", message: `${Math.round(share * 100)}% of the spoken time is voice-over (max ${NARRATOR_MAX_SHARE * 100}%); give the characters more of it or it plays like a slideshow` });
   if (p.cover && contrastRatio(SLAM.fill, SLAM.outline) < 4.5)
     out.push({ check: "cover-contrast", level: "error", message: "the cover title does not clear the contrast floor" });

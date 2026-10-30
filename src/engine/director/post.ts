@@ -1,6 +1,8 @@
 import type { Library } from "../rig/actorState";
 import { docBeats, type SkitDoc } from "./schema";
 import type { Program } from "./timeline";
+import { sourceLines } from "./data";
+import { stamp } from "./explainer";
 
 /** Post-ready text for a skit: the caption file and subtitles that go up with the MP4. */
 
@@ -17,8 +19,8 @@ export const slug = (s: string): string =>
 
 const tag = (h: string) => (h.startsWith("#") ? h : `#${h}`);
 
-/** Caption text for the platform post: description, hashtags, disclosure, then the script. */
-export const postText = (doc: SkitDoc, lib: Library): string => {
+/** Caption text for the platform post: description, chapters, sources, hashtags, disclosure, then the script. */
+export const postText = (doc: SkitDoc, lib: Library, program?: Pick<Program, "chapters" | "fps">): string => {
   const name = (castId: string) => {
     if (doc.narrator && castId === doc.narrator.id) return doc.narrator.name;
     const c = doc.cast.find((x) => x.id === castId);
@@ -28,6 +30,9 @@ export const postText = (doc: SkitDoc, lib: Library): string => {
     .filter((b) => !b.silent && b.line && b.speaker)
     .map((b) => `${name(b.speaker!)}: ${b.line}`);
   const parts = [doc.meta.description ?? doc.meta.title];
+  if (program?.chapters?.length) parts.push(program.chapters.map((c) => `${stamp(c.frame, program.fps)} ${c.title}`).join("\n"));
+  const sources = sourceLines(doc.datasets);
+  if (sources.length) parts.push(`Sources\n${sources.join("\n")}`);
   if (doc.meta.hashtags.length) parts.push(doc.meta.hashtags.map(tag).join(" "));
   if (doc.meta.syntheticVoices) parts.push(AI_VOICE_NOTE);
   return `${parts.join("\n\n")}\n\n---\nScript\n${script.join("\n")}\n`;

@@ -44,7 +44,7 @@ describe("templates", () => {
   });
   it("interview: the host holds the mic and swings it to the guest", () => {
     const skit = fromPremise(premise("interview"), library, sets);
-    expect(skit.cast[0]).toMatchObject({ holding: { prop: "mic" }, label: "reporter" });
+    expect(skit.cast![0]).toMatchObject({ holding: { prop: "mic" }, label: "reporter" });
     expect(skit.beats![1]!.actions!.at(-1)).toMatchObject({ who: "june", do: "pose", pose: "hold-out" });
   });
   it("me-vs-me needs labels; lines need a known speaker", () => {
@@ -88,7 +88,7 @@ describe("templates", () => {
       expect.objectContaining({ id: "milo", seated: true }),
       expect.objectContaining({ id: "june", seated: true }),
     ]);
-    expect(skit.cast.every((c) => !("seated" in c) || !c.seated)).toBe(true);
+    expect(skit.cast!.every((c) => !("seated" in c) || !c.seated)).toBe(true);
     const lines = skitLines(parseSkit(skit)).map((l) => ({ id: l.id, text: l.text, durationMs: 800 }));
     const result = compileSkit({ skit, voice: fakeVoice(lines), lib: library, sets, sfx: sfxLibrary, reactions });
     expect(checkSkit({ result, lib: library, sets, safeArea }).findings.filter((f) => f.level === "error")).toEqual([]);

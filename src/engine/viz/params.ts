@@ -202,6 +202,7 @@ export const CalloutParams = z.strictObject({
   ]),
 });
 
+import { BarsParams, CounterParams, LineParams, MapParams } from "./paramsData";
 import { BurstParams, EquationParams, FinePrintParams, GalaxyParams, HistogramParams, ImageParams, NumberLineParams, ProgressParams } from "./paramsMore";
 
 export const FIGURE_PARAMS = {
@@ -222,6 +223,10 @@ export const FIGURE_PARAMS = {
   galaxy: GalaxyParams,
   burst: BurstParams,
   fineprint: FinePrintParams,
+  line: LineParams,
+  bars: BarsParams,
+  counter: CounterParams,
+  map: MapParams,
 } as const;
 export type FigureKind = keyof typeof FIGURE_PARAMS;
 export const FIGURE_KINDS = Object.keys(FIGURE_PARAMS) as FigureKind[];

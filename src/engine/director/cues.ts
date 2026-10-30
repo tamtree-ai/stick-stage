@@ -39,3 +39,23 @@ export const AudioSourceSchema = z.discriminatedUnion("source", [
   }),
 ]);
 
+export const TRANSITIONS = ["cut", "fade", "slide", "wipe", "clock-wipe"] as const;
+export const TransitionSchema = z.strictObject({
+  type: z.enum(TRANSITIONS).default("fade"),
+  /** Ignored for "cut". */
+  durationMs: z.number().min(100).max(2000).default(400),
+});
+export type Transition = z.infer<typeof TransitionSchema>;
+
+/**
+ * Title card: an optional small kicker line, then the title stacked in big words. The kicker
+ * shows from the scene start; the title pops in on `at` (in the beat `beat`, default the scene's
+ * first beat). One anchor per title line reveals the lines one by one; `\n` forces a break.
+ */
+export const CardSchema = z.strictObject({
+  kicker: z.string().min(1).max(60).optional(),
+  title: z.string().min(1).max(60),
+  beat: z.string().min(1).optional(),
+  at: z.union([AnchorSchema, z.array(AnchorSchema).min(1).max(3)]).optional(),
+});
+export type Card = z.infer<typeof CardSchema>;

@@ -6,7 +6,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import type { CheckReport, Diagnostic } from "../engine/core";
+import type { CheckReport, Diagnostic, Fingerprint } from "../engine/core";
 
 export type JobStatus = "queued" | "running" | "succeeded" | "failed" | "cancelled";
 export type JobStage = "prep" | "compile" | "check" | "render" | "post";
@@ -28,6 +28,8 @@ export type JobOptions = {
   /** Scene-level frame cache. On for multi-scene renders. */
   sceneCache?: boolean;
   covers?: boolean;
+  /** Explainers: the channel's last videos' `check.fingerprint`s, most recent first. */
+  history?: Fingerprint[];
 };
 export type JobOutput = { file: string; type: string; bytes: number };
 

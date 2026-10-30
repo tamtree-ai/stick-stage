@@ -10,7 +10,7 @@ export const SUBTITLE = { y: 0.62, fontSize: 74, lineHeight: 1.15, fill: "#fffff
 export const STORY_SUBTITLE = { y: 0.88, fontSize: 58 } as const;
 /** Caption height and size for a timeline's directing style. */
 export const subtitleSpec = (directing?: { id: string }): { y: number; fontSize: number } =>
-  directing?.id === "story" ? STORY_SUBTITLE : { y: SUBTITLE.y, fontSize: SUBTITLE.fontSize };
+  directing?.id === "story" || directing?.id === "explainer" ? STORY_SUBTITLE : { y: SUBTITLE.y, fontSize: SUBTITLE.fontSize };
 export const POV = { fontSize: 52, lineHeight: 1.18, fill: "#16161a", card: "#ffffff" } as const;
 /**
  * "Who's wrong?" meter (`VerdictMeter`): header + two-colour bar just inside the top safe edge.

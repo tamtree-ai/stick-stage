@@ -95,6 +95,9 @@ export type PunchIn = {
   durationFrames: number;
 };
 
+/** A camera move onto a figure (`focus` cue); no `camera`: back to the shot. Held until the next key. */
+export type FocusKey = { frame: number; durationFrames: number; camera?: Camera };
+
 export type Shake = { frame: number; durationFrames: number; intensity: number };
 
 export type AudioClip = { frame: number; durationFrames: number; src: string; beatId: string };
@@ -131,6 +134,8 @@ export type Timeline = {
   shots: ShotKey[];
   punchIns: PunchIn[];
   shakes: Shake[];
+  /** Figure focus moves (explainers). Absent when the scene has none. */
+  focus?: FocusKey[];
   audio: AudioClip[];
   sfx: SfxEvent[];
   pov?: { text: string; from: number; to: number };
@@ -178,6 +183,10 @@ export type Program = {
   hook?: { kind: "teaser" | "slam"; scene: number; frame: number; prefixFrames: number; transitionFrames: number };
   /** The still the cover and thumbnail are framed from. */
   cover?: { scene: number; frame: number; title: string; badge?: string };
+  /** `explainer`: long-form rules apply in QA (`qa/variety.ts`). */
+  format?: "explainer";
+  /** YouTube chapters (explainers): a title per scene start, the first at frame 0. */
+  chapters?: { title: string; frame: number }[];
   /** Sets composed from described places (`place`), by id. The renderer looks here before the catalog. */
   sets?: Record<string, SetDef>;
   /** Workspace characters and props (the skit's `characters` / `props`), merged over the catalog when drawn. */

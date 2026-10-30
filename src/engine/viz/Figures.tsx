@@ -9,6 +9,9 @@ import { Axes, Plot } from "./draw/plot";
 import { Callout, Histogram, Label, NumberLine } from "./draw/scales";
 import { Vectors, Wave } from "./draw/vectorWave";
 import { Burst, FinePrint, GalaxyFig, Progress } from "./draw/cosmos";
+import { BarChart, Counter, LineChart } from "./draw/data";
+import { MapFig } from "./draw/map";
+import type { BarsP, CounterP, LineP, MapP } from "./paramsData";
 import type {
   AxesP,
   BurstP,
@@ -95,6 +98,14 @@ const Body: React.FC<{
       return <Burst {...as<BurstP>()} />;
     case "fineprint":
       return <FinePrint {...as<FinePrintP>()} />;
+    case "line":
+      return <LineChart {...as<LineP>()} fs={fs} />;
+    case "bars":
+      return <BarChart {...as<BarsP>()} fs={fs} />;
+    case "counter":
+      return <Counter {...as<CounterP>()} />;
+    case "map":
+      return <MapFig {...as<MapP>()} fs={fs} id={f.id} />;
     case "equation":
       return <Equation {...as<EquationP>()} typeset={f.typeset} />;
     case "image": {

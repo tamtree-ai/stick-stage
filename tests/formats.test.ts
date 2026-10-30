@@ -22,7 +22,7 @@ describe("formats", () => {
 
   it("a trio stands left, center, and right", () => {
     const skit = fromPremise(premise("trio"), library, sets);
-    expect(skit.cast.map((c) => c.mark)).toEqual(["left", "center", "right"]);
+    expect(skit.cast!.map((c) => c.mark)).toEqual(["left", "center", "right"]);
     expect(checkSkit({ result: compile(skit), lib: library, sets, safeArea }).errors).toBe(0);
   });
 

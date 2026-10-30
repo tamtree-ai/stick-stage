@@ -1,3 +1,5 @@
+import type { Fingerprint } from "./variety";
+
 /** One finding of the skit self-check. Errors block posting; warnings are for a human look. */
 export type Finding = {
   /** Stable machine-readable id, e.g. `punchline-camera`. */
@@ -17,6 +19,8 @@ export type CheckReport = {
   findings: Finding[];
   /** Every check that ran (so a clean report still says what it looked at). */
   ran: string[];
+  /** Explainers: what this video looks like, for the caller to keep and pass back as `history`. */
+  fingerprint?: Fingerprint;
 };
 
 export const report = (findings: Finding[], ran: string[]): CheckReport => {

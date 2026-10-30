@@ -14,6 +14,7 @@ import { MetaSchema } from "./meta";
 import { STYLE_IDS } from "./style";
 import { FigureCueSchema, FigureSchema } from "../viz/schema";
 import { LINE_ROLES, scienceFields } from "./science";
+import { DatasetSchema, SpokenNumberSchema } from "./data";
 
 /**
  * Skit document (`public/skits/<id>/skit.json`). Library ids (poses, expressions, props, sets,
@@ -115,6 +116,8 @@ export const BeatSchema = z.strictObject({
   text: z.array(TextCueSchema).default([]),
   /** Diagram cues: show, hide, switch state, or tween a scene figure. */
   figures: z.array(FigureCueSchema).default([]),
+  /** Explainers: numbers this line says, each checked against its dataset cell (`director/data.ts`). */
+  numbers: z.array(SpokenNumberSchema).max(8).optional(),
   /** Verdict meter after this line: the share (0–100) blaming the meter's left side. Needs `overlay.verdict`. */
   verdict: z.number().min(0).max(100).optional(),
 });
@@ -136,26 +139,8 @@ export const CastSchema = z.strictObject({
 });
 export type CastMember = z.infer<typeof CastSchema>;
 
-export const TRANSITIONS = ["cut", "fade", "slide", "wipe", "clock-wipe"] as const;
-export const TransitionSchema = z.strictObject({
-  type: z.enum(TRANSITIONS).default("fade"),
-  /** Ignored for "cut". */
-  durationMs: z.number().min(100).max(2000).default(400),
-});
-export type Transition = z.infer<typeof TransitionSchema>;
-
-/**
- * Title card: an optional small kicker line, then the title stacked in big words. The kicker
- * shows from the scene start; the title pops in on `at` (in the beat `beat`, default the scene's
- * first beat). One anchor per title line reveals the lines one by one; `\n` forces a break.
- */
-export const CardSchema = z.strictObject({
-  kicker: z.string().min(1).max(60).optional(),
-  title: z.string().min(1).max(60),
-  beat: z.string().min(1).optional(),
-  at: z.union([AnchorSchema, z.array(AnchorSchema).min(1).max(3)]).optional(),
-});
-export type Card = z.infer<typeof CardSchema>;
+export { TRANSITIONS, TransitionSchema, CardSchema, type Transition, type Card } from "./cues";
+import { CardSchema, TransitionSchema, type Card } from "./cues";
 
 /** The off-screen voice: beats whose `speaker` is the narrator's `id` are voice-over. */
 export const NarratorSchema = z.strictObject({
@@ -206,7 +191,9 @@ export const SceneSchema = z.strictObject({
   /** Words on a set part for this scene only. The shared set is unchanged. */
   labels: z.array(PartLabelSchema).max(6).optional(),
   /** Diagrams on the stage next to the cast (`docs/figures.md`). */
-  figures: z.array(FigureSchema).max(8).optional(),
+  figures: z.array(FigureSchema).max(12).optional(),
+  /** Explainers: this scene starts a YouTube chapter with this title. */
+  chapter: z.string().min(1).max(60).optional(),
   beats: z.array(BeatSchema).min(1),
 });
 export type Scene = z.infer<typeof SceneSchema>;
@@ -240,7 +227,12 @@ export const SkitSchema = z
     look: z.enum(STORY_LOOKS).optional(),
     /** Stage finish: "flat" (default, the house look) or the opt-in "illustrated" (cel shade, ink line, paper grain). */
     finish: z.enum(FINISHES).optional(),
-    cast: z.array(CastSchema).min(1).max(4),
+    /** `explainer`: a narrated 16:9 data story (`docs/explainer.md`): 16:9 by default, cast optional, variety checks. */
+    format: z.enum(["skit", "explainer"]).optional(),
+    /** Explainers: tables figures and spoken numbers reference as `"@id.column"` (`director/data.ts`). */
+    datasets: z.record(z.string().regex(/^[A-Za-z0-9_-]+$/), DatasetSchema).optional(),
+    /** Who is on stage. An explainer with a narrator may have nobody. */
+    cast: z.array(CastSchema).max(4).default([]),
     /** Off-screen voice-over (optional). */
     narrator: NarratorSchema.optional(),
     overlay: z
@@ -280,12 +272,14 @@ export const SkitSchema = z
     /** Dubbed words, keyed by BCP 47. Staging stays; timing follows the new voice. */
     i18n: I18nSchema.optional(),
     /** Figures for a single-scene skit (a multi-scene skit puts them on each scene). */
-    figures: z.array(FigureSchema).max(8).optional(),
+    figures: z.array(FigureSchema).max(12).optional(),
     ...scienceFields,
     beats: z.array(BeatSchema).min(1).optional(),
     scenes: z.array(SceneSchema).min(1).optional(),
   })
   .superRefine((d, ctx) => {
+    if (!d.cast.length && !(d.format === "explainer" && d.narrator))
+      ctx.addIssue({ code: "custom", path: ["cast"], message: `a skit needs a cast (only an explainer with a narrator may have none)` });
     if (d.beats && d.scenes) ctx.addIssue({ code: "custom", path: ["scenes"], message: `use either "beats" (one scene) or "scenes", not both` });
     if (!d.beats && !d.scenes) ctx.addIssue({ code: "custom", path: ["beats"], message: `a skit needs "beats" (or "scenes")` });
     if (d.scenes && d.figures) ctx.addIssue({ code: "custom", path: ["figures"], message: `a multi-scene skit puts "figures" on each scene` });

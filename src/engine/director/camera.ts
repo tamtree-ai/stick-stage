@@ -1,4 +1,5 @@
-import { easeOutBack } from "../lib/easing";
+import { easeInOutSine, easeOutBack } from "../lib/easing";
+import { clamp } from "../lib/math";
 import { noise } from "../lib/seed";
 import type { Library } from "../rig/actorState";
 import type { SetDef } from "../set/schema";
@@ -8,7 +9,7 @@ import { safeRect, type Rect, type SafeArea } from "../text/safeArea";
 import type { Camera } from "../shots/Stage";
 import { stageActorsAt } from "./placement";
 import { PUNCH_FACTOR, PUNCH_FRAMES, type ShotPlan } from "./shots";
-import type { CastTrack, PunchIn, Shake, ShotKey, Timeline } from "./timeline";
+import type { CastTrack, FocusKey, PunchIn, Shake, ShotKey, Timeline } from "./timeline";
 
 /** Used when the caller gives no safe area (the conservative TikTok / Reels / Shorts profile). */
 export const DEFAULT_SAFE_AREA: SafeArea = { schemaVersion: 1, top: 0.14, bottom: 0.3, left: 0.04, right: 0.12 };
@@ -92,6 +93,21 @@ export const solveShots = (
 
 const SHAKE_PX = 22;
 
+const lerpCam = (a: Camera, b: Camera, u: number): Camera => ({ scale: a.scale * (b.scale / a.scale) ** u, cx: a.cx + (b.cx - a.cx) * u, cy: a.cy + (b.cy - a.cy) * u });
+
+/** The shot camera moved by figure focus keys: each eases from the last key's target to its own. */
+export const focusAt = (keys: readonly FocusKey[], frame: number, base: Camera): Camera => {
+  let from = base;
+  let cam = base;
+  for (const k of keys) {
+    if (k.frame > frame) break;
+    const to = k.camera ?? base;
+    cam = lerpCam(from, to, easeInOutSine(clamp((frame - k.frame) / Math.max(1, k.durationFrames), 0, 1)));
+    from = to;
+  }
+  return cam;
+};
+
 /** The cut in effect at `frame`. */
 export const shotAt = (tl: Pick<Timeline, "shots">, frame: number): ShotKey => {
   let shot = tl.shots[0]!;
@@ -100,9 +116,9 @@ export const shotAt = (tl: Pick<Timeline, "shots">, frame: number): ShotKey => {
 };
 
 /** Camera at `frame`: the latest cut, plus a punch-in since that cut, plus any shake. */
-export const cameraAt = (tl: Pick<Timeline, "shots" | "punchIns" | "shakes" | "width" | "height">, frame: number): Camera => {
+export const cameraAt = (tl: Pick<Timeline, "shots" | "punchIns" | "shakes" | "width" | "height" | "focus">, frame: number): Camera => {
   const shot = shotAt(tl, frame);
-  let cam = shot.camera;
+  let cam = focusAt(tl.focus ?? [], frame, shot.camera);
   let punch: PunchIn | undefined;
   for (const p of tl.punchIns) if (p.frame <= frame && p.frame >= shot.frame) punch = p;
   if (punch) {

@@ -11,26 +11,32 @@ import { closeupChecks, pacingChecks, programChecks, punchlineChecks, STORY_CHEC
 import { report, type CheckReport, type Finding } from "./types";
 import { visualChecks, VISUAL_CHECKS } from "./visual";
 import { PACE_CHECKS, paceChecks, wordingChecks } from "./pace";
+import { fingerprint, samenessChecks, VARIETY_CHECKS, varietyChecks, type Fingerprint } from "./variety";
 
 export * from "./types";
 export { sampleFrames, contrastChecks } from "./visual";
+export { fingerprint, sameness, type Fingerprint } from "./variety";
 
 export type CheckInput = {
   result: Pick<CompileResult, "scenes" | "program">;
   lib: Library;
   sets: Readonly<Record<string, SetDef>>;
   safeArea: SafeArea;
+  /** Explainers: fingerprints of the channel's last videos, most recent first (sameness warnings). */
+  history?: readonly Fingerprint[];
 };
 
 /** The M5 self-check: story rules + visual QA over every scene of a compiled skit. Pure. */
-export const checkSkit = ({ result, lib: catalogLib, sets: catalogSets, safeArea }: CheckInput): CheckReport => {
+export const checkSkit = ({ result, lib: catalogLib, sets: catalogSets, safeArea, history = [] }: CheckInput): CheckReport => {
   const lib = withProgramAssets(catalogLib, result.program);
   const sets = result.program.sets ? { ...catalogSets, ...result.program.sets } : catalogSets;
   const hint = (e: string): Expression["closeup"] => lib.expressions[e]?.closeup;
   const multi = result.scenes.length > 1;
   const beats = result.scenes.flatMap((sc) => sc.skit.beats);
   const fast = result.program.scenes[0]?.timeline.directing?.pace === "fast";
-  const findings: Finding[] = [...programChecks(result.program), ...paceChecks(result.program, beats), ...wordingChecks(beats, fast), ...distinctFindings(result, lib)];
+  const findings: Finding[] = [...programChecks(result.program), ...paceChecks(result.program, beats), ...wordingChecks(beats, fast), ...distinctFindings(result, lib), ...varietyChecks(result.program)];
+  const fp = result.program.format === "explainer" ? fingerprint(result.program) : undefined;
+  if (fp) findings.push(...samenessChecks(fp, history));
   result.program.scenes.forEach((ps, i) => {
     const { skit, timeline: tl } = result.scenes[i]!;
     const scene = [
@@ -44,7 +50,8 @@ export const checkSkit = ({ result, lib: catalogLib, sets: catalogSets, safeArea
     findings.push(...scene.map((f) => ({ ...f, frame: f.frame === undefined ? undefined : f.frame + ps.from, scene: multi ? ps.id : undefined })));
   });
   findings.sort((a, b) => (a.frame ?? -1) - (b.frame ?? -1));
-  return report(findings, [...STORY_CHECKS, ...VISUAL_CHECKS, ...PACE_CHECKS, "distinct"]);
+  const r = report(findings, [...STORY_CHECKS, ...VISUAL_CHECKS, ...PACE_CHECKS, "distinct", ...(fp ? VARIETY_CHECKS : [])]);
+  return fp ? { ...r, fingerprint: fp } : r;
 };
 
 const distinctFindings = (result: CheckInput["result"], lib: Library): Finding[] => {

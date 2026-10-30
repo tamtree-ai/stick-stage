@@ -92,6 +92,9 @@ import widePark from "./sets/wide-park.json";
 import wideStreet from "./sets/wide-street.json";
 import wideCafe from "./sets/wide-cafe.json";
 import wideClassroom from "./sets/wide-classroom.json";
+import explainerPaper from "./sets/explainer-paper.json";
+import explainerNight from "./sets/explainer-night.json";
+import explainerGrid from "./sets/explainer-grid.json";
 import void1 from "./sets/void-1.json";
 import blueprint1 from "./sets/blueprint-1.json";
 import space1 from "./sets/space-1.json";
@@ -134,6 +137,7 @@ const STORY_SETS: SetDef[] = [
 export const sets: Record<string, SetDef> = createSets([
   plain1, living1, lounge1, office1, park1, street1, kitchen1, bedroom1, cafe1, classroom1, meeting1, living2, park2, streetNight1, beach1, stage1,
   widePlain, wideLiving, wideLounge, wideOffice, widePark, wideStreet, wideCafe, wideClassroom,
+  explainerPaper, explainerNight, explainerGrid,
   void1, blueprint1, space1, space2, lab1,
   ...STORY_SETS,
 ]);

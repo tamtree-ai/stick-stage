@@ -1,7 +1,7 @@
 /** A project: a workspace plus its registries. Loads, compiles, checks and summarizes skits. */
 import fs from "node:fs";
 import path from "node:path";
-import { applyLanguage, checkSkit, compileSkit, parseSkit, placeholderVoice, PreparedVoiceSchema, skitLines, type CheckReport, type CompileResult, type Library, type Program, type ReactionTable, type SafeArea, type SeriesStyle, type SetDef, type SfxManifest, type Timeline, type ImageDef, type Pronunciation } from "../engine/core";
+import { applyLanguage, checkSkit, compileSkit, parseSkit, placeholderVoice, PreparedVoiceSchema, skitLines, type CheckReport, type CompileResult, type Fingerprint, type Library, type Program, type ReactionTable, type SafeArea, type SeriesStyle, type SetDef, type SfxManifest, type Timeline, type ImageDef, type Pronunciation } from "../engine/core";
 import type { Workspace } from "./workspace";
 import { prepEquations } from "./figures";
 
@@ -42,8 +42,8 @@ export const compileSkitIn = (p: Project, id: string, extra?: { lang?: string; c
 };
 
 /** Self-check a compiled skit; writes `generated/check.json`. */
-export const checkSkitIn = (p: Project, id: string, result: CompileResult): CheckReport => {
-  const r = checkSkit({ result, lib: p.lib, sets: p.sets, safeArea: p.safeArea });
+export const checkSkitIn = (p: Project, id: string, result: CompileResult, history?: readonly Fingerprint[]): CheckReport => {
+  const r = checkSkit({ result, lib: p.lib, sets: p.sets, safeArea: p.safeArea, history });
   fs.writeFileSync(path.join(p.ws.skitDir(id), "generated/check.json"), JSON.stringify(r, null, 1));
   return r;
 };
