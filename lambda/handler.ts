@@ -15,10 +15,11 @@ import path from "node:path";
 import { remotionBackend } from "../src/node";
 import { HttpError } from "../src/server/http";
 import { JobFailure, type Job } from "../src/server/jobs";
-import { childPrep, renderPipeline } from "../src/server/pipeline";
+import { childPrep, renderPipeline, renderSegments } from "../src/server/pipeline";
 import { parseSubmission, writeSubmission } from "../src/server/submit";
 import { PROJECT, ROOT, WS } from "../scripts/lib/tools";
 import { checkOnly, DESCRIPTION, type CheckReply } from "./check";
+import { lambdaFarm, reportChunk, type Chunk } from "./fanout";
 import { toFindings, type EnvelopeFinding } from "./findings";
 
 type LambdaContext = { getRemainingTimeInMillis(): number };
@@ -30,6 +31,8 @@ type Envelope = {
   check_only?: boolean;
   /** Tamtree 2.7.0: answer what this function returns, no render. */
   describe?: boolean;
+  /** Set only by this function's own coordinator: render these segments (`fanout.ts`). */
+  chunk?: Chunk;
 };
 type RenderInput = { skit?: unknown; voice?: unknown; audio?: Record<string, string>; options?: Record<string, unknown> };
 /** Tamtree's reply file (EnvelopeBinary): a link, plus the lasting S3 location a Files connection reads. */
@@ -61,10 +64,10 @@ try {
 const s3 = new S3Client({});
 // Lambda has no GPU: without software GL, Chrome's GPU process hangs and Remotion times out
 // connecting. One Chrome process is also kinder to the sandbox and to a small vCPU share.
-// STICKSTAGE_GL=swiftshader rasterises on the CPU: in a 2-CPU Linux container a stick skit took
-// 64 ms/frame against swangle's 483, with the same picture. It needs multi-process Chrome
-// (single-process hung), and is not yet proven on Lambda; unset keeps swangle.
-const swiftshader = process.env.STICKSTAGE_GL === "swiftshader";
+// swiftshader rasterises on the CPU: in production (2026-10-30) it took a ~10 min render to ~3,
+// against swangle. It needs multi-process Chrome (single-process hung). STICKSTAGE_GL=swangle
+// goes back to the old path.
+const swiftshader = process.env.STICKSTAGE_GL !== "swangle";
 const chromiumOptions = { gl: swiftshader ? "swiftshader" : "swangle", enableMultiProcessOnLinux: swiftshader } as const;
 // Dockerfile.lambda builds the bundle into the image (STICKSTAGE_BUNDLE_DIR); unset, it is built on first use.
 const backend = remotionBackend({
@@ -74,12 +77,13 @@ const backend = remotionBackend({
   chromiumOptions,
   symlinkPublicDir: true,
 });
-const run = renderPipeline({ project: PROJECT, backend, prep: childPrep(ROOT, { requireLipSync: true }), skitIdOf: (id) => `${JOBS}/${id}` });
+const steps = { project: PROJECT, backend, prep: childPrep(ROOT, { requireLipSync: true }), skitIdOf: (id: string) => `${JOBS}/${id}` };
 
 export const handler = async (event: Envelope, context: LambdaContext): Promise<Reply | CheckReply | typeof DESCRIPTION | null> => {
   // Neither renders, and Tamtree always waits for their answer, so neither takes a callback.
   if (event.describe) return DESCRIPTION;
   if (event.check_only) return checkOnly(PROJECT, (event.items?.[0]?.json ?? {}) as RenderInput);
+  if (event.chunk) return renderChunk(event, event.chunk, context);
   const reply = await render(event, context);
   if (!event.callback) return reply;
   // Never log the callback URL: it is a single-use bearer capability.
@@ -95,18 +99,10 @@ const render = async (event: Envelope, context: LambdaContext): Promise<Reply> =
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), Math.max(0, context.getRemainingTimeInMillis() - MARGIN_MS));
   try {
-    const input = (event.items?.[0]?.json ?? {}) as RenderInput;
-    if (!input.skit || !input.voice || !input.audio) return failure("bad-request", "item 0 needs skit, voice and audio", []);
-    const form = new FormData();
-    form.set("skit", JSON.stringify(input.skit));
-    form.set("voice", JSON.stringify(input.voice));
-    form.set("options", JSON.stringify(input.options ?? {}));
-    for (const [file, key] of Object.entries(input.audio)) form.append("audio", new File([await download(key)], file));
-    const submission = await parseSubmission(form);
-    writeSubmission(dir, submission);
-
-    const job: Job = { id, status: "running", createdAt: new Date().toISOString(), seq: 0, options: submission.options, warnings: submission.warnings };
-    const result = await run(job, { dir, signal: controller.signal, update: (p) => p.stage && console.log(`stage ${p.stage}`) });
+    const job = await stage(event, id, dir);
+    if (typeof job === "string") return failure("bad-request", job, []);
+    const farm = lambdaFarm({ s3, bucket: BUCKET, items: event.items, jobId: id, deadline: () => Date.now() + context.getRemainingTimeInMillis() - 2 * MARGIN_MS, log: console.log });
+    const result = await renderPipeline({ ...steps, farm })(job, { dir, signal: controller.signal, update: (p) => p.stage && console.log(`stage ${p.stage}`) });
 
     const outputs: Record<string, unknown> = {};
     // The same files as Tamtree attachments: a later step reads $binary.mp4 as a file. `s3` lets a
@@ -143,6 +139,40 @@ const render = async (event: Envelope, context: LambdaContext): Promise<Reply> =
     clearTimeout(timer);
     fs.rmSync(dir, { recursive: true, force: true });
   }
+};
+
+/** Download the audio, check and write the submission into the job folder. A string is a bad request. */
+const stage = async (event: Envelope, id: string, dir: string): Promise<Job | string> => {
+  const input = (event.items?.[0]?.json ?? {}) as RenderInput;
+  if (!input.skit || !input.voice || !input.audio) return "item 0 needs skit, voice and audio";
+  const form = new FormData();
+  form.set("skit", JSON.stringify(input.skit));
+  form.set("voice", JSON.stringify(input.voice));
+  form.set("options", JSON.stringify(input.options ?? {}));
+  for (const [file, key] of Object.entries(input.audio)) form.append("audio", new File([await download(key)], file));
+  const submission = await parseSubmission(form);
+  writeSubmission(dir, submission);
+  return { id, status: "running", createdAt: new Date().toISOString(), seq: 0, options: submission.options, warnings: submission.warnings };
+};
+
+/** A fan-out worker: the coordinator's request, only these segments, uploaded for it to join. */
+const renderChunk = async (event: Envelope, chunk: Chunk, context: LambdaContext): Promise<null> => {
+  const id = randomUUID();
+  const dir = path.join(WS.publicDir, "skits", JOBS, id);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), Math.max(0, context.getRemainingTimeInMillis() - MARGIN_MS));
+  try {
+    const job = await stage(event, id, dir);
+    if (typeof job === "string") throw new Error(job);
+    await reportChunk(s3, BUCKET, chunk, await renderSegments(steps, job, dir, chunk.segments, controller.signal));
+  } catch (e) {
+    console.error(e);
+    await reportChunk(s3, BUCKET, chunk, e instanceof Error ? e : new Error(String(e)));
+  } finally {
+    clearTimeout(timer);
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+  return null;
 };
 
 // `logs` keeps the JSON lines until every Tamtree that calls this reads `findings` (2.7.0);

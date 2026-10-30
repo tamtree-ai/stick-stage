@@ -4,7 +4,8 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { library, reactions, safeArea, sets, sfxLibrary } from "../src/data";
-import { checkSkit, compileSkit, postText, SkitError, type SkitInput } from "../src/engine";
+import { checkSkit, compileSkit, planSegments, postText, SkitError, type SkitInput } from "../src/engine";
+import { binSegments } from "../lambda/fanout";
 import { bindData, parseSpoken, spokenMatches } from "../src/engine/director/data";
 import { stamp } from "../src/engine/director/explainer";
 import { cameraAt } from "../src/engine/director/camera";
@@ -190,5 +191,28 @@ describe("data figures draw", () => {
     const out = svg(React.createElement(MapFig, { ...base, p, fs: 30, id: "m" }));
     expect((out.match(/<path /g) ?? []).length).toBeGreaterThan(170);
     expect(out).toContain(theme.highlight);
+  });
+});
+
+describe("fan-out segments", () => {
+  it("cut long scene bodies into chunks that tile the program", () => {
+    const r = run(sample);
+    const whole = planSegments(r.program, "e");
+    const chunked = planSegments(r.program, "e", {}, 120);
+    expect(chunked.length).toBeGreaterThan(whole.length);
+    expect(chunked.every((s) => s.frames[1] - s.frames[0] + 1 <= 120)).toBe(true);
+    const frames = chunked.map((s) => s.frames).sort((a, b) => a[0] - b[0]);
+    frames.forEach((f, i) => i > 0 && expect(f[0]).toBe(frames[i - 1]![1] + 1));
+    expect(frames.at(-1)![1]).toBe(r.program.durationInFrames - 1);
+    expect(new Set(chunked.map((s) => s.hash)).size).toBe(chunked.length);
+  });
+
+  it("balance segments over workers by frames", () => {
+    const seg = (id: string, n: number) => ({ id, kind: "body" as const, frames: [0, n - 1] as [number, number], scenes: [], hash: id });
+    const bins = binSegments([seg("a", 900), seg("b", 600), seg("c", 500), seg("d", 400)], 2);
+    const load = bins.map((b) => b.reduce((n, s) => n + s.frames[1] + 1, 0));
+    // Greedy: 900 | 600+500, then 400 onto the lighter → 1300 / 1100.
+    expect(load.sort()).toEqual([1100, 1300]);
+    expect(binSegments([seg("a", 10)], 8)).toHaveLength(1);
   });
 });

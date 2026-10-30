@@ -35,9 +35,10 @@ const stable = (v: unknown): string => {
 
 /**
  * Non-overlapping segments of a program. A transition's hash covers both neighbouring scenes,
- * so editing one scene re-renders that body and the transitions that touch it.
+ * so editing one scene re-renders that body and the transitions that touch it. A body longer than
+ * `maxFrames` is cut into pieces (long explainer scenes), so pieces can render in parallel.
  */
-export const planSegments = (program: Program, engineHash: string, audioHashes: Readonly<Record<string, string>> = {}): SegmentPlan[] => {
+export const planSegments = (program: Program, engineHash: string, audioHashes: Readonly<Record<string, string>> = {}, maxFrames = Infinity): SegmentPlan[] => {
   const scenes = program.scenes;
   const unhooked = program.hook ? program.durationInFrames - program.hook.prefixFrames + program.hook.transitionFrames : program.durationInFrames;
   const out: SegmentPlan[] = [];
@@ -51,9 +52,10 @@ export const planSegments = (program: Program, engineHash: string, audioHashes: 
     const start = sc.from;
     const end = next ? next.from : unhooked;
     const bodyEnd = Math.max(start, end - trans);
-    if (bodyEnd > start) {
-      const frames: [number, number] = [start, bodyEnd - 1];
-      out.push({ id: `${sc.id}:body`, kind: "body", frames, scenes: [sc.id], hash: hashOf([sc.id], "body", frames) });
+    const pieces = bodyEnd > start ? Math.max(1, Math.ceil((bodyEnd - start) / maxFrames)) : 0;
+    for (let k = 0; k < pieces; k++) {
+      const frames: [number, number] = [start + Math.round(((bodyEnd - start) * k) / pieces), start + Math.round(((bodyEnd - start) * (k + 1)) / pieces) - 1];
+      out.push({ id: pieces > 1 ? `${sc.id}:body${k + 1}` : `${sc.id}:body`, kind: "body", frames, scenes: [sc.id], hash: hashOf([sc.id], "body", frames) });
     }
     if (next && trans > 0) {
       const frames: [number, number] = [bodyEnd, end - 1];

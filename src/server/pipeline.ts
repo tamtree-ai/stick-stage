@@ -6,9 +6,18 @@ import { makeCancelSignal } from "@remotion/renderer";
 import { execFileSync, spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { catalogVersion, planSegments, slug, SkitError, type Program } from "../engine/core";
+import { catalogVersion, planSegments, slug, SkitError, type Program, type SegmentPlan } from "../engine/core";
 import { checkSkitIn, compileSkitIn, writePostFiles, type Project, type RenderBackend } from "../node";
 import { JobFailure, type HookVariant, type Job, type JobOutput, type JobRun } from "./jobs";
+
+/** Segments are cut at scene changes and at most this long (1 min at 30 fps), the unit a fan-out renders. */
+export const CHUNK_FRAMES = 1800;
+
+/**
+ * Renders missing segments elsewhere (parallel Lambdas, `lambda/fanout.ts`) and puts each at
+ * `<cacheDir>/<hash>.mp4`. Whatever it leaves missing, or a throw, renders here as usual.
+ */
+export type SegmentFarm = (o: { job: Job; segments: SegmentPlan[]; cacheDir: string; signal: AbortSignal }) => Promise<void>;
 
 export type PrepOutcome = { lines: number; hits: number; mouthTool: string; warnings: string[] };
 export type PrepRunner = (skitId: string, signal: AbortSignal) => Promise<PrepOutcome>;
@@ -53,7 +62,7 @@ const TYPES: Record<string, string> = {
 };
 
 export const renderPipeline =
-  (o: { project: Project; backend: RenderBackend; prep: PrepRunner; skitIdOf: (jobId: string) => string }): JobRun =>
+  (o: { project: Project; backend: RenderBackend; prep: PrepRunner; skitIdOf: (jobId: string) => string; farm?: SegmentFarm }): JobRun =>
   async (job, { dir, signal, update }) => {
     const id = o.skitIdOf(job.id);
     const aborted = () => {
@@ -109,7 +118,9 @@ export const renderPipeline =
       for (const variant of variants) {
         if (variant) result = compile(variant);
         const out = variant ? `${base}-${variant}.mp4` : `${base}.mp4`;
-        await renderPicture(o.project, o.backend, id, dir, result.program, out, job, cancelSignal, (p) => update({ progress: +p.toFixed(3) }));
+        // A hook variant compiles to a different program: only the base render fans out.
+        const farm = variant ? undefined : o.farm && ((segments: SegmentPlan[], cacheDir: string) => o.farm!({ job, segments, cacheDir, signal }));
+        await renderPicture(o.project, o.backend, id, dir, result.program, out, job, cancelSignal, (p) => update({ progress: +p.toFixed(3) }), farm);
         files[variant ? `mp4-${variant}` : "mp4"] = out;
       }
       if (!files.mp4) files.mp4 = files[`mp4-${variants[0]}`]!;
@@ -145,29 +156,54 @@ export const renderPipeline =
 
 const statOut = (dir: string, file: string, kind: string): JobOutput => ({ file: path.relative(dir, file), type: TYPES[kind] ?? TYPES.mp4!, bytes: fs.statSync(file).size });
 
-const renderPicture = async (project: Project, backend: RenderBackend, id: string, dir: string, program: Program, out: string, job: Job, cancelSignal: ReturnType<typeof makeCancelSignal>["cancelSignal"], onProgress: (p: number) => void) => {
-  const draft = job.options.quality === "draft";
-  const look = { debug: job.options.debug, cancelSignal, onProgress, ...(draft ? { scale: 0.5, x264Preset: "ultrafast" as const } : {}) };
+type Farm = (segments: SegmentPlan[], cacheDir: string) => Promise<void>;
+type Look = NonNullable<Parameters<RenderBackend["renderSkit"]>[2]>;
+
+const lookOf = (job: Job, control: Pick<Look, "cancelSignal" | "onProgress"> = {}): Look => ({
+  debug: job.options.debug,
+  ...control,
+  ...(job.options.quality === "draft" ? { scale: 0.5, x264Preset: "ultrafast" as const } : {}),
+});
+
+const renderPicture = async (project: Project, backend: RenderBackend, id: string, dir: string, program: Program, out: string, job: Job, cancelSignal: ReturnType<typeof makeCancelSignal>["cancelSignal"], onProgress: (p: number) => void, farm?: Farm) => {
+  const look = lookOf(job, { cancelSignal, onProgress });
   const multi = job.options.sceneCache !== false && program.scenes.length > 1 && !job.options.debug;
   if (!multi) {
     await backend.renderSkit(id, out, look);
     return;
   }
   try {
-    await renderCached(project, backend, id, dir, program, out, look);
+    await renderCached(project, backend, id, dir, program, out, look, farm);
   } catch (e) {
     if (String(e).includes("cancelled")) throw e;
     await backend.renderSkit(id, out, look);
   }
 };
 
-const renderCached = async (project: Project, backend: RenderBackend, id: string, dir: string, program: Program, out: string, look: Parameters<RenderBackend["renderSkit"]>[2]) => {
+const cacheOf = (dir: string) => {
   const cache = path.join(dir, "..", "_cache");
   fs.mkdirSync(cache, { recursive: true });
+  return cache;
+};
+
+/**
+ * The program's segments; the same on every machine for the same skit, voice and engine. The job
+ * folder is left out of the hash (audio paths name it), so a fan-out worker's job finds the same ones.
+ */
+const segmentsOf = (project: Project, dir: string, id: string, program: Program): SegmentPlan[] => {
   const audio: Record<string, string> = {};
   const voiceDir = path.join(dir, "voice");
   if (fs.existsSync(voiceDir)) for (const name of fs.readdirSync(voiceDir)) audio[name] = String(fs.statSync(path.join(voiceDir, name)).size);
-  const plan = planSegments(program, catalogVersion(project), audio);
+  const portable = JSON.parse(JSON.stringify(program).replaceAll(`skits/${id}/`, "skits/~/")) as Program;
+  return planSegments(portable, catalogVersion(project), audio, CHUNK_FRAMES);
+};
+
+const renderCached = async (project: Project, backend: RenderBackend, id: string, dir: string, program: Program, out: string, look: Look, farm?: Farm) => {
+  const cache = cacheOf(dir);
+  const plan = segmentsOf(project, dir, id, program);
+  const missing = plan.filter((seg) => !fs.existsSync(path.join(cache, `${seg.hash}.mp4`)));
+  if (farm && missing.length)
+    await farm(missing, cache).catch((e) => console.warn(`fan-out failed, rendering here: ${e instanceof Error ? e.message : e}`));
   const parts: string[] = [];
   const hook = program.hook;
   if (hook) {
@@ -192,4 +228,25 @@ const concatMp4 = (root: string, parts: string[], out: string, trimFirstBodySec:
   });
   fs.writeFileSync(list, lines.join("\n"));
   execFileSync(path.join(root, "node_modules/.bin/remotion"), ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0", "-i", list, "-c", "copy", out], { stdio: ["ignore", "ignore", "pipe"] });
+};
+
+/**
+ * A fan-out worker's job: prep and compile the same submission, then render only the named
+ * segments (by hash) into the shared cache. Returns hash → file.
+ */
+export const renderSegments = async (o: { project: Project; backend: RenderBackend; prep: PrepRunner; skitIdOf: (jobId: string) => string }, job: Job, dir: string, hashes: readonly string[], signal: AbortSignal): Promise<Record<string, string>> => {
+  const id = o.skitIdOf(job.id);
+  await o.prep(id, signal);
+  const { program } = compileSkitIn(o.project, id, { lang: job.options.lang });
+  const plan = segmentsOf(o.project, dir, id, program);
+  const cache = cacheOf(dir);
+  const out: Record<string, string> = {};
+  for (const hash of hashes) {
+    const seg = plan.find((s) => s.hash === hash);
+    if (!seg) throw new JobFailure("render-failed", `no segment ${hash} in this program (engine or inputs differ from the coordinator's)`);
+    const file = path.join(cache, `${hash}.mp4`);
+    if (!fs.existsSync(file)) await o.backend.renderSkit(id, file, { ...lookOf(job), omitHook: true, frames: seg.frames });
+    out[hash] = file;
+  }
+  return out;
 };
