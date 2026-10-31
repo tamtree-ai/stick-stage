@@ -1,11 +1,9 @@
-# Unit tests, types and lint on every push and pull request. The quickstart workflow covers
-# the install-and-render path; this one is the fast check.
+# Unit tests, types and lint, run by hand (Actions → ci → Run workflow). The quickstart
+# workflow covers the install-and-render path; this one is the fast check.
 name: ci
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read

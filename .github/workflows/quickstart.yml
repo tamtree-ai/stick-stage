@@ -2,13 +2,8 @@
 # A red run blocks the release: the image job only publishes when the quickstart passed.
 name: quickstart
 
+# Run by hand only (Actions → quickstart → Run workflow). Pick a v* tag as the ref to publish.
 on:
-  push:
-    tags: ["v*"]
-  pull_request:
-    paths: [README.md, package.json, pnpm-lock.yaml, Dockerfile, "scripts/**", "src/node/**", ".github/**"]
-  schedule:
-    - cron: "0 6 * * 1" # Mondays: catches a moved download or a broken upstream release
   workflow_dispatch:
 
 permissions:
