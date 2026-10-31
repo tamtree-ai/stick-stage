@@ -20,6 +20,8 @@ import fennel from "./characters/fennel.json";
 import biscuit from "./characters/biscuit.json";
 import wren from "./characters/wren.json";
 import blip from "./characters/blip.json";
+import bram from "./characters/bram.json";
+import tess from "./characters/tess.json";
 
 import idle from "./poses/idle.json";
 import point from "./poses/point.json";
@@ -46,6 +48,7 @@ import thumbsUp from "./poses/thumbs-up.json";
 import { PROP_DOCS, PROP_IDS } from "./props";
 import miloJune from "./series/milo-june.json";
 import parkFables from "./series/park-fables.json";
+import whosWrong from "./series/whos-wrong.json";
 
 import neutral from "./expressions/neutral.json";
 import happy from "./expressions/happy.json";
@@ -114,7 +117,7 @@ export const EXPRESSION_IDS = ["neutral", "happy", "smug", "sarcastic", "annoyed
 export const EXTRA_EXPRESSION_IDS = ["skeptical", "worried", "embarrassed", "thinking", "laughing"];
 
 export const library: Library = createLibrary({
-  characters: [milo, june, lila, theo, moss, dash, reed, nell, pip, vera, gus, tofu, bobo, pim, mabel, otto, fennel, biscuit, wren, blip],
+  characters: [milo, june, lila, theo, moss, dash, reed, nell, pip, vera, gus, tofu, bobo, pim, mabel, otto, fennel, biscuit, wren, blip, bram, tess],
   poses: [idle, point, shrug, facepalm, armsUp, armsCrossed, think, leanIn, recoil, slump, handsOnHips, holdPhone, sit, holdOut, holdChest, holdUp, highFive, shove, faintPose, wavePose, thumbsUp],
   expressions: [neutral, happy, smug, sarcastic, annoyed, angry, shocked, sad, crying, cringe, confused, deadpan, skeptical, worried, embarrassed, thinking, laughing],
   props: PROP_DOCS,
@@ -157,6 +160,7 @@ export const catalog: Catalog = buildCatalog({ lib: library, sets, sfx: sfxLibra
 export const series: Readonly<Record<string, Series>> = {
   "milo-june": SeriesSchema.parse(migrate("series", miloJune).doc),
   "park-fables": SeriesSchema.parse(migrate("series", parkFables).doc),
+  "whos-wrong": SeriesSchema.parse(migrate("series", whosWrong).doc),
 };
 
 /** How each shipped character is played. A character with no entry is played straight. */

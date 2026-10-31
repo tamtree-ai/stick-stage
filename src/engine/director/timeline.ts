@@ -105,6 +105,17 @@ export type ListEvent = { items: string[]; at: number[]; to: number };
 /** A title card: the kicker from `kickerFrom`, title line `i` from `at[i]`, all until `to`. */
 export type CardEvent = { kicker?: string; lines: string[]; kickerFrom: number; at: number[]; to: number };
 
+/** The "Who's wrong?" meter: tips to `keys[i].value` (share blaming `sides[0]`) from `keys[i].frame`; the ask from `askFrom`. */
+export type VerdictEvent = {
+  question: string;
+  sides: [{ id: string; name: string }, { id: string; name: string }];
+  keys: { frame: number; value: number }[];
+  /** The question stamps in on frame 0, then shrinks into the header. */
+  intro: boolean;
+  ask?: string;
+  askFrom?: number;
+};
+
 export type Timeline = {
   schemaVersion: 1;
   title: string;
@@ -126,6 +137,7 @@ export type Timeline = {
   slams: SlamEvent[];
   lists: ListEvent[];
   card?: CardEvent;
+  verdict?: VerdictEvent;
   pages: CaptionPage[];
   /** Diagrams on the stage (absent when the scene has none). */
   figures?: FigureTrack[];
@@ -134,7 +146,7 @@ export type Timeline = {
   /** How narrator caption pages are drawn (skits with a narrator). */
   narratorCaption?: "italic" | "boxed";
   /** The style's targets, so QA checks the cut it was directed with. */
-  directing?: { id: string; closeupBudgetMs: number; minPunchGapMs: number; minCloseupMs: number; oneThingFrames: number; length: [number, number] };
+  directing?: { id: string; closeupBudgetMs: number; minPunchGapMs: number; minCloseupMs: number; oneThingFrames: number; length: [number, number]; pace?: "fast" };
   /** BCP 47. Captions and cards follow `direction`. */
   language?: string;
   direction?: "ltr" | "rtl";

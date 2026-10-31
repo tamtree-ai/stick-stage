@@ -63,6 +63,8 @@ export * from "./director/scene";
 export * from "./director/compile";
 export * from "./director/post";
 export * from "./qa";
+export * from "./qa/pace";
+export * from "./director/verdict";
 export * from "./templates";
 export * from "./writer";
 export * from "./series/schema";

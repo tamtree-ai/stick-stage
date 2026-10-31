@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "whos-wrong",
+  "title": "Who's Wrong?",
+  "cast": ["bram", "tess"],
+  "homeSets": ["cafe-1", "living-1", "kitchen-1", "office-1", "street-1"],
+  "coldOpen": "none",
+  "style": "argument",
+  "bible": "A petty everyday standoff where both sides have a point. The verdict meter (overlay.verdict) asks WHO'S WRONG? on frame 0; each strong point tips it with a beat's verdict (0-100, share blaming the left side); it ends near 50 with the comment ask. 18-28 s, 8-12 lines, lines under 10 words, a line ending in a dash gets cut off. The team writes the twist (the last line that flips sympathy); never copy a real Reddit post. Swap who started it each episode. No real people, no gender-war framing, no medical or legal advice."
+}

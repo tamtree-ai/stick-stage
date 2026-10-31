@@ -67,6 +67,12 @@ phrase by phrase and join with those silences (`pnpm voice:tts` does; see `perfo
 `scripts/lib/voice-tts.ts`). Prep finds the pauses by silence detection, so captions and mouths
 line up with them.
 
+**Pace.** A line may carry `pace: "fast"` when the skit's style (or its series' style) is a fast
+one (`argument`). `deliveryFor` then speeds the line up (×1.14, capped at 1.28), cuts every pause
+to 45 %, plays the mood a little bigger, and adds "keep it quick and punchy" to the acting
+direction. A harness voicing with its own TTS should honour `pace` the same way; a person
+recording should hear it as "no gaps, talk over the end of the other line".
+
 **Spoken forms and pronunciations.** A line from `skitLines` (and from `POST /validate`) may carry
 `spoken`: speak that instead of `text`, and return it in the manifest. Prep maps the spoken word
 timings back onto the caption's tokens, so subtitles highlight "ħ" while the voice says "h-bar". A

@@ -46,21 +46,35 @@ const MOODS: readonly [RegExp, Delivery][] = [
   [/angry|annoyed|furious|shout/, { speed: 1.05, pauseScale: 0.85, intensity: 0.75, direction: "Say this crossly, clipped and firm" }],
 ];
 
-export const deliveryFor = (line: { narrator?: boolean; expression?: string; delivery?: string }): Delivery => {
+/**
+ * `pace: "fast"` (the `argument` style): a shorts pace, ~180 wpm. Speed up, cut the pauses to under
+ * half, and play the mood a little bigger. The storybook pace above suits a narrated story, not a fight.
+ */
+export const FAST_PACE = { speedBy: 1.14, maxSpeed: 1.28, pauseBy: 0.45, intensityBy: 1.1, direction: "Keep it quick and punchy, like a real argument: no gaps, talk over the end of the other line" } as const;
+
+const fast = (d: Delivery): Delivery => ({
+  speed: +Math.min(FAST_PACE.maxSpeed, d.speed * FAST_PACE.speedBy).toFixed(3),
+  pauseScale: +(d.pauseScale * FAST_PACE.pauseBy).toFixed(3),
+  intensity: +Math.min(1, d.intensity * FAST_PACE.intensityBy).toFixed(3),
+  direction: `${d.direction}. ${FAST_PACE.direction}`,
+});
+
+export const deliveryFor = (line: { narrator?: boolean; expression?: string; delivery?: string; pace?: "normal" | "fast" }): Delivery => {
   const cue = `${line.delivery ?? ""} ${line.expression ?? ""}`.toLowerCase();
   const mood = MOODS.find(([re]) => re.test(cue))?.[1];
-  if (line.narrator)
-    return mood
+  const base = line.narrator
+    ? mood
       ? { speed: Math.min(NARRATOR.speed, mood.speed), pauseScale: Math.max(NARRATOR.pauseScale, mood.pauseScale), intensity: Math.min(mood.intensity, 0.65), direction: `${NARRATOR.direction}; ${mood.direction.replace(/^Say this /, "")}` }
-      : NARRATOR;
-  return mood ?? NEUTRAL;
+      : NARRATOR
+    : (mood ?? NEUTRAL);
+  return line.pace === "fast" ? fast(base) : base;
 };
 
 /**
  * The text to send a style-prompted TTS (Gemini TTS: "Say cheerfully: Have a wonderful day!"):
  * the acting direction, then the words to say. The line's caption `text` stays as it is.
  */
-export const performedText = (line: { text: string; spoken?: string; narrator?: boolean; expression?: string; delivery?: string }): string => `${deliveryFor(line).direction}: ${line.spoken ?? line.text}`;
+export const performedText = (line: { text: string; spoken?: string; narrator?: boolean; expression?: string; delivery?: string; pace?: "normal" | "fast" }): string => `${deliveryFor(line).direction}: ${line.spoken ?? line.text}`;
 
 /**
  * Phrases of a line: breaks after , ; : — … . ! ? (a run like "?!" or "..." stays together).

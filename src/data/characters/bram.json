@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "bram",
+  "displayName": "Bram",
+  "proportions": { "height": 1.04, "headRadius": 0.165, "neck": 0.02, "torso": 0.28, "upperArm": 0.15, "forearm": 0.14, "thigh": 0.17, "shin": 0.18 },
+  "style": {
+    "stroke": "#1b1b1f",
+    "strokeWidth": 12,
+    "headFill": "#ffffff",
+    "torso": { "style": "bean", "fill": "#f2b84b", "width": 0.15 },
+    "limbCurve": 0.3,
+    "hands": "nub",
+    "feet": "oval",
+    "footFill": "#1b1b1f"
+  },
+  "face": { "eyes": "big-pupil", "brows": true, "mouthSet": "default", "offsetX": 0.14, "eyeSpacing": 0.46, "eyeY": -0.04, "mouthY": 0.44 },
+  "accessories": [{ "slot": "hair", "id": "spikes-01", "color": "#2b2b33" }],
+  "voice": { "say": "Fred" }
+}
